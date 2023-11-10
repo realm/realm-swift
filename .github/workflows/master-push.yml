@@ -1,0 +1,570 @@
+name: Prepare Release
+on:
+  push:
+    branches:
+      - "master"
+env:
+  XCODE_VERSION: "['14.1', '14.2', '14.3.1', '15.0.1', '15.1']"
+  PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
+  BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst']"
+  DOC_VERSION: '14.3.1'
+  JAZZY_VERSION: '0.14.4'
+  XCFRAMEWORK_VERSION: '15.0.1'
+  CARTHAGE_VERSION: '15.1'
+  VISION_VERSION: '15.1'
+  REALM_VERSION: '15.1'
+  TEST_VERSION: '15.0.1'
+jobs:
+  cleanup: # Cleanups before running the workflow
+      runs-on: ubuntu-latest
+      steps:      
+        - name: Cleanup cache after everything is stored in the artifact repo
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            REPO: ${{ github.repository }}
+            BRANCH: ${{ github.ref_name }}
+          run: |
+            gh extension install actions/gh-actions-cache
+            cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH -L 100 | cut -f 1 )
+                  
+            ## Setting this to not fail the workflow while deleting cache keys. 
+            set +e
+        
+            for cacheKey in $cacheKeysForPR
+            do
+              gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+            done
+  prepare:
+      runs-on: ubuntu-latest
+      name: Prepare outputs
+      needs: [cleanup]
+      outputs:
+        XCODE_VERSIONS_MATRIX: ${{ env.XCODE_VERSION }}
+        BUILD_PLATFORM_MATRIX: ${{ env.BUILD_PLATFORM }}
+        PLATFORM_MATRIX: ${{ env.PLATFORM }}
+        VERSION: ${{ steps.get-version.outputs.VERSION }}
+      steps:
+        - name: Compute outputs
+          run: |
+            echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
+            echo "PLATFORM_MATRIX=${{ env.PLATFORM }}" >> $GITHUB_OUTPUT
+            echo "BUILD_PLATFORM_MATRIX=${{ env.BUILD_PLATFORM }}" >> $GITHUB_OUTPUT
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Read SDK version
+          id: get-version
+          run: |
+            version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${GITHUB_WORKSPACE}/dependencies.list")"
+            echo "VERSION=$version" >> $GITHUB_OUTPUT
+  build-docs:
+      runs-on: macos-13
+      name: Package docs
+      needs: prepare
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Install Jazzy
+          run: gem install jazzy -v ${{ env.JAZZY_VERSION }} # This is only used once, no need to cache this
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.DOC_VERSION }}
+        - name: Prepare docs for packaging
+          run: sh -x build.sh release-package-docs
+        - name: Upload docs to artifacts library
+          uses: actions/upload-artifact@v3
+          with:
+            name: realm-docs
+            path: docs/realm-docs.zip
+  build-examples:
+      runs-on: macos-13
+      name: Package examples
+      needs: prepare
+      steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+          - name: Prepare examples for packaging
+            run: sh -x build.sh release-package-examples
+          - name: Cache examples
+            uses: actions/cache/save@v3
+            with:
+              path: |
+                realm-examples.zip
+              key: realm-examples
+              enableCrossOsArchive: true
+  build-product: # Creates framework for each platform, xcode version, target and configuration
+      runs-on: macos-13
+      name: Package framework 
+      needs: prepare
+      strategy:
+        max-parallel: 10
+        matrix:
+          platform: ${{ fromJSON(needs.prepare.outputs.BUILD_PLATFORM_MATRIX) }}
+          target: [RealmSwift, Realm]
+          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
+          configuration: [release, static]
+          exclude:
+            - platform: osx
+              configuration: static
+            - platform: tvos
+              configuration: static
+            - platform: watchos
+              configuration: static
+            - platform: catalyst
+              configuration: static
+            - platform: tvossimulator
+              configuration: static
+            - platform: watchossimulator
+              configuration: static
+            - target: RealmSwift
+              configuration: static
+          include: 
+            - platform: visionos
+              target: Realm
+              xcode-version: 15.1
+              configuration: release
+            - platform: visionos
+              target: RealmSwift
+              xcode-version: 15.1
+              configuration: release
+            - platform: visionossimulator
+              target: Realm
+              xcode-version: 15.1
+              configuration: release
+            - platform: visionossimulator
+              target: RealmSwift
+              xcode-version: 15.1
+              configuration: release
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Get Token
+          id: token
+          uses: yuki0n0/action-appstoreconnect-token@v1.0
+          with:
+            # UUID. Can get from App Store Connect.
+            issuer id: ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }}
+            # Key ID. Can get from App Store Connect.
+            key id: ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }}
+            # P8 private key. Can get from App Store Connect.
+            key:  ${{ secrets.APPLE_STORE_CONNECT_API_KEY }}
+        - name: Creates on demand XCode Cloud's workflows with a build action for ${{ matrix.platform }} in ${{ matrix.xcode-version }} with configuration ${{ matrix.configuration }}
+          id: create-workflow
+          run: |
+            workflow_id=$(echo $(ruby ./scripts/xcode_cloud_helper.rb create-release-workflow "${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.configuration }}" -t ${{ steps.token.outputs.token }} --xcode-version ${{ matrix.xcode-version }}))
+            echo "WORKFLOW_ID=$workflow_id" >> $GITHUB_OUTPUT
+        - name: Runs the XCode Cloud workflow created by the previous step
+          id: build-run
+          run: |
+            build_run_id=$(echo $(ruby ./scripts/xcode_cloud_helper.rb build-workflow ${{ steps.create-workflow.outputs.WORKFLOW_ID }} ${{ github.ref_name }} -t ${{ steps.token.outputs.token }}))
+            echo "BUILD_RUN_ID=$build_run_id" >> $GITHUB_OUTPUT
+        - name: Check build status and wait for it to finish
+          run: |
+            ruby ./scripts/xcode_cloud_helper.rb wait-build ${{ steps.create-workflow.outputs.WORKFLOW_ID }} --t ${{ steps.token.outputs.token }}
+        - name: Download package from XCode Cloud artifacts ${{ matrix.platform }} in ${{ matrix.xcode-version }} with configuration ${{ matrix.configuration }}
+          run: |
+            ruby ./scripts/xcode_cloud_helper.rb download-artifact ${{ steps.build-run.outputs.BUILD_RUN_ID }} --t ${{ steps.token.outputs.token }}
+        - name: Download package from XCode Cloud artifacts ${{ matrix.platform }} in ${{ matrix.xcode-version }} with configuration ${{ matrix.configuration }}
+          run: |
+            mv product.zip package-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}.zip
+        - name: Cache build product
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              package-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}.zip
+            key: ${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}
+            enableCrossOsArchive: true
+  # build-product: # Creates framework for each platform, xcode version, target and configuration
+  #     runs-on: macos-13
+  #     name: Package framework 
+  #     needs: prepare
+  #     strategy:
+  #       max-parallel: 10
+  #       matrix:
+  #         platform: ${{ fromJSON(needs.prepare.outputs.BUILD_PLATFORM_MATRIX) }}
+  #         target: [RealmSwift, Realm]
+  #         xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
+  #         configuration: [release, static]
+  #         exclude:
+  #           - platform: osx
+  #             configuration: static
+  #           - platform: tvos
+  #             configuration: static
+  #           - platform: watchos
+  #             configuration: static
+  #           - platform: catalyst
+  #             configuration: static
+  #           - platform: tvossimulator
+  #             configuration: static
+  #           - platform: watchossimulator
+  #             configuration: static
+  #           - target: RealmSwift
+  #             configuration: static
+  #         include: 
+  #           - platform: visionos
+  #             target: Realm
+  #             xcode-version: 15.1
+  #             configuration: release
+  #           - platform: visionos
+  #             target: RealmSwift
+  #             xcode-version: 15.1
+  #             configuration: release
+  #           - platform: visionossimulator
+  #             target: Realm
+  #             xcode-version: 15.1
+  #             configuration: release
+  #           - platform: visionossimulator
+  #             target: RealmSwift
+  #             xcode-version: 15.1
+  #             configuration: release
+  #     steps:
+  #       - name: Checkout
+  #         uses: actions/checkout@v4
+  #       - uses: maxim-lobanov/setup-xcode@v1
+  #         with:
+  #           xcode-version: ${{ matrix.xcode-version }}
+  #       - name: Create framework
+  #         run: |
+  #           sh -x build.sh release-build_${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}
+  #       - name: Cache build product
+  #         uses: actions/cache/save@v3
+  #         with:
+  #           path: |
+  #             package-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}.zip
+  #           key: ${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}
+  #           enableCrossOsArchive: true
+  package-xcframework-platform: # Creates xcframework for each platform and xcode version
+      runs-on: macos-13
+      name: Package xcframework for platform
+      needs: [build-product, prepare]
+      strategy:
+        matrix:
+          platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
+          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
+          exclude:
+            - platform: visionos
+              xcode-version: 14.1
+            - platform: visionos
+              xcode-version: 14.2
+            - platform: visionos
+              xcode-version: 14.3.1
+            - platform: visionos
+              xcode-version: 15.0.1
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.XCFRAMEWORK_VERSION }} 
+        - name: Restore package Realm release
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              package-${{ matrix.platform }}-${{ matrix.xcode-version }}-Realm-release.zip
+            key: ${{ matrix.platform }}-${{ matrix.xcode-version }}-Realm-release
+        - name: Restore package RealmSwift release
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              package-${{ matrix.platform }}-${{ matrix.xcode-version }}-RealmSwift-release.zip
+            key: ${{ matrix.platform }}-${{ matrix.xcode-version }}-RealmSwift-release
+        - name: Restore package Realm release for simulator
+          uses: actions/cache/restore@v3
+          if: ${{ matrix.platform == 'ios' }} || ${{ matrix.platform == 'tvos' }} || ${{ matrix.platform == 'watchos' }} || ${{ matrix.platform == 'visionos' }}
+          with:
+            path: |
+              package-${{ matrix.platform }}simulator-${{ matrix.xcode-version }}-Realm-release.zip
+            key: ${{ matrix.platform }}simulator-${{ matrix.xcode-version }}-Realm-release
+        - name: Restore package RealmSwift release for simulator
+          uses: actions/cache/restore@v3
+          if: ${{ matrix.platform == 'ios' }} || ${{ matrix.platform == 'tvos' }} || ${{ matrix.platform == 'watchos' }} || ${{ matrix.platform == 'visionos' }}
+          with:
+            path: |
+              package-${{ matrix.platform }}simulator-${{ matrix.xcode-version }}-RealmSwift-release.zip
+            key: ${{ matrix.platform }}simulator-${{ matrix.xcode-version }}-RealmSwift-release
+        - name: Restore package Realm static
+          uses: actions/cache/restore@v3
+          if: ${{ matrix.platform == 'ios' }}
+          with:
+            path: |
+              package-${{ matrix.platform }}-${{ matrix.xcode-version }}-Realm-static.zip
+            key: ${{ matrix.platform }}-${{ matrix.xcode-version }}-Realm-static
+        - name: Restore package Realm static for simulator
+          uses: actions/cache/restore@v3
+          if: ${{ matrix.platform == 'ios' }}
+          with:
+            path: |
+              package-${{ matrix.platform }}simulator-${{ matrix.xcode-version }}-Realm-static.zip
+            key: ${{ matrix.platform }}simulator-${{ matrix.xcode-version }}-Realm-static
+        - name: Create xcframework
+          run: |
+            sh -x build.sh release-create-xcframework_${{ matrix.xcode-version }} ${{ matrix.platform }}
+        - name: Cache xcframework product
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              realm-${{ matrix.platform }}-${{ matrix.xcode-version }}.zip
+            key: realm-${{ matrix.platform }}-${{ matrix.xcode-version }}
+            enableCrossOsArchive: true
+  create-package-version: # Cretes a release package for each xcode version
+      runs-on: macos-13
+      name: Package release for each xcode version
+      needs: [package-xcframework-platform, prepare]
+      strategy:
+        matrix:
+          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.XCFRAMEWORK_VERSION }} 
+        - name: Restore ios xcframework
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-ios-${{ matrix.xcode-version }}.zip
+            key: realm-ios-${{ matrix.xcode-version }}
+        - name: Restore osx xcframework
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-osx-${{ matrix.xcode-version }}.zip
+            key: realm-osx-${{ matrix.xcode-version }}
+        - name: Restore tvos xcframework
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-tvos-${{ matrix.xcode-version }}.zip
+            key: realm-tvos-${{ matrix.xcode-version }}
+        - name: Restore watchos xcframework
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-watchos-${{ matrix.xcode-version }}.zip
+            key: realm-watchos-${{ matrix.xcode-version }}
+        - name: Restore catalyst xcframework
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-catalyst-${{ matrix.xcode-version }}.zip
+            key: realm-catalyst-${{ matrix.xcode-version }}
+        - name: Restore visionos xcframework
+          uses: actions/cache/restore@v3
+          if: ${{ matrix.xcode-version == env.VISION_VERSION }}
+          with:
+            path: |
+              realm-visionos-${{ matrix.xcode-version }}.zip
+            key: realm-visionos-${{ matrix.xcode-version }}
+        - name: Restore packaged examples
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-examples.zip
+            key: realm-examples
+        - name: Package release
+          run: |
+            sh -x build.sh release-create-version-package_${{ matrix.xcode-version }} ${{ env.REALM_VERSION }}
+        - name: Cache package for xcode version
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              realm-swift-${{ needs.prepare.outputs.VERSION }}-${{ matrix.xcode-version }}.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}-${{ matrix.xcode-version }}
+            enableCrossOsArchive: true
+        - name: Upload RealmSwift SPM for ${{ matrix.xcode-version }} to artifacts library
+          uses: actions/upload-artifact@v3
+          with:
+            name: RealmSwift@${{ matrix.xcode-version }}.spm
+            path: RealmSwift@${{ matrix.xcode-version }}.spm.zip
+        - name: Upload Realm SPM for ${{ matrix.xcode-version }} to artifacts library
+          uses: actions/upload-artifact@v3
+          if: ${{ matrix.xcode-version == env.REALM_VERSION }}
+          with:
+            name: Realm.spm
+            path: Realm.spm.zip
+        - name: Upload Carthage xcframework for ${{ matrix.xcode-version }} to artifacts library
+          uses: actions/upload-artifact@v3
+          if: ${{ matrix.xcode-version == env.CARTHAGE_VERSION }}
+          with:
+            name: Carthage.xcframework
+            path: Carthage.xcframework.zip
+  create-final-package: # Cretes a final package
+      runs-on: macos-13
+      name: Package final package
+      needs: [create-package-version, prepare]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.XCFRAMEWORK_VERSION }}
+        - name: Restore release for 14.1
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-swift-${{ needs.prepare.outputs.VERSION }}-14.1.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}-14.1
+        - name: Restore release for 14.2
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-swift-${{ needs.prepare.outputs.VERSION }}-14.2.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}-14.2
+        - name: Restore release for 14.3.1
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-swift-${{ needs.prepare.outputs.VERSION }}-14.3.1.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}-14.3.1
+        - name: Restore release for 15.0.1
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-swift-${{ needs.prepare.outputs.VERSION }}-15.0.1.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}-15.0.1
+        - name: Restore release for 15.1
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-swift-${{ needs.prepare.outputs.VERSION }}-15.1.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}-15.1
+        - name: Package release
+          run: |
+            sh -x build.sh release-create-final-package
+        - name: Cache release package for testing
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}
+            enableCrossOsArchive: true
+        - name: Upload release final package
+          uses: actions/upload-artifact@v3
+          with:
+              name: realm-swift-${{ needs.prepare.outputs.VERSION }}
+              path: realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
+  test-package-examples:
+      runs-on: macos-13
+      name: Test examples
+      needs: [create-final-package, prepare]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.TEST_VERSION }}
+        - name: Restore release
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+                realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
+            key: realm-swift-${{ needs.prepare.outputs.VERSION }}
+        - name: Test examples
+          run: |
+            sh -x build.sh release-test-examples
+  test-ios-static:
+      runs-on: macos-13
+      name: Run tests on iOS with configuration Static
+      needs: create-final-package
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.TEST_VERSION }}
+        - name: Test ios static
+          run: |
+            sh -x build.sh test-ios-static
+  test-osx-static:
+      runs-on: macos-13
+      name: Run tests on macOS
+      needs: create-final-package
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.TEST_VERSION }}
+        - name: Test osx static
+          run: |
+            export REALM_DISABLE_METADATA_ENCRYPTION=1
+            sh -x build.sh test-osx
+  test-installation:
+      runs-on: macos-13
+      name: Run installation test
+      needs: [create-final-package, prepare]
+      strategy:
+        matrix:
+          platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
+          installation: [cocoapods, spm, carthage, xcframework]
+          linkage: [dynamic, static]
+          exclude:
+            - platform: visionos
+            - platform: catalyst
+              installation: carthage
+            - installation: carthage
+              linkage: static
+            - installation: xcframework
+              linkage: static
+          include:
+            - platform: ios
+              installation: xcframework
+              linkage: static
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.TEST_VERSION }}
+        - name: Install FileUtils
+          run: gem install fileutils
+        - name: Restore release
+          uses: actions/cache/restore@v3
+          if: ${{ matrix.installation == 'xcframework' }}
+          with:
+            path: |
+              realm-${{ matrix.platform }}-${{ env.TEST_VERSION }}.zip
+            key: realm-${{ matrix.platform }}-${{ env.TEST_VERSION }}
+        - name: Unzip package release
+          if: ${{ matrix.installation == 'xcframework' }}
+          run: |
+            mkdir -p build
+            unzip realm-${{ matrix.platform }}-${{ env.TEST_VERSION }}.zip -d build
+        - name: Run installation test
+          run: | 
+            echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            cd examples/installation
+            ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
+  test-installation-xcframework:
+      runs-on: macos-13
+      name: Run installation test for xcframework
+      needs: [create-final-package, prepare]
+      env:
+        PLATFORM: 'osx'
+      strategy:
+        matrix:
+          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Install FileUtils
+          run: gem install fileutils
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ matrix.xcode-version }}
+        - name: Restore release
+          uses: actions/cache/restore@v3
+          with:
+            path: |
+              realm-${{ env.PLATFORM }}-${{ matrix.xcode-version }}.zip
+            key: realm-${{ env.PLATFORM }}-${{ matrix.xcode-version }}
+        - name: Unzip package release
+          run: |
+            mkdir -p build
+            unzip realm-${{ env.PLATFORM }}-${{ matrix.xcode-version }}.zip -d build
+        - name: Run installation test
+          run: |
+            echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            cd examples/installation
+            ./build.rb osx xcframework dynamic
+        

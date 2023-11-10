@@ -1,0 +1,177 @@
+name: Publish release
+on: workflow_dispatch
+env:
+  XCODE_VERSION: "['14.1', '14.2', '14.3.1', '15.0.1', '15.1']"
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare outputs
+    outputs:
+      XCODE_VERSIONS_MATRIX: ${{ env.XCODE_VERSION }}
+      VERSION: ${{ steps.get-version.outputs.VERSION }}
+    steps:
+      - name: Compute outputs
+        run: |
+          echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
+      - name: Read SDK version
+        id: get-version
+        run: |
+          version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${GITHUB_WORKSPACE}/dependencies.list")"
+          echo "VERSION=$version" >> $GITHUB_OUTPUT
+  tag-release:
+      runs-on: ubuntu-latest
+      name: Tag Release
+      needs: prepare
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - uses: rickstaa/action-create-tag@v1
+          id: "tag_create"
+          with:
+            tag: "v${{ needs.prepare.outputs.VERSION }}"
+            tag_exists_error: false
+            message: ""
+  publish-docs:
+      runs-on: macos-latest
+      name: Publish docs to S3 Bucket
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Install ruby
+          uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+          with:
+            ruby-version: '3.1.2'
+            bundler-cache: true
+        - name: Download docs artifact
+          uses: dawidd6/action-download-artifact@v3
+          with:
+            workflow: master-push.yml
+            commit: ${{ github.sha }}
+            name: realm-docs
+            workflow_conclusion: completed
+        - name: Unzip docs
+          run: |
+              unzip realm-docs.zip
+        - name: Publish docs
+          run: |
+              sh -x build.sh publish-docs
+  create-release:
+      runs-on: macos-latest
+      name: Create github release
+      needs: tag-release
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Install ruby
+          uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+          with:
+            ruby-version: '3.1.2'
+            bundler-cache: true
+        - name: Export GITHUB_TOKEN to workspace
+          run: echo "GITHUB_ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+        - name: Download all artifacts
+          uses: dawidd6/action-download-artifact@v3
+          with:
+            workflow: master-push.yml
+            commit: ${{ github.sha }}
+            path: ${{ github.workspace }}/release_pkg
+            workflow_conclusion: completed
+        - name: Create Github release
+          run: ./build.sh publish-github
+  publish-cocoapods:
+      runs-on: macos-latest
+      name: Publish Cocoapods specs
+      needs: [tag-release, prepare]
+      env:
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Install ruby
+          uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+          with:
+            ruby-version: '3.1.2'
+            bundler-cache: true
+        - name: Publish 
+          run: ./build.sh publish-cocoapods v${{ needs.prepare.outputs.VERSION }}
+  update-checker:
+      runs-on: macos-latest
+      name: Update to latest version update checker file
+      needs: tag-release
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.UPDATE_CHECKER_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.UPDATE_CHECKER_SECRET_KEY }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Install ruby
+          uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+          with:
+            ruby-version: '3.1.2'
+            bundler-cache: true
+        - name: Create Github release
+          run: ./build.sh publish-update-checker
+  test-installation:
+      runs-on: macos-13
+      name: Run installation test for ${{ matrix.platform }}, ${{ matrix.installation }} and ${{ matrix.linkage }}
+      needs: [update-checker, prepare]
+      env:
+        XCODE_VERSION: '15.1'
+      strategy:
+        max-parallel: 5
+        matrix:
+          platform: [ios, osx, watchos, tvos, catalyst, visionos]
+          installation: [cocoapods, spm, carthage, xcframework]
+          linkage: [static, dynamic]
+          exclude:
+            - installation: carthage
+              linkage: static
+            - platform: osx
+              installation: xcframework
+              linkage: static
+            - platform: watchos
+              installation: xcframework
+              linkage: static
+            - platform: tvos
+              installation: xcframework
+              linkage: static
+            - platform: catalyst
+              installation: xcframework
+              linkage: static
+            - platform: visionos
+              installation: xcframework
+              linkage: static
+            - platform: catalyst
+              installation: carthage
+              linkage: static
+            - platform: visionos
+              installation: carthage
+            - platform: visionos
+              installation: cocoapods
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Run installation test
+          run: |
+            echo "REALM_TEST_RELEASE=${{ needs.prepare.outputs.VERSION }}" >> $GITHUB_OUTPUT
+            cd examples/installation
+            ./build.rb ${{ matrix.xcode-version }} ${{ matrix.installation }} ${{ matrix.linkage }}
+  post-slack-release:
+      runs-on: macos-latest
+      name: Publish to release Slack channel
+      needs: [test-installation, prepare]
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Prepare Changelog
+          run: ./build.sh prepare-publish-changelog
+        - name: 'Post to #realm-releases'
+          uses: realm/ci-actions/release-to-slack@v3
+          with:
+            changelog: ExtractedChangelog/CHANGELOG.md
+            sdk: Swift
+            webhook-url: ${{ secrets.SLACK_RELEASE_WEBHOOK }}
+            version: ${{ needs.prepare.outputs.VERSION }}

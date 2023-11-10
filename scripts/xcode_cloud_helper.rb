@@ -8,12 +8,18 @@ require 'optparse'
 require 'pp'
 require 'uri'
 require_relative "pr-ci-matrix"
+require_relative "release-matrix"
 
 include Workflows
 
 APP_STORE_URL = 'https://api.appstoreconnect.apple.com/v1'
 HTTP = Net::HTTP.new('api.appstoreconnect.apple.com', 443)
 HTTP.use_ssl = true
+
+def sh(*args)
+    puts "executing: #{args.join(' ')}" if false
+    system(*args, false ? {} : {:out => '/dev/null'}) || exit(1)
+end
 
 def request(req)
     req['Authorization'] = "Bearer #{JWT_TOKEN}"
@@ -92,14 +98,40 @@ def get_xcode_versions
     }]
 end
 
+def get_build_actions(build_run)
+    get("/ciBuildRuns/#{build_run}/actions")['data'].map do |build_run|
+        {
+            id: build_run['id'],
+        }
+    end
+end
+
+def get_artifacts(build_action)
+    get("/ciBuildActions/#{build_action}/artifacts")['data'].map do |artifact|
+    {
+        id: artifact['id'],
+    }
+end
+
+def get_git_references
+    get("/scmRepositories/#{get_realm_repository_id}/gitReferences?limit=200")
+end
+
 def get_workflow_info(id)
     get("ciWorkflows/#{id}")
+end
+
+def get_build_info(id)
+    get("/ciBuildRuns/#{id}")
+end
+
+def get_artifact_info(id)
+    get("/ciArtifacts/#{id}")
 end
 
 def create_workflow(target, xcode_version)
     result = post('ciWorkflows', create_workflow_request(target, xcode_version))
     id = result["data"]["id"]
-    puts "#{result['data']['attributes']['name']}: https://appstoreconnect.apple.com/teams/69a6de86-7f37-47e3-e053-5b8c7c11a4d1/frameworks/#{get_realm_product_id}/workflows/#{id}"
     return id
 end
 
@@ -182,10 +214,38 @@ def delete_workflow(id)
     req = Net::HTTP::Delete.new("/v1/ciWorkflows/#{id}")
     req['Content-type'] = 'application/json'
     response = request req
-    puts "Workflow deleted #{id}"
+end
+
+def start_build(id, branch)
+    url = "#{APP_STORE_URL}/ciBuildRuns"
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(uri)
+    request["Authorization"] = "Bearer #{JWT_BEARER}"
+    request["Content-type"] = "application/json"
+    branch_id = find_git_reference_for_branch(branch)
+    data =
+    {
+        "type" => "ciBuildRuns",
+        "attributes" => { "clean" => true },
+        "relationships" => { "workflow" => { "data" => { "type" => "ciWorkflows", "id" => id }},
+                            "sourceBranchOrTag" => { "data" => { "type" => "scmGitReferences", "id" => branch_id }}}
+    }
+    body = { "data" => data }
+    request.body = body.to_json
+    response = http.request(request)
+    if response.code == "201"
+        result = JSON.parse(response.body)
+        build_id = result["data"]["id"]
+        return build_id
+    else
+        raise "Error: #{response.code} #{response.body}"
+    end
 end
 
 def start_build(id)
+    branch_id = find_git_reference_for_branch(branch)
     result = post('ciBuildRuns', {
         data: {
             type: 'ciBuildRuns',
@@ -195,6 +255,12 @@ def start_build(id)
                     data: {
                         type: 'ciWorkflows',
                         id: id
+                    }
+                },
+                sourceBranchOrTag: {
+                    data: {
+                        type: 'scmGitReferences',
+                        id: branch_id
                     }
                 }
             }
@@ -266,11 +332,97 @@ def synchronize_workflows()
     end
 
     workflows_to_create.each { |w|
-        create_workflow(w[:target], w[:version])
+        id = create_workflow(w[:target], w[:version])
+        puts "#{result['data']['attributes']['name']}: https://appstoreconnect.apple.com/teams/69a6de86-7f37-47e3-e053-5b8c7c11a4d1/frameworks/#{get_realm_product_id}/workflows/#{id}"
     }
     workflows_to_remove.each { |w|
         delete_workflow(w[:id])
+        puts "Workflow deleted #{w[:name]}"
     }
+end
+
+def create_release_workflow(platform, xcode_version, target, configuration)
+    target = ReleaseTarget.new("release-package-build-#{configuration}", target, platform)
+    return create_workflow_request(target, xcode_version)
+end
+
+def wait_build(build_run)
+    begin
+        build_state = get_build_info(build_run)
+        result = JSON.parse(build_state)
+        status = result["data"]["attributes"]["executionProgress"]
+        puts "Current status #{status}"
+        puts 'Waiting'
+        if status == 'COMPLETE'
+            completed = true
+        end
+    end until completed == true or not sleep 20
+    
+    build_state = get_build_info(build_run)
+    result = JSON.parse(build_state)
+    completion_status = result["data"]["attributes"]["completionStatus"]
+    get_logs_for_build(build_run)
+    if completion_status != 'SUCCEEDED'
+       puts "Completion status #{completion_status}"
+       raise "Error running build"
+    end
+    return
+end
+
+def get_logs_for_build(build_run)
+    actions = get_build_actions(build_run)
+    artifacts = get_artifacts(actions[0]["id"]) # we are only running one actions, so we use the first one in the list
+    artifact_url = ''
+    artifacts.each { |artifact| 
+        artifact_info = get_artifact_info(artifact['id'])
+        result = JSON.parse(artifact_info)
+        if result["data"]["attributes"]["fileName"].include? 'Logs' 
+            artifact_url = result["data"]["attributes"]["downloadUrl"]
+        end
+    }
+    print_logs(artifact_url)
+end
+
+def print_logs(url)
+    sh 'curl', '--output', 'logs.zip', "#{url}"
+    sh 'unzip', "logs.zip"
+    log_files = Dir["RealmSwift*/*.log"]
+    log_files.each { |log_file| 
+        text = File.readlines("#{log_file}").map do |line|
+            puts line
+        end
+    }   
+end
+
+def find_git_reference_for_branch(branch)
+    next_page = ''
+    references = get_git_references
+    branch_reference = references["data"].find { |reference| 
+        reference["attributes"]["kind"] == "BRANCH" && reference["attributes"]["name"] == branch 
+    }    
+    while branch_reference == nil || next_page == nil
+        next_page = references["links"]["next"]
+        next_page.slice!(APP_STORE_URL)
+        next_results = get(next_page)
+        references = JSON.parse(next_results.body)
+        branch_reference = references["data"].find { |reference| reference["attributes"]["kind"] == "BRANCH" && reference["attributes"]["name"] == branch } 
+    end
+    return branch_reference["id"]
+end
+
+def download_artifact_for_build(build_id_run)
+    actions = get_build_actions(build_id_run)
+    artifacts = get_artifacts(actions[0]["id"]) # One actions per workflow
+    artifact_url = ''
+    artifacts.each { |artifact| 
+        artifact_info = get_artifact_info(artifact['id'])
+        result = JSON.parse(artifact_info)
+        if result["data"]["attributes"]["fileName"].include? 'Products' 
+            artifact_url = result["data"]["attributes"]["downloadUrl"]
+        end
+    }
+
+    sh 'curl', '--output', "product.zip", "#{artifact_url}"
 end
 
 $xcode_ids = nil
@@ -394,8 +546,24 @@ when 'synchronize-workflows'
     synchronize_workflows()
 when 'build-workflow'
     workflow_id = ARGV.shift
+    branch = ARGV.shift
     usage unless workflow_id
-    start_build(workflow_id)
+    id = start_build(workflow_id)
+    puts "#{id}"
+when 'create-release-workflow'
+    platform = ARGV.shift
+    xcode_version = ARGV.shift
+    target = ARGV.shift
+    configuration = ARGV.shift
+    usage unless workflow_id
+    id = create_release_workflow(platform, xcode_version, target, configuration)
+    puts "#{id}"
+when 'wait-build'
+    build_id = ARGV.shift
+    wait_build(build_id)
+when 'download-artifact'
+    build_id = ARGV.shift
+    download_artifact_for_build(build_id)
 when 'get-token'
     pp JWT_TOKEN
 end
