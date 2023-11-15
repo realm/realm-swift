@@ -8,7 +8,9 @@ x.y.z Release notes (yyyy-MM-dd)
   making any changes is now actually allowed. This was supposed to be allowed
   in 10.39.1, but it did not actually work due to some redundant validation.
 * `SyncSession.ProgressDirection` and `SyncSession.ProgressMode` were missing
-  `Sendable` annotations.
+  `Sendable` annotations ([PR #8435](https://github.com/realm/realm-swift/pull/8435)).
+* `Realm.Error.subscriptionFailed` was reported with the incorrect error
+  domain, making it impossible to catch (since v10.42.2, [PR #8435](https://github.com/realm/realm-swift/pull/8435)).
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.

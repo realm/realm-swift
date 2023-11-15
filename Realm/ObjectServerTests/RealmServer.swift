@@ -143,7 +143,7 @@ typealias Json = Any
 #endif
 
 private extension ObjectSchema {
-    func stitchRule(_ partitionKeyType: String?, id: String? = nil) -> [String: Json] {
+    func stitchRule(_ partitionKeyType: String?, id: String? = nil, appId: String) -> [String: Json] {
         var stitchProperties: [String: Json] = [:]
 
         // We only add a partition property for pbs
@@ -165,7 +165,7 @@ private extension ObjectSchema {
             } else if id != nil {
                 stitchProperties[property.columnName] = property.stitchRule(self)
                 relationships[property.columnName] = [
-                    "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!)",
+                    "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!) \(appId)",
                     "foreign_key": "_id",
                     "is_list": property.isArray || property.isSet || property.isMap
                 ]
@@ -184,7 +184,7 @@ private extension ObjectSchema {
             "metadata": [
                 "data_source": "mongodb1",
                 "database": "test_data",
-                "collection": "\(className)",
+                "collection": "\(className) \(appId)"
             ],
             "relationships": relationships
         ]
@@ -206,6 +206,14 @@ struct AdminProfile: Codable {
 
 // Dispatch has not yet been annotated for sendability
 extension DispatchGroup: @unchecked Sendable {
+}
+
+private extension DispatchGroup {
+    func throwingWait(timeout: DispatchTime) throws {
+        if wait(timeout: timeout) == .timedOut {
+            throw URLError(.timedOut)
+        }
+    }
 }
 
 // MARK: AdminSession
@@ -440,9 +448,9 @@ class Admin {
         loginRequest.allHTTPHeaderFields = ["Content-Type": "application/json;charset=utf-8",
                                             "Accept": "application/json"]
 
-        loginRequest.httpBody = try! JSONEncoder().encode(["provider": "userpass",
-                                                           "username": "unique_user@domain.com",
-                                                           "password": "password"])
+        loginRequest.httpBody = try JSONEncoder().encode(["provider": "userpass",
+                                                          "username": "unique_user@domain.com",
+                                                          "password": "password"])
         return try URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue())
             .resultDataTask(with: loginRequest)
             .flatMap { data in
@@ -511,6 +519,9 @@ public class RealmServer: NSObject {
     /// The current admin session
     private var session: AdminSession?
 
+    /// Created appIds which should be cleaned up
+    private var appIds = [String]()
+
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
         let goDir = RealmServer.buildDir.appendingPathComponent("stitch")
@@ -570,9 +581,9 @@ public class RealmServer: NSObject {
     /// Launch the mongo server in the background.
     /// This process should run until the test suite is complete.
     private func launchMongoProcess() throws {
-        try! FileManager().createDirectory(at: tempDir,
-                                           withIntermediateDirectories: false,
-                                           attributes: nil)
+        try FileManager().createDirectory(at: tempDir,
+                                          withIntermediateDirectories: false,
+                                          attributes: nil)
 
         mongoProcess.launchPath = RealmServer.binDir.appendingPathComponent("mongod").path
         mongoProcess.arguments = [
@@ -635,8 +646,8 @@ public class RealmServer: NSObject {
         serverProcess.environment = env
         // golang server needs a tmp directory
 
-        try! FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",
-            withIntermediateDirectories: false, attributes: nil)
+        try FileManager.default.createDirectory(atPath: "\(tempDir.path)/tmp",
+                                                withIntermediateDirectories: false, attributes: nil)
         serverProcess.launchPath = "\(binDir)/stitch_server"
         serverProcess.currentDirectoryPath = tempDir.path
         serverProcess.arguments = [
@@ -671,7 +682,7 @@ public class RealmServer: NSObject {
                     parts.append("🔴")
                 } else if let json = try? JSONSerialization.jsonObject(with: part.data(using: .utf8)!) {
                     parts.append(String(data: try! JSONSerialization.data(withJSONObject: json,
-                                                                       options: .prettyPrinted),
+                                                                          options: .prettyPrinted),
                                   encoding: .utf8)!)
                 } else if !part.isEmpty {
                     parts.append(String(part))
@@ -680,6 +691,7 @@ public class RealmServer: NSObject {
             print(parts.joined(separator: "\t"))
         }
 
+        serverProcess.standardError = nil
         if logLevel != .none {
             serverProcess.standardOutput = pipe
         } else {
@@ -699,7 +711,7 @@ public class RealmServer: NSObject {
                                      delegateQueue: OperationQueue())
             session.dataTask(with: URL(string: "http://localhost:9090/api/admin/v3.0/groups/groupId/apps/appId")!) { (_, _, error) in
                 if error != nil {
-                    usleep(50000)
+                    Thread.sleep(forTimeInterval: 0.1)
                     pingServer(tries + 1)
                 } else {
                     group.leave()
@@ -749,9 +761,7 @@ public class RealmServer: NSObject {
     public typealias AppId = String
 
     /// Create a new server app
-    /// This will create a App with different configuration depending on the SyncMode (partition based sync or flexible sync), partition type is used only in case
-    /// this is partition based sync, and will crash if one is not provided in that mode
-    func createAppForSyncMode(_ syncMode: SyncMode, _ objectsSchema: [ObjectSchema]) throws -> AppId {
+    func createApp(syncMode: SyncMode, types: [ObjectBase.Type], persistent: Bool) throws -> AppId {
         let session = try XCTUnwrap(session)
 
         let info = try session.apps.post(["name": "test"]).get()
@@ -810,10 +820,12 @@ public class RealmServer: NSObject {
             }
         }
 
-        _ = app.secrets.post([
+        app.secrets.post(on: group, [
             "name": "BackingDB_uri",
             "value": "mongodb://localhost:26000"
-        ])
+        ], failOnError)
+
+        try group.throwingWait(timeout: .now() + 5.0)
 
         let appService: [String: Json] = [
             "name": "mongodb1",
@@ -828,54 +840,42 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        // Creating the schema is a two-step process where we first add all the
-        // objects with their properties to them so that we can add relationships
-        let syncTypes: [ObjectSchema]
+        let schema = types.map { ObjectiveCSupport.convert(object: $0.sharedSchema()!) }
+
         let partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
-            syncTypes = objectsSchema.filter {
-                guard let pk = $0.primaryKeyProperty else { return false }
-                return pk.columnName == "_id"
-            }
             partitionKeyType = bsonType
         } else {
-            syncTypes = objectsSchema.filter {
-                let validSyncClasses = ["Dog", "Person", "SwiftPerson", "SwiftTypesSyncObject", "PersonAsymmetric", "SwiftObjectAsymmetric", "HugeObjectAsymmetric", "SwiftCustomColumnObject", "SwiftCustomColumnAsymmetricObject"]
-                return validSyncClasses.contains($0.className)
-            }
             partitionKeyType = nil
         }
-        var schemaCreations = [Result<Any?, Error>]()
-        var asymmetricTables = [String]()
-        for objectSchema in syncTypes {
-            schemaCreations.append(app.schemas.post(objectSchema.stitchRule(partitionKeyType)))
-            if objectSchema.isAsymmetric {
-                asymmetricTables.append(objectSchema.className)
+
+        // Creating the schema is a two-step process where we first add all the
+        // objects with their properties to them so that we can add relationships
+        let lockedSchemaIds = Locked([String: String]())
+        for objectSchema in schema {
+            app.schemas.post(on: group, objectSchema.stitchRule(partitionKeyType, appId: clientAppId)) {
+                switch $0 {
+                case .success(let data):
+                    lockedSchemaIds.withLock {
+                        $0[objectSchema.className] = ((data as! [String: Any])["_id"] as! String)
+                    }
+                case .failure(let error):
+                    XCTFail(error.localizedDescription)
+                }
             }
         }
+        try group.throwingWait(timeout: .now() + 5.0)
 
-        var schemaIds: [String: String] = [:]
-        for result in schemaCreations {
-            guard case .success(let data) = result else {
-                fatalError("Failed to create schema: \(result)")
-            }
-            let dict = (data as! [String: Any])
-            let metadata = dict["metadata"] as! [String: String]
-            schemaIds[metadata["collection"]!] = dict["_id"]! as? String
-        }
-
-        var schemaUpdates = [Result<Any?, Error>]()
-        for objectSchema in syncTypes {
+        let schemaIds = lockedSchemaIds.value
+        for objectSchema in schema {
             let schemaId = schemaIds[objectSchema.className]!
-            schemaUpdates.append(app.schemas[schemaId].put(objectSchema.stitchRule(partitionKeyType, id: schemaId)))
+            app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, id: schemaId, appId: clientAppId), failOnError)
         }
+        try group.throwingWait(timeout: .now() + 5.0)
 
-        for result in schemaUpdates {
-            if case .failure(let error) = result {
-                fatalError("Failed to create relationships for schema: \(error)")
-            }
+        let asymmetricTables = schema.compactMap {
+            $0.isAsymmetric ? $0.className : nil
         }
-
         let serviceConfig: [String: Json]
         switch syncMode {
         case .pbs(let bsonType):
@@ -903,7 +903,7 @@ public class RealmServer: NSObject {
                     "asymmetric_tables": asymmetricTables as [Json]
                 ]
             ]
-            app.services[serviceId].default_rule.post(on: group, [
+            _ = try app.services[serviceId].default_rule.post([
                 "roles": [[
                     "name": "all",
                     "apply_when": [String: Json](),
@@ -916,7 +916,7 @@ public class RealmServer: NSObject {
                     "insert": true,
                     "delete": true
                 ]]
-            ], failOnError)
+            ]).get()
         }
         _ = try app.services[serviceId].config.patch(serviceConfig).get()
 
@@ -993,39 +993,38 @@ public class RealmServer: NSObject {
             "sync": ["disable_client_error_backoff": true]
         ], failOnError)
 
-        guard case .success = group.wait(timeout: .now() + 15.0) else {
-            throw URLError(.timedOut)
+        try group.throwingWait(timeout: .now() + 5.0)
+
+        // Wait for initial sync to complete as connecting before that has a lot of problems
+        try waitForSync(appServerId: appId, expectedCount: schema.count - asymmetricTables.count)
+
+        if !persistent {
+            appIds.append(appId)
         }
 
         return clientAppId
     }
 
-    @objc public func createAppWithQueryableFields(_ fields: [String]) throws -> AppId {
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
-        return try createAppForSyncMode(.flx(fields), schema.objectSchema)
+    @objc public func createApp(fields: [String], types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
+        return try createApp(syncMode: .flx(fields), types: types, persistent: persistent)
     }
 
-    @objc public func createAppForAsymmetricSchema(_ schema: [RLMObjectSchema]) throws -> AppId {
-        try createAppForSyncMode(.flx([]), schema.map(ObjectiveCSupport.convert(object:)))
+    @objc public func createApp(partitionKeyType: String = "string", types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
+        return try createApp(syncMode: .pbs(partitionKeyType), types: types, persistent: persistent)
     }
 
-    public func createAppForAsymmetricSchema(_ schema: [ObjectSchema]) throws -> AppId {
-        try createAppForSyncMode(.flx([]), schema)
+    /// Delete all Apps created without `persistent: true`
+    @objc func deleteApps() throws {
+        for appId in appIds {
+            let app = try XCTUnwrap(session).apps[appId]
+            _ = try app.delete().get()
+        }
+        appIds = []
     }
 
-    @objc public func createAppForBSONType(_ bsonType: String) throws -> AppId {
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
-        return try createAppForSyncMode(.pbs(bsonType), schema.objectSchema)
-    }
-
-    @objc public func createApp() throws -> AppId {
-        let schema = ObjectiveCSupport.convert(object: RLMSchema.shared())
-        return try createAppForSyncMode(.pbs("string"), schema.objectSchema)
-    }
-
-    @objc public func deleteApp(_ appId: AppId) throws {
-        let appServerId = try RealmServer.shared.retrieveAppServerId(appId)
-        let app = try XCTUnwrap(session).apps[appServerId]
+    @objc func deleteApp(_ appId: String) throws {
+        let serverAppId = try retrieveAppServerId(appId)
+        let app = try XCTUnwrap(session).apps[serverAppId]
         _ = try app.delete().get()
     }
 
@@ -1214,7 +1213,36 @@ public class RealmServer: NSObject {
         let session = try XCTUnwrap(session)
         let appServerId = try retrieveAppServerId(appId)
         let ident = RLMGetClientFileIdent(ObjectiveCSupport.convert(object: realm))
+        XCTAssertNotEqual(ident, 0)
         _ = try session.privateApps[appServerId].sync.forceReset.put(["file_ident": ident]).get()
+    }
+
+    public func waitForSync(appId: String) throws {
+        try waitForSync(appServerId: retrieveAppServerId(appId), expectedCount: 1)
+    }
+
+    public func waitForSync(appServerId: String, expectedCount: Int) throws {
+        let session = try XCTUnwrap(session)
+        let start = Date()
+        while true {
+            let complete = try session.apps[appServerId].sync.progress.get()
+                .map { resp in
+                    guard let resp = resp as? Dictionary<String, Any?> else { return false }
+                    guard let progress = resp["progress"] else { return false }
+                    guard let progress = progress as? Dictionary<String, Any?> else { return false }
+                    let values = progress.compactMapValues { $0 as? Dictionary<String, Any?> }
+                    let complete = values.allSatisfy { $0.value["complete"] as? Bool ?? false }
+                    return complete && progress.count >= expectedCount
+                }
+                .get()
+            if complete {
+                break
+            }
+            if -start.timeIntervalSinceNow > 60.0 {
+                throw "Waiting for sync to complete timed out"
+            }
+            Thread.sleep(forTimeInterval: 0.1)
+        }
     }
 }
 
@@ -1222,6 +1250,9 @@ public class RealmServer: NSObject {
     if case .failure(let error) = result {
         XCTFail(error.localizedDescription)
     }
+}
+
+extension String: Error {
 }
 
 #endif

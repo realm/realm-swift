@@ -113,66 +113,32 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 @interface RLMAsymmetricSyncServerTests : RLMSyncTestCase
 @end
 
-@implementation RLMAsymmetricSyncServerTests {
-    NSString *_asymmetricSyncAppId;
-    RLMApp *_asymmetricSyncApp;
-}
+@implementation RLMAsymmetricSyncServerTests
 
 #pragma mark Asymmetric Sync App
 
-- (NSString *)asymmetricSyncAppId {
-    if (!_asymmetricSyncAppId) {
-        static NSString *s_appId;
-        if (s_appId) {
-            _asymmetricSyncAppId = s_appId;
-        }
-        else {
-            NSError *error;
-            NSArray *objectsSchema = @[[RLMObjectSchema schemaForObjectClass:PersonAsymmetric.class]];
-            _asymmetricSyncAppId = [RealmServer.shared createAppForAsymmetricSchema:objectsSchema error:&error];
-            if (error) {
-                NSLog(@"Failed to create asymmetric app: %@", error);
-                abort();
-            }
-            s_appId = _asymmetricSyncAppId;
-        }
-    }
-    return _asymmetricSyncAppId;
+- (NSString *)createAppWithError:(NSError **)error {
+    return [RealmServer.shared createAppWithFields:@[]
+                                             types:@[PersonAsymmetric.self]
+                                        persistent:true
+                                             error:error];
 }
 
-- (RLMApp *)asymmetricSyncApp {
-    if (!_asymmetricSyncApp) {
-        _asymmetricSyncApp = [self appWithId:self.asymmetricSyncAppId];
-        RLMSyncManager *syncManager = self.asymmetricSyncApp.syncManager;
-        RLMLogger.defaultLogger.level = RLMLogLevelOff;
-        syncManager.userAgent = self.name;
-    }
-    return _asymmetricSyncApp;
+- (NSArray *)defaultObjectTypes {
+    return @[PersonAsymmetric.self];
 }
 
-- (RLMUser *)userForSelector:(SEL)testSel {
-    return [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(testSel)
-                                                               register:YES
-                                                                    app:self.asymmetricSyncApp]
-                                     app:self.asymmetricSyncApp];
+- (RLMRealmConfiguration *)configurationForUser:(RLMUser *)user {
+    return [user flexibleSyncConfiguration];
 }
 
 - (void)tearDown {
-    RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials]
-                                              app:self.asymmetricSyncApp];
-    RLMMongoClient *client = [user mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"PersonAsymmetric"];
-    [self cleanupRemoteDocuments:collection];
+    [self cleanupRemoteDocuments:[self.anonymousUser collectionForType:PersonAsymmetric.class app:self.app]];
     [super tearDown];
 }
 
 - (void)checkCountInMongo:(unsigned long)expectedCount {
-    RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials]
-                                              app:self.asymmetricSyncApp];
-    RLMMongoClient *client = [user mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"PersonAsymmetric"];
+    RLMMongoCollection *collection = [self.anonymousUser collectionForType:PersonAsymmetric.class app:self.app];
 
     __block unsigned long count = 0;
     NSDate *waitStart = [NSDate date];
@@ -193,15 +159,12 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 }
 
 - (void)testAsymmetricObjectSchema {
-    RLMUser *user = [self userForSelector:_cmd];
-    RLMRealmConfiguration *configuration = [user flexibleSyncConfiguration];
-    configuration.objectClasses = @[PersonAsymmetric.self];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    RLMRealm *realm = [self openRealm];
     XCTAssertTrue(realm.schema.objectSchema[0].isAsymmetric);
 }
 
 - (void)testUnsupportedAsymmetricLinkAsymmetricThrowsError {
-    RLMUser *user = [self userForSelector:_cmd];
+    RLMUser *user = [self createUser];
     RLMRealmConfiguration *configuration = [user flexibleSyncConfiguration];
     configuration.objectClasses = @[UnsupportedLinkAsymmetric.self, PersonAsymmetric.self];
     NSError *error;
@@ -212,7 +175,7 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 }
 
 - (void)testUnsupportedObjectLinksAsymmetricThrowsError  {
-    RLMUser *user = [self userForSelector:_cmd];
+    RLMUser *user = [self createUser];
     RLMRealmConfiguration *configuration = [user flexibleSyncConfiguration];
     configuration.objectClasses = @[UnsupportedObjectLinkAsymmetric.self, PersonAsymmetric.self];
     NSError *error;
@@ -234,8 +197,8 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 }
 
 - (void)testOpenPBSConfigurationWithAsymmetricObjectError {
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealmConfiguration *configuration = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMUser *user = [self createUser];
+    RLMRealmConfiguration *configuration = [user configurationWithPartitionValue:self.name];
     configuration.objectClasses = @[PersonAsymmetric.self];
     NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
@@ -245,16 +208,15 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 }
 
 - (void)testCreateAsymmetricObjects {
-    RLMUser *user = [self userForSelector:_cmd];
-    RLMRealmConfiguration *configuration = [user flexibleSyncConfiguration];
-    configuration.objectClasses = @[PersonAsymmetric.self];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
-    XCTAssertNotNil(realm);
+    RLMRealm *realm = [self openRealm];
 
     [realm beginWriteTransaction];
     for (int i = 1; i <= 12; ++i) {
         RLMObjectId *oid = [RLMObjectId objectId];
-        PersonAsymmetric *person = [PersonAsymmetric createInRealm:realm withValue:@[oid, [NSString stringWithFormat:@"firstname_%d", i], [NSString stringWithFormat:@"lastname_%d", i]]];
+        PersonAsymmetric *person = [PersonAsymmetric createInRealm:realm withValue:@[
+            oid, [NSString stringWithFormat:@"firstname_%d", i],
+            [NSString stringWithFormat:@"lastname_%d", i]
+        ]];
         XCTAssertNil(person);
     }
     [realm commitWriteTransaction];
@@ -263,11 +225,7 @@ RLM_COLLECTION_TYPE(PersonAsymmetric);
 }
 
 - (void)testCreateAsymmetricSameObjectNotDuplicates {
-    RLMUser *user = [self userForSelector:_cmd];
-    RLMRealmConfiguration *configuration = [user flexibleSyncConfiguration];
-    configuration.objectClasses = @[PersonAsymmetric.self];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
-    XCTAssertNotNil(realm);
+    RLMRealm *realm = [self openRealm];
 
     RLMObjectId *oid = [RLMObjectId objectId];
     [realm beginWriteTransaction];

@@ -90,6 +90,10 @@ static void RLMAddSkipBackupAttributeToItemAtPath(std::string_view path) {
 
 void RLMWaitForRealmToClose(NSString *path) {
     NSString *lockfilePath = [path stringByAppendingString:@".lock"];
+    if (![NSFileManager.defaultManager fileExistsAtPath:lockfilePath]) {
+        return;
+    }
+
     File lockfile(lockfilePath.UTF8String, File::mode_Update);
     lockfile.set_fifo_path([path stringByAppendingString:@".management"].UTF8String, "lock.fifo");
     while (!lockfile.try_rw_lock_exclusive()) {
@@ -1145,5 +1149,21 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
 #else
     @throw RLMException(@"Realm was not compiled with sync enabled");
 #endif
+}
+
+void RLMRealmSubscribeToAll(RLMRealm *realm) {
+    if (!realm.isFlexibleSync) {
+        return;
+    }
+
+    auto subs = realm->_realm->get_latest_subscription_set().make_mutable_copy();
+    auto& group = realm->_realm->read_group();
+    for (auto key : group.get_table_keys()) {
+        if (!std::string_view(group.get_table_name(key)).starts_with("class_")) {
+            continue;
+        }
+        subs.insert_or_assign(group.get_table(key)->where());
+    }
+    subs.commit();
 }
 @end

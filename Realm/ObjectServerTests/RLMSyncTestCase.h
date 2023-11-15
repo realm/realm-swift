@@ -28,11 +28,16 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @interface RealmServer : NSObject
 + (RealmServer *)shared;
 + (bool)haveServer;
-- (NSString *)createAppForBSONType:(NSString *)bsonType error:(NSError **)error;
-- (NSString *)createAppAndReturnError:(NSError **)error;
-- (NSString *)createAppWithQueryableFields:(NSArray *)queryableFields error:(NSError **)error;
-- (NSString *)createAppForAsymmetricSchema:(NSArray <RLMObjectSchema *> *)schema error:(NSError **)error;
-- (void)deleteApp:(NSString *)appId error:(NSError **)error;
+- (nullable NSString *)createAppWithFields:(NSArray<NSString *> *)fields
+                                     types:(nullable NSArray<Class> *)types
+                                persistent:(bool)persistent
+                                     error:(NSError **)error;
+- (nullable NSString *)createAppWithPartitionKeyType:(NSString *)type
+                                               types:(nullable NSArray<Class> *)types
+                                          persistent:(bool)persistent
+                                               error:(NSError **)error;
+- (BOOL)deleteAppsAndReturnError:(NSError **)error;
+- (BOOL)deleteApp:(NSString *)appId error:(NSError **)error;
 @end
 
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
@@ -48,20 +53,35 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 /// Any stray app ids passed between processes
 @property (nonatomic, readonly) NSArray<NSString *> *appIds;
 
-- (RLMUser *)userForTest:(SEL)sel;
+#pragma mark - Customization points
 
-- (RLMRealm *)realmForTest:(SEL)sel;
+- (NSArray<Class> *)defaultObjectTypes;
+- (nullable NSString *)createAppWithError:(NSError **)error;
+- (nullable NSString *)createFlexibleSyncAppWithError:(NSError **)error;
+- (RLMRealmConfiguration *)configurationForUser:(RLMUser *)user;
+
+#pragma mark - Helpers
+
+- (RLMUser *)userForTest:(SEL)sel;
+- (RLMUser *)userForTest:(SEL)sel app:(RLMApp *)app;
 
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister NS_SWIFT_NAME(basicCredentials(name:register:));
 
 - (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister
-                                         app:(nullable RLMApp*)app NS_SWIFT_NAME(basicCredentials(name:register:app:));
+                                         app:(RLMApp*)app NS_SWIFT_NAME(basicCredentials(name:register:app:));
 
 /// Synchronously open a synced Realm via asyncOpen and return the Realm.
 - (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
 /// Synchronously open a synced Realm via asyncOpen and return the expected error.
 - (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)configuration;
+
+- (RLMRealmConfiguration *)configuration NS_REFINED_FOR_SWIFT;
+
+// Open the realm with the partition value `self.name` using a newly created user
+- (RLMRealm *)openRealm NS_REFINED_FOR_SWIFT;
+// Open the realm with the partition value `self.name` using the given user
+- (RLMRealm *)openRealmWithUser:(RLMUser *)user;
 
 /// Synchronously open a synced Realm and wait for downloads.
 - (RLMRealm *)openRealmForPartitionValue:(nullable id<RLMBSON>)partitionValue
@@ -101,6 +121,10 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials;
 - (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials app:(RLMApp *)app;
 
+/// Synchronously register and log in a new non-anonymous user
+- (RLMUser *)createUser;
+- (RLMUser *)createUserForApp:(RLMApp *)app;
+
 - (RLMCredentials *)jwtCredentialWithAppId:(NSString *)appId;
 
 /// Synchronously, log out.
@@ -110,12 +134,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (void)addAllTypesSyncObjectToRealm:(RLMRealm *)realm values:(NSDictionary *)dictionary person:(Person *)person;
 
-/// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
-- (void)waitForDownloadsForUser:(RLMUser *)user
-                         realms:(NSArray<RLMRealm *> *)realms
-                partitionValues:(NSArray<NSString *> *)partitionValues
-                 expectedCounts:(NSArray<NSNumber *> *)counts;
-
 /// Wait for downloads to complete; drop any error.
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm;
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error;
@@ -124,17 +142,10 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 - (void)waitForUploadsForRealm:(RLMRealm *)realm;
 - (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
-/// Wait for downloads to complete while spinning the runloop. This method uses expectations.
-- (void)waitForDownloadsForUser:(RLMUser *)user
-                 partitionValue:(NSString *)partitionValue
-                    expectation:(nullable XCTestExpectation *)expectation
-                          error:(NSError **)error;
-
 /// Set the user's tokens to invalid ones to test invalid token handling.
 - (void)setInvalidTokensForUser:(RLMUser *)user;
 
-- (void)writeToPartition:(SEL)testSel block:(void (^)(RLMRealm *))block;
-- (void)writeToPartition:(nullable NSString *)testName userName:(NSString *)userNameBase block:(void (^)(RLMRealm *))block;
+- (void)writeToPartition:(nullable NSString *)partition block:(void (^)(RLMRealm *))block;
 
 - (void)resetSyncManager;
 
@@ -146,19 +157,13 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (NSString *)partitionBsonType:(id<RLMBSON>)bson;
 
-- (RLMApp *)appWithId:(NSString *)appId;
+- (RLMApp *)appWithId:(NSString *)appId NS_SWIFT_NAME(app(id:));
 
 - (void)resetAppCache;
 
 #pragma mark Flexible Sync App
 
-@property (nonatomic, readonly) NSString *flexibleSyncAppId;
-@property (nonatomic, readonly) RLMApp *flexibleSyncApp;
-
-- (RLMUser *)flexibleSyncUser:(SEL)testSel;
-- (RLMRealm *)openFlexibleSyncRealm:(SEL)testSel;
-- (RLMRealm *)getFlexibleSyncRealm:(SEL)testSel;
-- (bool)populateData:(void (^)(RLMRealm *))block;
+- (void)populateData:(void (^)(RLMRealm *))block;
 - (void)writeQueryAndCompleteForRealm:(RLMRealm *)realm block:(void (^)(RLMSyncSubscriptionSet *))block;
 
 @end
@@ -170,6 +175,10 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @interface RLMSyncSession ()
 - (void)pause;
 - (void)unpause;
+@end
+
+@interface RLMUser (Test)
+- (RLMMongoCollection *)collectionForType:(Class)type app:(RLMApp *)app NS_SWIFT_NAME(collection(for:app:));
 @end
 
 FOUNDATION_EXTERN int64_t RLMGetClientFileIdent(RLMRealm *realm);
