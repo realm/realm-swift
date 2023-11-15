@@ -38,22 +38,28 @@ let testCxxSettings: [CXXSetting] = cxxSettings + [
 // SPM requires all targets to explicitly include or exclude every file, which
 // gets very awkward when we have four targets building from a single directory
 let objectServerTestSources = [
+    "AsyncSyncTests.swift",
+    "ClientResetTests.swift",
+    "CombineSyncTests.swift",
+    "EventTests.swift",
     "Object-Server-Tests-Bridging-Header.h",
     "ObjectServerTests-Info.plist",
     "RLMAsymmetricSyncServerTests.mm",
     "RLMBSONTests.mm",
     "RLMCollectionSyncTests.mm",
     "RLMFlexibleSyncServerTests.mm",
+    "RLMMongoClientTests.mm",
     "RLMObjectServerPartitionTests.mm",
     "RLMObjectServerTests.mm",
+    "RLMServerTestObjects.h",
     "RLMServerTestObjects.m",
+    "RLMSubscriptionTests.mm",
     "RLMSyncTestCase.h",
     "RLMSyncTestCase.mm",
     "RLMUser+ObjectServerTests.h",
     "RLMUser+ObjectServerTests.mm",
     "RLMWatchTestUtility.h",
     "RLMWatchTestUtility.m",
-    "EventTests.swift",
     "RealmServer.swift",
     "SwiftAsymmetricSyncServerTests.swift",
     "SwiftCollectionSyncTests.swift",
@@ -324,24 +330,30 @@ let package = Package(
         objectServerTestSupportTarget(
             name: "RealmSyncTestSupport",
             dependencies: ["Realm", "RealmSwift", "RealmTestSupport"],
-            sources: ["RLMSyncTestCase.mm",
-                      "RLMUser+ObjectServerTests.mm",
-                      "RLMServerTestObjects.m"]
+            sources: [
+                "RLMServerTestObjects.m",
+                "RLMSyncTestCase.mm",
+                "RLMUser+ObjectServerTests.mm",
+                "RLMWatchTestUtility.m",
+            ]
         ),
         objectServerTestSupportTarget(
             name: "RealmSwiftSyncTestSupport",
             dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftTestSupport"],
             sources: [
+                 "RealmServer.swift",
+                 "SwiftServerObjects.swift",
                  "SwiftSyncTestCase.swift",
                  "TimeoutProxyServer.swift",
                  "WatchTestUtility.swift",
-                 "RealmServer.swift",
-                 "SwiftServerObjects.swift"
             ]
         ),
         objectServerTestTarget(
             name: "SwiftObjectServerTests",
             sources: [
+                "AsyncSyncTests.swift",
+                "ClientResetTests.swift",
+                "CombineSyncTests.swift",
                 "EventTests.swift",
                 "SwiftAsymmetricSyncServerTests.swift",
                 "SwiftCollectionSyncTests.swift",
@@ -349,7 +361,7 @@ let package = Package(
                 "SwiftMongoClientTests.swift",
                 "SwiftObjectServerPartitionTests.swift",
                 "SwiftObjectServerTests.swift",
-                "SwiftUIServerTests.swift"
+                "SwiftUIServerTests.swift",
             ]
         ),
         objectServerTestTarget(
@@ -359,9 +371,10 @@ let package = Package(
                 "RLMBSONTests.mm",
                 "RLMCollectionSyncTests.mm",
                 "RLMFlexibleSyncServerTests.mm",
+                "RLMMongoClientTests.mm",
                 "RLMObjectServerPartitionTests.mm",
                 "RLMObjectServerTests.mm",
-                "RLMWatchTestUtility.m"
+                "RLMSubscriptionTests.mm",
             ]
         )
     ],

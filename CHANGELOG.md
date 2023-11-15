@@ -10,6 +10,8 @@ x.y.z Release notes (yyyy-MM-dd)
   in 10.39.1, but it did not actually work due to some redundant validation.
 * `SyncSession.ProgressDirection` and `SyncSession.ProgressMode` were missing
   `Sendable` annotations.
+* `Realm.Error.subscriptionFailed` was reported with the incorrect error
+  domain, making it impossible to catch (since v10.42.2).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

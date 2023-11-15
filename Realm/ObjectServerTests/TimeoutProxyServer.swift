@@ -19,7 +19,7 @@
 #if os(macOS)
 
 import Foundation
-@preconcurrency import Network
+import Network
 
 @available(OSX 10.14, *)
 @objc(TimeoutProxyServer)

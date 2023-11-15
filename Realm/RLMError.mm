@@ -127,9 +127,18 @@ NSInteger translateFileError(realm::ErrorCodes::Error code) {
 }
 
 NSString *errorDomain(realm::ErrorCodes::Error error) {
-    if (error == realm::ErrorCodes::SyncConnectTimeout) {
-        return NSPOSIXErrorDomain;
+    // Special-case errors where our error domain doesn't match core's category
+    // NEXT-MAJOR: we should unify everything into RLMErrorDomain
+    using ec = realm::ErrorCodes::Error;
+    switch (error) {
+        case ec::SubscriptionFailed:
+            return RLMErrorDomain;
+        case ec::SyncConnectTimeout:
+            return NSPOSIXErrorDomain;
+        default:
+            break;
     }
+
     auto category = realm::ErrorCodes::error_categories(error);
     if (category.test(realm::ErrorCategory::sync_error)) {
         return RLMSyncErrorDomain;

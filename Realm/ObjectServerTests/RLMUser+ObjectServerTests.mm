@@ -29,36 +29,6 @@ using namespace realm;
 
 @implementation RLMUser (ObjectServerTests)
 
-- (BOOL)waitForUploadToFinish:(NSString *)partitionValue {
-    const NSTimeInterval timeout = 20;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
-    NSAssert(session, @"Cannot call with invalid URL");
-    BOOL couldWait = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                    callback:^(NSError *){
-                                                        dispatch_semaphore_signal(sema);
-                                                    }];
-    if (!couldWait) {
-        return NO;
-    }
-    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-}
-
-- (BOOL)waitForDownloadToFinish:(NSString *)partitionValue {
-    const NSTimeInterval timeout = 20;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
-    NSAssert(session, @"Cannot call with invalid URL");
-    BOOL couldWait = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                      callback:^(NSError *){
-                                                          dispatch_semaphore_signal(sema);
-                                                      }];
-    if (!couldWait) {
-        return NO;
-    }
-    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-}
-
 - (void)simulateClientResetErrorForSession:(NSString *)partitionValue {
     RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
     NSAssert(session, @"Cannot call with invalid URL");

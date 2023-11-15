@@ -26,34 +26,30 @@ import RealmSyncTestSupport
 import RealmTestSupport
 #endif
 
+@available(macOS 13, *)
 class CollectionSyncTestCase: SwiftSyncTestCase {
     var readRealm: Realm!
-    var writeRealm: Realm!
 
     override func setUp() {
         super.setUp()
-
-        let readUser = logInUser(for: basicCredentials(name: self.name + " read user", register: true))
-        let writeUser = logInUser(for: basicCredentials(name: self.name + " write user", register: true))
         // This autoreleasepool is needed to ensure that the Realms are closed
         // immediately in tearDown() rather than escaping to an outer pool.
         autoreleasepool {
-            readRealm = try! openRealm(partitionValue: self.name, user: readUser)
-            writeRealm = try! openRealm(partitionValue: self.name, user: writeUser)
+            readRealm = try! openRealm()
         }
     }
 
     override func tearDown() {
         readRealm = nil
-        writeRealm = nil
         super.tearDown()
     }
 
+    override var objectTypes: [ObjectBase.Type] {
+        [SwiftCollectionSyncObject.self, SwiftPerson.self]
+    }
+
     func write(_ fn: (Realm) -> Void) throws {
-        try writeRealm.write {
-            fn(writeRealm)
-        }
-        waitForUploads(for: writeRealm)
+        try super.write(fn)
         waitForDownloads(for: readRealm)
     }
 
@@ -175,7 +171,7 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
             if T.self is SwiftPerson.Type {
                 // formIntersection won't work with unique Objects
                 collection.removeAll()
-                collection.insert(set.values[0])
+                collection.insert(realm.create(SwiftPerson.self, value: set.values[0], update: .all) as! T)
             } else {
                 collection.formIntersection(otherCollection)
             }
