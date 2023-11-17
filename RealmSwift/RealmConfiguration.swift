@@ -51,8 +51,9 @@ extension Realm {
         /**
          Creates a `Configuration` which can be used to create new `Realm` instances.
 
-         - note: The `fileURL`, `inMemoryIdentifier`, and `syncConfiguration` parameters are mutually exclusive. Only
+         - note: The `fileURL`, `inMemoryIdentifier`, parameters are mutually exclusive. Only
                  set one of them, or none if you wish to use the default file URL.
+                 Synced Realms will set a unique file path unless is an in-memory realm.
 
          - parameter fileURL:            The local URL to the Realm file.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
@@ -106,15 +107,13 @@ extension Realm {
         // MARK: Configuration Properties
 
         /**
-         A configuration value used to configure a Realm for synchronization with Atlas App Services. Mutually
-         exclusive with `inMemoryIdentifier`.
+         A configuration value used to configure a Realm for synchronization with Atlas App Services.
          */
         public var syncConfiguration: SyncConfiguration? {
             get {
                 return _syncConfiguration
             }
             set {
-                _inMemoryIdentifier = nil
                 _syncConfiguration = newValue
             }
         }
@@ -128,15 +127,13 @@ extension Realm {
             }
         }
 
-        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL` and
-        /// `syncConfiguration`.
+        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`.
         public var inMemoryIdentifier: String? {
             get {
                 return _inMemoryIdentifier
             }
             set {
                 fileURL = nil
-                _syncConfiguration = nil
                 _inMemoryIdentifier = newValue
             }
         }
