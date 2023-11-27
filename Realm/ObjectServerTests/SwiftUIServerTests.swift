@@ -66,7 +66,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let ex = expectation(description: "download-realm-async-open")
         asyncOpen(user: user, appId: appId, partitionValue: #function) { asyncOpenState in
-            if case let .open(realm) = asyncOpenState {
+            if case .open = asyncOpenState {
                 ex.fulfill()
             }
         }
@@ -287,7 +287,7 @@ class SwiftUIServerTests: SwiftSyncTestCase {
 
         let ex = expectation(description: "download-realm-auto-open")
         autoOpen(user: user, appId: appId, partitionValue: #function) { autoOpenState in
-            if case let .open(realm) = autoOpenState {
+            if case .open = autoOpenState {
                 ex.fulfill()
             }
         }
