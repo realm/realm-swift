@@ -920,10 +920,6 @@ public class RealmServer: NSObject {
         }
         _ = try app.services[serviceId].config.patch(serviceConfig).get()
 
-        app.sync.config.put(on: group, data: [
-            "development_mode_enabled": true
-        ], failOnError)
-
         app.functions.post(on: group, [
             "name": "sum",
             "private": false,
