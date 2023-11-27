@@ -938,13 +938,13 @@
     auto ex = [self expectationWithDescription:@"should revert write"];
     self.flexibleSyncApp.syncManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
         RLMValidateError(error, RLMSyncErrorDomain, RLMSyncErrorWriteRejected,
-                         @"Client attempted a write that is outside of permissions or query filters; it has been reverted");
+                         @"Client attempted a write that is not allowed; it has been reverted");
         NSArray<RLMCompensatingWriteInfo *> *info = error.userInfo[RLMCompensatingWriteInfoKey];
         XCTAssertEqual(info.count, 1U);
         XCTAssertEqualObjects(info[0].objectType, @"Person");
         XCTAssertEqualObjects(info[0].primaryKey, invalidObjectPK);
         XCTAssertEqualObjects(info[0].reason,
-                              ([NSString stringWithFormat:@"write to \"%@\" in table \"Person\" not allowed; object is outside of the current query view", invalidObjectPK]));
+                              ([NSString stringWithFormat:@"write to ObjectID(\"%@\") in table \"Person\" not allowed; object is outside of the current query view", invalidObjectPK]));
         [ex fulfill];
     };
     [realm transactionWithBlock:^{
@@ -1048,11 +1048,6 @@
         XCTAssertNotNil(realm);
         XCTAssertNil(error);
         XCTAssertEqual(realm.subscriptions.count, 1UL);
-        // Adding this sleep, because there seems to be a timing issue after this commit in baas
-        // https://github.com/10gen/baas/commit/64e75b3f1fe8a6f8704d1597de60f9dda401ccce,
-        // data take a little longer to be downloaded to the realm even though the
-        // sync client changed the subscription state to completed.
-        sleep(1);
         CHECK_COUNT(11, Person, realm);
         [ex fulfill];
     }];
