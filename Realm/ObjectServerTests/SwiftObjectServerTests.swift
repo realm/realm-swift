@@ -3047,9 +3047,11 @@ class AsyncAwaitObjectServerTests: SwiftSyncTestCase {
         return super.defaultTestSuite
     }
 
-    func assertThrowsError<T, E: Error>(_ expression: @autoclosure () async throws -> T,
-                                        file: StaticString = #filePath, line: UInt = #line,
-                                        _ errorHandler: (_ error: E) -> Void) async {
+    func assertThrowsError<T: Sendable, E: Error>(
+        _ expression: @autoclosure () async throws -> T,
+        file: StaticString = #filePath, line: UInt = #line,
+        _ errorHandler: (_ error: E) -> Void
+    ) async {
         do {
             _ = try await expression()
             XCTFail("Expression should have thrown an error", file: file, line: line)

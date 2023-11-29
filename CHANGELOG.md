@@ -8,6 +8,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Registering new notifications inside write transactions before actually
   making any changes is now actually allowed. This was supposed to be allowed
   in 10.39.1, but it did not actually work due to some redundant validation.
+* `SyncSession.ProgressDirection` and `SyncSession.ProgressMode` were missing
+  `Sendable` annotations.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
