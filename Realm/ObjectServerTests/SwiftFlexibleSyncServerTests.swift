@@ -1895,7 +1895,7 @@ extension SwiftFlexibleSyncServerTests {
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @globalActor actor CustomGlobalActor: GlobalActor {
-    static var shared = CustomGlobalActor()
+    static let shared = CustomGlobalActor()
 }
 
 #endif // canImport(Combine)
