@@ -64,7 +64,8 @@ static BOOL encryptTests(void) {
     static BOOL encryptAll = NO;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        if (getenv("REALM_ENCRYPT_ALL")) {
+        const char *str = getenv("REALM_ENCRYPT_ALL");
+        if (str && *str) {
             encryptAll = YES;
         }
     });
