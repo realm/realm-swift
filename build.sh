@@ -17,9 +17,6 @@ readonly source_root="$(dirname "$0")"
 
 : "${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")}" # set to "current" to always use the current build
 
-# You can override the xcmode used
-: "${XCMODE:=xcodebuild}" # must be one of: xcodebuild (default), xctool
-
 # Provide a fallback value for TMPDIR, relevant for Xcode Bots
 : "${TMPDIR:=$(getconf DARWIN_USER_TEMP_DIR)}"
 
@@ -126,11 +123,7 @@ xcode() {
 xc() {
     # Logs xcodebuild output in realtime
     : "${NSUnbufferedIO:=YES}"
-    if [[ "$XCMODE" == "xcodebuild" ]]; then
-        xcode "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}"
-    elif [[ "$XCMODE" == "xctool" ]]; then
-        xctool "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}"
-    fi
+    xcode "$@" "${REALM_EXTRA_BUILD_ARGUMENTS[@]}"
 }
 
 xctest() {
@@ -198,11 +191,6 @@ build_combined() {
     rm -rf "$xcframework_path"
     xcodebuild -create-xcframework -allow-internal-distribution -output "$xcframework_path" \
         -framework "$os_path" "${simulator_framework[@]}"
-}
-
-set_configuration_for_distribution() {
-    filename="Configuration/RealmSwift/RealmSwift.xcconfig"
-    sed -i '' "s/REALM_BUILD_LIBRARY_FOR_DISTRIBUTION = NO;/REALM_BUILD_LIBRARY_FOR_DISTRIBUTION = YES;/" "$filename"
 }
 
 clean_retrieve() {
@@ -497,18 +485,12 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        if [ -z "$CI" ]; then
-            xctest Realm -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
-        fi
-
+        xctest Realm -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
         exit 0
         ;;
 
     "test-ios-swift")
-        if [ -z "$CI" ]; then
-            xctest RealmSwift -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
-        fi
-        
+        xctest RealmSwift -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
         exit 0
         ;;
 
@@ -531,20 +513,14 @@ case "$COMMAND" in
         ;;
 
     "test-tvos")
-        if [ -z "$CI" ]; then
-            destination="Apple TV"
-            xctest Realm -configuration "$CONFIGURATION" -sdk appletvsimulator -destination "name=$destination"
-        fi
-        
+        destination="Apple TV"
+        xctest Realm -configuration "$CONFIGURATION" -sdk appletvsimulator -destination "name=$destination"
         exit $?
         ;;
 
     "test-tvos-swift")
-       if [ -z "$CI" ]; then
-            destination="Apple TV"
-            xctest RealmSwift -configuration "$CONFIGURATION" -sdk appletvsimulator -destination "name=$destination"
-        fi
-        
+        destination="Apple TV"
+        xctest RealmSwift -configuration "$CONFIGURATION" -sdk appletvsimulator -destination "name=$destination"
         exit $?
         ;;
 
@@ -553,22 +529,12 @@ case "$COMMAND" in
         ;;
 
     "test-osx")
-        COVERAGE_PARAMS=()
-        if [[ "$CONFIGURATION" == "Debug" ]]; then
-            COVERAGE_PARAMS=(GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES)
-        fi
-        if [ -z "$CI" ]; then
-            xctest Realm -configuration "$CONFIGURATION" "${COVERAGE_PARAMS[@]}" -destination "platform=macOS,arch=$(uname -m)"
-        fi
-        
+        xctest Realm -configuration "$CONFIGURATION" -destination "platform=macOS,arch=$(uname -m)"
         exit 0
         ;;
 
     "test-osx-swift")
-        if [ -z "$CI" ]; then
-            xctest RealmSwift -configuration "$CONFIGURATION" -destination "platform=macOS,arch=$(uname -m)"
-        fi
-        
+        xctest RealmSwift -configuration "$CONFIGURATION" -destination "platform=macOS,arch=$(uname -m)"
         exit 0
         ;;
 
@@ -593,24 +559,17 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swiftui")
-        if [ -z "$CI" ]; then
-            xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
-        fi
-        
+        xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 11'
         exit 0
         ;;
 
     "test-catalyst")
-        if [ -z "$CI" ]; then
-            xctest Realm -configuration "$CONFIGURATION" -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY=''
-        fi
+        xctest Realm -configuration "$CONFIGURATION" -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY=''
         exit 0
         ;;
 
     "test-catalyst-swift")
-        if [ -z "$CI" ]; then
-            xctest RealmSwift -configuration "$CONFIGURATION" -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY=''
-        fi
+        xctest RealmSwift -configuration "$CONFIGURATION" -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY=''
         exit 0
         ;;
 
@@ -759,7 +718,6 @@ case "$COMMAND" in
 
     "verify-osx-encryption")
         REALM_ENCRYPT_ALL=YES sh build.sh test-osx
-        
         exit 0
         ;;
 
@@ -778,11 +736,7 @@ case "$COMMAND" in
         ;;
 
     "verify-osx-swift-evolution")
-        if [ -n "$CI" ]; then
-           set_configuration_for_distribution
-        else 
-           export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
-        fi
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         sh build.sh test-osx-swift
         exit 0
         ;;
@@ -800,11 +754,7 @@ case "$COMMAND" in
         ;;
 
     "verify-ios-swift-evolution")
-        if [ -n "$CI" ]; then
-           set_configuration_for_distribution
-        else 
-           export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
-        fi
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         sh build.sh test-ios-swift
         exit 0
         ;;
@@ -824,12 +774,7 @@ case "$COMMAND" in
         ;;
 
     "verify-tvos-swift-evolution")
-        if [ -n "$CI" ]; then
-           set_configuration_for_distribution
-        else 
-           export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
-        fi
-
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS REALM_BUILD_LIBRARY_FOR_DISTRIBUTION=YES"
         sh build.sh test-tvos-swift
         exit 0
         ;;
@@ -1004,60 +949,11 @@ case "$COMMAND" in
     ######################################
 
     "ci-pr")
-        echo "XCode Version $(xcodebuild -version)"
-        mkdir -p build/reports
-        export REALM_DISABLE_ANALYTICS=1
-        export REALM_DISABLE_UPDATE_CHECKER=1
-        # FIXME: Re-enable once CI can properly unlock the keychain
-        export REALM_DISABLE_METADATA_ENCRYPTION=1
-
-        # Make sure there aren't any lingering server processes from previous jobs
-        pkill -9 mongo stitch || true
-
-        # strip off the ios|tvos version specifier, e.g. the last part of: `ios-device-objc-ios8`
-        if [[ "$target" =~ ^((ios|tvos)-device(-(objc|swift))?)(-(ios|tvos)[[:digit:]]+)?$ ]]; then
-            export target=${BASH_REMATCH[1]}
-        fi
-
-        if [ "$target" = "docs" ]; then
-            sh build.sh verify-docs
-        elif [ "$target" = "swiftlint" ]; then
-            sh build.sh verify-swiftlint
-        else
-            export sha="$CI_BRANCH"
-            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
-
-            if [[ "$target" = *"server"* ]] || [[ "$target" = "swiftpm"* ]]; then
-                mkdir .baas
-                if [[ -z $CI ]]; then
-                    mv build/stitch .baas
-                    source "$(brew --prefix nvm)/nvm.sh" --no-use
-                fi
-                sh build.sh setup-baas
-            fi
-
-            failed=
-            sh build.sh "verify-$target" 2>&1 | tee build/build.log || failed=1
-            if [ "$failed" = "1" ] && grep -E 'DTXProxyChannel|DTXChannel|out of date and needs to be rebuilt|operation never finished bootstrapping|thread is already initializing this class' build/build.log ; then
-                echo "Known Xcode error detected. Running job again."
-                if grep -E 'out of date and needs to be rebuilt' build/build.log; then
-                    rm -rf build/DerivedData
-                fi
-                failed=0
-                sh build.sh "verify-$target" | tee build/build.log || failed=1
-            fi
-            if [ "$failed" = "1" ]; then
-                set +e
-                printf "%s" "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log
-                exit 1
-            fi
-        fi
-
-        if [ "$target" = "osx" ] && [ "$configuration" = "Debug" ]; then
-          gcovr -r . -f ".*Realm.*" -e ".*Tests.*" -e ".*core.*" --xml > build/reports/coverage-report.xml
-          WS=$(pwd | sed "s/\//\\\\\//g")
-          sed -i ".bak" "s/<source>\./<source>${WS}/" build/reports/coverage-report.xml
-        fi
+        echo "Building with Xcode Version $(xcodebuild -version)"
+        export sha="$BRANCH"
+        export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
+        target=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
+        sh build.sh "verify-$target"
         ;;
 
     ######################################
