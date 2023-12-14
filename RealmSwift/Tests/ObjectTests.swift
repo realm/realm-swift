@@ -1580,7 +1580,6 @@ class ObjectTests: TestCase {
 
     // This test consistently crashes inside the Swift runtime when building
     // with SPM.
-    #if !SWIFT_PACKAGE
     @MainActor
     @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
     func testAsyncSequenceObserve() async throws {
@@ -1608,7 +1607,6 @@ class ObjectTests: TestCase {
         task.cancel()
         _ = try await task.value
     }
-    #endif
 
     @MainActor
     @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
