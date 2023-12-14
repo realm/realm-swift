@@ -550,9 +550,6 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     if (_realm->config().automatic_change_notifications && !_realm->can_deliver_notifications()) {
         @throw RLMException(@"Can only add notification blocks from within runloops.");
     }
-    if (isCollection && _realm->is_in_transaction()) {
-        @throw RLMException(@"Cannot register notification blocks from within write transactions.");
-    }
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
