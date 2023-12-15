@@ -121,7 +121,7 @@ def doBuild() {
         parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion)
       }
     }
-    parallelBuilds["visionOS 15.1"] = buildPlatform('visionos', '15.1')
+    // parallelBuilds["visionOS 15.2"] = buildPlatform('visionos', '15.2')
 
     parallel parallelBuilds
   }
@@ -135,7 +135,7 @@ def doBuild() {
           unstash "${platform}-${xcodeVersion}"
         }
       }
-      unstash 'visionos-15.1'
+      // unstash 'visionos-15.2'
 
       unstash 'examples'
       unstash 'build-scripts'

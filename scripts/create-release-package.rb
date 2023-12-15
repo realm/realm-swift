@@ -20,7 +20,7 @@ def sh(*args)
 end
 
 def platforms(xcode_version)
-  if xcode_version.start_with? '15.1'
+  if xcode_version.start_with? '15.2'
     %w{osx ios watchos tvos catalyst visionos}
   else
     %w{osx ios watchos tvos catalyst}
@@ -117,7 +117,7 @@ puts 'Creating Carthage release zip'
 Dir.mktmpdir do |tmp|
   tmp = File.realpath tmp
   Dir.chdir(tmp) do
-    for platform in platforms('14')
+    for platform in platforms('15.1')
       sh 'unzip', "#{ROOT}/realm-#{platform}-#{OBJC_XCODE_VERSION}.zip"
     end
     create_xcframework tmp, '', 'Release', 'RealmSwift'
