@@ -4,7 +4,7 @@ import PackageDescription
 import Foundation
 
 let coreVersion = Version("13.24.1")
-let cocoaVersion = Version("10.44.0")
+let cocoaVersion = Version("10.45.0")
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),

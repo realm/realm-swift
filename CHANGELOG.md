@@ -1,6 +1,9 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.45.0 Release notes (2023-12-15)
 =============================================================
+
 ### Enhancements
+
+* Update release packaging for Xcode 15.1.
 * Expose waiting for upload/download on SyncSession, which will suspend
   the current method (or call an asynchronous block) until an upload or download
   completes for a given sync session, e.g.,:
@@ -33,6 +36,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #7161](https://github.com/realm/realm-core/pull/7161)).
 
 ### Fixed
+
 * Flexible sync subscriptions would sometimes not be sent to the server if they
   were created while the client was downloading the bootstrap state for a
   previous subscription change and the bootstrap did not complete successfully.
@@ -67,7 +71,8 @@ x.y.z Release notes (yyyy-MM-dd)
   links. ([Core #7112](https://github.com/realm/realm-core/issues/7112),
   since client reset recovery was implemented in v10.25.0).
 * During a client reset recovery a Set of links could be missing items, or an
-  exception could be thrown that prevents recovery (e.g. "Requested index 1 calling get() on set 'source.collection' when max is 0")
+  exception could be thrown that prevents recovery (e.g. "Requested index 1
+  calling get() on set 'source.collection' when max is 0")
   ([Core #7112](https://github.com/realm/realm-core/issues/7112),
   since client reset recovery was implemented in v10.25.0).
 * Calling `sort()` or `distinct()` on a `MutableSet<Object>` that had
@@ -77,7 +82,8 @@ x.y.z Release notes (yyyy-MM-dd)
   recovering a write which made an unrecoverable change to a list (i.e.
   modifying or deleting a pre-existing entry), followed by a subscription
   change, followed by a write which added an entry to the list
-  ([Core #7155](https://github.com/realm/realm-core/pull/7155), since the introduction of automatic client reset recovery for flexible sync).
+  ([Core #7155](https://github.com/realm/realm-core/pull/7155), since the
+  introduction of automatic client reset recovery for flexible sync).
 * Fixed several causes of "decryption failed" exceptions that could happen when
   opening multiple encrypted Realm files in the same process while using Realms
   stored on an exFAT file system.
@@ -108,6 +114,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #7161](https://github.com/realm/realm-core/pull/7161), since v10.29.0).
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.1.0.
@@ -115,6 +122,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.1.0.
 
 ### Internal
+
 * Migrated our current CI Pipelines to Xcode Cloud.
 * Upgraded realm-core from 13.23.1 to 13.24.1
 
