@@ -1,13 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Fix `@AsyncOpen` and `@AutoOpen` not using the syncConfiguration passed through 
+  the `configuration`, this is not allowing for the `initialSubscription` and 
+  `clientResetMode` to be passed in the initialiser or as an environment value.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
