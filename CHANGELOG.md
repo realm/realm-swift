@@ -1,15 +1,19 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.45.1 Release notes (2023-12-18)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Exceptions thrown while applying the initial download for a sync subscription
+  change terminated the program rather than being reported to the sync error
+  handler ([Core #7196](https://github.com/realm/realm-core/issues/7196) and
+  [Core #7197](https://github.com/realm/realm-core/pull/7197)).
+* Calling `SyncSession.reconnect()` while a reconnect after a non-fatal error
+  was pending would result in an assertion failure mentioning
+  "!m_try_again_activation_timer" if another non-fatal error was received
+  ([Core #6961](https://github.com/realm/realm-core/issues/6961)).
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.1.0.
@@ -17,7 +21,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.1.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from 13.24.1 to 13.25.0
 
 10.45.0 Release notes (2023-12-15)
 =============================================================
