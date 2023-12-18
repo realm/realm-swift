@@ -12,6 +12,14 @@ x.y.z Release notes (yyyy-MM-dd)
   `Sendable` annotations.
 * `Realm.Error.subscriptionFailed` was reported with the incorrect error
   domain, making it impossible to catch (since v10.42.2).
+* Exceptions thrown while applying the initial download for a sync subscription
+  change terminated the program rather than being reported to the sync error
+  handler ([Core #7196](https://github.com/realm/realm-core/issues/7196) and
+  [Core #7197](https://github.com/realm/realm-core/pull/7197)).
+* Calling `SyncSession.reconnect()` while a reconnect after a non-fatal error
+  was pending would result in an assertion failure mentioning
+  "!m_try_again_activation_timer" if another non-fatal error was received
+  ([Core #6961](https://github.com/realm/realm-core/issues/6961)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -23,7 +31,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.1.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.24.1 to 13.25.0
 
 10.45.0 Release notes (2023-12-15)
 =============================================================

@@ -950,7 +950,7 @@ case "$COMMAND" in
 
     "ci-pr")
         echo "Building with Xcode Version $(xcodebuild -version)"
-        export sha="$BRANCH"
+        export sha="$CI_BRANCH"
         export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
         target=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
         sh build.sh "verify-$target"
