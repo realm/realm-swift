@@ -118,17 +118,14 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Wait for downloads to complete; drop any error.
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm;
-- (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Wait for uploads to complete; drop any error.
 - (void)waitForUploadsForRealm:(RLMRealm *)realm;
-- (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
 - (void)waitForDownloadsForUser:(RLMUser *)user
                  partitionValue:(NSString *)partitionValue
-                    expectation:(nullable XCTestExpectation *)expectation
-                          error:(NSError **)error;
+                    expectation:(nullable XCTestExpectation *)expectation;
 
 /// Set the user's tokens to invalid ones to test invalid token handling.
 - (void)setInvalidTokensForUser:(RLMUser *)user;

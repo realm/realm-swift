@@ -37,14 +37,10 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 #pragma mark - SubscriptionSet
 
 @interface RLMSyncSubscriptionEnumerator : NSObject
-
-@property (nonatomic, readonly) RLMSyncSubscriptionSet *subscriptionSet;
-
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                     count:(NSUInteger)len;
 
 - (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet;
-
 @end
 
 @interface RLMSyncSubscriptionSet ()

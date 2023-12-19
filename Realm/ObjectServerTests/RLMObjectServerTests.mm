@@ -1171,7 +1171,7 @@ static NSString *randomEmail() {
         // Log out the user.
         [self logOutUser:user];
         // Log the user back in.
-        user = [self logInUserForCredentials:credentials];
+        [self logInUserForCredentials:credentials];
 
         RLMRunChildAndWait();
 
@@ -1200,7 +1200,7 @@ static NSString *randomEmail() {
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         CHECK_COUNT(1, Person, realm);
 
-        user = [self logInUserForCredentials:credentials];
+        [self logInUserForCredentials:credentials];
         [self addPersonsToRealm:realm
                         persons:@[[Person john], [Person paul], [Person ringo]]];
         [self waitForUploadsForRealm:realm];

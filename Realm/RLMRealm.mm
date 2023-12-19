@@ -215,18 +215,18 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     if (!configuration.seedFilePath) {
         return false;
     }
+    NSError *copyError;
+    bool didCopySeed = false;
     @autoreleasepool {
-        bool didCopySeed = false;
-        NSError *copyError;
         DB::call_with_lock(configuration.path, [&](auto const&) {
             didCopySeed = [[NSFileManager defaultManager] copyItemAtURL:configuration.seedFilePath
                                                                   toURL:configuration.fileURL
                                                                   error:&copyError];
         });
-        if (!didCopySeed && copyError != nil && copyError.code != NSFileWriteFileExistsError) {
-            RLMSetErrorOrThrow(copyError, error);
-            return true;
-        }
+    }
+    if (!didCopySeed && copyError && copyError.code != NSFileWriteFileExistsError) {
+        RLMSetErrorOrThrow(copyError, error);
+        return true;
     }
     return false;
 }

@@ -627,6 +627,12 @@ supported version.
   attempting to connect to the old URL and getting redirected rather than only
   the first connection after the deployment location changed.
   ([Core #6630](https://github.com/realm/realm-core/issues/6630), since v10.38.2)
+* `-[RLMAsymmetricObject createObject:withValue:]` was marked as having a
+  non-null return value despite always returning `nil` (since v10.29.0).
+* Eliminate several clang static analyzer warnings which did not report actual
+  bugs.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 

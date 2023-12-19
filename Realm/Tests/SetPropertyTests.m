@@ -271,7 +271,7 @@
     XCTAssertEqualObjects(results[0].intSet, setObj1.intSet);
 
     RLMSet *setProp = setObj1.set;
-    RLMAssertThrowsWithReasonMatching([setProp addObject:@"another one"], @"write transaction");
+    RLMAssertThrowsWithReasonMatching([setProp addObject:(id)@"another one"], @"write transaction");
 
     // make sure we can fast enumerate
     for (RLMObject *obj in setObj1.set) {

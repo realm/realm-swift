@@ -1603,6 +1603,10 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
             XCTAssertNotNil(oldObject);
             XCTAssertNotNil(newObject);
             RLMObject *childObject = newObject[@"object"];
+            XCTAssertNotNil(childObject);
+            if (childObject == nil) {
+                return;
+            }
             [migration createObject:EmbeddedIntParentObject.className withValue:@[@43, childObject, NSNull.null]];
         }];
     }];
