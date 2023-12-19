@@ -142,14 +142,6 @@ static NSURL *syncDirectoryForChildProcess() {
     [realm commitWriteTransaction];
 }
 
-- (void)addAllTypesSyncObjectToRealm:(RLMRealm *)realm values:(NSDictionary *)dictionary person:(Person *)person {
-    [realm beginWriteTransaction];
-    AllTypesSyncObject *obj = [[AllTypesSyncObject alloc] initWithValue:dictionary];
-    obj.objectCol = person;
-    [realm addObject:obj];
-    [realm commitWriteTransaction];
-}
-
 - (RLMRealmConfiguration *)configuration {
     RLMRealmConfiguration *configuration = [self configurationForUser:self.createUser];
     configuration.objectClasses = self.defaultObjectTypes;

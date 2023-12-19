@@ -48,6 +48,8 @@ public enum ProcessKind {
     }
 }
 
+// SwiftSyncTestCase wraps RLMSyncTestCase to make it more pleasant to use from
+// Swift. Most of the comments there apply to this as well.
 @available(macOS 13, *)
 @MainActor
 open class SwiftSyncTestCase: RLMSyncTestCase {
@@ -56,6 +58,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         user.configuration(partitionValue: self.name)
     }
 
+    // Must be overriden in each subclass to specify which types will be used
+    // in this test case.
     open var objectTypes: [ObjectBase.Type] {
         [SwiftPerson.self]
     }
@@ -125,6 +129,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         waitForDownloads(for: ObjectiveCSupport.convert(object: realm))
     }
 
+    // Populate the server-side data using the given block, which is called in
+    // a write transaction. Note that unlike the obj-c versions, this works for
+    // both PBS and FLX sync.
     public func write(app: App? = nil, _ block: (Realm) throws -> Void) throws {
         try autoreleasepool {
             let realm = try openRealm(app: app)
@@ -212,6 +219,10 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
 #if swift(>=5.8)
     // MARK: - Async helpers
+
+    // These are async versions of the synchronous functions defined above.
+    // They should function identially other than being async rather than using
+    // expecatations to synchronously await things.
     public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
         let email = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
@@ -260,6 +271,8 @@ public extension Publisher {
         })
     }
 
+    // Synchronously await non-error completion of the publisher, calling the
+    // `receiveValue` callback with the value if supplied.
     @MainActor
     func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0, receiveValue: (@Sendable (Self.Output) -> Void)? = nil) {
         let expectation = testCase.expectation(description: "Async combine pipeline")
@@ -268,6 +281,7 @@ public extension Publisher {
         cancellable.cancel()
     }
 
+    // Synchronously await non-error completion of the publisher, returning the published value.
     @discardableResult
     @MainActor
     func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0) -> Self.Output {
@@ -279,6 +293,7 @@ public extension Publisher {
         return value.wrappedValue!
     }
 
+    // Synchrously await error completion of the publisher
     @MainActor
     func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
                       _ errorHandler: (@Sendable (Self.Failure) -> Void)? = nil) {
