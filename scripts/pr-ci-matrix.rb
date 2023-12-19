@@ -1,70 +1,140 @@
 #!/usr/bin/env ruby
 # Matrix of current targets and XCode versions, and is used to add/update/delete XCode cloud workflows.
 
-# The target should have the following structure, target = <platform>-<scheme>_<extra>
-# this will help to create new workflows and their build actions automatically.
+Destination = Struct.new(:build_platform, :test_destination) do |cls|
+  def cls.macOS
+    Destination.new('MACOS', {
+      'deviceTypeName' => 'Mac',
+      'deviceTypeIdentifier' => 'mac',
+      'runtimeName' => 'Same As Selected macOS Version',
+      'runtimeIdentifier' => 'builder',
+      'kind' => 'MAC'
+    })
+  end
+
+  def cls.catalyst
+    Destination.new('MACOS', {
+      'deviceTypeName' => 'Mac (Mac Catalyst)',
+      'deviceTypeIdentifier' => 'mac_catalyst',
+      'runtimeName' => 'Same As Selected macOS Version',
+      'runtimeIdentifier' => 'builder',
+      'kind' => 'MAC'
+    })
+  end
+
+  def cls.iOS
+    Destination.new('IOS', {
+      'deviceTypeName' => 'iPhone 11',
+      'deviceTypeIdentifier' => 'com.apple.CoreSimulator.SimDeviceType.iPhone-11',
+      'runtimeName' => 'Latest from Selected Xcode (iOS 16.1)',
+      'runtimeIdentifier' => 'default',
+      'kind' => 'SIMULATOR'
+    })
+  end
+
+  def cls.tvOS
+    Destination.new('TVOS', {
+      'deviceTypeName' => 'Recommended Apple TVs',
+      'deviceTypeIdentifier' =>  'recommended_apple_tvs',
+      'runtimeName' =>  'Latest from Selected Xcode (tvOS 16.4)',
+      'runtimeIdentifier' =>  'default',
+      'kind' =>  'SIMULATOR'
+    })
+  end
+
+  def cls.generic
+    Destination.new('MACOS', nil)
+  end
+end
+
+Target = Struct.new(:name, :scheme, :filter, :destination) do
+  def action
+    action = {
+      name: self.name,
+      actionType: 'BUILD',
+      destination: nil,
+      buildDistributionAudience: nil,
+      scheme: self.scheme,
+      platform: self.destination.build_platform,
+      isRequiredToPass: true
+    }
+
+    test_destination = self.destination.test_destination
+    if test_destination
+      action['actionType'] = 'TEST'
+      action['destination'] = 'ANY_MAC'
+      action['testConfiguration'] = {
+        kind: 'USE_SCHEME_SETTINGS',
+        testPlanName: '',
+        testDestinations: [test_destination]
+      }
+    end
+
+    return action
+  end
+end
+
+# Each test target has a name, a scheme, an xcode version filter, and a
+# destination to run tests on. Targets which aren't testing a framework
+# use the 'CI' target and always the a 'generic' destination.
 #
-# platform: ios, tvos, osx, catalyst
-# For any other values different than the ones mentioned above, a default build action will be created
-# and all the tests must be run on the `ci_post_clone.sh` step.
-#
-# scheme:
-# swift => RealmSwift
-# swiftui => SwiftUITests
-# swiftuiserver => SwiftUISyncTests
-# default => For any other value Realm will be used as the scheme.
-#
-# To add new workflows which includes new platforms or schemes, the corresponding configuration should be
-# added to the `xcode_cloud-helper.rb` file.
-module WORKFLOWS
-  XCODE_VERSIONS = %w(14.1 14.2 14.3.1)
+# To avoid using excess CI resources we don't build the full matrix of
+# combinations of targets and Xcode version. We generally test each build
+# method (Xcode project, Swift package, and podspec) on every Xcode version for
+# a single platform, and everything else is tested with the oldest and newest
+# supported Xcode versions. Some things (e.g. swiftlint) only test the latest
+# because they don't care about Xcode versions, while some others are latest-only
+# because they're particularly slow to run.
+module Workflows
+  XCODE_VERSIONS = %w(14.1 14.2 14.3.1 15.0.1 15.1)
 
   all = ->(v) { true }
   latest_only = ->(v) { v == XCODE_VERSIONS.last }
   oldest_and_latest = ->(v) { v == XCODE_VERSIONS.first or v == XCODE_VERSIONS.last }
 
-  TARGETS = {
-    'osx' => all,
-    'osx-encryption' => latest_only,
-    'osx-swift' => all,
-    'osx-swift-evolution' => latest_only,
+  TARGETS = [
+    Target.new('osx', 'Realm', all, Destination.macOS),
+    Target.new('osx-encryption', 'Realm', latest_only, Destination.macOS),
+    Target.new('osx-swift', 'RealmSwift', all, Destination.macOS),
+    Target.new('osx-swift-evolution', 'RealmSwift', latest_only, Destination.macOS),
 
-    'ios' => oldest_and_latest,
-    'ios-static' => oldest_and_latest,
-    'ios-swift' => oldest_and_latest,
-    'ios-swift-evolution' => latest_only,
+    Target.new('ios', 'Realm', oldest_and_latest, Destination.iOS),
+    Target.new('ios-static', 'Realm', oldest_and_latest, Destination.iOS),
+    Target.new('ios-swift', 'RealmSwift', oldest_and_latest, Destination.iOS),
+    Target.new('ios-swift-evolution', 'RealmSwift', latest_only, Destination.iOS),
 
-    'tvos' => oldest_and_latest,
-    'tvos-swift' => oldest_and_latest,
-    'tvos-swift-evolution' => latest_only,
+    Target.new('tvos', 'Realm', oldest_and_latest, Destination.tvOS),
+    Target.new('tvos-static', 'Realm', oldest_and_latest, Destination.tvOS),
+    Target.new('tvos-swift', 'RealmSwift', oldest_and_latest, Destination.tvOS),
+    Target.new('tvos-swift-evolution', 'RealmSwift', latest_only, Destination.tvOS),
 
-    'catalyst' => oldest_and_latest,
-    'catalyst-swift' => oldest_and_latest,
+    Target.new('catalyst', 'Realm', oldest_and_latest, Destination.catalyst),
+    Target.new('catalyst-swift', 'RealmSwift', oldest_and_latest, Destination.catalyst),
 
-    'watchos' => oldest_and_latest,
+    Target.new('watchos', 'Realm', oldest_and_latest, Destination.generic),
+    Target.new('watchos', 'RealmSwift', oldest_and_latest, Destination.generic),
 
-    'ios-swiftui' => latest_only,
+    Target.new('swiftui', 'SwiftUITests', latest_only, Destination.iOS),
+    Target.new('swiftui-sync', 'SwiftUISyncTests', latest_only, Destination.macOS),
 
-    'swiftuiserver-osx' => latest_only,
-    'objectserver-osx' => oldest_and_latest,
+    Target.new('sync', 'Object Server Tests', oldest_and_latest, Destination.macOS),
 
-    'docs' => latest_only,
-    'swiftlint' => latest_only,
+    Target.new('docs', 'CI', latest_only, Destination.generic),
+    Target.new('swiftlint', 'CI', latest_only, Destination.generic),
 
-    'swiftpm' => oldest_and_latest,
-    'swiftpm-debug' => all,
-    'swiftpm-address' => latest_only,
-    'swiftpm-thread' => latest_only,
+    Target.new('swiftpm', 'CI', oldest_and_latest, Destination.generic),
+    Target.new('swiftpm-debug', 'CI', all, Destination.generic),
+    Target.new('swiftpm-address', 'CI', latest_only, Destination.generic),
+    Target.new('swiftpm-thread', 'CI', latest_only, Destination.generic),
+    Target.new('spm-ios', 'CI', all, Destination.generic),
 
-    'xcframework' => latest_only,
+    Target.new('xcframework', 'CI', latest_only, Destination.generic),
 
-    'cocoapods-osx' => all,
-    'cocoapods-ios-static' => latest_only,
-    'cocoapods-ios' => latest_only,
-    'cocoapods-watchos' => latest_only,
-    'cocoapods-tvos' => latest_only,
-    'cocoapods-catalyst' => latest_only,
-
-    'spm-ios' => all,
-  }
+    Target.new('cocoapods-osx', 'CI', all, Destination.generic),
+    Target.new('cocoapods-ios', 'CI', latest_only, Destination.generic),
+    Target.new('cocoapods-ios-static', 'CI', latest_only, Destination.generic),
+    Target.new('cocoapods-watchos', 'CI', latest_only, Destination.generic),
+    Target.new('cocoapods-tvos', 'CI', latest_only, Destination.generic),
+    Target.new('cocoapods-catalyst', 'CI', latest_only, Destination.generic),
+  ]
 end
