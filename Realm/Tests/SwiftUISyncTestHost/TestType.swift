@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2023 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
-
-RLM_HEADER_AUDIT_BEGIN(nullability)
-
-@interface RLMUser (ObjectServerTests)
-- (void)simulateClientResetErrorForSession:(NSString *)partitionValue;
-@end
-
-@interface RLMSyncSession (ObjectServerTests)
-+ (dispatch_queue_t)notificationsQueue;
-@end
-
-RLM_HEADER_AUDIT_END(nullability)
+enum TestType: String {
+    case asyncOpen
+    case asyncOpenEnvironmentPartition
+    case asyncOpenEnvironmentConfiguration
+    case asyncOpenFlexibleSync
+    case asyncOpenCustomConfiguration
+    case autoOpen
+    case autoOpenEnvironmentPartition
+    case autoOpenEnvironmentConfiguration
+    case autoOpenFlexibleSync
+    case autoOpenCustomConfiguration
+}

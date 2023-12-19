@@ -36,20 +36,17 @@
 @end
 
 @implementation RLMSetObjectServerTests
+- (NSArray *)defaultObjectTypes {
+    return @[RLMSetSyncObject.self, Person.self];
+}
 
 - (void)roundTripWithPropertyGetter:(RLMSet *(^)(id))propertyGetter
                              values:(NSArray *)values
                 otherPropertyGetter:(RLMSet *(^)(id))otherPropertyGetter
                         otherValues:(NSArray *)otherValues
-                           isObject:(BOOL)isObject
-                         callerName:(NSString *)callerName {
-    RLMUser *readUser = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
-                                                                            register:YES]];
-    RLMUser *writeUser = [self logInUserForCredentials:[self basicCredentialsWithName:[callerName stringByAppendingString:@"Writer"]
-                                                                            register:YES]];
-
-    RLMRealm *readRealm = [self openRealmForPartitionValue:callerName user:readUser];
-    RLMRealm *writeRealm = [self openRealmForPartitionValue:callerName user:writeUser];
+                           isObject:(BOOL)isObject {
+    RLMRealm *readRealm = [self openRealm];
+    RLMRealm *writeRealm = [self openRealm];
     auto write = [&](auto fn) {
         [writeRealm transactionWithBlock:^{
             fn();
@@ -106,8 +103,7 @@
                                values:@[@123, @234, @345]
                   otherPropertyGetter:^RLMSet *(RLMSetSyncObject *obj) { return obj.otherIntSet; }
                           otherValues:@[@345, @567, @789]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testStringSet {
@@ -115,8 +111,7 @@
                                values:@[@"Who", @"What", @"When"]
                   otherPropertyGetter:^RLMSet *(RLMSetSyncObject *obj) { return obj.otherStringSet; }
                           otherValues:@[@"When", @"Strings", @"Collide"]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDataSet {
@@ -131,8 +126,7 @@
                                values:@[duplicateData, createData(1024U), createData(1024U)]
                   otherPropertyGetter:^RLMSet *(RLMSetSyncObject *obj) { return obj.otherDataSet; }
                           otherValues:@[duplicateData, createData(1024U), createData(1024U)]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDoubleSet {
@@ -140,8 +134,7 @@
                                values:@[@123.456, @234.456, @345.567]
                   otherPropertyGetter:^RLMSet *(RLMSetSyncObject *obj) { return obj.otherDoubleSet; }
                           otherValues:@[@123.456, @434.456, @545.567]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testObjectIdSet {
@@ -153,8 +146,7 @@
                           otherValues:@[[[RLMObjectId alloc] initWithString:@"6058f12b957ba06156586a7c" error:nil],
                                         [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1e" error:nil],
                                         [[RLMObjectId alloc] initWithString:@"6058f12d42e5a393e67538df" error:nil]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDecimalSet {
@@ -166,8 +158,7 @@
                           otherValues:@[[[RLMDecimal128 alloc] initWithNumber:@123.456],
                                         [[RLMDecimal128 alloc] initWithNumber:@423.456],
                                         [[RLMDecimal128 alloc] initWithNumber:@523.456]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testUUIDSet {
@@ -179,8 +170,7 @@
                           otherValues:@[[[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
                                         [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae"],
                                         [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf"]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testObjectSet {
@@ -188,8 +178,7 @@
                                values:@[[Person john], [Person paul], [Person ringo]]
                   otherPropertyGetter:^RLMSet *(RLMSetSyncObject *obj) { return obj.otherObjectSet; }
                           otherValues:@[[Person john], [Person paul], [Person ringo]]
-                             isObject:YES
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:YES];
 }
 
 - (void)testAnySet {
@@ -199,8 +188,7 @@
                           otherValues:@[[[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
                                         @123,
                                         [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1d" error:nil]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 @end
@@ -211,18 +199,15 @@
 @end
 
 @implementation RLMArrayObjectServerTests
+- (NSArray *)defaultObjectTypes {
+    return @[RLMArraySyncObject.self, Person.self];
+}
 
 - (void)roundTripWithPropertyGetter:(RLMArray *(^)(id))propertyGetter
                              values:(NSArray *)values
-                           isObject:(BOOL)isObject
-                         callerName:(NSString *)callerName {
-    RLMUser *readUser = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
-                                                                            register:YES]];
-    RLMUser *writeUser = [self logInUserForCredentials:[self basicCredentialsWithName:[callerName stringByAppendingString:@"Writer"]
-                                                                            register:YES]];
-
-    RLMRealm *readRealm = [self openRealmForPartitionValue:callerName user:readUser];
-    RLMRealm *writeRealm = [self openRealmForPartitionValue:callerName user:writeUser];
+                           isObject:(BOOL)isObject {
+    RLMRealm *readRealm = [self openRealm];
+    RLMRealm *writeRealm = [self openRealm];
     auto write = [&](auto fn) {
         [writeRealm transactionWithBlock:^{
             fn();
@@ -269,22 +254,19 @@
 - (void)testIntArray {
     [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.intArray; }
                                values:@[@123, @234, @345]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testBoolArray {
     [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.boolArray; }
                                values:@[@YES, @NO, @YES]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testStringArray {
     [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.stringArray; }
                                values:@[@"Hello...", @"It's", @"Me"]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDataArray {
@@ -295,15 +277,13 @@
                                                        length:1],
                                         [NSData dataWithBytes:(unsigned char[]){0x0c}
                                                        length:1]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDoubleArray {
     [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.doubleArray; }
                                values:@[@123.456, @789.456, @987.344]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testObjectIdArray {
@@ -311,8 +291,7 @@
                                values:@[[[RLMObjectId alloc] initWithString:@"6058f12b957ba06156586a7c" error:nil],
                                         [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1d" error:nil],
                                         [[RLMObjectId alloc] initWithString:@"6058f12d42e5a393e67538d0" error:nil]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDecimalArray {
@@ -320,8 +299,7 @@
                                values:@[[[RLMDecimal128 alloc] initWithNumber:@123.456],
                                         [[RLMDecimal128 alloc] initWithNumber:@456.456],
                                         [[RLMDecimal128 alloc] initWithNumber:@789.456]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testUUIDArray {
@@ -329,22 +307,19 @@
                                values:@[[[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
                                         [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fe"],
                                         [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff"]]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testObjectArray {
     [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.objectArray; }
                                values:@[[Person john], [Person paul], [Person ringo]]
-                             isObject:YES
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:YES];
 }
 
 - (void)testAnyArray {
     [self roundTripWithPropertyGetter:^RLMArray *(RLMArraySyncObject *obj) { return obj.anyArray; }
                                values:@[@1234, @"I'm a String", NSNull.null]
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 @end
@@ -355,18 +330,15 @@
 @end
 
 @implementation RLMDictionaryObjectServerTests
+- (NSArray *)defaultObjectTypes {
+    return @[RLMDictionarySyncObject.self, Person.self];
+}
 
 - (void)roundTripWithPropertyGetter:(RLMDictionary *(^)(id))propertyGetter
                              values:(NSDictionary *)values
-                           isObject:(BOOL)isObject
-                         callerName:(NSString *)callerName {
-    RLMUser *readUser = [self logInUserForCredentials:[self basicCredentialsWithName:callerName
-                                                                            register:YES]];
-    RLMUser *writeUser = [self logInUserForCredentials:[self basicCredentialsWithName:[callerName stringByAppendingString:@"Writer"]
-                                                                            register:YES]];
-
-    RLMRealm *readRealm = [self openRealmForPartitionValue:callerName user:readUser];
-    RLMRealm *writeRealm = [self openRealmForPartitionValue:callerName user:writeUser];
+                           isObject:(BOOL)isObject {
+    RLMRealm *readRealm = [self openRealm];
+    RLMRealm *writeRealm = [self openRealm];
     auto write = [&](auto fn) {
         [writeRealm transactionWithBlock:^{
             fn();
@@ -423,14 +395,12 @@
 - (void)testIntDictionary {
     [self roundTripWithPropertyGetter:^RLMDictionary *(RLMDictionarySyncObject *obj) { return obj.intDictionary; }
                                values:@{@"0": @123, @"1": @234, @"2": @345, @"3": @567, @"4": @789}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 - (void)testStringDictionary {
     [self roundTripWithPropertyGetter:^RLMDictionary *(RLMDictionarySyncObject *obj) { return obj.stringDictionary; }
                                values:@{@"0": @"Who", @"1": @"What", @"2": @"When", @"3": @"Strings", @"4": @"Collide"}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDataDictionary {
@@ -440,15 +410,13 @@
                                         @"2": [NSData dataWithBytes:(unsigned char[]){0x0c} length:1],
                                         @"3": [NSData dataWithBytes:(unsigned char[]){0x0d} length:1],
                                         @"4": [NSData dataWithBytes:(unsigned char[]){0x0e} length:1]}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDoubleDictionary {
     [self roundTripWithPropertyGetter:^RLMDictionary *(RLMDictionarySyncObject *obj) { return obj.doubleDictionary; }
                                values:@{@"0": @123.456, @"1": @234.456, @"2": @345.567, @"3": @434.456, @"4": @545.567}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testObjectIdDictionary {
@@ -458,8 +426,7 @@
                                         @"2": [[RLMObjectId alloc] initWithString:@"6058f12d42e5a393e67538d0" error:nil],
                                         @"3": [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1e" error:nil],
                                         @"4": [[RLMObjectId alloc] initWithString:@"6058f12d42e5a393e67538df" error:nil]}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testDecimalDictionary {
@@ -469,8 +436,7 @@
                                         @"2": [[RLMDecimal128 alloc] initWithNumber:@323.456],
                                         @"3": [[RLMDecimal128 alloc] initWithNumber:@423.456],
                                         @"4": [[RLMDecimal128 alloc] initWithNumber:@523.456]}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testUUIDDictionary {
@@ -480,8 +446,7 @@
                                         @"2": [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90ff"],
                                         @"3": [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90ae"],
                                         @"4": [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90bf"]}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 
 - (void)testObjectDictionary {
@@ -491,8 +456,7 @@
                                         @"2": [Person ringo],
                                         @"3": [Person george],
                                         @"4": [Person stuart]}
-                             isObject:YES
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:YES];
 }
 
 - (void)testAnyDictionary {
@@ -502,8 +466,7 @@
                                         @"2": NSNull.null,
                                         @"3": [[NSUUID alloc] initWithUUIDString:@"6b28ec45-b29a-4b0a-bd6a-343c7f6d90fd"],
                                         @"4": [[RLMObjectId alloc] initWithString:@"6058f12682b2fbb1f334ef1d" error:nil]}
-                             isObject:NO
-                           callerName:NSStringFromSelector(_cmd)];
+                             isObject:NO];
 }
 @end
 

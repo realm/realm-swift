@@ -801,7 +801,7 @@ public extension SyncSession {
      Progress notification blocks can be registered on sessions if your app wishes to be informed
      how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
      */
-    enum ProgressDirection {
+    enum ProgressDirection: Sendable {
         /// For monitoring upload progress.
         case upload
         /// For monitoring download progress.
@@ -814,7 +814,7 @@ public extension SyncSession {
      Progress notification blocks can be registered on sessions if your app wishes to be informed
      how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
      */
-    enum ProgressMode {
+    enum ProgressMode: Sendable {
         /**
          The block will be called forever, or until it is unregistered by calling
          `ProgressNotificationToken.invalidate()`.

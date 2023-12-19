@@ -56,6 +56,8 @@ FOUNDATION_EXTERN RLMRealm *_Nullable RLMGetAnyCachedRealm(RLMRealmConfiguration
 // Scheduler an async refresh for the given Realm
 FOUNDATION_EXTERN RLMAsyncRefreshTask *_Nullable RLMRealmRefreshAsync(RLMRealm *rlmRealm) NS_RETURNS_RETAINED;
 
+FOUNDATION_EXTERN void RLMRealmSubscribeToAll(RLMRealm *);
+
 // RLMRealm private members
 @interface RLMRealm ()
 @property (nonatomic, readonly) BOOL dynamic;

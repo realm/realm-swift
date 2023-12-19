@@ -30,11 +30,17 @@ import RealmSwiftTestSupport
 #endif
 
 // MARK: - SwiftMongoClientTests
+@available(macOS 13.0, *)
 class SwiftMongoClientTests: SwiftSyncTestCase {
+    override var objectTypes: [ObjectBase.Type] {
+        [Dog.self]
+    }
+
     override func tearDown() {
         _ = setupMongoCollection()
         super.tearDown()
     }
+
     func testMongoClient() {
         let user = try! logInUser(for: .anonymous)
         let mongoClient = user.mongoClient("mongodb1")
@@ -46,10 +52,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 
     func setupMongoCollection() -> MongoCollection {
-        let user = try! logInUser(for: basicCredentials())
-        let mongoClient = user.mongoClient("mongodb1")
-        let database = mongoClient.database(named: "test_data")
-        let collection = database.collection(withName: "Dog")
+        let collection = createUser().collection(for: Dog.self, app: app)
         removeAllFromCollection(collection)
         return collection
     }
@@ -740,7 +743,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     // thread and doesn't let async tasks run. Xcode 14.3 introduced a new async
     // version of it which does work, but there doesn't appear to be a workaround
     // for older Xcode versions.
-    @available(macOS 12.0, *)
+    @available(macOS 13, *)
     func performAsyncWatchTest(filterIds: Bool = false, matchFilter: Bool = false) async throws {
         let collection = setupMongoCollection()
         let objectIds = insertDocuments(collection)
@@ -785,17 +788,17 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         _ = await task.result
     }
 
-    @available(macOS 12.0, *)
+    @available(macOS 13, *)
     func testWatchAsync() async throws {
         try await performAsyncWatchTest()
     }
 
-    @available(macOS 12.0, *)
+    @available(macOS 13, *)
     func testWatchWithMatchFilterAsync() async throws {
         try await performAsyncWatchTest(matchFilter: true)
     }
 
-    @available(macOS 12.0, *)
+    @available(macOS 13, *)
     func testWatchWithFilterIdsAsync() async throws {
         try await performAsyncWatchTest(filterIds: true)
     }
@@ -854,9 +857,7 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 
     func testShouldNotDeleteOnMigrationWithSync() throws {
-        let user = try logInUser(for: basicCredentials())
-        var configuration = user.configuration(testName: appId)
-
+        var configuration = try configuration()
         assertThrows(configuration.deleteRealmIfMigrationNeeded = true,
                      reason: "Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).")
 
@@ -867,9 +868,14 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
+#if swift(>=5.8)
 // MARK: - AsyncAwaitMongoClientTests
-@available(macOS 12.0, *)
+@available(macOS 13, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
+    override var objectTypes: [ObjectBase.Type] {
+        [Dog.self]
+    }
+
     override class var defaultTestSuite: XCTestSuite {
         // async/await is currently incompatible with thread sanitizer and will
         // produce many false positives
@@ -882,10 +888,7 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
     }
 
     func setupMongoCollection() async throws -> MongoCollection {
-        let user = try await self.app.login(credentials: basicCredentials())
-        let mongoClient = user.mongoClient("mongodb1")
-        let database = mongoClient.database(named: "test_data")
-        let collection = database.collection(withName: "Dog")
+        let collection = try await createUser().collection(for: Dog.self, app: app)
         _ = try await collection.deleteManyDocuments(filter: [:])
         return collection
     }
@@ -1244,5 +1247,6 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertEqual(count5, 1)
     }
 }
+#endif
 
 #endif // os(macOS)
