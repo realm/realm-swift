@@ -4,8 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* `@Persisted`'s Encodable implementation did not allow the encoder to
+  customize the encoding of values, which broke things like JSONEncoder's
+  `dateEncodingStrategy` ([#8425](https://github.com/realm/realm-swift/issues/8425)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
