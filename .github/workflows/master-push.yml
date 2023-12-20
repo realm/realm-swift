@@ -2,7 +2,7 @@ name: Prepare Release
 on:
   push:
     branches:
-      - "dp/test_final_release"
+      - "master"
 env:
   XCODE_VERSION: "['14.1', '14.2', '14.3.1', '15.0.1']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst']"

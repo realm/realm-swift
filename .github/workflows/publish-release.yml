@@ -1,5 +1,8 @@
 name: Publish release
-on: workflow_dispatch
+on: 
+  push:
+    branches:
+      - "dp/test_final_release"
 env:
   XCODE_VERSION: "['14.1', '14.2', '14.3.1', '15.0.1', '15.1']"
 jobs:
@@ -49,7 +52,7 @@ jobs:
           uses: dawidd6/action-download-artifact@v3
           with:
             workflow: master-push.yml
-            commit: ${{ github.sha }}
+            commit: ecf364a2da29aa459eedfe55cf5c5715a6c97ed2
             name: realm-docs
             workflow_conclusion: completed
         - name: Unzip docs
@@ -76,7 +79,7 @@ jobs:
           uses: dawidd6/action-download-artifact@v3
           with:
             workflow: master-push.yml
-            commit: ${{ github.sha }}
+            commit: ecf364a2da29aa459eedfe55cf5c5715a6c97ed2
             path: ${{ github.workspace }}/release_pkg
             workflow_conclusion: completed
         - name: Create Github release
@@ -154,6 +157,9 @@ jobs:
       steps:
         - name: Checkout
           uses: actions/checkout@v4
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ matrix.xcode-version }}
         - name: Run installation test
           run: |
             echo "REALM_TEST_RELEASE=${{ needs.prepare.outputs.VERSION }}" >> $GITHUB_OUTPUT
