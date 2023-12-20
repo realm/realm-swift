@@ -87,7 +87,7 @@ fi
 
 # In release we are creating some workflows which build the framework for each platform, target and configuration, 
 # and we need to set the linker flags in the Configuration file.
-if [[ "$CI_WORKFLOW" == "release-package-build-"* ]]; then
+if [[ "$CI_WORKFLOW" == "release-package-build_"* ]]; then
     filename="Configuration/Release.xcconfig"
     sed -i '' "s/REALM_HIDE_SYMBOLS = NO;/REALM_HIDE_SYMBOLS = YES;/" "$filename"
 fi
