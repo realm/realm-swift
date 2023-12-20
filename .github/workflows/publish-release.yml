@@ -13,6 +13,8 @@ jobs:
       XCODE_VERSIONS_MATRIX: ${{ env.XCODE_VERSION }}
       VERSION: ${{ steps.get-version.outputs.VERSION }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Compute outputs
         run: |
           echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
@@ -157,6 +159,8 @@ jobs:
       steps:
         - name: Checkout
           uses: actions/checkout@v4
+        - name: Install FileUtils
+          run: gem install fileutils
         - uses: maxim-lobanov/setup-xcode@v1
           with:
             xcode-version: ${{ matrix.xcode-version }}
