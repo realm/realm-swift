@@ -1296,7 +1296,8 @@ case "$COMMAND" in
         filename="Configuration/Release.xcconfig"
         sed -i '' "s/REALM_HIDE_SYMBOLS = NO;/REALM_HIDE_SYMBOLS = YES;/" "$filename"
 
-        build_command=${COMMAND#"release-build_"}
+        # Remove the identifier of the command, so we can obtain the parameters from the command
+        build_command=${COMMAND#"release-package-build_"}
         parameters=(${build_command//-/ })
 
         platform=${parameters[0]}
