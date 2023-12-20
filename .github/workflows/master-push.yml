@@ -150,7 +150,7 @@ jobs:
         - name: Creates on demand XCode Cloud's workflows with a build action for ${{ matrix.platform }} in ${{ matrix.xcode-version }} with configuration ${{ matrix.configuration }}
           id: create-workflow
           run: |
-            workflow_id=$(echo $(ruby ./scripts/xcode_cloud_helper.rb create-release-workflow "${{ matrix.platform }} ${{ matrix.target }} ${{ matrix.configuration }}" -t ${{ steps.token.outputs.token }} --xcode-version ${{ matrix.xcode-version }}))
+            workflow_id=$(echo $(ruby ./scripts/xcode_cloud_helper.rb create-release-workflow ${{ matrix.platform }} ${{ matrix.xcode-version }} ${{ matrix.target }} ${{ matrix.configuration }} -t ${{ steps.token.outputs.token }}))
             echo "WORKFLOW_ID=$workflow_id" >> $GITHUB_OUTPUT
         - name: Runs the XCode Cloud workflow created by the previous step
           id: build-run
@@ -224,7 +224,7 @@ jobs:
   #           xcode-version: ${{ matrix.xcode-version }}
   #       - name: Create framework
   #         run: |
-  #           sh -x build.sh release-build_${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}
+  #           sh -x build.sh release--package-build_${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}
   #       - name: Cache build product
   #         uses: actions/cache/save@v3
   #         with:
