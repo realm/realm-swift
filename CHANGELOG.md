@@ -1,7 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Greatly improve the performance of creating objects with a very large number
+  of pre-existing incoming links. This is primarily relevant to initial sync
+  bootstrapping when linking objects happen to be synchronized before the
+  target objects they link to ([Core #7217](https://github.com/realm/realm-core/issues/7217), since v10.0.0).
 
 ### Fixed
 * Registering new notifications inside write transactions before actually
@@ -20,7 +23,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.1-15.1.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.25.0 to 13.25.1
 
 10.45.1 Release notes (2023-12-18)
 =============================================================
