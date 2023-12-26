@@ -9,7 +9,9 @@ package enum PrimaryKey : Hashable {
 
 public struct Configuration {
     public let linkDepth: UInt8
-    package let discoveredObjects: [PrimaryKey : RawObjectSyntaxView]
+//    package let discoveredObjects: [PrimaryKey : RawObjectSyntaxView]
+    
+//    public static let `default` = Configuration(linkDepth: 0, discoveredObjects: [:])
 }
 
 public protocol SyntaxView : CustomStringConvertible {
@@ -18,6 +20,8 @@ public protocol SyntaxView : CustomStringConvertible {
     var startIndex: String.Index { get }
     var endIndex: String.Index { get }
     var rawJSON: String { get }
+//    var configuration: Configuration { get }
+    
     init(json: String,
          at startIndex: String.Index,
          configuration: inout Configuration) throws
@@ -34,47 +38,35 @@ extension SyntaxView {
 }
 
 extension SyntaxView {
-    public func `as`<View>(_ type: View.Type) throws -> View? where View : ObjectSyntaxView {
-        if let self = self as? RawObjectSyntaxView {
-            return try View.init(from: self)
-        } else {
-            return self as? View
-        }
-    }
-//    public func `as`<View>(_ type: View.Type) throws -> View? where Self.RawDocumentValue : Object {
+//    public func `as`<View>(_ type: View.Type) throws -> View? where View : ObjectSyntaxView {
+//        if let self = self as? RawObjectSyntaxView {
+//            return try View.init(from: self)
+//        } else {
+//            return self as? View
+//        }
+//    }
+//
+//    public func `as`<View>(_ type: View?.Type) throws -> View? where View : ObjectSyntaxView {
+//        if let self = self as? RawObjectSyntaxView {
+//            return try View.init(from: self)
+//        } else {
+//            return self as? View
+//        }
+//    }
+
+//    public func `as`<View : SyntaxView>(_ type: View.Type) throws -> View? {
 //        if let self = self as? View {
 //            return self
+//        } else if let self = self as? RawArraySyntaxView {
+//            return try View.init(json: self.rawJSON, at: self.startIndex, configuration: &self.configuration)
 //        } else {
 //            return nil
 //        }
 //    }
-    public func `as`<View>(_ type: View?.Type) throws -> View? where View : ObjectSyntaxView {
-        if let self = self as? RawObjectSyntaxView {
-            return try View.init(from: self)
-        } else {
-            return self as? View
-        }
-    }
-//    public func `as`<View>(_ type: View.Type) throws -> View? {
-//        if let self = self as? View {
-//            return self
-//        } else {
-//            return nil
-//        }
+//    
+//    public func `as`<View: SyntaxView>(_ type: View.Type) throws -> View? where Self == RawArraySyntaxView {
+//        return try View.init(json: self.rawJSON, at: self.startIndex, configuration: &self.configuration)
 //    }
-    public func `as`<View : SyntaxView>(_ type: View.Type) throws -> View? {
-        if let self = self as? View {
-            return self
-        } else if let self = self as? RawArraySyntaxView {
-            return try View.init(json: self.rawJSON, at: self.startIndex, configuration: &self.configuration)
-        } else {
-            return nil
-        }
-    }
-    
-    public func `as`<View: SyntaxView>(_ type: View.Type) throws -> View? where Self == RawArraySyntaxView {
-        return try View.init(json: self.rawJSON, at: self.startIndex, allowedObjectTypes: [])
-    }
 }
 
 extension SyntaxView where RawDocumentValue : Object {

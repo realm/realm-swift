@@ -149,7 +149,9 @@ if #available(macOS 10.15, *) {
             name: "MongoDataAccessTests",
             dependencies: ["MongoDataAccess", "MongoDataAccessMacros",
                            .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")],
-            path: "MongoDataAccess/Tests"),
+            path: "MongoDataAccess/Tests",
+//            exclude: ["bson-corpus"],
+            resources: [.process("bson-corpus")]),
     ]
 } else {
     addedTargets = []

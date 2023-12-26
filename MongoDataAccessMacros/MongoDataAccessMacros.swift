@@ -16,111 +16,58 @@ public struct BSONCodableMacro : ExtensionMacro, MemberMacro, MemberAttributeMac
             
         ]
     }
-    
     public static func expansion(of node: SwiftSyntax.AttributeSyntax, attachedTo declaration: some SwiftSyntax.DeclGroupSyntax, providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol, conformingTo protocols: [SwiftSyntax.TypeSyntax], in context: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
         var typeName = "\(type)"
         if typeName.contains(".") {
             typeName = String(typeName.split(separator: ".")[1])
         }
         let lowercasedType = typeName.lowercasingFirstLetter()
-        return [.init(extendedType: type, inheritanceClause: InheritanceClauseSyntax.init(inheritedTypes: .init(arrayLiteral: .init(type: TypeSyntax(stringLiteral: "RawDocumentObjectRepresentable")))), memberBlock: """
+        let members = try declaration.memberBlock.members.compactMap(view(for:))
+        var isStruct = declaration is StructDeclSyntax
+//        if type is StructDeclSyntax {
+//            
+//        }
+        return [.init(extendedType: type, inheritanceClause: InheritanceClauseSyntax.init(inheritedTypes: .init(arrayLiteral: .init(type: TypeSyntax(stringLiteral: "ExtJSONQueryRepresentable")))), memberBlock: """
             {
-                struct \(raw: typeName)SyntaxView : ObjectSyntaxViewProtocol {
-                    package let objectView: ObjectSyntaxView
-                    private let \(raw: lowercasedType): \(type)
-                    init?(from objectView: ObjectSyntaxView) {
-                        self.objectView = objectView
-                        guard let document = objectView.rawDocumentRepresentable as? [String : any RawDocumentRepresentable] else {
-                            return nil
-                        }
-                        do {
-                            self.\(raw: lowercasedType) = try \(raw: type).init(from: document)
-                        } catch {
-                            print(error)
-                            return nil
-                        }
+                \(raw: !isStruct ? "convenience" : "") init(from document: ExtJSONRepresentable) throws {
+                    guard let document = document as? [String : Any] else {
+                        fatalError()
                     }
-                    package init(allowedObjectTypes: [any ObjectSyntaxViewProtocol.Type], @SyntaxViewBuilder fields: () -> [FieldSyntaxView]) {
-                        var objectView = ObjectSyntaxView(fields: fields)
-                        objectView.allowedObjectTypes = \(raw: type).rawDocumentObjectRepresentableSchema + defaultSchema
-                        objectView.objectType = Self.self
-                        objectView.fields = Self.fields
-                        self.init(from: objectView)!
-                    }
-                    var startIndex: String.Index {
-                        objectView.endIndex
-                    }
-                    
-                    var endIndex: String.Index {
-                        objectView.endIndex
-                    }
-                    
-                    var description: String {
-                        objectView.description
-                    }
-                    var rawDocumentRepresentable: any RawDocumentRepresentable {
-                        \(raw: lowercasedType)
-                    }
-                    static var fields: [String : any MongoDataAccess.SyntaxView.Type] {
-                        [
-                            \(raw: declaration.memberBlock.members.compactMap { member in
-                                guard let decl = member.decl.as(VariableDeclSyntax.self),
-                                    let binding = decl.bindings.compactMap({
-                                        $0.pattern.as(IdentifierPatternSyntax.self)
-                                    }).first,
-                                      let type = decl.bindings.compactMap({
-                                          $0.typeAnnotation?.type
-                                      }).first, !type.is(StructDeclSyntax.self)
-                                else { return nil }
-                                let typeString = type.description == "any RawDocumentRepresentable" ? "MongoDataAccess.AnyValueSyntaxView.self" :
-                "\(type).SyntaxView.self"
-                                return """
-                                "\(binding)": \(typeString)
-                                """
-                            }.joined(separator: ","))
-                        ]
-                    }
-                }
-                public var syntaxView: \(raw: typeName)SyntaxView {
-                    \(raw: typeName)SyntaxView(allowedObjectTypes: Self.rawDocumentObjectRepresentableSchema) {
-                        \(raw: declaration.memberBlock.members.compactMap { member in
-                            guard let decl = member.decl.as(VariableDeclSyntax.self),
-                                let binding = decl.bindings.compactMap({
-                                    $0.pattern.as(IdentifierPatternSyntax.self)
-                                }).first
-                            else { return nil }
-
-                            return """
-                            FieldSyntaxView(key: "\(binding)", value: \(binding).syntaxView)
-                            """
-                        }.joined(separator: "\n"))
-                    }
-                }
-                static var rawDocumentObjectRepresentableSchema: [any ObjectSyntaxViewProtocol.Type] {
-                    var rawDocumentObjectRepresentableSchema: [any ObjectSyntaxViewProtocol.Type] = []
-                    rawDocumentObjectRepresentableSchema.append(Self.SyntaxView.self)
-                    func syntaxViewType<T: RawDocumentObjectRepresentable>(_ t: T.Type) -> [any ObjectSyntaxViewProtocol.Type] {
-                        return [T.SyntaxView.self] + t.rawDocumentObjectRepresentableSchema
-                    }
-                    \(raw: declaration.memberBlock.members.compactMap { member in
-                        guard let decl = member.decl.as(VariableDeclSyntax.self),
-                            let binding = decl.bindings.compactMap({
-                                $0.pattern.as(IdentifierPatternSyntax.self)
-                            }).first,
-                            let type = decl.bindings.compactMap({
-                                $0.typeAnnotation?.type
-                            }).first, !type.is(StructDeclSyntax.self)
-                        else { return nil }
-                        if type.description == "any RawDocumentRepresentable" {
-                            return ""
-                        }
+                    \(raw: !isStruct ? "self.init()" : "")
+                    \(raw: members.compactMap { member in
                         return """
-                        if let type = \(type).self as? any RawDocumentObjectRepresentable.Type {
-                            rawDocumentObjectRepresentableSchema.append(contentsOf: syntaxViewType(type))
-                        }
+                        self.\(member.name) = try ExtJSONSerialization.read(key: "\(member.name)", from: document)
                         """
                     }.joined(separator: "\n"))
-                    return rawDocumentObjectRepresentableSchema
+                }
+                var extJSONLiteralValue: ExtJSONLiteral {
+                    [
+                        \(raw: members.compactMap { member in
+                            return """
+                            "\(member.name)": \(member.name).extJSONLiteralValue
+                            """
+                        }.joined(separator: ",\n"))
+                    ]
+                }
+            
+                static var keyPaths: [PartialKeyPath<\(raw: type)> : String] {
+                    [
+                        \(raw: members.compactMap { member in
+                            return """
+                            \\.\(member.name): "\(member.name)"
+                            """.trimmingCharacters(in: .whitespaces)
+                        }.joined(separator: ",\n"))
+                    ]
+                }
+            
+                static var schema: [String : Any.Type] {
+                    [
+                        \(raw: members.compactMap { member in
+                            return """
+                            "\(member.name)": (\(member.type)).self
+                            """.trimmingCharacters(in: .whitespaces)
+                        }.joined(separator: ",\n"))
+                    ]
                 }
             }
             """)]
@@ -164,97 +111,36 @@ public struct BSONCodableMacro : ExtensionMacro, MemberMacro, MemberAttributeMac
     }
     
     public static func expansion(of node: SwiftSyntax.AttributeSyntax, providingMembersOf declaration: some SwiftSyntax.DeclGroupSyntax, in context: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.DeclSyntax] {
+//        let extendedType = type
+        let members = try declaration.memberBlock.members.compactMap(view(for:))
+        let isStruct = declaration is StructDeclSyntax
         return [
             """
-            init(\(raw: try declaration.memberBlock.members.compactMap(declAsArg).joined(separator: ","))) {
-                \(raw: declaration.memberBlock.members.compactMap(declName).map {
-                """
-                self.\($0) = \($0)
-                """
-                }.joined(separator: "\n"))
-            }
-            """,
-            """
-            init(from document: RawDocument) throws {
-                \(raw: declaration.memberBlock.members.compactMap { member in
-                    guard let decl = member.decl.as(VariableDeclSyntax.self),
-                        let binding = decl.bindings.compactMap({
-                            $0.pattern.as(IdentifierPatternSyntax.self)
-                        }).first,
-                      let type = decl.bindings.compactMap({
-                          $0.typeAnnotation?.type
-                      }).first, !type.is(StructDeclSyntax.self)
-                    else { return nil }
-
-                    return """
-                    guard let \(binding.identifier) = document["\(binding.identifier)"] else {
-                        throw BSONError.missingKey("\(binding.identifier)")
-                    }
-                    guard let \(binding.identifier): \(type) = try \(binding.identifier) as? \(type) else {
-                        throw BSONError.invalidType(key: "\(binding.identifier)")
-                    }
-                    self.\(binding.identifier) = \(binding.identifier)
-                    """
-                }.joined(separator: "\n"))
-            }
-            """,
-            """
-            func encode(to document: inout RawDocument) {
-                \(raw: declaration.memberBlock.members.compactMap { member in
-                    guard let decl = member.decl.as(VariableDeclSyntax.self),
-                        let binding = decl.bindings.compactMap({
-                            $0.pattern.as(IdentifierPatternSyntax.self)
-                        }).first
-                    else { return nil }
-
-                    return """
-                    document["\(binding.identifier)"] = \(binding)
-                    """
-                }.joined(separator: "\n"))
-            }
-            """,
-            """
-            struct Filter : BSONFilter {
-                var documentRef = DocumentRef()
-                \(raw: declaration.memberBlock.members.compactMap { member in
-                    guard let decl = member.decl.as(VariableDeclSyntax.self),
-                        let binding = decl.bindings.compactMap({
-                            $0.pattern.as(IdentifierPatternSyntax.self)
-                        }).first,
-                        let type = decl.bindings.compactMap({
-                            $0.typeAnnotation?.type.as(SimpleTypeIdentifierSyntax.self)?.name
-                        }).first
-                    else { return nil }
-
-                    return """
-                    var \(binding.identifier): BSONQuery<\(type)>
-                    """
-                }.joined(separator: "\n"))
-                init() {
-                    \(raw: declaration.memberBlock.members.compactMap { member in
-                    guard let decl = member.decl.as(VariableDeclSyntax.self),
-                        let binding = decl.bindings.compactMap({
-                            $0.pattern.as(IdentifierPatternSyntax.self)
-                        }).first,
-                        let type = decl.bindings.compactMap({
-                            $0.typeAnnotation?.type.as(SimpleTypeIdentifierSyntax.self)?.name
-                        }).first
-                    else { return nil }
-            
-                    return """
-                    \(binding.identifier) = BSONQuery<\(type)>(identifier: "\(binding.identifier)", documentRef: documentRef)
-                    """
-                    }.joined(separator: "\n"))
+            \(raw: !isStruct ? "convenience" : "") init(\(raw: members.reduce(into: [String]()) { strings, member in
+                    strings.append("\(member.name): \(member.type)")
+                if let assignment = member.assignment {
+                    strings[strings.index(before: strings.endIndex)] += " = \(assignment)"
                 }
-                mutating func encode() -> RawDocument {
-                    return documentRef.document
-                }
+                }.joined(separator: ",\n"))) {
+                \(raw: !isStruct ? "self.init()" : "")
+                \(raw: members.reduce(into: [String]()) { strings, member in
+                            strings.append("self.\(member.name) = \(member.name)")
+                }.joined(separator: "\n"))
             }
-            """,
             """
-            typealias Id = \(raw: try declaration.memberBlock.members.compactMap({ (declName($0), try declType($0)) })
-                .first(where: {$0.0 == "_id"})?.1 ?? "ObjectId")
-            """
+//            """
+//            convenience init(\(raw: members.reduce(into: [String]()) { strings, member in
+//                    strings.append("\(member.name): \(member.type)")
+//                if let assignment = member.assignment {
+//                    strings[strings.index(before: strings.endIndex)] += " = \(assignment)"
+//                }
+//                }.joined(separator: ",\n"))) {
+//                self.init()
+//                \(raw: members.reduce(into: [String]()) { strings, member in
+//                            strings.append("self.\(member.name) = \(member.name)")
+//                }.joined(separator: "\n"))
+//            }
+//            """,
         ]
     }
 }
@@ -545,43 +431,43 @@ public struct ObjectSyntaxViewMacro : MemberMacro, ExtensionMacro {
         ]
     }
 }
-
+private struct MemberView {
+    let name: String
+    let type: String
+    var attributeKey: String?
+    var assignment: String?
+}
+enum Error : Swift.Error {
+    case blah(String)
+}
+private func view(for member: MemberBlockItemListSyntax.Element) throws -> MemberView? {
+    guard let decl = member.decl.as(VariableDeclSyntax.self),
+          let binding = decl.bindings.compactMap({
+              $0.pattern.as(IdentifierPatternSyntax.self)
+          }).first,
+          let type = decl.bindings.compactMap({
+              $0.typeAnnotation?.type
+          }).first,
+            !type.is(StructDeclSyntax.self) else {
+        return nil
+    }
+    var memberView = MemberView(name: "\(binding.identifier)", type: "\(type)", attributeKey: nil)
+    if let macroName = decl.attributes.first(where: { element in
+            element.as(AttributeSyntax.self)?.attributeName
+            .as(IdentifierTypeSyntax.self)?.name.text == "DocumentKey"
+        })?.as(AttributeSyntax.self)?
+        .arguments?.as(LabeledExprListSyntax.self)?.first?.expression.as(StringLiteralExprSyntax.self) {
+        memberView.attributeKey = "\(macroName.segments)"
+    }
+    if let assignment = decl.bindings.compactMap({
+        $0.initializer?.value
+    }).first {
+        memberView.assignment = "\(assignment)"
+    }
+    return memberView
+}
 public struct RawDocumentQueryRepresentableMacro : MemberMacro, ExtensionMacro, PeerMacro {
-    private struct MemberView {
-        let name: String
-        let type: String
-        var attributeKey: String?
-        var assignment: String?
-    }
-    enum Error : Swift.Error {
-        case blah(String)
-    }
-    private static func view(for member: MemberBlockItemListSyntax.Element) throws -> MemberView? {
-        guard let decl = member.decl.as(VariableDeclSyntax.self),
-              let binding = decl.bindings.compactMap({
-                  $0.pattern.as(IdentifierPatternSyntax.self)
-              }).first,
-              let type = decl.bindings.compactMap({
-                  $0.typeAnnotation?.type
-              }).first, 
-                !type.is(StructDeclSyntax.self) else {
-            return nil
-        }
-        var memberView = MemberView(name: "\(binding.identifier)", type: "\(type)", attributeKey: nil)
-        if let macroName = decl.attributes.first(where: { element in
-                element.as(AttributeSyntax.self)?.attributeName
-                .as(IdentifierTypeSyntax.self)?.name.text == "DocumentKey"
-            })?.as(AttributeSyntax.self)?
-            .arguments?.as(LabeledExprListSyntax.self)?.first?.expression.as(StringLiteralExprSyntax.self) {
-            memberView.attributeKey = "\(macroName.segments)"
-        }
-        if let assignment = decl.bindings.compactMap({
-            $0.initializer?.value
-        }).first {
-            memberView.assignment = "\(assignment)"
-        }
-        return memberView
-    }
+    
     public static func expansion(of node: SwiftSyntax.AttributeSyntax, providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol, in context: some SwiftSyntaxMacros.MacroExpansionContext) throws -> [SwiftSyntax.DeclSyntax] {
         []
     }

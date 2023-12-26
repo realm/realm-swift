@@ -16,20 +16,34 @@ import Realm
 }
 
 @BSONCodable struct AllTypesBSONObject {
+    @BSONCodable struct AllTypesA : Equatable {
+        @BSONCodable struct AllTypesB : Equatable {
+            let intB: Int
+            let stringB: String
+        }
+        let intA: Int
+        let stringA: String
+        let allTypesB: AllTypesB
+    }
     let int: Int
+    let intArray: [Int]
+    let intOpt: Int?
+    
     let string: String
-    var bool: Bool
-    var double: Double
+    let bool: Bool
+    let double: Double
 //    let data: Data
-//    let long: Int64
+    let long: Int64
 //    let decimal: Decimal128
 //    let uuid: UUID
-    let object: Person
-    var anyValue: any RawDocumentRepresentable
+    let object: AllTypesA
+    let objectArray: [AllTypesA]
+    let objectOpt: AllTypesA?
+    var anyValue: any ExtJSONRepresentable
 }
 
 @BSONCodable final class RealmPerson : Object {
-    @Persisted(primaryKey: true) var _id: ObjectId
+    @Persisted(primaryKey: true) var _id: ObjectId = .generate()
     @Persisted var name: String
     @Persisted var age: Int
     @Persisted var address: RealmAddress?
@@ -42,7 +56,7 @@ import Realm
 }
 
 @BSONCodable final class RealmDog : Object {
-    @Persisted(primaryKey: true) var _id: ObjectId
+    @Persisted(primaryKey: true) var _id: ObjectId = .generate()
     @Persisted var owner: RealmPerson?
     @Persisted var name: String
     @Persisted var age: Int
@@ -55,7 +69,183 @@ import Realm
 //    }
 //}
 //
+
+
+
 class MongoDataAccessMacrosTests : XCTestCase {
+    func testObj2() throws {
+        let data = """
+        {
+            "a": "hello",
+            "b": {"$numberLong": "42"}
+        }
+        """.data(using: .utf8)!
+        let doc = try ExtJSONSerialization.jsonObject(with: data)
+        XCTAssertEqual((doc as! RawDocument)["b"] as? Int, 42)
+        
+        struct Frame : ExtJSONStructuredRepresentable {
+            init(from document: ExtJSONRepresentable) throws {
+                guard let document = document as? [String : ExtJSONRepresentable] else {
+                    fatalError()
+                }
+                a = document["a"] as! String
+                b = document["b"] as! Int
+            }
+            
+            static var schema: [String : Any.Type] = [
+                "a": String.self,
+                "b": Int.self
+            ]
+            
+            var extJSONLiteralValue: ExtJSONLiteral {
+                [
+                    "a": a, "b": b
+                ]
+            }
+            let a: String
+            let b: Int
+        }
+        
+        let doc2: Frame = try ExtJSONSerialization.jsonObject(with: data)
+        XCTAssertEqual(doc2.a, "hello")
+        XCTAssertEqual(doc2.b, 42)
+    }
+    func testObj() throws {
+//        var scanner = Scanner(string: "{\\\"a\\\" : []}")
+//        let doc = try SyntaxNode.init(from: &scanner).view as! RawDocument
+//        XCTAssert(doc ==
+//                       [
+//                            "a": []
+//                       ])
+    }
+    
+
+    @BSONCodable struct Test : Equatable {
+        @BSONCodable struct Valid : Equatable {
+            let description: String
+            let canonical_extjson: String
+        }
+        let description: String
+        let test_key: String
+        let valid: Array<Valid>
+    }
+    
+    @BSONCodable struct ArrayTest : Equatable {
+        let a: [Int]
+    }
+    
+    func run<T : ExtJSONQueryRepresentable & Equatable>(test: String, answers: [T]) throws {
+        let url = Bundle.module.url(forResource: test, withExtension: "json")!
+        let data = try Data(contentsOf: url)
+        let test: Test = try ExtJSONSerialization.jsonObject(with: data)
+        for entryIdx in test.valid.indices {
+            let parsedEntry: T =
+                try ExtJSONSerialization
+                    .jsonObject(with: test.valid[entryIdx].canonical_extjson
+                        .data(using: .utf8)!)
+            XCTAssertEqual(parsedEntry, answers[entryIdx])
+        }
+    }
+    
+    func testArray() throws {
+        try run(test: "array", answers: [
+            ArrayTest(a: []),
+            ArrayTest(a: [10]),
+            ArrayTest(a: [10]),
+            ArrayTest(a: [10]),
+            ArrayTest(a: [10, 20]),
+        ])
+    }
+    
+    @BSONCodable struct BoolTest : Equatable {
+        let b: Bool
+    }
+    func testBoolean() throws {
+        try run(test: "boolean", answers: [
+            BoolTest(b: true),
+            BoolTest(b: false)
+        ])
+    }
+    
+    @BSONCodable struct DateTest : Equatable {
+        let a: Date
+    }
+    func testDate() throws {
+        try run(test: "datetime", answers: [
+            DateTest(a: .init(timeIntervalSince1970: 0)),
+            DateTest(a: .init(timeIntervalSince1970: 1356351330501)),
+            DateTest(a: .init(timeIntervalSince1970: -284643869501)),
+            DateTest(a: .init(timeIntervalSince1970: 253402300800000)),
+            DateTest(a: .init(timeIntervalSince1970: 1356351330001))
+        ])
+    }
+    
+    @BSONCodable struct ObjectIdTest : Equatable {
+        let a: ObjectId
+    }
+    func testObjectId() throws {
+        try run(test: "oid", answers: [
+            ObjectIdTest(a: .init("000000000000000000000000")),
+            ObjectIdTest(a: .init("ffffffffffffffffffffffff")),
+            ObjectIdTest(a: .init("56e1fc72e0c917e9c4714161"))
+        ])
+    }
+    
+    func testAllTypes() throws {
+        let extJSONValue = """
+        {
+            "int": {"$numberInt": "42"},
+            "intArray": [{"$numberInt": "42"}, {"$numberInt": "84"}],
+            "intOpt": null,
+            "string": "hello",
+            "bool": true,
+            "double": {"$numberDouble": "42.42"},
+            "long": {"$numberLong": "84"},
+            "object": {
+                "intA": {"$numberInt": "152"},
+                "stringA": "world",
+                "allTypesB": {
+                    "intB": {"$numberInt": "256"},
+                    "stringB": "California"
+                }
+            },
+            "objectArray": [
+                {
+                    "intA": {"$numberInt": "152"},
+                    "stringA": "hello",
+                    "allTypesB": {
+                        "intB": {"$numberInt": "256"},
+                        "stringB": "California"
+                    }
+                },
+                {
+                    "intA": {"$numberInt": "1024"},
+                    "stringA": "world",
+                    "allTypesB": {
+                        "intB": {"$numberInt": "256"},
+                        "stringB": "California"
+                    }
+                }
+            ],
+            "objectOpt": null,
+            "anyValue": {"$numberInt": "16"}
+        }
+        """.data(using: .utf8)!
+        let allTypes: AllTypesBSONObject = try ExtJSONSerialization.jsonObject(with: extJSONValue)
+        XCTAssertEqual(allTypes.int, 42)
+        XCTAssertEqual(allTypes.object.intA, 152)
+        XCTAssertEqual(allTypes.object.stringA, "world")
+        XCTAssertEqual(allTypes.object.allTypesB.intB, 256)
+        XCTAssertEqual(allTypes.object.allTypesB.stringB, "California")
+        XCTAssertEqual(allTypes.objectOpt, nil)
+        XCTAssertEqual(allTypes.objectOpt, nil)
+        XCTAssertEqual(allTypes.anyValue as? Int, 16)
+        
+        let extJSONRoundTripped =
+        String(data: try allTypes.extJSONValue, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let extJSONOriginal = String(data: extJSONValue, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        XCTAssertEqual(extJSONRoundTripped, extJSONOriginal)
+    }
 //    // TODO: Fix spacing in macro expansion
 //    func testWithoutAnyCustomization() throws {
 //        assertMacroExpansion(
@@ -257,7 +447,7 @@ class MongoDataAccessMacrosTests : XCTestCase {
 //        XCTAssertNil(nilPerson)
 //    }
 ////    
-    func testMongoCollectionFilters() async throws {
+    @MainActor func testMongoCollectionFilters() async throws {
         let app = App(id: "application-1-iyczo")
         let user = try await app.login(credentials: .anonymous)
         let realm = try await Realm(configuration: user.flexibleSyncConfiguration())
@@ -680,74 +870,74 @@ class MongoDataAccessRawDocumentRepresentableTests : XCTestCase {
 //        XCTAssertEqual(oid?.objectId, objectId)
 //    }
     
-    func testPersonRoundTrip() throws {
-        let person = Person(name: "Jason", age: 32, address: Person.Address(city: "Austin", state: "TX"))
-        let ast = person.syntaxView
-        XCTAssertEqual(ast.description,
-                       """
-                       {"name":"Jason","age":{"$numberLong":"32"},"address":{"city":"Austin","state":"TX"}}
-                       """)
-        let decodedPerson = ast.rawDocumentRepresentable
-        XCTAssertEqual(person, decodedPerson as! Person)
-    }
-    
-    func testAllTypesRoundTrip() throws {
-        var allTypesObject = AllTypesBSONObject(int: 42,
-                                                string: "hello", bool: true, double: 42.42,
-                                                object: Person(name: "Jason",
-                                                               age: 32,
-                                                               address: Person.Address(city: "Austin",
-                                                                                       state: "TX")),
-                                                anyValue: 84)
-        var ast = allTypesObject.syntaxView
-        XCTAssertEqual(ast.description,
-                       """
-                       {"int":{"$numberInt":42},"string":"hello","bool":true,"double":{"$numberDouble":42.42},"object":{"name":"Jason","age":{"$numberInt":32},"address":{"city":"Austin","state":"TX"}},"anyValue":{"$numberInt":84}}
-                       """)
-        var decodedAllTypesObject = ast.rawDocumentRepresentable as! AllTypesBSONObject
-        XCTAssertEqual(allTypesObject.int, decodedAllTypesObject.int)
-        XCTAssertEqual(allTypesObject.string, decodedAllTypesObject.string)
-        XCTAssertEqual(allTypesObject.bool, decodedAllTypesObject.bool)
-        XCTAssertEqual(allTypesObject.object, decodedAllTypesObject.object)
-        XCTAssertEqual(allTypesObject.anyValue as? Int, decodedAllTypesObject.anyValue as? Int)
-        
-        allTypesObject.anyValue = "world"
-        allTypesObject.bool = false
-        allTypesObject.double = .infinity
-        ast = allTypesObject.syntaxView
-        XCTAssertEqual(ast.description,
-                       """
-                       {"int":{"$numberInt":42},"string":"hello","bool":false,"double":{"$numberDouble":"Infinity"},"object":{"name":"Jason","age":{"$numberInt":32},"address":{"city":"Austin","state":"TX"}},"anyValue":"world"}
-                       """)
-        decodedAllTypesObject = ast.rawDocumentRepresentable as! AllTypesBSONObject
-        XCTAssertEqual(allTypesObject.int, decodedAllTypesObject.int)
-        XCTAssertEqual(allTypesObject.string, decodedAllTypesObject.string)
-        XCTAssertEqual(allTypesObject.bool, decodedAllTypesObject.bool)
-        XCTAssertEqual(allTypesObject.object, decodedAllTypesObject.object)
-        XCTAssertEqual(allTypesObject.anyValue as? String, decodedAllTypesObject.anyValue as? String)
-        
-        allTypesObject.anyValue = Person(name: "Jason",
-                                         age: 32,
-                                         address: Person.Address(city: "Austin",
-                                                                 state: "TX"))
-        allTypesObject.double = -.infinity
-        ast = AllTypesBSONObject.SyntaxView(from: allTypesObject)
-        guard let fields = ((ast as? AllTypesBSONObject.SyntaxView)?.rawObjectSyntaxView) else {
-            return XCTFail()
-        }
-//        XCTAssert(type(of: value) is AnyValueSyntaxView.Type)
-        XCTAssertEqual(ast.description,
-                       """
-                       {"int":{"$numberLong":"42"},"string":"hello","bool":false,"double":{"$numberDouble":"-Infinity"},"object":{"name":"Jason","age":{"$numberLong":"32"},"address":{"city":"Austin","state":"TX"}},"anyValue":{"name":"Jason","age":{"$numberLong":"32"},"address":{"city":"Austin","state":"TX"}}}
-                       """)
-        decodedAllTypesObject = ast.rawDocumentRepresentable as! AllTypesBSONObject
-        XCTAssertEqual(allTypesObject.int, decodedAllTypesObject.int)
-        XCTAssertEqual(allTypesObject.string, decodedAllTypesObject.string)
-        XCTAssertEqual(allTypesObject.bool, decodedAllTypesObject.bool)
-        XCTAssertEqual(allTypesObject.object, decodedAllTypesObject.object)
-        XCTAssertEqual(allTypesObject.anyValue as? Person, decodedAllTypesObject.anyValue as? Person)
-        XCTAssertEqual((allTypesObject.anyValue as? Person)?.address, (decodedAllTypesObject.anyValue as? Person)?.address)
-    }
+//    func testPersonRoundTrip() throws {
+//        let person = Person(name: "Jason", age: 32, address: Person.Address(city: "Austin", state: "TX"))
+//        let ast = person.rawDocument
+//        XCTAssertEqual(ast.description,
+//                       """
+//                       {"name":"Jason","age":{"$numberLong":"32"},"address":{"city":"Austin","state":"TX"}}
+//                       """)
+//        let decodedPerson = ast.rawDocumentRepresentable
+//        XCTAssertEqual(person, decodedPerson as! Person)
+//    }
+//    
+//    func testAllTypesRoundTrip() throws {
+//        var allTypesObject = AllTypesBSONObject(int: 42,
+//                                                string: "hello", bool: true, double: 42.42,
+//                                                object: Person(name: "Jason",
+//                                                               age: 32,
+//                                                               address: Person.Address(city: "Austin",
+//                                                                                       state: "TX")),
+//                                                anyValue: 84)
+//        var ast = allTypesObject.syntaxView
+//        XCTAssertEqual(ast.description,
+//                       """
+//                       {"int":{"$numberInt":42},"string":"hello","bool":true,"double":{"$numberDouble":42.42},"object":{"name":"Jason","age":{"$numberInt":32},"address":{"city":"Austin","state":"TX"}},"anyValue":{"$numberInt":84}}
+//                       """)
+//        var decodedAllTypesObject = ast.rawDocumentRepresentable as! AllTypesBSONObject
+//        XCTAssertEqual(allTypesObject.int, decodedAllTypesObject.int)
+//        XCTAssertEqual(allTypesObject.string, decodedAllTypesObject.string)
+//        XCTAssertEqual(allTypesObject.bool, decodedAllTypesObject.bool)
+//        XCTAssertEqual(allTypesObject.object, decodedAllTypesObject.object)
+//        XCTAssertEqual(allTypesObject.anyValue as? Int, decodedAllTypesObject.anyValue as? Int)
+//        
+//        allTypesObject.anyValue = "world"
+//        allTypesObject.bool = false
+//        allTypesObject.double = .infinity
+//        ast = allTypesObject.syntaxView
+//        XCTAssertEqual(ast.description,
+//                       """
+//                       {"int":{"$numberInt":42},"string":"hello","bool":false,"double":{"$numberDouble":"Infinity"},"object":{"name":"Jason","age":{"$numberInt":32},"address":{"city":"Austin","state":"TX"}},"anyValue":"world"}
+//                       """)
+//        decodedAllTypesObject = ast.rawDocumentRepresentable as! AllTypesBSONObject
+//        XCTAssertEqual(allTypesObject.int, decodedAllTypesObject.int)
+//        XCTAssertEqual(allTypesObject.string, decodedAllTypesObject.string)
+//        XCTAssertEqual(allTypesObject.bool, decodedAllTypesObject.bool)
+//        XCTAssertEqual(allTypesObject.object, decodedAllTypesObject.object)
+//        XCTAssertEqual(allTypesObject.anyValue as? String, decodedAllTypesObject.anyValue as? String)
+//        
+//        allTypesObject.anyValue = Person(name: "Jason",
+//                                         age: 32,
+//                                         address: Person.Address(city: "Austin",
+//                                                                 state: "TX"))
+//        allTypesObject.double = -.infinity
+//        ast = AllTypesBSONObject.SyntaxView(from: allTypesObject)
+//        guard let fields = ((ast as? AllTypesBSONObject.SyntaxView)?.rawObjectSyntaxView) else {
+//            return XCTFail()
+//        }
+////        XCTAssert(type(of: value) is AnyValueSyntaxView.Type)
+//        XCTAssertEqual(ast.description,
+//                       """
+//                       {"int":{"$numberLong":"42"},"string":"hello","bool":false,"double":{"$numberDouble":"-Infinity"},"object":{"name":"Jason","age":{"$numberLong":"32"},"address":{"city":"Austin","state":"TX"}},"anyValue":{"name":"Jason","age":{"$numberLong":"32"},"address":{"city":"Austin","state":"TX"}}}
+//                       """)
+//        decodedAllTypesObject = ast.rawDocumentRepresentable as! AllTypesBSONObject
+//        XCTAssertEqual(allTypesObject.int, decodedAllTypesObject.int)
+//        XCTAssertEqual(allTypesObject.string, decodedAllTypesObject.string)
+//        XCTAssertEqual(allTypesObject.bool, decodedAllTypesObject.bool)
+//        XCTAssertEqual(allTypesObject.object, decodedAllTypesObject.object)
+//        XCTAssertEqual(allTypesObject.anyValue as? Person, decodedAllTypesObject.anyValue as? Person)
+//        XCTAssertEqual((allTypesObject.anyValue as? Person)?.address, (decodedAllTypesObject.anyValue as? Person)?.address)
+//    }
 }
 
 // MARK: Realm Interop Tests
@@ -765,76 +955,76 @@ class MongoDataAccecssRealmInteropTests : XCTestCase {
 }
 
 class MongoDataAccessSyntaxViewTests : XCTestCase {
-    func testRawObjectSyntaxView() {
-        let view: RawObjectSyntaxView = """
-        {"_id": 42, "age": 30, "name": "Meghna"}
-        """
-        XCTAssertEqual(view.startIndex.utf16Offset(in: view.rawJSON), 0)
-        XCTAssertEqual(view.endIndex.utf16Offset(in: view.rawJSON), view.rawJSON.endIndex.utf16Offset(in: view.rawJSON))
-        XCTAssertNotNil(view["_id"])
-        XCTAssertNotNil(view["age"])
-        XCTAssertNotNil(view["name"])
-    }
-    
-    func testRawObjectArraySyntaxView() {
-        let view: RawArraySyntaxView = """
-        [{"_id":{"$oid":"650a3e7015c136409dc53e70"},"address":{"city":"Marlboro","state":"NJ"},"age":{"$numberLong":"32"},"dog":{"_id":{"$oid":"650a3e7015c136409dc53e6e"},"age":{"$numberLong":"2"},"name":"Murphy"},"name":"Jason"}]
-        """
-        XCTAssertEqual(view.startIndex.utf16Offset(in: view.rawJSON), 0)
-        XCTAssertEqual(view.endIndex.utf16Offset(in: view.rawJSON), 
-                       view.rawJSON.endIndex.utf16Offset(in: view.rawJSON))
-        guard let object = view[0] as? RawObjectSyntaxView else {
-            return XCTFail()
-        }
-        XCTAssertEqual(object.startIndex.utf16Offset(in: object.rawJSON), 1)
-        XCTAssertEqual(object.endIndex.utf16Offset(in: object.rawJSON), 221)
-        
-        guard object["_id"] is RawObjectSyntaxView else {
-            return XCTFail()
-        }
-        var iter = object.makeIterator()
-        XCTAssertEqual(iter.next()?.0, "_id")
-        XCTAssertEqual(iter.next()?.0, "address")
-        XCTAssertEqual(iter.next()?.0, "age")
-        XCTAssertEqual(iter.next()?.0, "dog")
-        XCTAssertEqual(iter.next()?.0, "name")
-        XCTAssertNotNil(object["address"])
-        XCTAssertNotNil(object["age"])
-        XCTAssertEqual(object["dog"]?.startIndex.utf16Offset(in: view.rawJSON), 120)
-        XCTAssertEqual(object["dog"]?.endIndex.utf16Offset(in: view.rawJSON), 205)
-        XCTAssertNotNil(object["name"])
-    }
-    
-    func testArgs() {
-        let document: RawDocument = [
-            "pipeline": [
-                [
-                    "$match": ["_id": ObjectId("650b22b9109c33ec9f13935f")]
-                ],
-                [
-                    "$lookup": [
-                        "from": "RealmDog",
-                        "localField": "dog"
-                    ]
-                ]
-            ]
-        ]
-        let syntaxView = document.syntaxView as! RawObjectSyntaxView
-        let arraySyntaxView = syntaxView["pipeline"] as! RawArraySyntaxView
-        var match = arraySyntaxView[0] as! RawObjectSyntaxView
-        match = match["$match"] as! RawObjectSyntaxView
-        match["_id"]
-        XCTAssertEqual("""
-        {"pipeline":[{"$match":{"_id":{"$oid":"650b22b9109c33ec9f13935f"}}},{"$lookup":{"from":"RealmDog","localField":"dog"}}]}
-        """, syntaxView.description)
-        let document2: RawDocument = [
-            "pipeline": [
-                "$match": ["_id": ObjectId("650b22b9109c33ec9f13935f")]
-            ]
-        ]
-        XCTAssertEqual("""
-        {"pipeline":{"$match":{"_id":{"$oid":"650b22b9109c33ec9f13935f"}}}}
-        """, document2.syntaxView.description)
-//        json    String    "\"pipeline\":[{\"$match\":{\"_id\":{\"$oid\":\"650b22b9109c33ec9f13935f\"}},{\"$lookup\":{\"from\":\"RealmDog\",\"localField\":\"dog\",\"foreignField\":\"_id\",\"as\":\"dog\"}},{\"$unwind\":{\"path\":\"$dog\",\"preserveNullAndEmptyArrays\":true}}]"
-    }
+//    func testRawObjectSyntaxView() {
+//        let view: RawObjectSyntaxView = """
+//        {"_id": 42, "age": 30, "name": "Meghna"}
+//        """
+//        XCTAssertEqual(view.startIndex.utf16Offset(in: view.rawJSON), 0)
+//        XCTAssertEqual(view.endIndex.utf16Offset(in: view.rawJSON), view.rawJSON.endIndex.utf16Offset(in: view.rawJSON))
+//        XCTAssertNotNil(view["_id"])
+//        XCTAssertNotNil(view["age"])
+//        XCTAssertNotNil(view["name"])
+//    }
+//    
+//    func testRawObjectArraySyntaxView() {
+//        let view: RawArraySyntaxView = """
+//        [{"_id":{"$oid":"650a3e7015c136409dc53e70"},"address":{"city":"Marlboro","state":"NJ"},"age":{"$numberLong":"32"},"dog":{"_id":{"$oid":"650a3e7015c136409dc53e6e"},"age":{"$numberLong":"2"},"name":"Murphy"},"name":"Jason"}]
+//        """
+//        XCTAssertEqual(view.startIndex.utf16Offset(in: view.rawJSON), 0)
+//        XCTAssertEqual(view.endIndex.utf16Offset(in: view.rawJSON), 
+//                       view.rawJSON.endIndex.utf16Offset(in: view.rawJSON))
+//        guard let object = view[0] as? RawObjectSyntaxView else {
+//            return XCTFail()
+//        }
+//        XCTAssertEqual(object.startIndex.utf16Offset(in: object.rawJSON), 1)
+//        XCTAssertEqual(object.endIndex.utf16Offset(in: object.rawJSON), 221)
+//        
+//        guard object["_id"] is RawObjectSyntaxView else {
+//            return XCTFail()
+//        }
+//        var iter = object.makeIterator()
+//        XCTAssertEqual(iter.next()?.0, "_id")
+//        XCTAssertEqual(iter.next()?.0, "address")
+//        XCTAssertEqual(iter.next()?.0, "age")
+//        XCTAssertEqual(iter.next()?.0, "dog")
+//        XCTAssertEqual(iter.next()?.0, "name")
+//        XCTAssertNotNil(object["address"])
+//        XCTAssertNotNil(object["age"])
+//        XCTAssertEqual(object["dog"]?.startIndex.utf16Offset(in: view.rawJSON), 120)
+//        XCTAssertEqual(object["dog"]?.endIndex.utf16Offset(in: view.rawJSON), 205)
+//        XCTAssertNotNil(object["name"])
+//    }
+//    
+//    func testArgs() {
+//        let document: RawDocument = [
+//            "pipeline": [
+//                [
+//                    "$match": ["_id": ObjectId("650b22b9109c33ec9f13935f")]
+//                ],
+//                [
+//                    "$lookup": [
+//                        "from": "RealmDog",
+//                        "localField": "dog"
+//                    ]
+//                ]
+//            ]
+//        ]
+//        let syntaxView = document.syntaxView as! RawObjectSyntaxView
+//        let arraySyntaxView = syntaxView["pipeline"] as! RawArraySyntaxView
+//        var match = arraySyntaxView[0] as! RawObjectSyntaxView
+//        match = match["$match"] as! RawObjectSyntaxView
+//        match["_id"]
+//        XCTAssertEqual("""
+//        {"pipeline":[{"$match":{"_id":{"$oid":"650b22b9109c33ec9f13935f"}}},{"$lookup":{"from":"RealmDog","localField":"dog"}}]}
+//        """, syntaxView.description)
+//        let document2: RawDocument = [
+//            "pipeline": [
+//                "$match": ["_id": ObjectId("650b22b9109c33ec9f13935f")]
+//            ]
+//        ]
+//        XCTAssertEqual("""
+//        {"pipeline":{"$match":{"_id":{"$oid":"650b22b9109c33ec9f13935f"}}}}
+//        """, document2.syntaxView.description)
+////        json    String    "\"pipeline\":[{\"$match\":{\"_id\":{\"$oid\":\"650b22b9109c33ec9f13935f\"}},{\"$lookup\":{\"from\":\"RealmDog\",\"localField\":\"dog\",\"foreignField\":\"_id\",\"as\":\"dog\"}},{\"$unwind\":{\"path\":\"$dog\",\"preserveNullAndEmptyArrays\":true}}]"
+//    }
 }

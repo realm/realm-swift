@@ -1,0 +1,60 @@
+{
+    "description": "Document type (sub-documents)",
+    "bson_type": "0x03",
+    "test_key": "x",
+    "valid": [
+        {
+            "description": "Empty subdoc",
+            "canonical_bson": "0D000000037800050000000000",
+            "canonical_extjson": "{\"x\" : {}}"
+        },
+        {
+            "description": "Empty-string key subdoc",
+            "canonical_bson": "150000000378000D00000002000200000062000000",
+            "canonical_extjson": "{\"x\" : {\"\" : \"b\"}}"
+        },
+        {
+            "description": "Single-character key subdoc",
+            "canonical_bson": "160000000378000E0000000261000200000062000000",
+            "canonical_extjson": "{\"x\" : {\"a\" : \"b\"}}"
+        },
+        {
+            "description": "Dollar-prefixed key in sub-document",
+            "canonical_bson": "170000000378000F000000022461000200000062000000",
+            "canonical_extjson": "{\"x\" : {\"$a\" : \"b\"}}"
+        },
+        {
+            "description": "Dollar as key in sub-document",
+            "canonical_bson": "160000000378000E0000000224000200000061000000",
+            "canonical_extjson": "{\"x\" : {\"$\" : \"a\"}}"
+        },
+        {
+            "description": "Dotted key in sub-document",
+            "canonical_bson": "180000000378001000000002612E62000200000063000000",
+            "canonical_extjson": "{\"x\" : {\"a.b\" : \"c\"}}"
+        },
+        {
+            "description": "Dot as key in sub-document",
+            "canonical_bson": "160000000378000E000000022E000200000061000000",
+            "canonical_extjson": "{\"x\" : {\".\" : \"a\"}}"
+        }
+    ],
+    "decodeErrors": [
+        {
+            "description": "Subdocument length too long: eats outer terminator",
+            "bson": "1800000003666F6F000F0000001062617200FFFFFF7F0000"
+        },
+        {
+            "description": "Subdocument length too short: leaks terminator",
+            "bson": "1500000003666F6F000A0000000862617200010000"
+        },
+        {
+            "description": "Invalid subdocument: bad string length in field",
+            "bson": "1C00000003666F6F001200000002626172000500000062617A000000"
+        },
+        {
+            "description": "Null byte in sub-document key",
+            "bson": "150000000378000D00000010610000010000000000"
+        }
+    ]
+}

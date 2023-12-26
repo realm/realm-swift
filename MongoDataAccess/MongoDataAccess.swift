@@ -9,45 +9,41 @@ public protocol BSONFilter {
     mutating func encode() -> RawDocument
 }
 
-public protocol RawDocumentRepresentable {
-    associatedtype SyntaxView : MongoDataAccess.SyntaxView where SyntaxView.RawDocumentValue == Self
-}
-
-package struct AnyRawDocumentRepresentable : RawDocumentRepresentable {
-    package struct SyntaxView : LiteralSyntaxView {
-        package var endIndex: String.Index
-        package var startIndex: String.Index
-        package var rawJSON: String
-        package var description: String
-        package var rawDocumentRepresentable: AnyRawDocumentRepresentable
-        
-        package init(json: String, at startIndex: String.Index, allowedObjectTypes: [any MongoDataAccess.SyntaxView.Type]) throws {
-            let syntaxView = SyntaxView.map(json: json, at: startIndex, allowedObjectTypes: allowedObjectTypes)
-            self.startIndex = syntaxView.startIndex
-            self.endIndex = syntaxView.endIndex
-            self.rawJSON = syntaxView.rawJSON
-            self.description = syntaxView.description
-            self.rawDocumentRepresentable = AnyRawDocumentRepresentable(rawDocumentRepresentable:  syntaxView.rawDocumentRepresentable)
-        }
-        package init(from value: AnyRawDocumentRepresentable) {
-            let syntaxView = value.rawDocumentRepresentable.syntaxView
-            self.startIndex = syntaxView.startIndex
-            self.endIndex = syntaxView.endIndex
-            self.rawJSON = syntaxView.rawJSON
-            self.description = syntaxView.description
-            self.rawDocumentRepresentable = value
-        }
-    }
-    let rawDocumentRepresentable: any RawDocumentRepresentable
-}
+//package struct AnyRawDocumentRepresentable : RawDocumentRepresentable {
+////    package struct SyntaxView : LiteralSyntaxView {
+////        package var endIndex: String.Index
+////        package var startIndex: String.Index
+////        package var rawJSON: String
+////        package var description: String
+////        package var rawDocumentRepresentable: AnyRawDocumentRepresentable
+////        
+////        package init(json: String, at startIndex: String.Index, allowedObjectTypes: [any MongoDataAccess.SyntaxView.Type]) throws {
+////            let syntaxView = SyntaxView.map(json: json, at: startIndex, allowedObjectTypes: allowedObjectTypes)
+////            self.startIndex = syntaxView.startIndex
+////            self.endIndex = syntaxView.endIndex
+////            self.rawJSON = syntaxView.rawJSON
+////            self.description = syntaxView.description
+////            self.rawDocumentRepresentable = AnyRawDocumentRepresentable(rawDocumentRepresentable:  syntaxView.rawDocumentRepresentable)
+////        }
+////        package init(from value: AnyRawDocumentRepresentable) {
+////            let syntaxView = value.rawDocumentRepresentable.syntaxView
+////            self.startIndex = syntaxView.startIndex
+////            self.endIndex = syntaxView.endIndex
+////            self.rawJSON = syntaxView.rawJSON
+////            self.description = syntaxView.description
+////            self.rawDocumentRepresentable = value
+////        }
+////    }
+////    let rawDocumentRepresentable: any RawDocumentRepresentable
+//}
 
 package extension RawDocumentRepresentable {
-    var syntaxViewType: any MongoDataAccess.SyntaxView.Type {
-        SyntaxView.self
-    }
-    var syntaxView: any MongoDataAccess.SyntaxView {
-        SyntaxView(from: self)
-    }
+//    var syntaxViewType: any MongoDataAccess.SyntaxView.Type {
+//        SyntaxView.self
+//    }
+//    var syntaxView: any MongoDataAccess.SyntaxView {
+//        SyntaxView(from: self)
+//    }
 }
 
 public protocol RawDocumentKey : RawRepresentable, CaseIterable where RawValue == String {
@@ -98,36 +94,48 @@ public protocol KeyPathIterable {
     static var keyPaths: [PartialKeyPath<Self> : String] { get }
 }
 
-public protocol RawDocumentQueryRepresentable : RawDocumentRepresentable, KeyPathIterable where Self.SyntaxView : ObjectSyntaxView {
+public protocol ExtJSONQueryRepresentable : ExtJSONStructuredRepresentable, KeyPathIterable {
 }
 
-extension Dictionary : RawDocumentRepresentable where Self.Key == String, 
-                                                        Self.Value == any RawDocumentRepresentable {
-    public typealias SyntaxView = RawObjectSyntaxView
-}
+//public protocol RawDocumentQueryRepresentable : RawDocumentRepresentable, KeyPathIterable, StructuredDocumentRepresentable  {
+//    static var propertyTypes: [String : RawDocumentRepresentable.Type] { get }
+//    
+//    init(from document: inout LazyDocument<Self>) throws
+//}
+//extension RawDocumentQueryRepresentable {
+//    public init(from document: LazyDocument<Self>) throws {
+//        var document = document
+//        try self.init(from: &document)
+//    }
+//}
+//
+//extension Dictionary : RawDocumentRepresentable where Self.Key == String, 
+//                                                        Self.Value == any RawDocumentRepresentable {
+//    public typealias SyntaxView = RawObjectSyntaxView
+//}
 
 // MARK: Type - ObjectId
-extension ObjectId : RawDocumentRepresentable {
-    public struct SyntaxView : ObjectSyntaxView {
-        public let rawObjectSyntaxView: RawObjectSyntaxView
-        public let rawDocumentRepresentable: ObjectId
-        
-        public init(from view: RawObjectSyntaxView) throws {
-            self.rawObjectSyntaxView = view
-            guard let view = view["$oid"] as? StringLiteralSyntaxView else {
-                throw BSONError.missingKey("$oid")
-            }
-            self.rawDocumentRepresentable = try ObjectId(string: view.string)
-        }
-        
-        public init(from rawDocumentValue: ObjectId) {
-            self.rawDocumentRepresentable = rawDocumentValue
-            self.rawObjectSyntaxView = [
-                "$oid": StringLiteralSyntaxView(stringLiteral: rawDocumentRepresentable.stringValue)
-            ]
-        }
-    }
-}
+//extension ObjectId : RawDocumentRepresentable {
+//    public struct SyntaxView : ObjectSyntaxView {
+//        public let rawObjectSyntaxView: RawObjectSyntaxView
+//        public let rawDocumentRepresentable: ObjectId
+//        
+//        public init(from view: RawObjectSyntaxView) throws {
+//            self.rawObjectSyntaxView = view
+//            guard let view = view["$oid"] as? StringLiteralSyntaxView else {
+//                throw BSONError.missingKey("$oid")
+//            }
+//            self.rawDocumentRepresentable = try ObjectId(string: view.string)
+//        }
+//        
+//        public init(from rawDocumentValue: ObjectId) {
+//            self.rawDocumentRepresentable = rawDocumentValue
+//            self.rawObjectSyntaxView = [
+//                "$oid": StringLiteralSyntaxView(stringLiteral: rawDocumentRepresentable.stringValue)
+//            ]
+//        }
+//    }
+//}
 
 //extension Int32 : RawDocumentRepresentable {
 //    public var rawValue: RawDocument {
@@ -145,9 +153,9 @@ extension ObjectId : RawDocumentRepresentable {
 //        self = rawDocumentValue["$int64"] as! Int64
 //    }
 //}
-extension Bool : RawDocumentRepresentable {
-    public typealias SyntaxView = BoolSyntaxView
-}
+//extension Bool : RawDocumentRepresentable {
+//    public typealias SyntaxView = BoolSyntaxView
+//}
 //extension Double : RawDocumentRepresentable {
 //    public var rawValue: RawDocument {
 //        ["$numberDouble": self]
@@ -158,80 +166,39 @@ extension Bool : RawDocumentRepresentable {
 //}
 
 // MARK: Type - Regex
-@available(macOS 13.0, *)
-extension Regex : RawDocumentRepresentable {
-    public struct SyntaxView : ObjectSyntaxView {
-        public var rawDocumentRepresentable: Regex<Output>
-        
-        public var rawObjectSyntaxView: RawObjectSyntaxView
-        public typealias RawDocumentValue = Regex
-        
-        public init(from value: Regex<Output>) {
-            fatalError()
-        }
-        public init(from view: RawObjectSyntaxView) throws {
-            fatalError()
-        }
-    }
-}
+//@available(macOS 13.0, *)
+//extension Regex : RawDocumentRepresentable {
+////    public struct SyntaxView : ObjectSyntaxView {
+////        public var rawDocumentRepresentable: Regex<Output>
+////        
+////        public var rawObjectSyntaxView: RawObjectSyntaxView
+////        public typealias RawDocumentValue = Regex
+////        
+////        public init(from value: Regex<Output>) {
+////            fatalError()
+////        }
+////        public init(from view: RawObjectSyntaxView) throws {
+////            fatalError()
+////        }
+////    }
+//}
 
 // MARK: Type - Array
 //extension Array : RawDocumentRepresentable where Element: RawDocumentRepresentable {
 //    public typealias SyntaxView = ArraySyntaxView<Element>
 //}
-extension Array : RawDocumentRepresentable where Element == any RawDocumentRepresentable {
-    public typealias SyntaxView = RawArraySyntaxView
-}
+//extension Array : RawDocumentRepresentable where Element == any RawDocumentRepresentable {
+////    public typealias SyntaxView = RawArraySyntaxView
+//}
 //extension Array where Element : RawDocumentRepresentable {
 //    public typealias SyntaxView = ArraySyntaxView<Element>
 //}
 @BSONCodable struct Person {
     let name: String
     let age: Int
-//    struct PersonSyntaxView : ObjectSyntaxViewProtocol {
-//        private let objectView: ObjectSyntaxView
-//        private let person: Person
-//        init?(from objectView: ObjectSyntaxView) {
-//            self.objectView = objectView
-//            let document = objectView.rawDocumentRepresentable
-//            do {
-//                self.person = try Person.init(from: document)
-//            } catch {
-//                return nil
-//            }
-//        }
-//        
-//        var startIndex: String.Index {
-//            objectView.endIndex
-//        }
-//        
-//        var endIndex: String.Index {
-//            objectView.endIndex
-//        }
-//        
-//        var description: String {
-//            objectView.description
-//        }
-//        var rawDocumentRepresentable: Person {
-//            person
-//        }
-//    }
-//
-//    
-//    static var rawDocumentObjectRepresentableSchema: [any ObjectSyntaxViewProtocol.Type] {
-//        var rawDocumentObjectRepresentableSchema: [any ObjectSyntaxViewProtocol.Type] = []
-//        rawDocumentObjectRepresentableSchema.append(Self.SyntaxView.self)
-//        func syntaxViewType<T: RawDocumentObjectRepresentable>(_ t: T.Type) -> T.SyntaxView.Type {
-//            return T.SyntaxView.self
-//        }
-//        if let type = String.self as? any RawDocumentObjectRepresentable.Type {
-//            rawDocumentObjectRepresentableSchema.append(syntaxViewType(type))
-//        }
-//        return rawDocumentObjectRepresentableSchema
-//    }
 }
 
-public typealias RawDocument = [String : any RawDocumentRepresentable]
+public typealias RawDocument = [String : Any]
 @dynamicMemberLookup public struct RawDocumentFilter : BSONFilter {
     public init() {
         documentRef = DocumentRef()
@@ -255,12 +222,12 @@ public class DocumentRef {
 }
 
 public protocol BSONQueryable {
-    associatedtype FieldType : RawDocumentRepresentable
+    associatedtype FieldType : ExtJSONRepresentable
     var documentRef: DocumentRef { get }
     var key: String { get }
 }
 
-@dynamicMemberLookup public struct Filter<Value : RawDocumentQueryRepresentable> {
+@dynamicMemberLookup public struct Filter<Value : ExtJSONQueryRepresentable> {
     var documentRef: DocumentRef = .init()
     
     public subscript<V>(dynamicMember member: KeyPath<Value, V>) -> BSONQuery<V> {
@@ -273,7 +240,7 @@ public protocol BSONQueryable {
     }
 }
 
-@dynamicMemberLookup public struct BSONQuery<FieldType : RawDocumentRepresentable> : BSONQueryable {
+@dynamicMemberLookup public struct BSONQuery<FieldType : ExtJSONRepresentable> : BSONQueryable {
     public let identifier: String
     public fileprivate(set) var documentRef: DocumentRef
     public var key: String {
@@ -302,7 +269,7 @@ public protocol BSONQueryable {
     }
 }
 
-public extension Collection where Element : RawDocumentRepresentable {
+public extension Collection where Element : ExtJSONRepresentable {
     func contains(_ element: BSONQuery<Element>) -> BSONQuery<Element> {
         let raw: RawDocument = [
             "$in" : self.map({ $0 })
@@ -367,21 +334,21 @@ public extension BSONQuery where FieldType : Collection {
         
     }
 }
-
-public extension BSONQuery where FieldType == String {
-    @available(macOS 13.0, *)
-    func contains(_ regex: some RegexComponent) -> Self {
-        self.documentRef.document[self.key] = regex.regex
-        return self
-    }
-}
+//
+//public extension BSONQuery where FieldType == String {
+//    @available(macOS 13.0, *)
+//    func contains(_ regex: some RegexComponent) -> Self {
+////        self.documentRef.document[self.key] = regex.regex
+//        return self
+//    }
+//}
 
 public enum BSONError : Error {
     case missingKey(String)
     case invalidType(key: String)
 }
 
-public struct MongoCollection<T : RawDocumentQueryRepresentable> {
+public struct MongoCollection<T : ExtJSONQueryRepresentable> {
     fileprivate let mongoCollection: RLMMongoCollection
     fileprivate let database: MongoDatabase
     fileprivate init(mongoCollection: RLMMongoCollection, database: MongoDatabase) {
@@ -526,7 +493,7 @@ public struct MongoCollection<T : RawDocumentQueryRepresentable> {
             document["collection"] = mongoCollection.name
             mongoCollection.user.callFunctionNamed(
                 "findOne",
-                arguments: [document].syntaxView.description,
+                arguments: String(data: [document].extJSONValue, encoding: .utf8)!,
                 serviceName: mongoCollection.serviceName) { data, error in
                     guard let data = data else {
                     guard let error = error else {
@@ -537,76 +504,81 @@ public struct MongoCollection<T : RawDocumentQueryRepresentable> {
                 continuation.resume(returning: data)
             }
         }
-        let view = await ExtJSON(extJSON: data)
-            .parse(database: self.database)
-        guard let view = view as? RawObjectSyntaxView else {
-            return nil
-        }
-        return try T.SyntaxView(from: view).rawDocumentRepresentable
+
+        fatalError()
+//        let objectTypes = T.schema.compactMap {
+//            $0.value as? any StructuredDocumentRepresentable.Type
+//        }
+//        var scanner: Scanner = ExtJSONScanner(string: data, objectTypes: objectTypes)
+        
+//        let node = try SyntaxNode(from: &scanner)
+//        var document = LazyDocument<T>(from: &scanner)
+        fatalError()
+//        return try T(from: &document) try T.SyntaxView(from: view).rawDocumentRepresentable
     }
     
-    @_unsafeInheritExecutor
-    public func findOne(options: FindOptions = FindOptions(),
-                        _ filter: ((inout Filter<T>) -> any BSONQueryable)? = nil) async throws -> T? where T: ObjectBase {
-        let data: String = try await withCheckedThrowingContinuation { continuation in
-            var document = RawDocument()
-            if let filter = filter {
-                var filterDocument = Filter<T>()
-                _ = filter(&filterDocument)
-                
-                guard let schema = T.sharedSchema() else {
-                    fatalError()
-                }
-                let namesAndClassNames: [(String, String?)] = schema.properties.filter {
-                    if let objectClassName = $0.objectClassName, let schema = RLMSchema.partialPrivateShared().schema(forClassName: objectClassName), !schema.isEmbedded {
-                        return true
-                    }
-                    return false
-                }.map { ($0.name, $0.objectClassName) }
-                document["pipeline"] = [
-                    [
-                        "$match": filterDocument.documentRef.document,
-//                        "$limit": 1
-                    ]
-                ]
-                + namesAndClassNames.map {
-                    ["$lookup": [
-                        "from": $0.1!,
-                        "localField": $0.0,
-                        "foreignField": "_id",
-                        "as": $0.0
-                    ]]
-                }
+//    @_unsafeInheritExecutor
+//    public func findOne(options: FindOptions = FindOptions(),
+//                        _ filter: ((inout Filter<T>) -> any BSONQueryable)? = nil) async throws -> T? where T: ObjectBase {
+//        let data: String = try await withCheckedThrowingContinuation { continuation in
+//            var document = RawDocument()
+//            if let filter = filter {
+//                var filterDocument = Filter<T>()
+//                _ = filter(&filterDocument)
+//                
+//                guard let schema = T.sharedSchema() else {
+//                    fatalError()
+//                }
+//                let namesAndClassNames: [(String, String?)] = schema.properties.filter {
+//                    if let objectClassName = $0.objectClassName, let schema = RLMSchema.partialPrivateShared().schema(forClassName: objectClassName), !schema.isEmbedded {
+//                        return true
+//                    }
+//                    return false
+//                }.map { ($0.name, $0.objectClassName) }
+//                document["pipeline"] = [
+//                    [
+//                        "$match": filterDocument.documentRef.document,
+////                        "$limit": 1
+//                    ]
+//                ]
 //                + namesAndClassNames.map {
-//                    ["$unwind": "$\($0.0)"]//[
-//                        "path":"$\($0.0)",
-////                        "includeArrayIndex": "0",
-//                        "preserveNullAndEmptyArrays": true
+//                    ["$lookup": [
+//                        "from": $0.1!,
+//                        "localField": $0.0,
+//                        "foreignField": "_id",
+//                        "as": $0.0
 //                    ]]
 //                }
-            }
-            print(document.syntaxView.description)
-            document["database"] = mongoCollection.databaseName
-            document["collection"] = mongoCollection.name
-            mongoCollection.user.callFunctionNamed(
-                "aggregate",
-                arguments: [document].syntaxView.description,
-                serviceName: mongoCollection.serviceName) { data, error in
-                    guard let data = data else {
-                    guard let error = error else {
-                        return continuation.resume(throwing: AppError(RLMAppError.Code.httpRequestFailed))
-                    }
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(returning: data)
-            }
-        }
-        let view = await ExtJSON(extJSON: data).parse(database: self.database)
-        guard let view = view as? RawArraySyntaxView else {
-            return nil
-        }
-        return try T.SyntaxView(from: view[0] as! RawObjectSyntaxView).rawDocumentRepresentable
-    }
+////                + namesAndClassNames.map {
+////                    ["$unwind": "$\($0.0)"]//[
+////                        "path":"$\($0.0)",
+//////                        "includeArrayIndex": "0",
+////                        "preserveNullAndEmptyArrays": true
+////                    ]]
+////                }
+//            }
+//            print(document.syntaxView.description)
+//            document["database"] = mongoCollection.databaseName
+//            document["collection"] = mongoCollection.name
+//            mongoCollection.user.callFunctionNamed(
+//                "aggregate",
+//                arguments: [document].syntaxView.description,
+//                serviceName: mongoCollection.serviceName) { data, error in
+//                    guard let data = data else {
+//                    guard let error = error else {
+//                        return continuation.resume(throwing: AppError(RLMAppError.Code.httpRequestFailed))
+//                    }
+//                    return continuation.resume(throwing: error)
+//                }
+//                continuation.resume(returning: data)
+//            }
+//        }
+//        let view = await ExtJSON(extJSON: data).parse(database: self.database)
+//        guard let view = view as? RawArraySyntaxView else {
+//            return nil
+//        }
+//        return try T.SyntaxView(from: view[0] as! RawObjectSyntaxView).rawDocumentRepresentable
+//    }
 //    //
 //    //    /// Runs an aggregation framework pipeline against this collection.
 //    //    /// - Parameters:
@@ -716,7 +688,7 @@ public struct MongoCollection<T : RawDocumentQueryRepresentable> {
 
 public struct MongoDatabase {
     fileprivate let mongoDatabase: RLMMongoDatabase
-    public func collection<T: RawDocumentRepresentable>(named name: String, type: T.Type) -> MongoCollection<T> {
+    public func collection<T: ExtJSONRepresentable>(named name: String, type: T.Type) -> MongoCollection<T> {
         MongoCollection<T>(mongoCollection: mongoDatabase.collection(withName: name),
                            database: self)
     }
@@ -728,35 +700,35 @@ public extension MongoClient {
     }
 }
 
-extension ExtJSON {
-    func parse(database: MongoDatabase) async -> any SyntaxView {
-        let ast = parse()
-        if let ast = ast as? any ObjectSyntaxView {
-//            for field in ast.fieldList.fields where field.value is DBRefSyntaxView {
-//                guard let dbRefView = field.value as? DBRefSyntaxView else {
-//                    continue
-//                }
-//                guard let type = configuration.schema.first(where: {
-//                    "\($0)" == dbRefView.collectionName.string
-//                }) else {
-//                    continue
-//                }
-//                
-//                let collection = database.collection(named: dbRefView.collectionName.string, type: RawDocument.self)
-//                await collection.findOne {
-//                    $0._id == dbRefView._id.rawDocumentRepresentable
-//                }
-//            }
-        }
-        return ast
-    }
-}
+//extension ExtJSON {
+//    func parse(database: MongoDatabase) async -> any SyntaxView {
+//        let ast = parse()
+//        if let ast = ast as? any ObjectSyntaxView {
+////            for field in ast.fieldList.fields where field.value is DBRefSyntaxView {
+////                guard let dbRefView = field.value as? DBRefSyntaxView else {
+////                    continue
+////                }
+////                guard let type = configuration.schema.first(where: {
+////                    "\($0)" == dbRefView.collectionName.string
+////                }) else {
+////                    continue
+////                }
+////                
+////                let collection = database.collection(named: dbRefView.collectionName.string, type: RawDocument.self)
+////                await collection.findOne {
+////                    $0._id == dbRefView._id.rawDocumentRepresentable
+////                }
+////            }
+//        }
+//        return ast
+//    }
+//}
 
-@attached(extension, conformances: RawDocumentQueryRepresentable, names: named(SyntaxView), named(keyPaths), suffixed(SyntaxView), arbitrary)
-@attached(member, names: named(init(from:)), named(syntaxView), arbitrary)
+@attached(extension, conformances: ExtJSONQueryRepresentable, names: named(SyntaxView), named(keyPaths), suffixed(SyntaxView), arbitrary)
+@attached(member, names: named(init(from:)), named(rawDocument), arbitrary)
 @available(swift 5.9)
 public macro BSONCodable(key: String? = nil) = #externalMacro(module: "MongoDataAccessMacros",
-                                                              type: "RawDocumentQueryRepresentableMacro")
+                                                              type: "BSONCodableMacro")
 
 @attached(peer)
 @available(swift 5.9)

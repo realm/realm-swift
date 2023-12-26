@@ -16,7 +16,7 @@ extension Scanner {
     }
 }
 
-package enum Token : Character {
+package enum Token : Character, CaseIterable {
     case openBrace = "{"
     case closeBrace = "}"
     case openBracket = "["
@@ -25,20 +25,25 @@ package enum Token : Character {
     case colon = ":"
     case comma = ","
     
-    func view(for json: String, 
-              at position: String.Index,
-              objectType: (any ObjectSyntaxView.Type)?,
-              allowedObjectTypes: [any SyntaxView.Type],
-              fields: [String : any SyntaxView.Type] = [:]) -> (any SyntaxView)? {
-        switch self {
-        case .openBrace: RawObjectSyntaxView(json: json, at: position, allowedObjectTypes: allowedObjectTypes)
-        case .closeBrace: nil
-        case .quotation: nil
-        case .colon: nil
-        case .comma, .closeBracket: nil
-        case .openBracket: try? RawArraySyntaxView(json: json, at: position, allowedObjectTypes: allowedObjectTypes)
-        }
-    }
+//    func view(for json: String, 
+//              at position: String.Index,
+//              objectType: (any ObjectSyntaxView.Type)?,
+//              allowedObjectTypes: [any SyntaxView.Type],
+//              fields: [String : any SyntaxView.Type] = [:]) -> (any SyntaxView2)? {
+//        switch self {
+//        case .openBrace:
+//            var scanner = Scanner(string: json)
+//            scanner.currentIndex = position
+//            return try? RawDocument(from: &scanner)
+//            //RawObjectSyntaxView(json: json, at: position, allowedObjectTypes: allowedObjectTypes)
+//        case .closeBrace: nil
+//        case .quotation: nil
+//        case .colon: nil
+//        case .comma, .closeBracket: nil
+//        case .openBracket: 
+//            fatalError()//try? RawArraySyntaxView(json: json, at: position, allowedObjectTypes: allowedObjectTypes)
+//        }
+//    }
 }
 
 // Literal Syntax Views
@@ -87,65 +92,68 @@ public protocol LiteralSyntaxView : SyntaxView {
 //    var rawDocumentRepresentable: any RawDocumentRepresentable { get }
 }
 
-extension Int : RawDocumentRepresentable {
-    public struct SyntaxView : ObjectSyntaxView {
-        public typealias RawDocumentValue = Int
-        public let rawDocumentRepresentable: Int
-        public let rawObjectSyntaxView: RawObjectSyntaxView
-        
-        public init(from value: Int) {
-            self.rawObjectSyntaxView = ["$numberLong": StringLiteralSyntaxView(stringLiteral: "\(value)")]
-            self.rawDocumentRepresentable = value
-        }
-        
-        public init(from view: RawObjectSyntaxView) throws {
-            self.rawObjectSyntaxView = view
-            guard let view = view["$numberLong"] as? StringLiteralSyntaxView,
-                let int = Int(view.string) else {
-                throw BSONError.missingKey("$numberLong")
-            }
-            self.rawDocumentRepresentable = int
-        }
-    }
-}
+//extension Int : RawDocumentRepresentable {
+//    public struct SyntaxView : ObjectSyntaxView {
+//        public typealias RawDocumentValue = Int
+//        public let rawDocumentRepresentable: Int
+//        public let rawObjectSyntaxView: RawObjectSyntaxView
+//        
+//        public init(from value: Int) {
+//            self.rawObjectSyntaxView = ["$numberLong": StringLiteralSyntaxView(stringLiteral: "\(value)")]
+//            self.rawDocumentRepresentable = value
+//        }
+//        
+//        public init(from view: RawObjectSyntaxView) throws {
+//            self.rawObjectSyntaxView = view
+//            guard let view = view["$numberLong"] as? StringLiteralSyntaxView,
+//                let int = Int(view.string) else {
+//                throw BSONError.missingKey("$numberLong")
+//            }
+//            self.rawDocumentRepresentable = int
+//        }
+//    }
+//}
 
-package struct IntLiteralSyntaxView : LiteralSyntaxView, ExpressibleByIntegerLiteral {
-    public let startIndex: String.Index
-    public let rawJSON: String
-    
-    public init(json: String, at startIndex: String.Index, allowedObjectTypes: [any SyntaxView.Type] = []) {
-        self.rawJSON = json
-        self.startIndex = startIndex
-    }
-    
-    package init(from value: Int) {
-        self.init(integerLiteral: value)
-    }
-    
-    package init(integerLiteral value: IntegerLiteralType) {
-        self.rawJSON = "\(value)"
-        self.startIndex = rawJSON.startIndex
-    }
-    
-    package var description: String {
-        String(self.rawJSON[startIndex..<endIndex])
-    }
-    
-    package var integer: IntegerLiteralType {
-        let scanner = self.scanner()
-        return scanner.scanInt()!
-    }
-    
-    package var rawDocumentRepresentable: Int {
-        integer
-    }
-    
-    package var endIndex: String.Index {
-        let scanner = self.scanner()
-        _ = scanner.scanInt()
-        return scanner.currentIndex
-    }
-}
+//package struct IntLiteralSyntaxView : LiteralSyntaxView, ExpressibleByIntegerLiteral {
+//    public var configuration: Configuration
+//    public let startIndex: String.Index
+//    public let rawJSON: String
+//    
+//    public init(json: String, 
+//                at startIndex: String.Index,
+//                configuration: inout Configuration) {
+//        self.rawJSON = json
+//        self.startIndex = startIndex
+//    }
+//    
+//    package init(from value: Int) {
+//        self.init(integerLiteral: value)
+//    }
+//    
+//    package init(integerLiteral value: IntegerLiteralType) {
+//        self.rawJSON = "\(value)"
+//        self.startIndex = rawJSON.startIndex
+//    }
+//    
+//    package var description: String {
+//        String(self.rawJSON[startIndex..<endIndex])
+//    }
+//    
+//    package var integer: IntegerLiteralType {
+//        let scanner = self.scanner()
+//        return scanner.scanInt()!
+//    }
+//    
+//    package var rawDocumentRepresentable: Int {
+//        integer
+//    }
+//    
+//    package var endIndex: String.Index {
+//        let scanner = self.scanner()
+//        _ = scanner.scanInt()
+//        return scanner.currentIndex
+//    }
+//}
 
 
 //@BSONCodable public struct DBRef {
@@ -237,50 +245,9 @@ package struct IntLiteralSyntaxView : LiteralSyntaxView, ExpressibleByIntegerLit
 //    }
 //}
 
+//public let defaultSchema: [any SyntaxView.Type] = _defaultSchema()
 
-public struct BoolSyntaxView : LiteralSyntaxView, ExpressibleByBooleanLiteral {
-    public typealias BooleanLiteralType = Bool
-    
-    public var startIndex: String.Index
-    
-    public var endIndex: String.Index {
-        let scanner = scanner()
-        if let `true` = scanner.scanString("true") { return scanner.currentIndex }
-        else if let `false` = scanner.scanString("false") { return scanner.currentIndex }
-        else { fatalError() }
-    }
-    
-    public let rawJSON: String
-    public init(json: String, at startIndex: String.Index, allowedObjectTypes: [any SyntaxView.Type] = []) {
-        self.rawJSON = json
-        self.startIndex = startIndex
-        let scanner = Scanner(string: json)
-        scanner.currentIndex = startIndex
-        if let `true` = scanner.scanString("true") { boolean = true }
-        else if let `false` = scanner.scanString("false") { boolean = false }
-        else { fatalError() }
-    }
-    private let boolean: Bool
-    public init(booleanLiteral value: Bool) {
-        self.boolean = value
-        self.rawJSON = "\(value)"
-        startIndex = rawJSON.startIndex
-    }
-    public init(from value: Bool) {
-        self.init(booleanLiteral: value)
-    }
-    public var rawDocumentRepresentable: Bool {
-        boolean
-    }
-    
-    public var description: String {
-        "\(boolean)"
-    }
-}
-
-public let defaultSchema: [any SyntaxView.Type] = _defaultSchema()
-
-import Realm.Private
+//import Realm.Private
 
 
 //@resultBuilder package struct SyntaxViewBuilder : SyntaxView {
@@ -328,57 +295,57 @@ import Realm.Private
 //    }
 //}
 
-extension ObjectBase {
-    fileprivate static var syntaxView: (any SyntaxView.Type)? {
-        guard let view = (Self() as? any RawDocumentRepresentable) else {
-            return nil
-        }
-        return view.syntaxViewType
-    }
-}
+//extension ObjectBase {
+//    fileprivate static var syntaxView: (any SyntaxView.Type)? {
+//        guard let view = (Self() as? any RawDocumentRepresentable) else {
+//            return nil
+//        }
+//        return view.syntaxViewType
+//    }
+//}
+//
+//private func _defaultSchema() -> [any SyntaxView.Type] {
+//    [
+//        Int.SyntaxView.self, ObjectId.SyntaxView.self, Double.SyntaxView.self
+//    ] + (Realm.Configuration.defaultConfiguration.objectTypes.map {
+//        $0.compactMap {
+//            $0.syntaxView
+//        } 
+//    } ?? [])
+//}
 
-private func _defaultSchema() -> [any SyntaxView.Type] {
-    [
-        Int.SyntaxView.self, ObjectId.SyntaxView.self, Double.SyntaxView.self
-    ] + (Realm.Configuration.defaultConfiguration.objectTypes.map {
-        $0.compactMap {
-            $0.syntaxView
-        } 
-    } ?? [])
-}
 
-
-package struct ExtJSON {
-    public struct Configuration {
-        let objectType: (any ObjectSyntaxView.Type)?
-        let fields: [String: any SyntaxView.Type]
-        public let linkDepth: UInt8
-        public let schema: [any SyntaxView.Type]
-    }
-    private let extJSON: String
-    private let objectType: (any ObjectSyntaxView.Type)?
-    private let fields: [String: any SyntaxView.Type]
-    public let configuration: Configuration
-    
-    public init(extJSON: String) {
-        self.extJSON = extJSON
-        self.objectType = nil
-        self.fields = [:]
-        self.configuration = .init(objectType: objectType, fields: fields, linkDepth: 5, schema: defaultSchema)
-    }
-    
-    public init<R : RawDocumentRepresentable>(_ type: R.Type, extJSON: String) where R.SyntaxView : ObjectSyntaxView {
-        self.extJSON = extJSON
-        self.objectType = R.SyntaxView.self
-        self.fields = [:]// R.SyntaxView.fields
-        self.configuration = .init(objectType: objectType, fields: fields, linkDepth: 5, schema: defaultSchema)
-    }
-    
-    package func parse() -> any SyntaxView {
-        guard let token = extJSON.first.map(Token.init),
-              let view = token?.view(for: extJSON, at: extJSON.startIndex, objectType: objectType, allowedObjectTypes: configuration.schema, fields: fields) else {
-            fatalError("Malformed JSON")
-        }
-        return view
-    }
-}
+//package struct ExtJSON {
+//    public struct Configuration {
+//        let objectType: (any ObjectSyntaxView.Type)?
+//        let fields: [String: any SyntaxView.Type]
+//        public let linkDepth: UInt8
+//        public let schema: [any SyntaxView.Type]
+//    }
+//    private let extJSON: String
+//    private let objectType: (any ObjectSyntaxView.Type)?
+//    private let fields: [String: any SyntaxView.Type]
+////    public let configuration: Configuration
+//    
+//    public init(extJSON: String) {
+//        self.extJSON = extJSON
+//        self.objectType = nil
+//        self.fields = [:]
+////        self.configuration = .init(objectType: objectType, fields: fields, linkDepth: 5, schema: defaultSchema)
+//    }
+//    
+////    public init<R : RawDocumentRepresentable>(_ type: R.Type, extJSON: String) where R.SyntaxView : ObjectSyntaxView {
+////        self.extJSON = extJSON
+//////        self.objectType = R.SyntaxView.self
+////        self.fields = [:]// R.SyntaxView.fields
+////        self.configuration = .init(objectType: objectType, fields: fields, linkDepth: 5, schema: defaultSchema)
+////    }
+//    
+//    package func parse() -> any SyntaxView2 {
+//        guard let token = extJSON.first.map(Token.init),
+//              let view = token?.view(for: extJSON, at: extJSON.startIndex, objectType: objectType, allowedObjectTypes: configuration.schema, fields: fields) else {
+//            fatalError("Malformed JSON")
+//        }
+//        return view
+//    }
+//}
