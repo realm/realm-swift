@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5D659E7D1BE04556006515A0"
+               BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
                BuildableName = "Realm.framework"
-               BlueprintName = "Realm"
+               BlueprintName = "Realm iOS static"
                ReferencedContainer = "container:../../../Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
