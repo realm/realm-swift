@@ -189,6 +189,8 @@
 		3FD0D7C729675A2E0031C196 /* RLMAsyncTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FD0D7C929675A2E0031C196 /* RLMAsyncTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */; };
 		3FD0D7CE2967CA1E0031C196 /* RLMMongoCollection_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D224816AAA00890DD2 /* RLMMongoCollection_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3FD6D1A92B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3FD6D1A82B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy */; };
+		3FD6D1AC2B4CA56D00A4FEBE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3FD6D1AB2B4CA56C00A4FEBE /* PrivacyInfo.xcprivacy */; };
 		3FDAB841290B4CCB00168F24 /* RLMError.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FDAB83E290B4CCB00168F24 /* RLMError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FDAB845290B4CCB00168F24 /* RLMError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FDAB840290B4CCB00168F24 /* RLMError.mm */; };
 		3FDAB848290B658300168F24 /* file-format-version-21.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3FDAB847290B658300168F24 /* file-format-version-21.realm */; };
@@ -754,6 +756,8 @@
 		3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask.h; sourceTree = "<group>"; };
 		3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAsyncTask.mm; sourceTree = "<group>"; };
 		3FD0D7CB29675AE10031C196 /* RLMAsyncTask_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask_Private.h; sourceTree = "<group>"; };
+		3FD6D1A82B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3FD6D1AB2B4CA56C00A4FEBE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3FDAB83E290B4CCB00168F24 /* RLMError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMError.h; sourceTree = "<group>"; };
 		3FDAB83F290B4CCB00168F24 /* RLMError_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMError_Private.hpp; sourceTree = "<group>"; };
 		3FDAB840290B4CCB00168F24 /* RLMError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMError.mm; sourceTree = "<group>"; };
@@ -1351,6 +1355,7 @@
 				5D660FE71BE98D670021E04F /* ObjectSchema.swift */,
 				5D660FE81BE98D670021E04F /* Optional.swift */,
 				3F149CCA2668112A00111D65 /* PersistedProperty.swift */,
+				3FD6D1AB2B4CA56C00A4FEBE /* PrivacyInfo.xcprivacy */,
 				0CD1632526D3DD7B0027C49B /* Projection.swift */,
 				5D660FE91BE98D670021E04F /* Property.swift */,
 				ACF08B6626DD936200686CBC /* Query.swift */,
@@ -1791,6 +1796,7 @@
 			isa = PBXGroup;
 			children = (
 				023B19F71A423BD20067FB81 /* libc++.dylib */,
+				3FD6D1A82B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy */,
 				E81A1F621955FC9300FDED82 /* Realm-Info.plist */,
 				02E334C21A5F3C45009F8810 /* Realm.modulemap */,
 			);
@@ -2256,6 +2262,7 @@
 			files = (
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
+				3FD6D1A92B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2263,6 +2270,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FD6D1AC2B4CA56D00A4FEBE /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

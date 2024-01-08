@@ -254,6 +254,9 @@ let package = Package(
                 "Realm/RLMUser.mm",
                 "Realm/RLMUserAPIKey.mm"
             ],
+            resources: [
+                .copy("Realm/PrivacyInfo.xcprivacy")
+            ],
             publicHeadersPath: "include",
             cxxSettings: cxxSettings,
             linkerSettings: [
@@ -268,6 +271,9 @@ let package = Package(
                 "Nonsync.swift",
                 "RealmSwift-Info.plist",
                 "Tests",
+            ],
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
             ]
         ),
         .target(
