@@ -18,7 +18,6 @@
 
 import CoreLocation
 import Realm
-import MapKit
 
 /**
  A struct that represents the coordinates of a point formed by a latitude and a longitude value.
@@ -29,7 +28,9 @@ import MapKit
  Values outside this ranges will return nil when trying to create a `GeoPoint`.
 
  - note: There is no dedicated type to store Geospatial points, instead points should be stored as
- [GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/) embedded object, as explained below.
+ [GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/) embedded
+ object, as explained below. Geospatial queries (`geoWithin`) can only be executed in such a type
+ of objects and will throw otherwise.
 
  Persisting geo points in Realm is currently done using duck-typing, which means that any model class with a specific **shape**
  can be queried as though it contained a geographical location.
@@ -67,8 +68,9 @@ public extension GeoPoint {
     ///
     /// - Parameter latitude: Latitude in degrees. Ranges between -90 and 90 degrees, inclusive.
     /// - Parameter longitude: Longitude in degrees. Ranges between -180 and 180 degrees, inclusive.
-    convenience init?(_ latitude: Double, _ longitude: Double) {
-        self.init(latitude: latitude, longitude: longitude)
+    /// - Parameter altitude: Altitude distance. Distance cannot have negative values.
+    convenience init?(_ latitude: Double, _ longitude: Double, _ altitude: Double = 0) {
+        self.init(latitude: latitude, longitude: longitude, altitude: 0)
     }
 }
 
@@ -112,6 +114,8 @@ public extension GeoBox {
  - Only one nesting is allowed.
 
  - warning: This class cannot be persisted and can only be use within a geospatial `geoWithin` query.
+
+ - warning: Altitude is not used in any of the query calculations.
  */
 public typealias GeoPolygon = RLMGeospatialPolygon
 

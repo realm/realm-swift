@@ -18,6 +18,7 @@
 
 import Foundation
 import Realm
+import Realm.Private
 
 /// Enum representing an option for `String` queries.
 public struct StringOptions: OptionSet {
@@ -825,8 +826,16 @@ extension Query where T: _HasPersistedType, T.PersistedType: _QueryNumeric {
 }
 
 public extension Query where T: OptionalProtocol, T.Wrapped: EmbeddedObject {
-    /// Use `geoWithin` function to filter objects whose location points lie within a certain area,
-    /// using a Geospatial shape (`GeoBox`, `GeoPolygon` or `GeoCircle`).
+    /**
+    Use `geoWithin` function to filter objects whose location points lie within a certain area,
+    using a Geospatial shape (`GeoBox`, `GeoPolygon` or `GeoCircle`).
+
+     - note: There is no dedicated type to store Geospatial points, instead points should be stored as
+     [GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/)
+     embedded object. Geospatial queries (`geoWithin`) can only be executed
+     in such a type of objects and will throw otherwise.
+     - see: `GeoPoint`
+    */
     func geoWithin<U: RLMGeospatial>(_ value: U) -> Query<Bool> {
         .init(.geoWithin(node, .constant(value)))
     }
@@ -885,7 +894,6 @@ private indirect enum QueryNode {
 
     case subqueryCount(_ child: QueryNode)
     case mapSubscript(_ keyPath: QueryNode, key: Any)
-
     case geoWithin(_ keyPath: QueryNode, _ value: QueryNode)
 }
 

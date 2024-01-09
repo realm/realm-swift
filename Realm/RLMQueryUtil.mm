@@ -947,11 +947,9 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
 #pragma mark Geospatial
 
 void QueryBuilder::add_within_constraint(const ColumnReference& column, id value) {
-    if ([value isKindOfClass:[RLMGeospatial class]]) {
-        RLMGeospatial *geospatial = (RLMGeospatial *)value;
-        auto geoQuery = column.resolve<Link>().geo_within(geospatial.geoSpatial);
-        m_query.and_query(geoQuery);
-    }
+    id<RLMGeospatial_Private> geospatial = (id<RLMGeospatial_Private>)value;
+    auto geoQuery = column.resolve<Link>().geo_within(geospatial.geoSpatial);
+    m_query.and_query(geoQuery);
 }
 
 // iterate over an array of subpredicates, using @func to build a query from each
@@ -1560,7 +1558,7 @@ void QueryBuilder::apply_value_expression(KeyPath&& kp, id value, NSComparisonPr
 
     // turn "key.path IN collection" into ored together ==. "collection IN key.path" is handled elsewhere.
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
-        if ([value isKindOfClass:[RLMGeospatial class]]) {
+        if ([value conformsToProtocol:@protocol(RLMGeospatial)]) {
             add_within_constraint(std::move(column), value);
         } else {
             process_or_group(m_query, value, [&](id item) {

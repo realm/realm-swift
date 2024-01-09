@@ -19,9 +19,8 @@
 #import <Realm/RLMConstants.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
-
-/// :nodoc:
-@interface RLMGeospatial : NSObject
+/// Conforming protocol for a Geo-shape.
+@protocol RLMGeospatial
 @end
 
 /**
@@ -29,22 +28,30 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
   * Latitude ranges between -90 and 90 degrees, inclusive.
   * Longitude ranges between -180 and 180 degrees, inclusive.
+  * Altitude cannot have negative values.
 
  Values outside this ranges will return nil when trying to create a `RLMGeospatialPoint`.
 
  @note There is no dedicated type to store Geospatial points, instead points should be stored as
- [GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/) embedded object, as explained below.
+ [GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/) 
+ embedded object, as explained below. Geospatial queries (`geoWithin`) can only be executed
+ in such a type of objects and will throw otherwise.
 
  Persisting geo points in Realm is currently done using duck-typing, which means that any model class with a specific **shape**
  can be queried as though it contained a geographical location. The recommended approach is using an embedded object.
 
- @warning This structure cannot be persisted and can only be used to build other geospatial shapes such as (`RLMGeospatialBox`, `RLMGeospatialPolygon` and `RLMGeospatialCircle`).
+ @warning This structure cannot be persisted and can only be used to build other geospatial shapes
+ such as (`RLMGeospatialBox`, `RLMGeospatialPolygon` and `RLMGeospatialCircle`).
+
+ @warning Altitude is not used in any of the query calculations.
  */
 @interface RLMGeospatialPoint : NSObject
 /// Latitude in degrees.
 @property (readonly) double latitude;
 /// Longitude in degrees.
 @property (readonly) double longitude;
+/// Altitude distance.
+@property (readonly) double altitude;
 
 /**
 Initialize a `RLMGeospatialPoint`, with the specific values for latitude and longitude.
@@ -55,6 +62,19 @@ Returns `nil` if the values of latitude and longitude are not within the ranges 
 @param longitude Longitude in degrees. Ranges between -180 and 180 degrees, inclusive.
  */
 - (nullable instancetype)initWithLatitude:(double)latitude longitude:(double)longitude;
+
+/**
+Initialize a `RLMGeospatialPoint`, with the specific values for latitude and longitude.
+
+Returns `nil` if the values of latitude and longitude are not within the ranges specified.
+
+@param latitude Latitude in degrees. Ranges between -90 and 90 degrees, inclusive.
+@param longitude Longitude in degrees. Ranges between -180 and 180 degrees, inclusive.
+@param altitude Altitude. Distance cannot have negative values
+
+ @warning Altitude is not used in any of the query calculations.
+ */
+- (nullable instancetype)initWithLatitude:(double)latitude longitude:(double)longitude altitude:(double)altitude;
 @end
 
 /**
@@ -62,7 +82,7 @@ Returns `nil` if the values of latitude and longitude are not within the ranges 
 
  - warning: This class cannot be persisted and can only be use within a geospatial `geoWithin` query.
  */
-@interface RLMGeospatialBox : RLMGeospatial
+@interface RLMGeospatialBox : NSObject <RLMGeospatial>
 /// The bottom left corner of the rectangle.
 @property (readonly, strong) RLMGeospatialPoint *bottomLeft;
 /// The top right corner of the rectangle.
@@ -98,7 +118,7 @@ Returns `nil` if the values of latitude and longitude are not within the ranges 
 
  @warning This class cannot be persisted and can only be use within a geospatial `geoWithin` query.
  */
-@interface RLMGeospatialPolygon : RLMGeospatial
+@interface RLMGeospatialPolygon : NSObject <RLMGeospatial>
 /// The polygon's external (outer) ring.
 @property (readonly, strong) NSArray<RLMGeospatialPoint *> *outerRing;
 /// The holes (if any) in the polygon.
@@ -132,7 +152,7 @@ Returns `nil` if the first and the last `RLMGeospatialPoint` in a polygon are no
 
  - warning: This structure cannot be persisted and can only be used to build other geospatial shapes
  */
-@interface RLMDistance : RLMGeospatial
+@interface RLMDistance : NSObject
 /// The distance in radians.
 @property (readonly) double radians;
 
@@ -202,7 +222,7 @@ A class that represents a circle, that can be used in a geospatial `geoWithin`qu
 
 @warning This class cannot be persisted and can only be use within a geospatial `geoWithin` query.
 */
-@interface RLMGeospatialCircle : RLMGeospatial
+@interface RLMGeospatialCircle : NSObject <RLMGeospatial>
 /// Center of the circle.
 @property (readonly, strong) RLMGeospatialPoint *center;
 /// Radius of the circle.

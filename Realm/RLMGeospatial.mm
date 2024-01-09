@@ -16,24 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMGeospatial.h"
+#import "RLMGeospatial_Private.hpp"
 
 #import <realm/geospatial.hpp>
-
-@implementation RLMGeospatial
-- (realm::Geospatial)geoSpatial {
-    return realm::Geospatial{realm::GeoBox{realm::GeoPoint{1.1, 2.2}, realm::GeoPoint{1.1, 2,2}}};
-}
-@end
-
 @implementation RLMGeospatialPoint
 - (nullable instancetype)initWithLatitude:(double)latitude longitude:(double)longitude {
+    return [self initWithLatitude:latitude longitude:longitude altitude:0];
+}
+
+- (nullable instancetype)initWithLatitude:(double)latitude longitude:(double)longitude altitude:(double)altitude {
     if (self = [super init]) {
-        if ((latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180)) {
+        if ((latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180) || (altitude < 0)) {
             return nil;
         }
         _latitude = latitude;
         _longitude = longitude;
+        _altitude = altitude;
     }
     return self;
 }
@@ -50,6 +48,9 @@
     }
     return NO;
 }
+@end
+
+@interface RLMGeospatialBox () <RLMGeospatial_Private>
 @end
 
 @implementation RLMGeospatialBox
@@ -75,6 +76,9 @@
     }
     return NO;
 }
+@end
+
+@interface RLMGeospatialPolygon () <RLMGeospatial_Private>
 @end
 
 @implementation RLMGeospatialPolygon
@@ -195,6 +199,9 @@ static double const c_earthRadiusMeters = 6378100.0;
     }
     return NO;
 }
+@end
+
+@interface RLMGeospatialCircle () <RLMGeospatial_Private>
 @end
 
 @implementation RLMGeospatialCircle

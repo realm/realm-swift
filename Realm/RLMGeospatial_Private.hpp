@@ -24,7 +24,7 @@ class Geospatial;
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-@interface RLMGeospatial ()
+@protocol RLMGeospatial_Private <NSObject>
 - (realm::Geospatial)geoSpatial;
 @end
 
