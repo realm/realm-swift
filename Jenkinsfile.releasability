@@ -1,4 +1,4 @@
-xcodeVersions = ['14.1', '14.2', '14.3.1', '15.0', '15.1']
+xcodeVersions = ['14.2', '14.3.1', '15.1', '15.2']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst', 'visionos': 'visionOS']
 docsXcodeVersion = '14.3.1'
@@ -121,7 +121,7 @@ def doBuild() {
         parallelBuilds["${platformName} ${xcodeVersion}"] = buildPlatform(platform, xcodeVersion)
       }
     }
-    // parallelBuilds["visionOS 15.2"] = buildPlatform('visionos', '15.2')
+    parallelBuilds["visionOS 15.2"] = buildPlatform('visionos', '15.2')
 
     parallel parallelBuilds
   }
@@ -135,12 +135,12 @@ def doBuild() {
           unstash "${platform}-${xcodeVersion}"
         }
       }
-      // unstash 'visionos-15.2'
+      unstash 'visionos-15.2'
 
       unstash 'examples'
       unstash 'build-scripts'
 
-      withEnv(['DEVELOPER_DIR=/Applications/Xcode-15.1.app/Contents/Developer']) {
+      withEnv(['DEVELOPER_DIR=/Applications/Xcode-15.2.app/Contents/Developer']) {
         sh './build.sh package-release'
       }
 
@@ -181,11 +181,12 @@ def doBuild() {
       },
 
       'Test macOS': {
-        node('osx') {
+        node('macos_13') {
           deleteDir()
           unstash 'source'
           sh '''
             export REALM_DISABLE_METADATA_ENCRYPTION=1
+            export REALM_XCODE_VERSION=15.2
             sh build.sh test-osx
           '''
         }
