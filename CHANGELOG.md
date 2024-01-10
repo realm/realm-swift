@@ -7,6 +7,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * `@Persisted`'s Encodable implementation did not allow the encoder to
   customize the encoding of values, which broke things like JSONEncoder's
   `dateEncodingStrategy` ([#8425](https://github.com/realm/realm-swift/issues/8425)).
+* Fix running Package.swift on Linux to support tools like Dependabot which
+  need to build the package description but not the package itself
+  ([#8458](https://github.com/realm/realm-swift/issues/8458), since v10.40.1).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
