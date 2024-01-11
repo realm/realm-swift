@@ -104,12 +104,16 @@ func runCommand() -> String {
     let task = Process()
     let pipe = Pipe()
 
-    task.standardOutput = pipe
-    task.standardError = pipe
-    task.launchPath = "/usr/sbin/ioreg"
+    task.executableURL = URL(fileURLWithPath: "/usr/sbin/ioregg")
     task.arguments = ["-rd1", "-c", "IOPlatformExpertDevice"]
     task.standardInput = nil
-    task.launch()
+    task.standardError = nil
+    task.standardOutput = pipe
+    do {
+        try task.run()
+    } catch {
+        return ""
+    }
 
     let data = pipe.fileHandleForReading.readDataToEndOfFile()
     let output = String(data: data, encoding: .utf8) ?? ""
