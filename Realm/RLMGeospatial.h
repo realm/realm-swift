@@ -163,7 +163,7 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param kilometers Distance in kilometers.
 @returns A value that represents the provided distance in radians.
  */
-+ (nullable instancetype)initFromKilometers:(double)kilometers NS_SWIFT_NAME(fromKilometers(kilometers:));
++ (nullable instancetype)kilometers:(double)kilometers;
 
 /**
 Constructs a `Distance`.
@@ -173,7 +173,7 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param miles Distance in miles.
 @return A value that represents the provided distance in radians.
 */
-+ (nullable instancetype)initFromMiles:(double)miles NS_SWIFT_NAME(fromMiles(miles:));
++ (nullable instancetype)miles:(double)miles;
 
 /**
 Constructs a `Distance`.
@@ -183,7 +183,7 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param degrees Distance in degrees.
 @returns A value that represents the provided distance in radians.
 */
-+ (nullable instancetype)initFromDegrees:(double)degrees NS_SWIFT_NAME(fromDegrees(degrees:));
++ (nullable instancetype)degrees:(double)degrees;
 
 /**
 Constructs a `Distance`.
@@ -193,28 +193,28 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param radians Distance in radians.
 @returns A value that represents the provided distance in radians.
 */
-+ (nullable instancetype)initFromRadians:(double)radians NS_SWIFT_NAME(fromRadians(radians:));
++ (nullable instancetype)radians:(double)radians;
 
 /**
 Returns the current `Distance` value in kilometers.
 
 @returns The value un kilometers.
 */
-@property (readonly, nonatomic) double kilometers;
+- (double)asKilometers;
 
 /**
 Returns the current `Distance` value in miles.
 
 @returns The value un miles.
 */
-@property (readonly, nonatomic) double miles;
+- (double)asMiles;
 
 /**
 Returns the current `Distance` value in degrees.
 
 @returns The value un degrees.
 */
-@property (readonly, nonatomic) double degrees;
+- (double)asDegrees;
 @end
 
 /**

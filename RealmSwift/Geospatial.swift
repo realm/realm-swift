@@ -61,19 +61,6 @@ import Realm
  */
 public typealias GeoPoint = RLMGeospatialPoint
 
-public extension GeoPoint {
-    /// Initialize a `GeoPoint`, with the specific values for latitude and longitude.
-    ///
-    /// Returns `nil` if the values of latitude and longitude are not within the ranges specified.
-    ///
-    /// - Parameter latitude: Latitude in degrees. Ranges between -90 and 90 degrees, inclusive.
-    /// - Parameter longitude: Longitude in degrees. Ranges between -180 and 180 degrees, inclusive.
-    /// - Parameter altitude: Altitude distance. Distance cannot have negative values.
-    convenience init?(_ latitude: Double, _ longitude: Double, _ altitude: Double = 0) {
-        self.init(latitude: latitude, longitude: longitude, altitude: 0)
-    }
-}
-
 /**
  A class that represents a rectangle, that can be used in a geospatial `geoWithin`query.
 
@@ -87,8 +74,8 @@ public extension GeoBox {
     /// - Parameter bottomLeft: The bottom left corner of the rectangle.
     /// - Parameter topRight: The top right corner of the rectangle.
     convenience init?(bottomLeft: (Double, Double), topRight: (Double, Double)) {
-        guard let bottomLeftPoint = GeoPoint(bottomLeft.0, bottomLeft.1),
-              let topRightPoint = GeoPoint(topRight.0, topRight.1) else {
+        guard let bottomLeftPoint = GeoPoint(latitude: bottomLeft.0, longitude: bottomLeft.1),
+              let topRightPoint = GeoPoint(latitude: topRight.0, longitude: topRight.1) else {
             return nil
         }
         self.init(bottomLeft: bottomLeftPoint, topRight: topRightPoint)
@@ -127,20 +114,14 @@ public extension GeoPolygon {
     ///
     /// - Parameter outerRing: The polygon's external (outer) ring.
     /// - Parameter holes: The holes (if any) in the polygon.
-    convenience init?(outerRing: [(Double, Double)], holes: [[(Double, Double)]]? = nil) {
-        let outerRingPoints = outerRing.map { GeoPoint(latitude: $0.0, longitude: $0.1) }
-        guard !outerRingPoints.contains(nil) else {
+    convenience init?(outerRing: [(Double, Double)], holes: [[(Double, Double)]] = []) {
+        let outerRingPoints = outerRing.compactMap(GeoPoint.init)
+        let holesPoints = holes.map { $0.compactMap(GeoPoint.init) }
+        guard outerRing.count == outerRingPoints.count,
+              zip(holes, holesPoints).allSatisfy({ $0.count == $1.count }) else {
             return nil
         }
-        var holesPoints: [[GeoPoint]]?
-        if let holes = holes {
-            let holesMapped = holes.map { $0.map { GeoPoint(latitude: $0.0, longitude: $0.1) } }
-            guard !holesMapped.flatMap({ $0 }).contains(nil) else {
-                return nil
-            }
-            holesPoints = holes.map { $0.compactMap { GeoPoint(latitude: $0.0, longitude: $0.1) } }
-        }
-        self.init(outerRing: outerRingPoints.compactMap { $0 }, holes: holesPoints)
+        self.init(outerRing: outerRingPoints, holes: holesPoints)
     }
 
     /// Initialize a `GeoPolygon`, with values for bottom left corner and top right corner.
@@ -151,17 +132,7 @@ public extension GeoPolygon {
     /// - Parameter outerRing: The polygon's external (outer) ring.
     /// - Parameter holes: The holes (if any) in the polygon.
     convenience init?(outerRing: [(Double, Double)], holes: [(Double, Double)]...) {
-        let outerRingPoints = outerRing.map { GeoPoint(latitude: $0.0, longitude: $0.1) }
-        guard !outerRingPoints.contains(nil) else {
-            return nil
-        }
-
-        let holesMapped = holes.map { $0.map { GeoPoint(latitude: $0.0, longitude: $0.1) } }
-        guard !holesMapped.flatMap({ $0 }).contains(nil) else {
-            return nil
-        }
-        let holesPoints = holes.map { $0.compactMap { GeoPoint(latitude: $0.0, longitude: $0.1) } }
-        self.init(outerRing: outerRingPoints.compactMap { $0 }, holes: holesPoints)
+        self.init(outerRing: outerRing, holes: holes.map { $0 })
     }
 }
 
@@ -186,7 +157,7 @@ public extension GeoCircle {
     /// - Parameter center: Center of the circle.
     /// - Parameter radiusInRadians: The radius of the circle in radians.
     convenience init?(center: (Double, Double), radiusInRadians: Double) {
-        guard let centerPoint = GeoPoint(center.0, center.1) else {
+        guard let centerPoint = GeoPoint(latitude: center.0, longitude: center.1) else {
             return nil
         }
         self.init(center: centerPoint, radiusInRadians: radiusInRadians)
@@ -197,7 +168,7 @@ public extension GeoCircle {
     /// - Parameter center: Center of the circle.
     /// - Parameter radius: Radius of the circle.
     convenience init?(center: (Double, Double), radius: Distance) {
-        guard let centerPoint = GeoPoint(center.0, center.1) else {
+        guard let centerPoint = GeoPoint(latitude: center.0, longitude: center.1) else {
             return nil
         }
         self.init(center: centerPoint, radius: radius)

@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMGeospatial_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import <realm/geospatial.hpp>
 @implementation RLMGeospatialPoint
@@ -41,10 +42,8 @@
 }
 
 - (BOOL)isEqual:(id)other {
-    if ([other isKindOfClass:[self class]]) {
-        RLMGeospatialPoint *otherCasted = (RLMGeospatialPoint*)other;
-        if (otherCasted.latitude == self.latitude && otherCasted.longitude == self.longitude)
-            return YES;
+    if (auto point = RLMDynamicCast<RLMGeospatialPoint>(other)) {
+        return point.latitude == self.latitude && point.longitude == self.longitude;
     }
     return NO;
 }
@@ -69,9 +68,8 @@
 }
 
 - (BOOL)isEqual:(id)other {
-    if ([other isKindOfClass:[self class]]) {
-        RLMGeospatialBox *otherCasted = (RLMGeospatialBox*)other;
-        if ([otherCasted.bottomLeft isEqual:self.bottomLeft] && [otherCasted.topRight isEqual: self.topRight])
+    if (auto box = RLMDynamicCast<RLMGeospatialBox>(other)) {
+        if ([box.bottomLeft isEqual:self.bottomLeft] && [box.topRight isEqual: self.topRight])
             return YES;
     }
     return NO;
@@ -127,9 +125,8 @@
 }
 
 - (BOOL)isEqual:(id)other {
-    if ([other isKindOfClass:[self class]]) {
-        RLMGeospatialPolygon *otherCasted = (RLMGeospatialPolygon*)other;
-        if ([otherCasted.outerRing isEqualToArray:self.outerRing] && [otherCasted.holes isEqualToArray:self.holes])
+    if (auto polygon = RLMDynamicCast<RLMGeospatialPolygon>(other)) {
+        if ([polygon.outerRing isEqualToArray:self.outerRing] && [polygon.holes isEqualToArray:self.holes])
             return YES;
     }
     return NO;
@@ -140,7 +137,7 @@
 static double const c_earthRadiusMeters = 6378100.0;
 
 @implementation RLMDistance
-+ (nullable instancetype)initFromKilometers:(double)kilometers {
++ (nullable instancetype)kilometers:(double)kilometers {
     if (kilometers < 0) {
         return nil;
     }
@@ -148,7 +145,7 @@ static double const c_earthRadiusMeters = 6378100.0;
     return [[RLMDistance alloc] initWithRadians:radians];
 }
 
-+ (nullable instancetype)initFromMiles:(double)miles {
++ (nullable instancetype)miles:(double)miles {
     if (miles < 0) {
         return nil;
     }
@@ -156,7 +153,7 @@ static double const c_earthRadiusMeters = 6378100.0;
     return [[RLMDistance alloc] initWithRadians:radians];
 }
 
-+ (nullable instancetype)initFromDegrees:(double)degrees {
++ (nullable instancetype)degrees:(double)degrees {
     if (degrees < 0) {
         return nil;
     }
@@ -164,22 +161,22 @@ static double const c_earthRadiusMeters = 6378100.0;
     return [[RLMDistance alloc] initWithRadians:(degrees * radiansPerDegree)];
 }
 
-+ (nullable instancetype)initFromRadians:(double)radians {
++ (nullable instancetype)radians:(double)radians {
     if (radians < 0) {
         return nil;
     }
     return [[RLMDistance alloc] initWithRadians:radians];
 }
 
-- (double)kilometers {
+- (double)asKilometers {
     return (self.radians * c_earthRadiusMeters) / 1000;
 }
 
-- (double)miles {
+- (double)asMiles {
     return (self.radians * c_earthRadiusMeters) / 1609.344;
 }
 
-- (double)degrees {
+- (double)asDegrees {
     double radiansPerDegree = M_PI / 180;
     return (self.radians / radiansPerDegree);
 }
@@ -192,9 +189,8 @@ static double const c_earthRadiusMeters = 6378100.0;
 }
 
 - (BOOL)isEqual:(id)other {
-    if ([other isKindOfClass:[self class]]) {
-        RLMDistance *otherCasted = (RLMDistance*)other;
-        if (otherCasted.radians == self.radians)
+    if (auto distance = RLMDynamicCast<RLMDistance>(other)) {
+        if (distance.radians == self.radians)
             return YES;
     }
     return NO;
@@ -227,9 +223,8 @@ static double const c_earthRadiusMeters = 6378100.0;
 }
 
 - (BOOL)isEqual:(id)other {
-    if ([other isKindOfClass:[self class]]) {
-        RLMGeospatialCircle *otherCasted = (RLMGeospatialCircle*)other;
-        if (otherCasted.radians == self.radians && [otherCasted.center isEqual:self.center])
+    if (auto circle = RLMDynamicCast<RLMGeospatialCircle>(other)) {
+        if (circle.radians == self.radians && [circle.center isEqual:self.center])
             return YES;
     }
     return NO;

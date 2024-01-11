@@ -1556,11 +1556,12 @@ void QueryBuilder::apply_value_expression(KeyPath&& kp, id value, NSComparisonPr
         return;
     }
 
-    // turn "key.path IN collection" into ored together ==. "collection IN key.path" is handled elsewhere.
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
         if ([value conformsToProtocol:@protocol(RLMGeospatial)]) {
+            // In case of `IN` check if the value is a Geo-shape, create a `geoWithin` query
             add_within_constraint(std::move(column), value);
         } else {
+            // turn "key.path IN collection" into ored together ==. "collection IN key.path" is handled elsewhere.
             process_or_group(m_query, value, [&](id item) {
                 id normalized = value_from_constant_expression_or_value(item);
                 column.validate_comparison(normalized);

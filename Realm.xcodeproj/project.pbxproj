@@ -1862,7 +1862,6 @@
 				AC813612287F21700029F15E /* RLMAsymmetricObject.h in Headers */,
 				3FD0D7C729675A2E0031C196 /* RLMAsyncTask.h in Headers */,
 				3FDB67152970720E0052233B /* RLMAsyncTask_Private.h in Headers */,
-				AC7825BF2ACD90DA007ABA4B /* RLMGeospatial.h in Headers */,
 				49E12CF2245DB7E800359DF1 /* RLMBSON.h in Headers */,
 				49E12CF5245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */,
 				5D659EAB1BE04556006515A0 /* RLMCollection.h in Headers */,
@@ -1878,6 +1877,7 @@
 				3FEE4F40281C4370009194C7 /* RLMEvent.h in Headers */,
 				CF76F7F324816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */,
 				CF76F7F524816AAB00890DD2 /* RLMFindOptions.h in Headers */,
+				AC7825BF2ACD90DA007ABA4B /* RLMGeospatial.h in Headers */,
 				AC3B33AE29DC6CEE0042F3A0 /* RLMLogger.h in Headers */,
 				AC3B33B029DC6CEE0042F3A0 /* RLMLogger_Private.h in Headers */,
 				5D659EAF1BE04556006515A0 /* RLMMigration.h in Headers */,
@@ -2170,7 +2170,7 @@
 						TestTargetID = 53124AB725B71AF600771CE4;
 					};
 					5D659E7D1BE04556006515A0 = {
-						LastSwiftMigration = 1500;
+						LastSwiftMigration = 1320;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FCB1BE98C560021E04F = {
@@ -2472,6 +2472,7 @@
 				3FEE4F42281C4370009194C7 /* RLMEvent.mm in Sources */,
 				CF76F7FD24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */,
 				CF76F7E724816AAB00890DD2 /* RLMFindOptions.mm in Sources */,
+				AC7825BD2ACD90DA007ABA4B /* RLMGeospatial.mm in Sources */,
 				AC3B33AF29DC6CEE0042F3A0 /* RLMLogger.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMManagedArray.mm in Sources */,
 				CF9881C125DABC6500BD7E4F /* RLMManagedDictionary.mm in Sources */,
@@ -2481,7 +2482,6 @@
 				CF76F7E924816AAB00890DD2 /* RLMMongoCollection.mm in Sources */,
 				4993221624129E6600A0EC8E /* RLMNetworkTransport.mm in Sources */,
 				5D659E8C1BE04556006515A0 /* RLMObject.mm in Sources */,
-				AC7825BD2ACD90DA007ABA4B /* RLMGeospatial.mm in Sources */,
 				5D659E8D1BE04556006515A0 /* RLMObjectBase.mm in Sources */,
 				3F4F3ADB23F71C790048DB43 /* RLMObjectId.mm in Sources */,
 				5D659E8E1BE04556006515A0 /* RLMObjectSchema.mm in Sources */,
@@ -2538,6 +2538,7 @@
 				3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				3F7BCEB52834377E00EB6E16 /* Events.swift in Sources */,
+				AC7825B92ACD90BE007ABA4B /* Geospatial.swift in Sources */,
 				3F857A482769291800F9B9B1 /* KeyPathStrings.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
@@ -2554,7 +2555,6 @@
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
-				AC7825B92ACD90BE007ABA4B /* Geospatial.swift in Sources */,
 				3FE267D8264308680030F83C /* Persistable.swift in Sources */,
 				3F149CCB2668112A00111D65 /* PersistedProperty.swift in Sources */,
 				3F857A49276A507200F9B9B1 /* Projection.swift in Sources */,
@@ -2884,9 +2884,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				SWIFT_VERSION = 5.0;
 			};
 			name = Static;
 		};
@@ -2923,7 +2920,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3059,10 +3055,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -3070,9 +3062,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -3190,7 +3179,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3202,7 +3190,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";

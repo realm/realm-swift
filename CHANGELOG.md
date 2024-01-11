@@ -76,9 +76,7 @@ x.y.z Release notes (yyyy-MM-dd)
   let shape = GeoPolygon(outerRing: [(0, 0), (1, 1), (2, 2), (0, 0)], holes: [[(0, 0), (1, 1), (2, 2), (0, 0)]])!
   let locations = realm.objects(PersonLocation.self).filter("location IN %@", shape)
   
-  let arguments = NSMutableArray()
-  arguments.add(shape)
-  let locations = realm.objects(PersonLocation.self).filter(NSPredicate(format: "location IN %@", argumentArray: arguments as? [Any])
+  let locations = realm.objects(PersonLocation.self).filter(NSPredicate(format: "location IN %@", shape))
   ```
 
 ### Fixed
