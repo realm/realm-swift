@@ -75,7 +75,7 @@ typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet *
 
 #pragma mark - Properties
 
-/// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`,
+/// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`;
 /// setting one of the two properties will automatically nil out the other.
 @property (nonatomic, copy, nullable) NSURL *fileURL;
 

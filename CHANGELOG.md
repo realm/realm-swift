@@ -10,10 +10,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * The `baseURL` field of `AppConfiguration` can now be updated, rather than the
   value being persisted between runs of the application in the metadata
   storage. ([Core #7201](https://github.com/realm/realm-core/issues/7201))
-* Allow in-memory synced Realms. This will allow setting and in-memory identifier on
-  flexible sync realms, this will not create a .realm file or its associated auxiliary 
-  files for the synced realm and instead stores objects in memory while the realm is 
-  open and discards them immediately when all instances are closed.
+* Allow in-memory synced Realms. This will allow setting an in-memory identifier on
+  a flexible sync realm.
 
 ### Fixed
 * `@Persisted`'s Encodable implementation did not allow the encoder to

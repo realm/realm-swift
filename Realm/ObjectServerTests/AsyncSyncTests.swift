@@ -522,7 +522,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         try await Task {
             var config = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
                 subs.append(QuerySubscription<SwiftPerson> {
-                    $0.age > 0 && $0.firstName == "\(#function)"
+                    $0.age > 0 && $0.firstName == self.name
                 })
             })
             config.objectTypes = [SwiftPerson.self]
@@ -530,7 +530,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
             let inMemoryRealm = try await Realm(configuration: config, downloadBeforeOpen: .always)
             XCTAssertEqual(inMemoryRealm.objects(SwiftPerson.self).count, 5)
             try! inMemoryRealm.write {
-                let person = SwiftPerson(firstName: "\(#function)",
+                let person = SwiftPerson(firstName: self.name,
                                          lastName: "lastname_10",
                                          age: 10)
                 inMemoryRealm.add(person)
@@ -541,7 +541,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
 
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
             subs.append(QuerySubscription<SwiftPerson> {
-                $0.age > 5 && $0.firstName == "\(#function)"
+                $0.age > 5 && $0.firstName == self.name
             })
         })
         config.objectTypes = [SwiftPerson.self]
@@ -551,7 +551,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
 
         var config2 = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
             subs.append(QuerySubscription<SwiftPerson> {
-                $0.age > 0 && $0.firstName == "\(#function)"
+                $0.age > 0 && $0.firstName == self.name
             })
         })
         config2.objectTypes = [SwiftPerson.self]
