@@ -23,7 +23,7 @@ BuildDestination = Struct.new(:build_platform, :destination) do |cls|
   end
 
   def cls.tvOSSimulator
-    BuildDestination.new('TVOS', 'ANY_TVOS_DEVICE')
+    BuildDestination.new('TVOS', 'ANY_TVOS_SIMULATOR')
   end
 
   def cls.watchOS

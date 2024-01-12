@@ -42,7 +42,7 @@ def create_release(version)
   response = github.create_release(REPOSITORY, release, name: release, body: release_notes, prerelease: prerelease)
   release_url = response[:url]
 
-  Dir.glob 'release_pkg/*.zip' do |upload|
+  Dir.glob 'release-package/*.zip' do |upload|
     puts "Uploading #{upload} to GitHub"
     github.upload_asset(release_url, upload, content_type: 'application/zip')
   end
@@ -55,7 +55,7 @@ def package_release_notes(version)
   out_file.puts(release_notes)
 end
 
-def download_all_artifacts(sha, excluding)
+def download_artifacts(key, sha)
   access_token = ENV['GITHUB_ACCESS_TOKEN']
   raise 'GITHUB_ACCESS_TOKEN must be set to create GitHub releases' unless access_token
 
@@ -63,25 +63,11 @@ def download_all_artifacts(sha, excluding)
   github.access_token = ENV['GITHUB_ACCESS_TOKEN']
 
   response = github.repository_artifacts(REPOSITORY)
-  sha_artifacts = response[:artifacts].filter { |artifact| artifact[:workflow_run][:head_sha] == sha && artifact[:name] != excluding }
+  sha_artifacts = response[:artifacts].filter { |artifact| artifact[:workflow_run][:head_sha] == sha && artifact[:name] == key }
   sha_artifacts.each { |artifact|
     download_url = github.artifact_download_url(REPOSITORY, artifact[:id])
     download(artifact[:name], download_url)
   }
-end
-
-def download_artifact(name, sha)
-  access_token = ENV['GITHUB_ACCESS_TOKEN']
-  raise 'GITHUB_ACCESS_TOKEN must be set to create GitHub releases' unless access_token
-
-  puts "Downloading artifact #{name}"
-  github = Octokit::Client.new
-  github.access_token = ENV['GITHUB_ACCESS_TOKEN']
-
-  response = github.repository_artifacts(REPOSITORY)
-  selected_artifact = response[:artifacts].find {|artifact| artifact[:name] == name and artifact[:workflow_run][:head_sha] == sha }
-  download_url = github.artifact_download_url(REPOSITORY, selected_artifact[:id])
-  download(selected_artifact[:name], download_url)
 end
 
 def download(name, url)
@@ -94,12 +80,8 @@ if ARGV[0] == 'create-release'
 elsif ARGV[0] == 'package-release-notes'
   version = ARGV[1]
   package_release_notes(version)
-elsif ARGV[0] == 'download-artifact'
-  name = ARGV[1]
+elsif ARGV[0] == 'download-artifacts'
+  key = ARGV[1]
   sha = ARGV[2]
-  download_artifact(name, sha)
-elsif ARGV[0] == 'download-all-artifacts'
-  sha = ARGV[1]
-  excluding = ARGV[2]
-  download_all_artifacts(sha, excluding)
+  download_artifacts(key, sha)
 end

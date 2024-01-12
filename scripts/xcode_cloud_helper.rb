@@ -15,6 +15,7 @@ include Workflows
 APP_STORE_URL = 'https://api.appstoreconnect.apple.com/v1'
 HTTP = Net::HTTP.new('api.appstoreconnect.apple.com', 443)
 HTTP.use_ssl = true
+HTTP.max_retries = 2
 
 def sh(*args)
     puts "executing: #{args.join(' ')}" if false
@@ -24,7 +25,15 @@ end
 def request(req)
     req['Authorization'] = "Bearer #{JWT_TOKEN}"
     # puts req.path
-    response = HTTP.request(req)
+    counter = 0
+    while true do
+        sleep 5
+        counter +=1
+        response = HTTP.request(req)
+    break if (response.code =~ /20./ ) == 0
+    break if counter == 2
+    end
+
     raise "Error: #{response.code} #{response.body}" unless response.code =~ /20./
     response
 end
@@ -54,7 +63,7 @@ def get_jwt_bearer(issuer_id, key_id, pk)
     private_key = OpenSSL::PKey.read(pk)
     info = {
         iss: issuer_id,
-        exp: Time.now.to_i + 10 * 60,
+        exp: Time.now.to_i + 20 * 60,
         aud: 'appstoreconnect-v1'
     }
     header_fields = { kid: key_id }
@@ -265,8 +274,6 @@ def synchronize_workflows()
     }
     current_workflows = get_workflows.filter_map { |workflow|
         name = workflow['attributes']['name']
-        # don't touch release pipeline jobs
-        next if name.include? 'release_'
         pieces = name.partition('_')
         {name: pieces.first, version: pieces.last, id: workflow['id']}
     }
@@ -310,7 +317,7 @@ def synchronize_workflows()
 
     workflows_to_create.each { |w|
         id = create_workflow(w[:target], w[:version])
-        puts "#{result['data']['attributes']['name']}: https://appstoreconnect.apple.com/teams/69a6de86-7f37-47e3-e053-5b8c7c11a4d1/frameworks/#{get_realm_product_id}/workflows/#{id}"
+        puts "#{w[:target]}: https://appstoreconnect.apple.com/teams/69a6de86-7f37-47e3-e053-5b8c7c11a4d1/frameworks/#{get_realm_product_id}/workflows/#{id}"
     }
     workflows_to_remove.each { |w|
         delete_workflow(w[:id])
@@ -318,36 +325,21 @@ def synchronize_workflows()
     }
 end
 
-def create_release_workflow(platform, xcode_version, target, configuration)
-    target = ReleaseTarget.new("release-package-build-#{platform}-#{target}-#{configuration}", target, platform)
-    return create_workflow(target, xcode_version)
+def get_build_status(build_run)
+    build_state = get_build_info(build_run)
+    status = build_state["data"]["attributes"]["executionProgress"]
+    return status
 end
 
-def wait_build(build_run)
-    begin
-        build_state = get_build_info(build_run)
-        status = build_state["data"]["attributes"]["executionProgress"]
-        puts "Current status #{status}"
-        puts 'Waiting'
-        if status == 'COMPLETE'
-            completed = true
-        end
-    end until completed == true or not sleep 20
-    
+def get_build_result(build_run)
     build_state = get_build_info(build_run)
     completion_status = build_state["data"]["attributes"]["completionStatus"]
-    puts "Completion status #{completion_status}"
-    get_logs_for_build(build_run)
-    if completion_status != 'SUCCEEDED'
-       puts "Completion status #{completion_status}"
-       raise "Error running build"
-    end
-    return
+    return completion_status
 end
 
 def get_logs_for_build(build_run)
     actions = get_build_actions(build_run)
-    artifacts = get_artifacts(actions[0][:id]) # we are only running one actions, so we use the first one in the list
+    artifacts = get_artifacts(actions[0][:id]) # we are only running one action, so we use the first one in the list
     artifact_url = ''
     artifacts.each { |artifact| 
         artifact_info = get_artifact_info(artifact[:id])
@@ -396,6 +388,18 @@ def download_artifact_for_build(build_id_run)
     }
 
     sh 'curl', '--output', "product.zip", "#{artifact_url}"
+end
+
+def clean_up_release_workflows()
+    workflows_to_remove = get_workflows.filter_map { |workflow|
+        if workflow['attributes']['name'].start_with?('release-package-build')
+            {name: workflow['attributes']['name'], id: workflow['id']}
+        end 
+    }
+    workflows_to_remove.each { |w|
+        delete_workflow(w[:id])
+        puts "Workflow deleted #{w[:name]}"
+    }
 end
 
 $xcode_ids = nil
@@ -458,12 +462,22 @@ $parser = OptionParser.new do |opts|
         Delete old workflows and/or create new ones.
       build-workflow workflow-id
         Run a build for the corresponding workflow.
-      create-release-workflow platform xcode_version target configuration
-        Creates a release workflow to create platform framework.
+      create-workflow platform xcode_version target configuration
+        Creates a workflow to create platform framework for an specific configuration, target and xcode version.
+      delete-workflow workflow-id
+        Deletes the workflow.
       wait-build build_id
         Check status of a current build and waits, returns when completed or fails.
       download-artifact build_id
         Download a build artifact for any given build run with a build action.
+      clean-up-release-workflows
+        Cleans all workflows created for a release (starts with release-package-build).
+      get-build-status
+        Get build current status.
+      get-build-result
+        Get build run completion status (Complete, Error).
+      print-build-logs
+        Print build logs.
       get-token
         Get Apple Connect Store API Token for local use.
 
@@ -537,22 +551,38 @@ when 'build-workflow'
     usage unless workflow_id
     id = start_build(workflow_id, branch)
     puts id
-when 'create-release-workflow'
+when 'create-workflow'
+    prefix = ARGV.shift
     platform = ARGV.shift
     xcode_version = ARGV.shift
     target = ARGV.shift
     configuration = ARGV.shift
     usage unless platform and xcode_version and target and configuration
-    id = create_release_workflow(platform, xcode_version, target, configuration)
+    release_target = ReleaseTarget.new("#{prefix}-#{platform}-#{target}-#{configuration}", target, platform)
+    id = create_workflow(release_target, xcode_version)
     puts id
-when 'wait-build'
-    build_id = ARGV.shift
-    usage unless build_id
-    wait_build(build_id)
+when 'delete-workflow'
+    workflow_id = ARGV.shift
+    delete_workflow(workflow_id)
 when 'download-artifact'
     build_id = ARGV.shift
     usage unless build_id
     download_artifact_for_build(build_id)
+when 'clean-up-release-workflows'
+    clean_up_release_workflows()
+when 'get-build-status'
+    build_id = ARGV.shift
+    status = get_build_status(build_id)
+    puts status
+when 'get-build-result'
+    build_id = ARGV.shift
+    usage unless build_id
+    completion_status = get_build_result(build_id)
+    puts completion_status
+when 'print-build-logs'
+    build_id = ARGV.shift
+    usage unless build_id
+    get_logs_for_build(build_id)
 when 'get-token'
-    pp JWT_TOKEN
+    puts JWT_TOKEN
 end

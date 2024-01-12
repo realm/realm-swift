@@ -31,13 +31,6 @@ install_dependencies() {
     else
         sh build.sh download-core
     fi
-
-    if [[ "$CI_PRODUCT_PLATFORM" == 'xrOS' ]]; then
-        # We need to install the visionOS because is not installed by default in the XCode Cloud image, 
-        # even if the build action selected platform is visionOS.
-        echo "Installing visionos"
-        xcodebuild -downloadPlatform visionOS
-    fi
 }
 
 install_ruby() {

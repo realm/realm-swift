@@ -88,8 +88,7 @@ command:
   release-package-docs:           build release package the docs
   release-package-*:              build release package for the given platform, configuration and target (this is executed in XCode Cloud)
   release-create-xcframework_[xcode-version] [platform]:  creates an xcframework from the framework build by the previous step
-  release-create-version-package [xcode-version]:  creates a package for a given xcode version, with all devices architectures xcframeworks
-  release-create-final-package:   creates the final package with all xcode versions 
+  release-package:                creates the final packages 
   release-package-test-examples:  test a built examples release package
 
   test-package-release: locally build a complete release package for all platforms
@@ -209,7 +208,6 @@ build_combined() {
 build_platform() {
     local product="$1"
     local platform="$2"
-    local xcode_version="$3"
     local config="$CONFIGURATION"
 
     local destination build_args config_suffix
@@ -278,8 +276,7 @@ build_platform() {
     cp -a "$build_path/." "$dir"
 
     config_name="$(tr [A-Z] [a-z] <<< "$config")"
-    package_name=package-$platform-$xcode_version-$product-$config_name.zip
-    zip -r "$package_name" "$dir"
+    zip -r product.zip "$dir"
     rm -rf "$folder_name"
 }
 
@@ -287,6 +284,7 @@ create_xcframework() {
     local product="$1"
     local platform="$2"
     local config="$3"
+    local xcode_version="$4"
     
     config_name="$(tr [A-Z] [a-z] <<< "$config")"
     
@@ -319,8 +317,8 @@ create_xcframework() {
     product_name="$product.framework"
     out_path="$ROOT_WORKSPACE/$config/$platform"
     xcframework_path="$out_path/$product.xcframework"
-    os_path="$ROOT_WORKSPACE/package-$platform-$product-$config_name/$config${config_suffix}/$product_name"
-    simulator_path="$ROOT_WORKSPACE/package-${platform}simulator-$product-$config_name/$config-$simulator_suffix/$product_name"
+    os_path="$ROOT_WORKSPACE/product-$platform-$xcode_version-$product-$config_name/$config${config_suffix}/$product_name"
+    simulator_path="$ROOT_WORKSPACE/product-${platform}simulator-$xcode_version-$product-$config_name/$config-$simulator_suffix/$product_name"
 
     simulator_framework=()
     if [[ -n "$simulator_suffix" ]]; then
@@ -337,7 +335,7 @@ unzip_product() {
     new_file_name="$2"
 
     unzip "$file_name.zip" -d $file_name
-    find . -depth -type d -name "RealmSwift Build*" -exec mv {} $new_file_name \;
+    find product -maxdepth 1 -type d -name "RealmSwift Build*" -exec mv {} $new_file_name \;
 
     rm $file_name.zip
     rm -rf $file_name
@@ -1133,26 +1131,19 @@ case "$COMMAND" in
         zip -r docs/realm-docs.zip docs/objc_output docs/swift_output
         ;;
 
+    "release-package-product")
+        unzip_product product product-package
+        ;;
+
     (release-create-xcframework_*)
         platform="$2"
         xcode_version=$(echo "$COMMAND" | cut -d_ -f2 ) 
-        
-        unzip_product package-$platform-$xcode_version-Realm-release package-$platform-Realm-release
-        unzip_product package-$platform-$xcode_version-RealmSwift-release package-$platform-RealmSwift-release
-        
-        if [ "$platform" == "ios" ] || [ "$platform" == "tvos" ] || [ "$platform" == "watchos" ] || [ "$platform" == "visionos" ]; then
-            unzip_product package-${platform}simulator-$xcode_version-Realm-release package-${platform}simulator-Realm-release
-            unzip_product package-${platform}simulator-$xcode_version-RealmSwift-release package-${platform}simulator-RealmSwift-release
-        fi
 
-        create_xcframework Realm "$platform" Release
-        create_xcframework RealmSwift "$platform" Release
+        create_xcframework Realm "$platform" Release "$xcode_version"
+        create_xcframework RealmSwift "$platform" Release "$xcode_version"
 
         if [ "$platform" = "ios" ] ; then
-            unzip_product package-$platform-$xcode_version-Realm-static package-$platform-Realm-static
-            unzip_product package-${platform}simulator-$xcode_version-Realm-static package-${platform}simulator-Realm-static
-
-            create_xcframework Realm "${platform}" Static
+            create_xcframework Realm "$platform" Static "$xcode_version"
         else
             mkdir -p "Static"
         fi
@@ -1161,45 +1152,31 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    (release-create-version-package_*)
-        objc_version="$2"
-        xcode_version=$(echo "$COMMAND" | cut -d_ -f2 ) 
+    "release-package")
         version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        
-        ./scripts/create-release-package.rb "$ROOT_WORKSPACE" "$version" "$xcode_version" "$objc_version"
-        
-        exit 0
-        ;;
-
-    ("release-create-final-package")
-        version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-
-        for file in $(find . -name "realm-swift-$version-1*.zip" -maxdepth 1); do
-            unzip -o "$file"
-        done
-
-        zip -r "realm-swift-$version.zip" "realm-swift-$version"
-
-        exit 0
+        find . -name 'realm-*-1*' -maxdepth 1 \
+            | sed 's@./realm-[a-z]*-\(.*\)@\1@' \
+            | sort -u --version-sort \
+            | xargs ./scripts/create-release-package.rb "${ROOT_WORKSPACE}/pkg" "${version}"
         ;;
 
     "release-test-examples")
         VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        dir="realm-swift-${VERSION}"
-        unzip "${dir}.zip"
+        filename="realm-swift-${VERSION}"
+        unzip "${filename}"
 
-        cp "$0" "${dir}"
-        cp -r "${source_root}/scripts" "${dir}"
-        cp "dependencies.list" "${dir}"
+        cp "$0" "${filename}"
+        cp -r "${source_root}/scripts" "${filename}"
+        cp "dependencies.list" "${filename}"
         
-        cd "${dir}"
+        cd "${filename}"
         sh build.sh examples-ios
         sh build.sh examples-tvos
         sh build.sh examples-osx
         sh build.sh examples-ios-swift
         sh build.sh examples-tvos-swift
         cd ..
-        rm -rf "${dir}"
+        rm -rf "${filename}"
 
         exit 0
         ;;
@@ -1216,7 +1193,7 @@ case "$COMMAND" in
         targets="Realm RealmSwift"
         
         platforms=("ios" "iossimulator" "osx" "tvos" "tvossimulator" "watchos" "watchossimulator" "catalyst")
-        if [ "$xcode_version" == "15.1" ]; then
+        if [ "$xcode_version" == "15.2" ]; then
             platforms+=("visionos" "visionossimulator")
         fi
 
@@ -1236,21 +1213,42 @@ case "$COMMAND" in
         done
         ;;
 
-    ("test-create-framework-xcode-cloud")
-        token="$2"
+    ("test-build-product-workflow-xcode-cloud")
+        issuer_id=""
+        key_id=""
+        pk_path=""
+
+        token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id $issuer_id --key-id $key_id --pk-path $pk_path get-token)
+        echo "Authentication token -> $token"
 
         # Test parameters 
         platform="ios"
         target="RealmSwift"
-        xcode_version="15.1"
+        xcode_version="15.2"
         configuration="release"
 
-        workflow_id=$(echo $(ruby ./scripts/xcode_cloud_helper.rb --create-build-workflow "$platform-$target-$configuration" --token $token --xcode-version $xcode_version))
-        build_run_id=$(echo $(ruby ./scripts/xcode_cloud_helper.rb --run-release-workflow $workflo_id --token $token --branch $BRANCH }))
-        ruby ./scripts/xcode_cloud_helper.rb --token $token --check-workflow-status $build_run_id
-        ruby ./scripts/xcode_cloud_helper.rb --download-build-artifact $build_run_id --token $token
+        workflow_id=$(ruby ./scripts/xcode_cloud_helper.rb create-workflow release-package-build $platform $xcode_version $target $configuration -t $token)
+        echo "Created workflow -> $workflow_id"
+        build_run_id=$(ruby ./scripts/xcode_cloud_helper.rb build-workflow $workflow_id dp/new_migration_branch -t $token)
+        echo "Build Run -> $build_run_id"
+        while [ "$status" != 'COMPLETE' ]
+        do
+            token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id $issuer_id --key-id $key_id --pk-path $pk_path get-token)
+            status=$(ruby ./scripts/xcode_cloud_helper.rb get-build-status $build_run_id -t $token)
+            echo "Status $status" | ts
+            sleep 20
+        done
+        completion_status=$(ruby ./scripts/xcode_cloud_helper.rb get-build-result $build_run_id -t $token)
+        echo "Completion Status $completion_status" | ts
+        if [ "$completion_status" != 'SUCCEEDED' ]; then
+            echo "XCode build failed"
+            ruby ./scripts/xcode_cloud_helper.rb print-build-logs $build_run_id -t $token
+            exit 1
+        fi
 
-        mv product.zip package-$platform-$xcode_version-$target-$configuration.zip
+        ruby ./scripts/xcode_cloud_helper.rb print-build-logs $build_run_id -t $token
+        ruby ./scripts/xcode_cloud_helper.rb download-artifact $build_run_id -t $token
+        ruby ./scripts/xcode_cloud_helper.rb delete-workflow $workflow_id -t $token
         ;;
 
     # Pass xcode version as argument
@@ -1268,14 +1266,6 @@ case "$COMMAND" in
 
             rm -rf "$ROOT_WORKSPACE/Release"
             rm -rf "$ROOT_WORKSPACE/Static"
-        done
-        ;;
-
-    ("test-create-release-package-xcode-version")
-        xcode_versions=("14.1" "14.2" "14.3.1" "15.0.1" "15.1")
-
-        for xcode_version in "${xcode_versions[@]}"; do
-            ./build.sh release-create-version-package $xcode_version
         done
         ;;
 
@@ -1314,10 +1304,9 @@ case "$COMMAND" in
         parameters=(${build_command//-/ })
 
         platform=${parameters[0]}
-        xcode_version=${parameters[1]}
-        target=${parameters[2]}
+        target=${parameters[1]}
 
-        build_platform "$target" "$platform" "$xcode_version"
+        build_platform "$target" "$platform"
         exit 0
         ;;
 
@@ -1330,13 +1319,10 @@ case "$COMMAND" in
         VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
 
         # Exclude docs because we don't want it for the release
-        ./scripts/github_release.rb download-all-artifacts "${sha}" realm-docs
+        ./scripts/github_release.rb download-artifacts release-package "${sha}"
 
-        mkdir -p release_pkg
-        export -f unzip_artifact
-        find . -name '*.zip' -maxdepth 1 \
-            | sed 's|^./||' \
-            | xargs -I {} bash -c 'unzip_artifact "{}" release_pkg/'
+        unzip release-package.zip -d release-package
+
 
         ./scripts/github_release.rb create-release "$VERSION"
         exit 0
@@ -1345,7 +1331,7 @@ case "$COMMAND" in
     "publish-docs")
         sha="$2"
         # Exclude docs because we don't want it for the release
-        ./scripts/github_release.rb download-artifact realm-docs "${sha}"
+        ./scripts/github_release.rb download-artifacts realm-docs "${sha}"
         unzip_artifact realm-docs.zip
         unzip realm-docs.zip
         
