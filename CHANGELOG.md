@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add a privacy manifest to both frameworks.
 
 ### Fixed
 * `@Persisted`'s Encodable implementation did not allow the encoder to
