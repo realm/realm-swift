@@ -2,6 +2,11 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add a privacy manifest to both frameworks.
+* Internal C++ symbols are no longer exported from Realm.framework when
+  installing via CocoaPods, which reduces the size of the binary by ~5%,
+  improves app startup time a little, and eliminates some warnings when linking
+  the framework. This was already the case when using Carthage or a prebuilt
+  framework ([PR #8464](https://github.com/realm/realm-swift/pull/8464)).
 
 ### Fixed
 * `@Persisted`'s Encodable implementation did not allow the encoder to
