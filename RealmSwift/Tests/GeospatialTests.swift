@@ -93,6 +93,9 @@ class GeospatialTests: TestCase {
         assertGeoPoint(0, 9999999, isNull: true)
         assertGeoPoint(0, -9999999, isNull: true)
 
+        assertGeoPoint(Double.nan, 0, isNull: true)
+        assertGeoPoint(0, Double.nan, isNull: true)
+
         func assertGeoPoint(_ latitude: Double, _ longitude: Double, isNull: Bool = false) {
             if isNull {
                 XCTAssertNil(GeoPoint(latitude: latitude, longitude: longitude))
@@ -149,18 +152,22 @@ class GeospatialTests: TestCase {
         assertGeoDistance(Distance.radians(0))
         assertGeoDistance(Distance.radians(20))
         assertGeoDistance(Distance.radians(-20), isNull: true)
+        assertGeoDistance(Distance.radians(.nan), isNull: true)
 
         assertGeoDistance(Distance.kilometers(0))
         assertGeoDistance(Distance.kilometers(10))
         assertGeoDistance(Distance.kilometers(-10), isNull: true)
+        assertGeoDistance(Distance.kilometers(.nan), isNull: true)
 
         assertGeoDistance(Distance.miles(0))
         assertGeoDistance(Distance.miles(10))
         assertGeoDistance(Distance.miles(-10), isNull: true)
+        assertGeoDistance(Distance.miles(.nan), isNull: true)
 
         assertGeoDistance(Distance.degrees(0))
         assertGeoDistance(Distance.degrees(90))
         assertGeoDistance(Distance.degrees(-90), isNull: true)
+        assertGeoDistance(Distance.degrees(.nan), isNull: true)
 
         func assertGeoDistance(_ radius: Distance?, isNull: Bool = false) {
             if isNull {
@@ -174,7 +181,7 @@ class GeospatialTests: TestCase {
     func testGeoCircle() throws {
         XCTAssertNotNil(GeoCircle(center: GeoPoint(latitude: 0, longitude: 70)!, radius: .radians(0)!))
         XCTAssertNotNil(GeoCircle(center: GeoPoint(latitude: 0, longitude: 70)!, radiusInRadians: 500))
-        // Using radiusInRadians initialiser
+        XCTAssertNil(GeoCircle(center: GeoPoint(latitude: 0, longitude: 70)!, radiusInRadians: Double.nan))
         XCTAssertNil(GeoCircle(center: GeoPoint(latitude: 0, longitude: 70)!, radiusInRadians: -500))
 
         // Using Simplified initialiser

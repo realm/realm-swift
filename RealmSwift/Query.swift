@@ -1002,7 +1002,7 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
             formatStr.append("[%@]")
             arguments.add(key)
         case .geoWithin(let keyPath, let value):
-            buildExpression(keyPath, "\(QueryNode.Operator.in.rawValue)", value, prefix: nil)
+            buildExpression(keyPath, QueryNode.Operator.in.rawValue, value, prefix: nil)
         }
     }
     build(root, isNewNode: true)

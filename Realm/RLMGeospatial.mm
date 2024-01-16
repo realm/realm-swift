@@ -27,7 +27,7 @@
 
 - (nullable instancetype)initWithLatitude:(double)latitude longitude:(double)longitude altitude:(double)altitude {
     if (self = [super init]) {
-        if ((latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180) || (altitude < 0)) {
+        if ((isnan(latitude) || isnan(longitude)) || (latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180) || (altitude < 0)) {
             return nil;
         }
         _latitude = latitude;
@@ -137,34 +137,22 @@
 static double const c_earthRadiusMeters = 6378100.0;
 
 @implementation RLMDistance
-+ (nullable instancetype)kilometers:(double)kilometers {
-    if (kilometers < 0) {
-        return nil;
-    }
++ (nullable instancetype)distanceFromKilometers:(double)kilometers {
     double radians = (kilometers * 1000) / c_earthRadiusMeters;
     return [[RLMDistance alloc] initWithRadians:radians];
 }
 
-+ (nullable instancetype)miles:(double)miles {
-    if (miles < 0) {
-        return nil;
-    }
++ (nullable instancetype)distanceFromMiles:(double)miles {
     double radians = (miles * 1609.344) / c_earthRadiusMeters;
     return [[RLMDistance alloc] initWithRadians:radians];
 }
 
-+ (nullable instancetype)degrees:(double)degrees {
-    if (degrees < 0) {
-        return nil;
-    }
++ (nullable instancetype)distanceFromDegrees:(double)degrees {
     double radiansPerDegree = M_PI / 180;
     return [[RLMDistance alloc] initWithRadians:(degrees * radiansPerDegree)];
 }
 
-+ (nullable instancetype)radians:(double)radians {
-    if (radians < 0) {
-        return nil;
-    }
++ (nullable instancetype)distanceFromRadians:(double)radians {
     return [[RLMDistance alloc] initWithRadians:radians];
 }
 
@@ -183,6 +171,9 @@ static double const c_earthRadiusMeters = 6378100.0;
 
 - (nullable instancetype)initWithRadians:(double)radians {
     if (self = [super init]) {
+        if (isnan(radians) || radians < 0) {
+            return nil;
+        }
         _radians = radians;
     }
     return self;
@@ -203,7 +194,7 @@ static double const c_earthRadiusMeters = 6378100.0;
 @implementation RLMGeospatialCircle
 - (nullable instancetype)initWithCenter:(RLMGeospatialPoint *)center radiusInRadians:(double)radians {
     if (self = [super init]) {
-        if (radians < 0) {
+        if (isnan(radians) || radians < 0) {
             return nil;
         }
 

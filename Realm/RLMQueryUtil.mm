@@ -949,7 +949,7 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
 void QueryBuilder::add_within_constraint(const ColumnReference& column, id value) {
     id<RLMGeospatial_Private> geospatial = (id<RLMGeospatial_Private>)value;
     auto geoQuery = column.resolve<Link>().geo_within(geospatial.geoSpatial);
-    m_query.and_query(geoQuery);
+    m_query.and_query(std::move(geoQuery));
 }
 
 // iterate over an array of subpredicates, using @func to build a query from each

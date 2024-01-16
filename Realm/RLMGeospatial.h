@@ -18,7 +18,7 @@
 
 #import <Realm/RLMConstants.h>
 
-RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
+RLM_HEADER_AUDIT_BEGIN(nullability)
 /// Conforming protocol for a Geo-shape.
 @protocol RLMGeospatial
 @end
@@ -45,6 +45,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
  @warning Altitude is not used in any of the query calculations.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMGeospatialPoint : NSObject
 /// Latitude in degrees.
 @property (readonly) double latitude;
@@ -82,6 +83,7 @@ Returns `nil` if the values of latitude and longitude are not within the ranges 
 
  - warning: This class cannot be persisted and can only be use within a geospatial `geoWithin` query.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMGeospatialBox : NSObject <RLMGeospatial>
 /// The bottom left corner of the rectangle.
 @property (readonly, strong) RLMGeospatialPoint *bottomLeft;
@@ -118,6 +120,7 @@ Returns `nil` if the values of latitude and longitude are not within the ranges 
 
  @warning This class cannot be persisted and can only be use within a geospatial `geoWithin` query.
  */
+RLM_SWIFT_SENDABLE
 @interface RLMGeospatialPolygon : NSObject <RLMGeospatial>
 /// The polygon's external (outer) ring.
 @property (readonly, strong) NSArray<RLMGeospatialPoint *> *outerRing;
@@ -152,6 +155,7 @@ Returns `nil` if the first and the last `RLMGeospatialPoint` in a polygon are no
 
  - warning: This structure cannot be persisted and can only be used to build other geospatial shapes
  */
+RLM_SWIFT_SENDABLE
 @interface RLMDistance : NSObject
 /// The distance in radians.
 @property (readonly) double radians;
@@ -163,7 +167,7 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param kilometers Distance in kilometers.
 @returns A value that represents the provided distance in radians.
  */
-+ (nullable instancetype)kilometers:(double)kilometers;
++ (nullable instancetype)distanceFromKilometers:(double)kilometers NS_SWIFT_NAME(kilometers(_:));
 
 /**
 Constructs a `Distance`.
@@ -173,7 +177,7 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param miles Distance in miles.
 @return A value that represents the provided distance in radians.
 */
-+ (nullable instancetype)miles:(double)miles;
++ (nullable instancetype)distanceFromMiles:(double)miles NS_SWIFT_NAME(miles(_:));
 
 /**
 Constructs a `Distance`.
@@ -183,7 +187,7 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param degrees Distance in degrees.
 @returns A value that represents the provided distance in radians.
 */
-+ (nullable instancetype)degrees:(double)degrees;
++ (nullable instancetype)distanceFromDegrees:(double)degrees NS_SWIFT_NAME(degrees(_:));
 
 /**
 Constructs a `Distance`.
@@ -193,7 +197,7 @@ Returns `nil` if the value is lower than 0, because we cannot construct negative
 @param radians Distance in radians.
 @returns A value that represents the provided distance in radians.
 */
-+ (nullable instancetype)radians:(double)radians;
++ (nullable instancetype)distanceFromRadians:(double)radians NS_SWIFT_NAME(radians(_:));
 
 /**
 Returns the current `Distance` value in kilometers.
@@ -222,6 +226,7 @@ A class that represents a circle, that can be used in a geospatial `geoWithin`qu
 
 @warning This class cannot be persisted and can only be use within a geospatial `geoWithin` query.
 */
+RLM_SWIFT_SENDABLE
 @interface RLMGeospatialCircle : NSObject <RLMGeospatial>
 /// Center of the circle.
 @property (readonly, strong) RLMGeospatialPoint *center;
@@ -232,7 +237,7 @@ A class that represents a circle, that can be used in a geospatial `geoWithin`qu
 Initialize a `RLMGeospatialCircle`, from its center and radius.
 
 @param center Center of the circle.
-@param radiusInRadians Radius of the circle.
+@param radians Radius of the circle.
 */
 - (nullable instancetype)initWithCenter:(RLMGeospatialPoint *)center radiusInRadians:(double)radians;
 
@@ -245,4 +250,4 @@ Initialize a `GeoCircle`, from its center and radius.
 - (instancetype)initWithCenter:(RLMGeospatialPoint *)center radius:(RLMDistance *)radius;
 @end
 
-RLM_HEADER_AUDIT_END(nullability, sendability)
+RLM_HEADER_AUDIT_END(nullability)
