@@ -93,14 +93,20 @@ class GeospatialTests: TestCase {
         assertGeoPoint(0, 9999999, isNull: true)
         assertGeoPoint(0, -9999999, isNull: true)
 
+        assertGeoPoint(90, 0, 0)
+        assertGeoPoint(90, 0, 500)
+        assertGeoPoint(90, 0, -1, isNull: true)
+        assertGeoPoint(90, 0, Double.nan, isNull: true)
+        assertGeoPoint(90, 0, -500, isNull: true)
+
         assertGeoPoint(Double.nan, 0, isNull: true)
         assertGeoPoint(0, Double.nan, isNull: true)
 
-        func assertGeoPoint(_ latitude: Double, _ longitude: Double, isNull: Bool = false) {
+        func assertGeoPoint(_ latitude: Double, _ longitude: Double, _ altitude: Double = 0, isNull: Bool = false) {
             if isNull {
-                XCTAssertNil(GeoPoint(latitude: latitude, longitude: longitude))
+                XCTAssertNil(GeoPoint(latitude: latitude, longitude: longitude, altitude: altitude))
             } else {
-                XCTAssertNotNil(GeoPoint(latitude: latitude, longitude: longitude))
+                XCTAssertNotNil(GeoPoint(latitude: latitude, longitude: longitude, altitude: altitude))
             }
         }
     }
@@ -306,9 +312,9 @@ class GeospatialTests: TestCase {
 
         assertThrowsFilter(PersonWithInvalidTypes.self, query: {
             $0.geoPointCoordinatesEmbedded.geoWithin(shape)
-        }, reason: "Query 'geoPointCoordinatesEmbedded GEOWITHIN GeoCircle([0, 0], 10)' links to data in the wrong format for a geoWithin query")
+        }, reason: "Query 'geoPointCoordinatesEmbedded GEOWITHIN GeoCircle([0, 0, 0], 10)' links to data in the wrong format for a geoWithin query")
 
-        assertThrowsFilter(PersonWithInvalidTypes.self, query: { $0.geoPointTypeEmbedded.geoWithin(shape) }, reason: "Query 'geoPointTypeEmbedded GEOWITHIN GeoCircle([0, 0], 10)' links to data in the wrong format for a geoWithin query")
+        assertThrowsFilter(PersonWithInvalidTypes.self, query: { $0.geoPointTypeEmbedded.geoWithin(shape) }, reason: "Query 'geoPointTypeEmbedded GEOWITHIN GeoCircle([0, 0, 0], 10)' links to data in the wrong format for a geoWithin query")
 
         // This is only allowed using filter/NSPredicate
         assertThrows(realm.objects(PersonWithInvalidTypes.self).filter(NSPredicate(format: "geoPoint IN %@", shape)), reason: "A GEOWITHIN query can only operate on a link to an embedded class but 'TopLevelGeoPoint' is at the top level")
@@ -327,29 +333,31 @@ class GeospatialTests: TestCase {
 
     func testGeoPolygonHoleNotContainedInOuterRingThrows() throws {
         let realm = realmWithTestPath()
-        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)], holes: [[(2, 2), (2, 3), (3, 3), (3, 2), (2, 2)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]}, {[2, 2], [3, 2], [3, 3], [2, 3], [2, 2]})': 'Secondary ring 1 not contained by first exterior ring - secondary rings must be holes in the first ring")
-        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)], holes: [[(0, 0.1), (0.5, 0.1), (0.5, 0.5), (0, 0.5), (0, 0.1)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]}, {[0.1, 0], [0.1, 0.5], [0.5, 0.5], [0.5, 0], [0.1, 0]})': 'Secondary ring 1 not contained by first exterior ring - secondary rings must be holes in the first ring")
-        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)], holes: [[(0.25, 0.5), (0.75, 0.5), (0.75, 1.5), (0.25, 1.5), (0.25, 0.5)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]}, {[0.5, 0.25], [0.5, 0.75], [1.5, 0.75], [1.5, 0.25], [0.5, 0.25]})': 'Secondary ring 1 not contained by first exterior ring - secondary rings must be holes in the first ring")
+        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)], holes: [[(2, 2), (2, 3), (3, 3), (3, 2), (2, 2)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 0]}, {[2, 2, 0], [3, 2, 0], [3, 3, 0], [2, 3, 0], [2, 2, 0]})': 'Secondary ring 1 not contained by first exterior ring - secondary rings must be holes in the first ring")
+        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)], holes: [[(0, 0.1), (0.5, 0.1), (0.5, 0.5), (0, 0.5), (0, 0.1)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 0]}, {[0.1, 0, 0], [0.1, 0.5, 0], [0.5, 0.5, 0], [0.5, 0, 0], [0.1, 0, 0]})': 'Secondary ring 1 not contained by first exterior ring - secondary rings must be holes in the first ring")
+        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(0, 0), (0, 1), (1, 1), (1, 0), (0, 0)], holes: [[(0.25, 0.5), (0.75, 0.5), (0.75, 1.5), (0.25, 1.5), (0.25, 0.5)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 0]}, {[0.5, 0.25, 0], [0.5, 0.75, 0], [1.5, 0.75, 0], [1.5, 0.25, 0], [0.5, 0.25, 0]})': 'Secondary ring 1 not contained by first exterior ring - secondary rings must be holes in the first ring")
     }
 
     func testGeoPolygonWithEdgesIntersectionThrows() throws {
         let realm = realmWithTestPath()
-        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [GeoPoint(latitude: 50, longitude: -50)!, GeoPoint(latitude: 55, longitude: 55)!, GeoPoint(latitude: -50, longitude: 50)!, GeoPoint(latitude: 70, longitude: -25)!, GeoPoint(latitude: 50, longitude: -50)!])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[-50, 50], [55, 55], [50, -50], [-25, 70], [-50, 50]})': 'Ring 0 is not valid: 'Edges 0 and 2 cross. Edge locations in degrees: [50.0000000, -50.0000000]-[55.0000000, 55.0000000] and [-50.0000000, 50.0000000]-[70.0000000, -25.0000000]''")
+        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [GeoPoint(latitude: 50, longitude: -50)!, GeoPoint(latitude: 55, longitude: 55)!, GeoPoint(latitude: -50, longitude: 50)!, GeoPoint(latitude: 70, longitude: -25)!, GeoPoint(latitude: 50, longitude: -50)!])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[-50, 50, 0], [55, 55, 0], [50, -50, 0], [-25, 70, 0], [-50, 50, 0]})': 'Ring 0 is not valid: 'Edges 0 and 2 cross. Edge locations in degrees: [50.0000000, -50.0000000]-[55.0000000, 55.0000000] and [-50.0000000, 50.0000000]-[70.0000000, -25.0000000]''")
     }
 
     func testGeoPolygonDuplicateEdgesThrows() throws {
         let realm = realmWithTestPath()
-        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(50, -80), (60, 20), (20, 20), (-80, -80), (50, -80)], holes: [[(40.0096192, -75.5175781), (60, 20), (20, 20), (-75.5175781, -75.5175781), (40.0096192, -75.5175781)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[-80, 50], [20, 60], [20, 20], [-80, -80], [-80, 50]}, {[-75.5176, 40.0096], [20, 60], [20, 20], [-75.5176, -75.5176], [-75.5176, 40.0096]})': 'Polygon isn't valid: 'Duplicate edge: ring 1, edge 1 and ring 0, edge 1''")
+        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(50, -80), (60, 20), (20, 20), (-80, -80), (50, -80)], holes: [[(40.0096192, -75.5175781), (60, 20), (20, 20), (-75.5175781, -75.5175781), (40.0096192, -75.5175781)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[-80, 50, 0], [20, 60, 0], [20, 20, 0], [-80, -80, 0], [-80, 50, 0]}, {[-75.5176, 40.0096, 0], [20, 60, 0], [20, 20, 0], [-75.5176, -75.5176, 0], [-75.5176, 40.0096, 0]})': 'Polygon isn't valid: 'Duplicate edge: ring 1, edge 1 and ring 0, edge 1''")
     }
 
     func testGeoPolygonNestedRingsThrows() throws {
         let realm = realmWithTestPath()
-        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(50, -80), (62, 22), (22, 22), (-80, -80), (50, -80)], holes: [[(45, -77), (61, 21), (21, 21), (-77, -77), (45, -77)], [(40.0096192, -75.5175780), (60, 20), (20, 20), (-75.5175781, -75.5175781), (40.0096192, -75.5175780)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[-80, 50], [22, 62], [22, 22], [-80, -80], [-80, 50]}, {[-77, 45], [21, 61], [21, 21], [-77, -77], [-77, 45]}, {[-75.5176, 40.0096], [20, 60], [20, 20], [-75.5176, -75.5176], [-75.5176, 40.0096]})': 'Polygon interior rings cannot be nested: 2")
+        assertThrows(realm.objects(PersonLocation.self).where { $0.location.geoWithin(GeoPolygon(outerRing: [(50, -80), (62, 22), (22, 22), (-80, -80), (50, -80)], holes: [[(45, -77), (61, 21), (21, 21), (-77, -77), (45, -77)], [(40.0096192, -75.5175780), (60, 20), (20, 20), (-75.5175781, -75.5175781), (40.0096192, -75.5175780)]])!) }, reason: "Invalid region in GEOWITHIN query for parameter 'GeoPolygon({[-80, 50, 0], [22, 62, 0], [22, 22, 0], [-80, -80, 0], [-80, 50, 0]}, {[-77, 45, 0], [21, 61, 0], [21, 21, 0], [-77, -77, 0], [-77, 45, 0]}, {[-75.5176, 40.0096, 0], [20, 60, 0], [20, 20, 0], [-75.5176, -75.5176, 0], [-75.5176, 40.0096, 0]})': 'Polygon interior rings cannot be nested: 2")
     }
 
     func testGeoEquality() throws {
-        XCTAssertEqual(GeoPoint(latitude: 1, longitude: 1), GeoPoint(latitude: 1, longitude: 1))
-        XCTAssertNotEqual(GeoPoint(latitude: 1, longitude: 1), GeoPoint(latitude: 2, longitude: 1))
+        XCTAssertEqual(GeoPoint(latitude: 1, longitude: 1, altitude: 1), GeoPoint(latitude: 1, longitude: 1, altitude: 1))
+        XCTAssertNotEqual(GeoPoint(latitude: 1, longitude: 1, altitude: 1), GeoPoint(latitude: 2, longitude: 1, altitude: 1))
+        XCTAssertNotEqual(GeoPoint(latitude: 1, longitude: 1, altitude: 1), GeoPoint(latitude: 1, longitude: 2, altitude: 1))
+        XCTAssertNotEqual(GeoPoint(latitude: 1, longitude: 1, altitude: 1), GeoPoint(latitude: 1, longitude: 1, altitude: 2))
 
         XCTAssertEqual(GeoBox(bottomLeft: (0, 0), topRight: (1, 1)), GeoBox(bottomLeft: (0, 0), topRight: (1, 1)))
         XCTAssertNotEqual(GeoBox(bottomLeft: (1, 1), topRight: (0, 0)), GeoBox(bottomLeft: (0, 0), topRight: (1, 1)))

@@ -551,7 +551,7 @@ public:
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, RLMObjectBase *obj);
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, realm::null);
     void add_link_constraint(NSPredicateOperatorType, const ColumnReference&, const ColumnReference&);
-    void add_within_constraint(const ColumnReference& column, id value);
+    void add_within_constraint(const ColumnReference& column, id<RLMGeospatial_Private> geospatial);
 
     template <CollectionOperation::Type Operation, bool IsLinkCollection, bool IsDictionary, typename R>
     void add_collection_operation_constraint(NSPredicateOperatorType operatorType,
@@ -946,8 +946,7 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
 
 #pragma mark Geospatial
 
-void QueryBuilder::add_within_constraint(const ColumnReference& column, id value) {
-    id<RLMGeospatial_Private> geospatial = (id<RLMGeospatial_Private>)value;
+void QueryBuilder::add_within_constraint(const ColumnReference& column, id<RLMGeospatial_Private> geospatial) {
     auto geoQuery = column.resolve<Link>().geo_within(geospatial.geoSpatial);
     m_query.and_query(std::move(geoQuery));
 }

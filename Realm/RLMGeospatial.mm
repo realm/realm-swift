@@ -20,6 +20,7 @@
 #import "RLMUtil.hpp"
 
 #import <realm/geospatial.hpp>
+
 @implementation RLMGeospatialPoint
 - (nullable instancetype)initWithLatitude:(double)latitude longitude:(double)longitude {
     return [self initWithLatitude:latitude longitude:longitude altitude:0];
@@ -27,7 +28,7 @@
 
 - (nullable instancetype)initWithLatitude:(double)latitude longitude:(double)longitude altitude:(double)altitude {
     if (self = [super init]) {
-        if ((isnan(latitude) || isnan(longitude)) || (latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180) || (altitude < 0)) {
+        if ((isnan(latitude) || isnan(longitude) || isnan(altitude)) || (latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180) || (altitude < 0)) {
             return nil;
         }
         _latitude = latitude;
@@ -38,12 +39,12 @@
 }
 
 - (realm::GeoPoint)value {
-    return realm::GeoPoint{_longitude, _latitude};
+    return realm::GeoPoint{_longitude, _latitude, _altitude};
 }
 
 - (BOOL)isEqual:(id)other {
     if (auto point = RLMDynamicCast<RLMGeospatialPoint>(other)) {
-        return point.latitude == self.latitude && point.longitude == self.longitude;
+        return point.latitude == self.latitude && point.longitude == self.longitude && point.altitude == self.altitude;
     }
     return NO;
 }
@@ -57,7 +58,6 @@
     if (self = [super init]) {
         _bottomLeft = bottomLeft;
         _topRight = topRight;
-
     }
     return self;
 }
