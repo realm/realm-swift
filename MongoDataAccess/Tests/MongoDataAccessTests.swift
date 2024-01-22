@@ -39,7 +39,7 @@ import Realm
     let object: AllTypesA
     let objectArray: [AllTypesA]
     let objectOpt: AllTypesA?
-    var anyValue: any ExtJSONRepresentable
+    var anyValue: any ExtJSONLiteral
 }
 
 @BSONCodable final class RealmPerson : Object {
@@ -73,43 +73,43 @@ import Realm
 
 
 class MongoDataAccessMacrosTests : XCTestCase {
-    func testObj2() throws {
-        let data = """
-        {
-            "a": "hello",
-            "b": {"$numberLong": "42"}
-        }
-        """.data(using: .utf8)!
-        let doc = try ExtJSONSerialization.jsonObject(with: data)
-        XCTAssertEqual((doc as! RawDocument)["b"] as? Int, 42)
-        
-        struct Frame : ExtJSONStructuredRepresentable {
-            init(from document: ExtJSONRepresentable) throws {
-                guard let document = document as? [String : ExtJSONRepresentable] else {
-                    fatalError()
-                }
-                a = document["a"] as! String
-                b = document["b"] as! Int
-            }
-            
-            static var schema: [String : Any.Type] = [
-                "a": String.self,
-                "b": Int.self
-            ]
-            
-            var extJSONLiteralValue: ExtJSONLiteral {
-                [
-                    "a": a, "b": b
-                ]
-            }
-            let a: String
-            let b: Int
-        }
-        
-        let doc2: Frame = try ExtJSONSerialization.jsonObject(with: data)
-        XCTAssertEqual(doc2.a, "hello")
-        XCTAssertEqual(doc2.b, 42)
-    }
+//    func testObj2() throws {
+//        let data = """
+//        {
+//            "a": "hello",
+//            "b": {"$numberLong": "42"}
+//        }
+//        """.data(using: .utf8)!
+//        let doc = try ExtJSONSerialization.jsonObject(with: data)
+//        XCTAssertEqual((doc as! RawDocument)["b"] as? Int, 42)
+//        
+//        struct Frame : ExtJSONStructuredRepresentable {
+//            init(from document: ExtJSONRepresentable) throws {
+//                guard let document = document as? [String : ExtJSONRepresentable] else {
+//                    fatalError()
+//                }
+//                a = document["a"] as! String
+//                b = document["b"] as! Int
+//            }
+//            
+//            static var schema: [String : Any.Type] = [
+//                "a": String.self,
+//                "b": Int.self
+//            ]
+//            
+//            var extJSONLiteralValue: ExtJSONLiteral {
+//                [
+//                    "a": a, "b": b
+//                ]
+//            }
+//            let a: String
+//            let b: Int
+//        }
+//        
+//        let doc2: Frame = try ExtJSONSerialization.jsonObject(with: data)
+//        XCTAssertEqual(doc2.a, "hello")
+//        XCTAssertEqual(doc2.b, 42)
+//    }
     func testObj() throws {
 //        var scanner = Scanner(string: "{\\\"a\\\" : []}")
 //        let doc = try SyntaxNode.init(from: &scanner).view as! RawDocument
@@ -134,15 +134,14 @@ class MongoDataAccessMacrosTests : XCTestCase {
         let a: [Int]
     }
     
-    func run<T : ExtJSONQueryRepresentable & Equatable>(test: String, answers: [T]) throws {
+    func run<T : ExtJSONObjectRepresentable & Equatable>(test: String, answers: [T]) throws {
         let url = Bundle.module.url(forResource: test, withExtension: "json")!
         let data = try Data(contentsOf: url)
-        let test: Test = try ExtJSONSerialization.jsonObject(with: data)
+        let test: Test = try Test(extJSONValue: JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as! [String: any ExpressibleByExtJSONLiteral])
         for entryIdx in test.valid.indices {
-            let parsedEntry: T =
-                try ExtJSONSerialization
-                    .jsonObject(with: test.valid[entryIdx].canonical_extjson
-                        .data(using: .utf8)!)
+            let document = try JSONSerialization.jsonObject(with: test.valid[entryIdx].canonical_extjson
+                .data(using: .utf8)!, options: .fragmentsAllowed) as! [String: any ExpressibleByExtJSONLiteral]
+            let parsedEntry = try T(extJSONValue: document)
             XCTAssertEqual(parsedEntry, answers[entryIdx])
         }
     }

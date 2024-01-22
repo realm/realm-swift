@@ -8,6 +8,59 @@ public protocol BSONFilter {
     init()
     mutating func encode() -> RawDocument
 }
+public protocol ExpressibleByExtJSONLiteral {
+    associatedtype ExtJSONValue: ExtJSONLiteral
+    init(extJSONValue value: ExtJSONValue) throws
+    var extJSONValue: ExtJSONValue { get }
+}
+
+public protocol ExtJSONLiteral : ExpressibleByExtJSONLiteral {
+}
+extension String: ExtJSONLiteral {
+    public init(extJSONValue value: Self) throws {
+        self = value
+    }
+    public var extJSONValue: Self {
+        self
+    }
+}
+extension Bool: ExtJSONLiteral {
+    public init(extJSONValue value: Self) throws {
+        self = value
+    }
+    public var extJSONValue: Self {
+        self
+    }
+}
+extension Dictionary: ExtJSONLiteral, ExpressibleByExtJSONLiteral
+    where Key == String, Value == any ExpressibleByExtJSONLiteral {
+    public typealias ExtJSONValue = Self
+    
+    public init(extJSONValue value: Self) throws {
+        self = value
+    }
+    public var extJSONValue: Self {
+        self
+    }
+}
+public typealias ExtJSONDocument = Dictionary<String, any ExpressibleByExtJSONLiteral>
+extension Array: ExtJSONLiteral, ExpressibleByExtJSONLiteral
+    where Element == any ExpressibleByExtJSONLiteral {
+    public typealias ExtJSONValue = Self
+    
+    public init(extJSONValue value: Self) throws {
+        self = value
+    }
+    public var extJSONValue: Self {
+        self
+    }
+}
+public typealias ExtJSONArray = Array<any ExpressibleByExtJSONLiteral>
+
+public protocol ExtJSONObjectRepresentable: ExpressibleByExtJSONLiteral
+    where ExtJSONValue == ExtJSONDocument {
+}
+
 
 //package struct AnyRawDocumentRepresentable : RawDocumentRepresentable {
 ////    package struct SyntaxView : LiteralSyntaxView {
@@ -37,14 +90,7 @@ public protocol BSONFilter {
 ////    let rawDocumentRepresentable: any RawDocumentRepresentable
 //}
 
-package extension RawDocumentRepresentable {
-//    var syntaxViewType: any MongoDataAccess.SyntaxView.Type {
-//        SyntaxView.self
-//    }
-//    var syntaxView: any MongoDataAccess.SyntaxView {
-//        SyntaxView(from: self)
-//    }
-}
+
 
 public protocol RawDocumentKey : RawRepresentable, CaseIterable where RawValue == String {
 }
@@ -84,17 +130,12 @@ public protocol RawDocumentKey : RawRepresentable, CaseIterable where RawValue =
 //        }
 //    }
 //}
-extension RawDocumentRepresentable {
-    fileprivate var value: Self {
-        self
-    }
-}
 
 public protocol KeyPathIterable {
     static var keyPaths: [PartialKeyPath<Self> : String] { get }
 }
 
-public protocol ExtJSONQueryRepresentable : ExtJSONStructuredRepresentable, KeyPathIterable {
+public protocol ExtJSONQueryRepresentable : ExtJSONObjectRepresentable, KeyPathIterable {
 }
 
 //public protocol RawDocumentQueryRepresentable : RawDocumentRepresentable, KeyPathIterable, StructuredDocumentRepresentable  {
@@ -222,7 +263,7 @@ public class DocumentRef {
 }
 
 public protocol BSONQueryable {
-    associatedtype FieldType : ExtJSONRepresentable
+    associatedtype FieldType : ExpressibleByExtJSONLiteral
     var documentRef: DocumentRef { get }
     var key: String { get }
 }
@@ -240,7 +281,7 @@ public protocol BSONQueryable {
     }
 }
 
-@dynamicMemberLookup public struct BSONQuery<FieldType : ExtJSONRepresentable> : BSONQueryable {
+@dynamicMemberLookup public struct BSONQuery<FieldType : ExpressibleByExtJSONLiteral> : BSONQueryable {
     public let identifier: String
     public fileprivate(set) var documentRef: DocumentRef
     public var key: String {
@@ -269,7 +310,7 @@ public protocol BSONQueryable {
     }
 }
 
-public extension Collection where Element : ExtJSONRepresentable {
+public extension Collection where Element : ExpressibleByExtJSONLiteral {
     func contains(_ element: BSONQuery<Element>) -> BSONQuery<Element> {
         let raw: RawDocument = [
             "$in" : self.map({ $0 })
@@ -482,28 +523,28 @@ public struct MongoCollection<T : ExtJSONQueryRepresentable> {
     @_unsafeInheritExecutor
     public func findOne(options: FindOptions = FindOptions(),
                         _ filter: ((inout Filter<T>) -> any BSONQueryable)? = nil) async throws -> T? {
-        let data: String = try await withCheckedThrowingContinuation { continuation in
-            var document = RawDocument()
-            if let filter = filter {
-                var filterDocument = Filter<T>()
-                _ = filter(&filterDocument)
-                document["query"] = filterDocument.documentRef.document
-            }
-            document["database"] = mongoCollection.databaseName
-            document["collection"] = mongoCollection.name
-            mongoCollection.user.callFunctionNamed(
-                "findOne",
-                arguments: String(data: [document].extJSONValue, encoding: .utf8)!,
-                serviceName: mongoCollection.serviceName) { data, error in
-                    guard let data = data else {
-                    guard let error = error else {
-                        return continuation.resume(throwing: AppError(RLMAppError.Code.httpRequestFailed))
-                    }
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(returning: data)
-            }
-        }
+//        let data: String = try await withCheckedThrowingContinuation { continuation in
+//            var document = RawDocument()
+//            if let filter = filter {
+//                var filterDocument = Filter<T>()
+//                _ = filter(&filterDocument)
+//                document["query"] = filterDocument.documentRef.document
+//            }
+//            document["database"] = mongoCollection.databaseName
+//            document["collection"] = mongoCollection.name
+//            mongoCollection.user.callFunctionNamed(
+//                "findOne",
+//                arguments: String(data: [document].extJSONValue, encoding: .utf8)!,
+//                serviceName: mongoCollection.serviceName) { data, error in
+//                    guard let data = data else {
+//                    guard let error = error else {
+//                        return continuation.resume(throwing: AppError(RLMAppError.Code.httpRequestFailed))
+//                    }
+//                    return continuation.resume(throwing: error)
+//                }
+//                continuation.resume(returning: data)
+//            }
+//        }
 
         fatalError()
 //        let objectTypes = T.schema.compactMap {
@@ -688,7 +729,7 @@ public struct MongoCollection<T : ExtJSONQueryRepresentable> {
 
 public struct MongoDatabase {
     fileprivate let mongoDatabase: RLMMongoDatabase
-    public func collection<T: ExtJSONRepresentable>(named name: String, type: T.Type) -> MongoCollection<T> {
+    public func collection<T: ExtJSONObjectRepresentable>(named name: String, type: T.Type) -> MongoCollection<T> {
         MongoCollection<T>(mongoCollection: mongoDatabase.collection(withName: name),
                            database: self)
     }
@@ -724,8 +765,8 @@ public extension MongoClient {
 //    }
 //}
 
-@attached(extension, conformances: ExtJSONQueryRepresentable, names: named(SyntaxView), named(keyPaths), suffixed(SyntaxView), arbitrary)
-@attached(member, names: named(init(from:)), named(rawDocument), arbitrary)
+@attached(extension, conformances: ExtJSONObjectRepresentable, names: arbitrary)
+@attached(member, names: named(init(extJSONValue:)), named(rawDocument), arbitrary)
 @available(swift 5.9)
 public macro BSONCodable(key: String? = nil) = #externalMacro(module: "MongoDataAccessMacros",
                                                               type: "BSONCodableMacro")

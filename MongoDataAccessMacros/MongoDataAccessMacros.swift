@@ -27,24 +27,24 @@ public struct BSONCodableMacro : ExtensionMacro, MemberMacro, MemberAttributeMac
 //        if type is StructDeclSyntax {
 //            
 //        }
-        return [.init(extendedType: type, inheritanceClause: InheritanceClauseSyntax.init(inheritedTypes: .init(arrayLiteral: .init(type: TypeSyntax(stringLiteral: "ExtJSONQueryRepresentable")))), memberBlock: """
+        return [.init(extendedType: type, inheritanceClause: InheritanceClauseSyntax.init(inheritedTypes: .init(arrayLiteral: .init(type: TypeSyntax(stringLiteral: "ExtJSONObjectRepresentable")))), memberBlock: """
             {
-                \(raw: !isStruct ? "convenience" : "") init(from document: ExtJSONRepresentable) throws {
-                    guard let document = document as? [String : Any] else {
-                        fatalError()
-                    }
+                \(raw: !isStruct ? "convenience" : "") init(extJSONValue value: ExtJSONDocument) throws {
                     \(raw: !isStruct ? "self.init()" : "")
                     \(raw: members.compactMap { member in
                         return """
-                        self.\(member.name) = try ExtJSONSerialization.read(key: "\(member.name)", from: document)
+                        guard let \(member.name)Raw = value["\(member.name)"] as? \(member.type).ExtJSONValue else {
+                            throw JSONError.missingKey(key: "\(member.name)")
+                        }
+                        self.\(member.name) = try \(member.type)(extJSONValue: \(member.name)Raw)
                         """
                     }.joined(separator: "\n"))
                 }
-                var extJSONLiteralValue: ExtJSONLiteral {
+                var extJSONValue: ExtJSONDocument {
                     [
                         \(raw: members.compactMap { member in
                             return """
-                            "\(member.name)": \(member.name).extJSONLiteralValue
+                            "\(member.name)": \(member.name).extJSONValue
                             """
                         }.joined(separator: ",\n"))
                     ]
@@ -602,9 +602,8 @@ public struct RawDocumentQueryRepresentableMacro : MemberMacro, ExtensionMacro, 
                 """)
         ]
     }
-    
-    
 }
+
 @main
 struct MongoDataAccessMacrosPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
