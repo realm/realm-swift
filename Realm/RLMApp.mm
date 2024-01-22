@@ -334,7 +334,7 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 - (instancetype)initWithConfiguration:(RLMAppConfiguration *)configuration {
     if (self = [super init]) {
         _app = RLMTranslateError([&] {
-            return app::App::get_shared_app(configuration.config, configuration.clientConfig);
+            return app::App::get_app(app::App::CacheMode::Enabled, configuration.config, configuration.clientConfig);
         });
         _configuration = configuration;
         _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];

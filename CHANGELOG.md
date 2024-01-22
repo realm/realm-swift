@@ -7,6 +7,9 @@ x.y.z Release notes (yyyy-MM-dd)
   improves app startup time a little, and eliminates some warnings when linking
   the framework. This was already the case when using Carthage or a prebuilt
   framework ([PR #8464](https://github.com/realm/realm-swift/pull/8464)).
+* The `baseURL` field of `AppConfiguration` can now be updated, rather than the
+  value being persisted between runs of the application in the metadata
+  storage. ([Core #7201](https://github.com/realm/realm-core/issues/7201))
 
 ### Fixed
 * `@Persisted`'s Encodable implementation did not allow the encoder to
@@ -16,7 +19,11 @@ x.y.z Release notes (yyyy-MM-dd)
   need to build the package description but not the package itself
   ([#8458](https://github.com/realm/realm-swift/issues/8458), since v10.40.1).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+
+* The `schemaVersion` field of `Realm.Configuration` must now always be zero
+  for synchronized Realms. Schema versions are currently not applicable to
+  synchronized Realms and the field was previously not read.
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
@@ -26,7 +33,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.2-15.2.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from 13.25.1 to 13.26.0
 
 10.45.3 Release notes (2024-01-08)
 =============================================================
