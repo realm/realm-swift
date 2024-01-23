@@ -515,6 +515,52 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     @MainActor
+    func testFlexibleSyncInitInMemory() async throws {
+        try await populateSwiftPerson(5)
+
+        let user = try await createUser()
+        try await Task {
+            var config = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
+                subs.append(QuerySubscription<SwiftPerson> {
+                    $0.age > 0 && $0.firstName == self.name
+                })
+            })
+            config.objectTypes = [SwiftPerson.self]
+            config.inMemoryIdentifier = "identifier"
+            let inMemoryRealm = try await Realm(configuration: config, downloadBeforeOpen: .always)
+            XCTAssertEqual(inMemoryRealm.objects(SwiftPerson.self).count, 5)
+            try! inMemoryRealm.write {
+                let person = SwiftPerson(firstName: self.name,
+                                         lastName: "lastname_10",
+                                         age: 10)
+                inMemoryRealm.add(person)
+            }
+            XCTAssertEqual(inMemoryRealm.objects(SwiftPerson.self).count, 6)
+            try await inMemoryRealm.syncSession?.wait(for: .upload)
+        }.value
+
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
+            subs.append(QuerySubscription<SwiftPerson> {
+                $0.age > 5 && $0.firstName == self.name
+            })
+        })
+        config.objectTypes = [SwiftPerson.self]
+        config.inMemoryIdentifier = "identifier"
+        let inMemoryRealm = try await Realm(configuration: config, downloadBeforeOpen: .always)
+        XCTAssertEqual(inMemoryRealm.objects(SwiftPerson.self).count, 1)
+
+        var config2 = user.flexibleSyncConfiguration(initialSubscriptions: { subs in
+            subs.append(QuerySubscription<SwiftPerson> {
+                $0.age > 0 && $0.firstName == self.name
+            })
+        })
+        config2.objectTypes = [SwiftPerson.self]
+        config2.inMemoryIdentifier = "identifier2"
+        let inMemoryRealm2 = try await Realm(configuration: config2, downloadBeforeOpen: .always)
+        XCTAssertEqual(inMemoryRealm2.objects(SwiftPerson.self).count, 6)
+    }
+
+    @MainActor
     func testStates() async throws {
         let realm = try await openRealm()
         let subscriptions = realm.subscriptions
