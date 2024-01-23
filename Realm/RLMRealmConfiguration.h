@@ -79,9 +79,9 @@ typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet *
 /// setting one of the two properties will automatically nil out the other.
 @property (nonatomic, copy, nullable) NSURL *fileURL;
 
-/// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`,
-/// `seedFilePath`.
-/// setting an in-memory identifier will automatically nil out the other two.
+/// A string used to identify a particular in-memory Realm. Mutually exclusive
+/// with `fileURL` and `seedFilePath`.
+/// Setting an in-memory identifier will automatically nil out the other two.
 @property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
 /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.

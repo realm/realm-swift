@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.46.0 Release notes (2024-01-23)
 =============================================================
+
 ### Enhancements
+
 * Add a privacy manifest to both frameworks.
 * Internal C++ symbols are no longer exported from Realm.framework when
   installing via CocoaPods, which reduces the size of the binary by ~5%,
@@ -14,6 +16,7 @@ x.y.z Release notes (yyyy-MM-dd)
   a flexible sync realm.
 
 ### Fixed
+
 * `@Persisted`'s Encodable implementation did not allow the encoder to
   customize the encoding of values, which broke things like JSONEncoder's
   `dateEncodingStrategy` ([#8425](https://github.com/realm/realm-swift/issues/8425)).
@@ -28,6 +31,7 @@ x.y.z Release notes (yyyy-MM-dd)
   synchronized Realms and the field was previously not read.
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.2.0.
@@ -35,6 +39,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.2-15.2.0.
 
 ### Internal
+
 * Upgraded realm-core from 13.25.1 to 13.26.0
 
 10.45.3 Release notes (2024-01-08)
