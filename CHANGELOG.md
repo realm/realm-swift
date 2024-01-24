@@ -39,7 +39,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ```
   A `filter` or `NSPredicate` can be used as well to perform a Geospatial query.
   ```swift
-  let shape = GeoPolygon(outerRing: [(0, 0), (1, 1), (2, 2), (0, 0)], holes: [[(0, 0), (1, 1), (2, 2), (0, 0)]])!
+  let shape = GeoPolygon(outerRing: [(-2, -2), (-2, 2), (2, 2), (2, -2), (-2, -2)], holes: [[(0, 0), (1, 1), (-1, 1), (0, 0)]])!
   let locations = realm.objects(PersonLocation.self).filter("location IN %@", shape)
   
   let locations = realm.objects(PersonLocation.self).filter(NSPredicate(format: "location IN %@", shape))
