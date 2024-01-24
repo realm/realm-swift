@@ -378,12 +378,6 @@ using namespace realm;
 
 #pragma mark - Private API
 
-+ (void)_setUpBindingContextFactory {
-    SyncUser::set_binding_context_factory([] {
-        return std::make_shared<CocoaSyncUserContext>();
-    });
-}
-
 - (NSString *)refreshToken {
     if (!_user || _user->refresh_token().empty()) {
         return nil;

@@ -113,7 +113,6 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
 
 - (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager {
     if (self = [super init]) {
-        [RLMUser _setUpBindingContextFactory];
         _syncManager = syncManager;
         return self;
     }
