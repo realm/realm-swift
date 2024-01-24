@@ -1,40 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
-### Compatibility
-* Realm Studio: 14.0.1 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 15.2.0.
-* CocoaPods: 1.10 or later.
-* Xcode: 14.2-15.2.0.
-
-### Internal
-* Upgraded realm-core from ? to ?
-
-10.46.0 Release notes (2024-01-23)
-=============================================================
-
-### Enhancements
-
-* Add a privacy manifest to both frameworks.
-* Internal C++ symbols are no longer exported from Realm.framework when
-  installing via CocoaPods, which reduces the size of the binary by ~5%,
-  improves app startup time a little, and eliminates some warnings when linking
-  the framework. This was already the case when using Carthage or a prebuilt
-  framework ([PR #8464](https://github.com/realm/realm-swift/pull/8464)).
-* The `baseURL` field of `AppConfiguration` can now be updated, rather than the
-  value being persisted between runs of the application in the metadata
-  storage. ([Core #7201](https://github.com/realm/realm-core/issues/7201))
-* Allow in-memory synced Realms. This will allow setting an in-memory identifier on
-  a flexible sync realm.
 * Added initial support for geospatial queries on points.
   There is no new dedicated type to store Geospatial points, instead points should
   be stored as ([GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/)) embedded object, as the example below.
@@ -78,6 +44,39 @@ x.y.z Release notes (yyyy-MM-dd)
   
   let locations = realm.objects(PersonLocation.self).filter(NSPredicate(format: "location IN %@", shape))
   ```
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.2.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.2-15.2.0.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
+10.46.0 Release notes (2024-01-23)
+=============================================================
+
+### Enhancements
+
+* Add a privacy manifest to both frameworks.
+* Internal C++ symbols are no longer exported from Realm.framework when
+  installing via CocoaPods, which reduces the size of the binary by ~5%,
+  improves app startup time a little, and eliminates some warnings when linking
+  the framework. This was already the case when using Carthage or a prebuilt
+  framework ([PR #8464](https://github.com/realm/realm-swift/pull/8464)).
+* The `baseURL` field of `AppConfiguration` can now be updated, rather than the
+  value being persisted between runs of the application in the metadata
+  storage. ([Core #7201](https://github.com/realm/realm-core/issues/7201))
+* Allow in-memory synced Realms. This will allow setting an in-memory identifier on
+  a flexible sync realm.
 
 ### Fixed
 
