@@ -8,6 +8,7 @@ framework module Realm {
     header "RLMDecimal128.h"
     header "RLMDictionary.h"
     header "RLMEmbeddedObject.h"
+    header "RLMGeospatial.h"
     header "RLMLogger.h"
     header "RLMMigration.h"
     header "RLMObject.h"

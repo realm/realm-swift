@@ -85,7 +85,7 @@ public final class Decimal128: RLMDecimal128, Decodable, @unchecked Sendable {
         }
     }
 
-    /// The mininum value for Decimal128
+    /// The minimum value for Decimal128
     public static var min: Decimal128 {
         unsafeDowncast(__minimumDecimalNumber, to: Self.self)
     }

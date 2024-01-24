@@ -346,6 +346,10 @@
 		AC3B33AE29DC6CEE0042F3A0 /* RLMLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AC3B33AF29DC6CEE0042F3A0 /* RLMLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */; };
 		AC3B33B029DC6CEE0042F3A0 /* RLMLogger_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		AC7825B92ACD90BE007ABA4B /* Geospatial.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7825B82ACD90BE007ABA4B /* Geospatial.swift */; };
+		AC7825BD2ACD90DA007ABA4B /* RLMGeospatial.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */; };
+		AC7825BF2ACD90DA007ABA4B /* RLMGeospatial.h in Headers */ = {isa = PBXBuildFile; fileRef = AC7825BC2ACD90DA007ABA4B /* RLMGeospatial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AC7825C22ACD917B007ABA4B /* GeospatialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7825C02ACD916C007ABA4B /* GeospatialTests.swift */; };
 		AC7D182D261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC7D182B261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm */; };
 		AC7D182E261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7D182C261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift */; };
 		AC81360F287F21350029F15E /* AsymmetricObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC81360E287F21350029F15E /* AsymmetricObject.swift */; };
@@ -889,6 +893,11 @@
 		AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger.h; sourceTree = "<group>"; };
 		AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMLogger.mm; sourceTree = "<group>"; };
 		AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger_Private.h; sourceTree = "<group>"; };
+		AC7825B82ACD90BE007ABA4B /* Geospatial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geospatial.swift; sourceTree = "<group>"; };
+		AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMGeospatial.mm; sourceTree = "<group>"; };
+		AC7825BB2ACD90DA007ABA4B /* RLMGeospatial_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMGeospatial_Private.hpp; sourceTree = "<group>"; };
+		AC7825BC2ACD90DA007ABA4B /* RLMGeospatial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMGeospatial.h; sourceTree = "<group>"; };
+		AC7825C02ACD916C007ABA4B /* GeospatialTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeospatialTests.swift; sourceTree = "<group>"; };
 		AC7D182B261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObjectServerPartitionTests.mm; path = Realm/ObjectServerTests/RLMObjectServerPartitionTests.mm; sourceTree = "<group>"; };
 		AC7D182C261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftObjectServerPartitionTests.swift; path = Realm/ObjectServerTests/SwiftObjectServerPartitionTests.swift; sourceTree = "<group>"; };
 		AC81360E287F21350029F15E /* AsymmetricObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsymmetricObject.swift; sourceTree = "<group>"; };
@@ -1339,6 +1348,7 @@
 				3FC3F9162419B63100E27322 /* EmbeddedObject.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
 				3F7BCEB42834377E00EB6E16 /* Events.swift */,
+				AC7825B82ACD90BE007ABA4B /* Geospatial.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
 				0C3BD4D225C1C5AB007CFDD3 /* Map.swift */,
@@ -1389,6 +1399,7 @@
 				3F40C612276D1B05007FEF1A /* CustomObjectCreationTests.swift */,
 				3F9F53D42718E8E6000EEB4A /* CustomPersistableTestObjects.swift */,
 				CFFECBA8250646750010F585 /* Decimal128Tests.swift */,
+				AC7825C02ACD916C007ABA4B /* GeospatialTests.swift */,
 				CF0D04F02693652E0038A058 /* KeyPathTests.swift */,
 				5D660FFF1BE98D880021E04F /* KVOTests.swift */,
 				5D6610001BE98D880021E04F /* ListTests.swift */,
@@ -1703,6 +1714,9 @@
 				3FDAB83F290B4CCB00168F24 /* RLMError_Private.hpp */,
 				3FEE4F3E281C4370009194C7 /* RLMEvent.h */,
 				3FEE4F3F281C4370009194C7 /* RLMEvent.mm */,
+				AC7825BC2ACD90DA007ABA4B /* RLMGeospatial.h */,
+				AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */,
+				AC7825BB2ACD90DA007ABA4B /* RLMGeospatial_Private.hpp */,
 				AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */,
 				AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */,
 				AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */,
@@ -1863,6 +1877,7 @@
 				3FEE4F40281C4370009194C7 /* RLMEvent.h in Headers */,
 				CF76F7F324816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */,
 				CF76F7F524816AAB00890DD2 /* RLMFindOptions.h in Headers */,
+				AC7825BF2ACD90DA007ABA4B /* RLMGeospatial.h in Headers */,
 				AC3B33AE29DC6CEE0042F3A0 /* RLMLogger.h in Headers */,
 				AC3B33B029DC6CEE0042F3A0 /* RLMLogger_Private.h in Headers */,
 				5D659EAF1BE04556006515A0 /* RLMMigration.h in Headers */,
@@ -2457,6 +2472,7 @@
 				3FEE4F42281C4370009194C7 /* RLMEvent.mm in Sources */,
 				CF76F7FD24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */,
 				CF76F7E724816AAB00890DD2 /* RLMFindOptions.mm in Sources */,
+				AC7825BD2ACD90DA007ABA4B /* RLMGeospatial.mm in Sources */,
 				AC3B33AF29DC6CEE0042F3A0 /* RLMLogger.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMManagedArray.mm in Sources */,
 				CF9881C125DABC6500BD7E4F /* RLMManagedDictionary.mm in Sources */,
@@ -2522,6 +2538,7 @@
 				3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				3F7BCEB52834377E00EB6E16 /* Events.swift in Sources */,
+				AC7825B92ACD90BE007ABA4B /* Geospatial.swift in Sources */,
 				3F857A482769291800F9B9B1 /* KeyPathStrings.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
@@ -2576,6 +2593,7 @@
 				3F40C613276D1B05007FEF1A /* CustomObjectCreationTests.swift in Sources */,
 				3F9F53D52718E8E6000EEB4A /* CustomPersistableTestObjects.swift in Sources */,
 				CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */,
+				AC7825C22ACD917B007ABA4B /* GeospatialTests.swift in Sources */,
 				CF0D04F1269365300038A058 /* KeyPathTests.swift in Sources */,
 				3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */,
 				5D6610161BE98D880021E04F /* ListTests.swift in Sources */,

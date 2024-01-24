@@ -24,6 +24,7 @@
 #import <Realm/RLMDictionary.h>
 #import <Realm/RLMEmbeddedObject.h>
 #import <Realm/RLMError.h>
+#import <Realm/RLMGeospatial.h>
 #import <Realm/RLMLogger.h>
 #import <Realm/RLMMigration.h>
 #import <Realm/RLMObject.h>

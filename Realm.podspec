@@ -30,6 +30,7 @@ Pod::Spec.new do |s|
                               'include/RLMDecimal128.h',
                               'include/RLMDictionary.h',
                               'include/RLMEmbeddedObject.h',
+                              'include/RLMGeospatial.h',
                               'include/RLMError.h',
                               'include/RLMLogger.h',
                               'include/RLMMigration.h',
