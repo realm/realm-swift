@@ -47,8 +47,3 @@ SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
 RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stopPolicy) {
     return static_cast<RLMSyncStopPolicy>(stopPolicy);
 }
-
-CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user)
-{
-    return *std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
-}

@@ -23,31 +23,15 @@
 #import <realm/object-store/sync/sync_user.hpp>
 #import <realm/sync/config.hpp>
 
-@class RLMSyncConfiguration, RLMSyncSessionRefreshHandle, RLMApp;
+@class RLMSyncConfiguration, RLMApp;
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
-
-class CocoaSyncUserContext : public realm::SyncUserContext {
-public:
-
-private:
-    /**
-     A map of paths to 'refresh handles'.
-
-     A refresh handle is an object that encapsulates the concept of periodically
-     refreshing the Realm's access token before it expires. Tokens are indexed by their
-     paths (e.g. `/~/path/to/realm`).
-     */
-    std::unordered_map<std::string, RLMSyncSessionRefreshHandle *> m_refresh_handles;
-    std::mutex m_mutex;
-};
 
 @interface RLMUser ()
 - (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user app:(RLMApp *)app;
 - (std::string)pathForPartitionValue:(std::string const&)partitionValue;
 - (std::string)pathForFlexibleSync;
 - (std::shared_ptr<realm::SyncUser>)_syncUser;
-+ (void)_setUpBindingContextFactory;
 @property (weak, readonly) RLMApp *app;
 
 @end
