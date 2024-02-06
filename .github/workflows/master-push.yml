@@ -5,12 +5,11 @@ on:
       - "master"
 env:
   XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2']"
-  PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst']"
-  BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst']"
+  PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
+  BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
   DOC_VERSION: '15.1'
   JAZZY_VERSION: '0.14.4'
   RELEASE_VERSION: '15.2'
-  VISION_VERSION: '15.2'
   TEST_VERSION: '15.1'
 jobs:
   cleanup: # Clean-up XCode cloud workflows, before running the pipeline
@@ -34,7 +33,6 @@ jobs:
         XCODE_VERSIONS_MATRIX: ${{ env.XCODE_VERSION }}
         BUILD_PLATFORM_MATRIX: ${{ env.BUILD_PLATFORM }}
         PLATFORM_MATRIX: ${{ env.PLATFORM }}
-        VISION_VERSION: ${{ env.VISION_VERSION }}
         VERSION: ${{ steps.get-version.outputs.VERSION }}
       steps:
         - name: Compute outputs
@@ -42,7 +40,6 @@ jobs:
             echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
             echo "PLATFORM_MATRIX=${{ env.PLATFORM }}" >> $GITHUB_OUTPUT
             echo "BUILD_PLATFORM_MATRIX=${{ env.BUILD_PLATFORM }}" >> $GITHUB_OUTPUT
-            echo "VISION_VERSION=${{ env.VISION_VERSION }}" >> $GITHUB_OUTPUT
         - name: Checkout
           uses: actions/checkout@v4
         - name: Read SDK version
@@ -100,31 +97,30 @@ jobs:
               configuration: static
             - platform: watchos
               configuration: static
+            - platform: visionos
+              configuration: static
             - platform: catalyst
               configuration: static
             - platform: tvossimulator
               configuration: static
             - platform: watchossimulator
               configuration: static
+            - platform: visionossimulator
+              configuration: static
             - target: RealmSwift
               configuration: static
-          include: 
             - platform: visionos
-              target: Realm
-              xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-              configuration: release
+              xcode-version: 14.2
+            - platform: visionossimulator
+              xcode-version: 14.2
             - platform: visionos
-              target: RealmSwift
-              xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-              configuration: release
+              xcode-version: 14.3.1
             - platform: visionossimulator
-              target: Realm
-              xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-              configuration: release
+              xcode-version: 14.3.1
+            - platform: visionos
+              xcode-version: 15.1
             - platform: visionossimulator
-              target: RealmSwift
-              xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-              configuration: release
+              xcode-version: 15.1
       steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -209,31 +205,30 @@ jobs:
   #             configuration: static
   #           - platform: watchos
   #             configuration: static
+  #           - platform: visionos
+  #             configuration: static
   #           - platform: catalyst
   #             configuration: static
   #           - platform: tvossimulator
   #             configuration: static
   #           - platform: watchossimulator
   #             configuration: static
+  #           - platform: visionossimulator
+  #             configuration: static
   #           - target: RealmSwift
   #             configuration: static
-  #         include: 
   #           - platform: visionos
-  #             target: Realm
-  #             xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-  #             configuration: release
+  #             xcode-version: 14.2
+  #           - platform: visionossimulator
+  #             xcode-version: 14.2
   #           - platform: visionos
-  #             target: RealmSwift
-  #             xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-  #             configuration: release
+  #             xcode-version: 14.3.1
   #           - platform: visionossimulator
-  #             target: Realm
-  #             xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-  #             configuration: release
+  #             xcode-version: 14.3.1
+  #           - platform: visionos
+  #             xcode-version: 15.1
   #           - platform: visionossimulator
-  #             target: RealmSwift
-  #             xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
-  #             configuration: release
+  #             xcode-version: 15.1
   #     steps:
   #       - name: Checkout
   #         uses: actions/checkout@v4
@@ -259,9 +254,13 @@ jobs:
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
-          include: 
+          exclude: 
             - platform: visionos
-              xcode-version: ${{ needs.prepare.outputs.VISION_VERSION }}
+              xcode-version: 14.2
+            - platform: visionos
+              xcode-version: 14.3.1
+            - platform: visionos
+              xcode-version: 15.1
       steps:
         - name: Checkout
           uses: actions/checkout@v4

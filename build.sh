@@ -344,13 +344,12 @@ unzip_product() {
 # Artifacts are zipped by the artifacts store so they're endup nested zipped, so we need to unzip this zip.
 unzip_artifact() {
     initial_path="$1"
-    out_path="$2"
     file_name=${initial_path%.*}
 
     unzip "$file_name.zip" -d "$file_name"
     rm "$file_name.zip"
 
-    mv "$file_name/$file_name.zip" "$out_path$file_name.zip"
+    mv "$file_name/$file_name.zip" "$file_name.zip"
     rm -rf "$file_name"
 }
 
@@ -1318,11 +1317,9 @@ case "$COMMAND" in
         sha="$2"
         VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
 
-        # Exclude docs because we don't want it for the release
         ./scripts/github_release.rb download-artifacts release-package "${sha}"
 
         unzip release-package.zip -d release-package
-
 
         ./scripts/github_release.rb create-release "$VERSION"
         exit 0
@@ -1330,7 +1327,7 @@ case "$COMMAND" in
 
     "publish-docs")
         sha="$2"
-        # Exclude docs because we don't want it for the release
+        
         ./scripts/github_release.rb download-artifacts realm-docs "${sha}"
         unzip_artifact realm-docs.zip
         unzip realm-docs.zip
@@ -1342,11 +1339,11 @@ case "$COMMAND" in
           exit 0
         fi
 
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} swift_output/ s3://realm-sdks/docs/realm-sdks/swift/${VERSION}/
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} swift_output/ s3://realm-sdks/docs/realm-sdks/swift/latest/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/swift_output/ s3://realm-sdks/docs/realm-sdks/swift/${VERSION}/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/swift_output/ s3://realm-sdks/docs/realm-sdks/swift/latest/
 
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/${VERSION}/
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} objc_output/ s3://realm-sdks/docs/realm-sdks/objc/latest/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/objc_output/ s3://realm-sdks/docs/realm-sdks/objc/${VERSION}/
+        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/objc_output/ s3://realm-sdks/docs/realm-sdks/objc/latest/
         ;;
 
     "publish-update-checker")

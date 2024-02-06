@@ -60,6 +60,7 @@ def download_artifacts(key, sha)
   raise 'GITHUB_ACCESS_TOKEN must be set to create GitHub releases' unless access_token
 
   github = Octokit::Client.new
+  github.auto_paginate = true
   github.access_token = ENV['GITHUB_ACCESS_TOKEN']
 
   response = github.repository_artifacts(REPOSITORY)
