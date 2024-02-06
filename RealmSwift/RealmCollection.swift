@@ -287,7 +287,7 @@ public protocol RealmCollection: RealmCollectionBase, Equatable where Iterator =
     /**
      Returns an array containing the objects in the collection at the indexes specified by a given index set.
 
-     - warning Throws if an index supplied in the IndexSet is out of bounds.
+     - warning: Throws if an index supplied in the IndexSet is out of bounds.
 
      - parameter indexes: The indexes in the collection to select objects from.
      */
