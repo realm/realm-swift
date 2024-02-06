@@ -389,7 +389,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * Build the prebuilt libraries with the classic linker to work around the new
   linker being broken on iOS <15. When using CocoaPods or SPM, you will need to
-  manually add `-Wl,-classic_ld` to `OTHER_LDFLAGS` for your application until
+  manually add `-Wl,-ld_classic` to `OTHER_LDFLAGS` for your application until
   Apple fixes the bug.
 * Remove the visionOS slice from the Carthage build as it makes Carthage reject
   the xcframework ([#8370](https://github.com/realm/realm-swift/issues/8370)).
