@@ -24,8 +24,10 @@ install_dependencies() {
     elif [[ "$CI_WORKFLOW" == "objectserver"* ]] || [[ "$target" == "swiftpm"* ]]; then
         sh build.sh setup-baas
         sh build.sh download-core
-    elif [[ "$$CI_WORKFLOW" = *"xcode"* ]] || [[ "$target" = "xcframework"* ]]; then
+    elif [[ "$$CI_WORKFLOW" = *"spm"* ]] || [[ "$target" = "xcframework"* ]]; then
         install_ruby
+    elif [[ "$CI_WORKFLOW" == *"carthage"* ]]; then
+        brew install carthage
     else
         sh build.sh download-core
     fi
@@ -74,6 +76,13 @@ if [[ "$target" == *-encryption ]]; then
         set YES
         save
 EOF
+fi
+
+# In release we are creating some workflows which build the framework for each platform, target and configuration, 
+# and we need to set the linker flags in the Configuration file.
+if [[ "$target" == "release-package-build-"* ]]; then
+    filename="Configuration/Release.xcconfig"
+    sed -i '' "s/REALM_HIDE_SYMBOLS = NO;/REALM_HIDE_SYMBOLS = YES;/" "$filename"
 fi
 
 # If we're building the dummy CI target then run the test. Other schemes are

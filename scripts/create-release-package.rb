@@ -56,7 +56,7 @@ Dir.mktmpdir do |tmp|
     FileUtils.mkdir_p "#{tmp}/#{version}"
     Dir.chdir("#{tmp}/#{version}") do
       for platform in platforms(version)
-        sh 'unzip', "#{ROOT}/realm-#{platform}-#{version}.zip"
+        sh 'unzip', "#{ROOT}/realm-#{platform}-#{version}/realm-#{platform}-#{version}.zip"
       end
     end
   end
@@ -74,7 +74,7 @@ Dir.mktmpdir do |tmp|
   package_dir = "#{tmp}/realm-swift-#{VERSION}"
   FileUtils.mkdir_p package_dir
   sh 'cp', "#{ROOT}/LICENSE", package_dir
-  sh 'unzip', "#{ROOT}/realm-examples.zip", '-d', package_dir
+  sh 'unzip', "#{ROOT}/realm-examples/realm-examples.zip", '-d', package_dir
   for lang in %w(objc swift)
     File.write "#{package_dir}/#{lang}-docs.webloc", %Q{
       <?xml version="1.0" encoding="UTF-8"?>
@@ -115,7 +115,7 @@ Dir.mktmpdir do |tmp|
   tmp = File.realpath tmp
   Dir.chdir(tmp) do
     for platform in platforms('15.1')
-      sh 'unzip', "#{ROOT}/realm-#{platform}-#{OBJC_XCODE_VERSION}.zip"
+      sh 'unzip', "#{ROOT}/realm-#{platform}-#{OBJC_XCODE_VERSION}/realm-#{platform}-#{OBJC_XCODE_VERSION}.zip"
     end
     create_xcframework tmp, '', 'Release', 'RealmSwift'
     create_xcframework tmp, '', 'Release', 'Realm'
@@ -125,4 +125,3 @@ Dir.mktmpdir do |tmp|
     end
   end
 end
-
