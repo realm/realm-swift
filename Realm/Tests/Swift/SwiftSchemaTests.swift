@@ -132,6 +132,19 @@ class NoProps: FakeObject {
     // no @objc properties
 }
 
+class OnlyComputedSource: RLMObject {
+    @objc dynamic var link: OnlyComputedProps?
+}
+
+class OnlyComputedProps: RLMObject {
+    @objc dynamic var id = 0
+    @objc dynamic var backlinks: RLMLinkingObjects<OnlyComputedSource>?
+
+    override class func linkingObjectsProperties() -> [String : RLMPropertyDescriptor] {
+        return ["backlinks": RLMPropertyDescriptor(with: OnlyComputedSource.self, propertyName: "link")]
+    }
+}
+
 @MainActor
 class RequiresObjcName: RLMObject {
     static var enable = false
@@ -170,7 +183,17 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
 
     func testShouldRaiseObjectWithoutProperties() {
         assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: NoProps.self),
-                                       "No properties are defined for 'NoProps'. Did you remember to mark them with '@objc' in your model?")
+                                       "No properties are defined for 'NoProps'. Did you remember to mark them with '@objc' or '@Persisted' in your model?")
+    }
+    
+    func testShouldNotThrowForObjectWithOnlyComputedProps() {
+        let config = RLMRealmConfiguration.default()
+        config.objectClasses = [OnlyComputedProps.self, OnlyComputedSource.self]
+        config.inMemoryIdentifier = #function
+        let r = try! RLMRealm(configuration: config)
+        try! r.transaction {
+            _ = OnlyComputedProps.create(in: r, withValue: [])
+        }
     }
 
     func testSchemaInitWithLinkedToObjectUsingInitWithValue() {
