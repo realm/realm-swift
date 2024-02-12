@@ -132,7 +132,7 @@ def get_git_references
     repository_id = get_realm_repository_id
     get("/scmRepositories/#{repository_id}/gitReferences?limit=200")
 end
- 
+
 def get_workflow_info(id)
     get("ciWorkflows/#{id}")
 end
@@ -341,9 +341,9 @@ def get_logs_for_build(build_run)
     actions = get_build_actions(build_run)
     artifacts = get_artifacts(actions[0][:id]) # we are only running one action, so we use the first one in the list
     artifact_url = ''
-    artifacts.each { |artifact| 
+    artifacts.each { |artifact|
         artifact_info = get_artifact_info(artifact[:id])
-        if artifact_info["data"]["attributes"]["fileName"].include? 'Logs' 
+        if artifact_info["data"]["attributes"]["fileName"].include? 'Logs'
             artifact_url = artifact_info["data"]["attributes"]["downloadUrl"]
         end
     }
@@ -352,26 +352,26 @@ end
 
 def print_logs(url)
     sh 'curl', '--output', 'logs.zip', "#{url}"
-    sh 'unzip', "logs.zip"
+    sh 'unzip', '-o', 'logs.zip'
     log_files = Dir["RealmSwift*/*.log"]
-    log_files.each { |log_file| 
+    log_files.each { |log_file|
         text = File.readlines("#{log_file}").map do |line|
             puts line
         end
-    }   
+    }
 end
 
 def find_git_reference_for_branch(branch)
     next_page = ''
     references = get_git_references
-    branch_reference = references["data"].find { |reference| 
-        reference["attributes"]["kind"] == "BRANCH" && reference["attributes"]["name"] == branch 
-    }    
+    branch_reference = references["data"].find { |reference|
+        reference["attributes"]["kind"] == "BRANCH" && reference["attributes"]["name"] == branch
+    }
     while branch_reference == nil || next_page == nil
         next_page = references["links"]["next"]
         next_page.slice!(APP_STORE_URL)
         references = get(next_page)
-        branch_reference = references["data"].find { |reference| reference["attributes"]["kind"] == "BRANCH" && reference["attributes"]["name"] == branch } 
+        branch_reference = references["data"].find { |reference| reference["attributes"]["kind"] == "BRANCH" && reference["attributes"]["name"] == branch }
     end
     return branch_reference["id"]
 end
@@ -380,21 +380,21 @@ def download_artifact_for_build(build_id_run)
     actions = get_build_actions(build_id_run)
     artifacts = get_artifacts(actions[0][:id]) # One actions per workflow
     artifact_url = ''
-    artifacts.each { |artifact| 
+    artifacts.each { |artifact|
         artifact_info = get_artifact_info(artifact[:id])
-        if artifact_info["data"]["attributes"]["fileName"].include? 'Products' 
+        if artifact_info["data"]["attributes"]["fileName"].include? 'Products'
             artifact_url = artifact_info["data"]["attributes"]["downloadUrl"]
         end
     }
 
-    sh 'curl', '--output', "product.zip", "#{artifact_url}"
+    sh 'curl', '--output', "xcode-cloud-build-#{build_id_run}.zip", "#{artifact_url}"
 end
 
 def clean_up_release_workflows()
     workflows_to_remove = get_workflows.filter_map { |workflow|
         if workflow['attributes']['name'].start_with?('release-package-build')
             {name: workflow['attributes']['name'], id: workflow['id']}
-        end 
+        end
     }
     workflows_to_remove.each { |w|
         delete_workflow(w[:id])
