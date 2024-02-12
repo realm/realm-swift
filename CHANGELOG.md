@@ -1,9 +1,12 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.47.0 Release notes (2024-02-12)
 =============================================================
+
 ### Enhancements
+
 * Added initial support for geospatial queries on points.
   There is no new dedicated type to store Geospatial points, instead points should
-  be stored as ([GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/)) embedded object, as the example below.
+  be stored as ([GeoJson-shaped](https://www.mongodb.com/docs/manual/reference/geojson/))
+  embedded object, as the example below:
   ```swift
   public class Location: EmbeddedObject {
     @Persisted private var coordinates: List<Double>
@@ -18,22 +21,22 @@ x.y.z Release notes (yyyy-MM-dd)
         coordinates.append(objectsIn: [longitude, latitude])
     }
   }
-  ``` 
-  Geospatial queries (`geoWithin`) can only be executed in such a type of objects and 
-  will throw otherwise.
-  The queries can be used to filter objects whose points lie within a certain area, 
-  using the following pre-established shapes (`GeoBox`, `GeoPolygon`, `GeoCircle`).
+  ```
+  Geospatial queries (`geoWithin`) can only be executed on such a type of
+  objects and will throw otherwise. The queries can be used to filter objects
+  whose points lie within a certain area, using the following pre-established
+  shapes (`GeoBox`, `GeoPolygon`, `GeoCircle`).
   ```swift
   class Person: Object {
     @Persisted var name: String
     @Persisted var location: Location? // GeoJson embedded object
   }
-  
+
   let realm = realmWithTestPath()
   try realm.write {
     realm.add(PersonLocation(name: "Maria", location: Location(latitude: 55.6761, longitude: 12.5683)))
   }
-  
+
   let shape = GeoBox(bottomLeft: (55.6281, 12.0826), topRight: (55.6762, 12.5684))!
   let locations = realm.objects(PersonLocation.self).where { $0.location.geoWithin(shape) })
   ```
@@ -41,17 +44,12 @@ x.y.z Release notes (yyyy-MM-dd)
   ```swift
   let shape = GeoPolygon(outerRing: [(-2, -2), (-2, 2), (2, 2), (2, -2), (-2, -2)], holes: [[(0, 0), (1, 1), (-1, 1), (0, 0)]])!
   let locations = realm.objects(PersonLocation.self).filter("location IN %@", shape)
-  
+
   let locations = realm.objects(PersonLocation.self).filter(NSPredicate(format: "location IN %@", shape))
   ```
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.2.0.
@@ -59,8 +57,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.2-15.2.0.
 
 ### Internal
+
 * Migrated Release pipelines to Github Actions.
-* Upgraded realm-core from ? to ?
 
 10.46.0 Release notes (2024-01-23)
 =============================================================
