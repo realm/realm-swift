@@ -1295,11 +1295,11 @@ case "$COMMAND" in
           exit 0
         fi
 
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/swift_output/ s3://realm-sdks/docs/realm-sdks/swift/${VERSION}/
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/swift_output/ s3://realm-sdks/docs/realm-sdks/swift/latest/
+        s3cmd put --no-mime-magic --guess-mime-type --recursive --acl-public docs/swift_output/ s3://realm-sdks/docs/realm-sdks/swift/${VERSION}/
+        s3cmd put --no-mime-magic --guess-mime-type --recursive --acl-public docs/swift_output/ s3://realm-sdks/docs/realm-sdks/swift/latest/
 
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/objc_output/ s3://realm-sdks/docs/realm-sdks/objc/${VERSION}/
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} docs/objc_output/ s3://realm-sdks/docs/realm-sdks/objc/latest/
+        s3cmd put --no-mime-magic --guess-mime-type --recursive --acl-public docs/objc_output/ s3://realm-sdks/docs/realm-sdks/objc/${VERSION}/
+        s3cmd put --no-mime-magic --guess-mime-type --recursive --acl-public docs/objc_output/ s3://realm-sdks/docs/realm-sdks/objc/latest/
         ;;
 
     "publish-update-checker")
@@ -1311,7 +1311,7 @@ case "$COMMAND" in
 
         # update static.realm.io/update/cocoa
         printf "%s" "${VERSION}" > cocoa
-        s3cmd put --recursive --acl-public --access_key=${AWS_ACCESS_KEY_ID} --secret_key=${AWS_SECRET_ACCESS_KEY} cocoa s3://static.realm.io/update/
+        s3cmd put --acl-public cocoa s3://static.realm.io/update/
         exit 0
         ;;
 
