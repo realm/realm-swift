@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - "master"
-      - "tg/release-symlink"
 env:
   XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
@@ -16,8 +15,7 @@ jobs:
   cleanup: # Clean-up XCode cloud workflows, before running the pipeline
       runs-on: ubuntu-latest
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Get Token
           id: token
           run: |
@@ -41,8 +39,7 @@ jobs:
             echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
             echo "PLATFORM_MATRIX=${{ env.PLATFORM }}" >> $GITHUB_OUTPUT
             echo "BUILD_PLATFORM_MATRIX=${{ env.BUILD_PLATFORM }}" >> $GITHUB_OUTPUT
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Read SDK version
           id: get-version
           run: |
@@ -53,14 +50,14 @@ jobs:
       name: Package docs
       needs: prepare
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-        - name: Install Jazzy
-          run: gem install jazzy -v ${{ env.JAZZY_VERSION }} # This is only used once, no need to cache this
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.DOC_VERSION }}.app
         - name: Prepare docs for packaging
-          run: sh -x build.sh release-package-docs
+          run: bundle exec sh -x build.sh release-package-docs
         - name: Upload docs to artifacts library
           uses: actions/upload-artifact@v4
           with:
@@ -71,15 +68,14 @@ jobs:
       name: Package examples
       needs: prepare
       steps:
-          - name: Checkout
-            uses: actions/checkout@v4
-          - name: Prepare examples for packaging
-            run: sh -x build.sh release-package-examples
-          - name: Upload examples to artifacts library
-            uses: actions/upload-artifact@v4
-            with:
-              path: realm-examples.zip
-              name: realm-examples
+        - uses: actions/checkout@v4
+        - name: Prepare examples for packaging
+          run: sh -x build.sh release-package-examples
+        - name: Upload examples to artifacts library
+          uses: actions/upload-artifact@v4
+          with:
+            path: realm-examples.zip
+            name: realm-examples
   build-product: # Creates framework for each platform, xcode version, target and configuration
       runs-on: macos-13
       name: Package framework
@@ -120,8 +116,7 @@ jobs:
             - platform: visionossimulator
               xcode-version: 15.1
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Get Token
           id: token
           run: |
@@ -196,8 +191,7 @@ jobs:
             - platform: visionos
               xcode-version: 15.1
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode-version }}.app
         - name: Restore frameworks
@@ -216,8 +210,7 @@ jobs:
       name: Package release file
       needs: [package-xcframework-platform, prepare]
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Restore packages xcframeworks
@@ -241,8 +234,7 @@ jobs:
       name: Test examples
       needs: [package-release, prepare]
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
         - name: Restore release
@@ -256,8 +248,7 @@ jobs:
       name: Run tests on iOS with configuration Static
       needs: package-release
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
         - name: Test ios static
@@ -267,8 +258,7 @@ jobs:
       name: Run tests on macOS
       needs: package-release
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
         - name: Test osx static
@@ -297,12 +287,12 @@ jobs:
               installation: xcframework
               linkage: static
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
-        - name: Install FileUtils
-          run: gem install fileutils
         - name: Restore release
           uses: actions/download-artifact@v4
           if: ${{ matrix.installation == 'xcframework' }}
@@ -317,7 +307,7 @@ jobs:
           run: |
             echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             cd examples/installation
-            ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
+            bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
   test-installation-xcframework:
       runs-on: macos-13
       name: Run installation test for xcframework
@@ -328,10 +318,10 @@ jobs:
         matrix:
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-        - name: Install FileUtils
-          run: gem install fileutils
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode-version }}.app
         - name: Restore release
@@ -346,5 +336,5 @@ jobs:
           run: |
             echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             cd examples/installation
-            ./build.rb osx xcframework dynamic
+            bundle exec ./build.rb osx xcframework dynamic
 
