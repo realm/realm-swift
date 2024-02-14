@@ -7,21 +7,20 @@ env:
   XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
-  DOC_VERSION: '15.1'
+  DOC_VERSION: '15.2'
   JAZZY_VERSION: '0.14.4'
   RELEASE_VERSION: '15.2'
-  TEST_VERSION: '15.1'
+  TEST_VERSION: '15.2'
 jobs:
   cleanup: # Clean-up XCode cloud workflows, before running the pipeline
       runs-on: ubuntu-latest
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Get Token
           id: token
           run: |
             token=$(echo $(ruby ./scripts/xcode_cloud_helper.rb --issuer-id ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }} --key-id ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }} --pk "${{ secrets.APPLE_STORE_CONNECT_API_KEY }}" get-token))
-            echo "TOKEN=$token" >> $GITHUB_OUTPUT      
+            echo "TOKEN=$token" >> $GITHUB_OUTPUT
         - name: Clean up release-packages xcode cloud workflows
           run: |
             ruby ./scripts/xcode_cloud_helper.rb clean-up-release-workflows -t ${{ steps.token.outputs.TOKEN }}
@@ -40,8 +39,7 @@ jobs:
             echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
             echo "PLATFORM_MATRIX=${{ env.PLATFORM }}" >> $GITHUB_OUTPUT
             echo "BUILD_PLATFORM_MATRIX=${{ env.BUILD_PLATFORM }}" >> $GITHUB_OUTPUT
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Read SDK version
           id: get-version
           run: |
@@ -52,14 +50,14 @@ jobs:
       name: Package docs
       needs: prepare
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-        - name: Install Jazzy
-          run: gem install jazzy -v ${{ env.JAZZY_VERSION }} # This is only used once, no need to cache this
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.DOC_VERSION }}.app
         - name: Prepare docs for packaging
-          run: sh -x build.sh release-package-docs
+          run: bundle exec sh -x build.sh release-package-docs
         - name: Upload docs to artifacts library
           uses: actions/upload-artifact@v4
           with:
@@ -70,24 +68,22 @@ jobs:
       name: Package examples
       needs: prepare
       steps:
-          - name: Checkout
-            uses: actions/checkout@v4
-          - name: Prepare examples for packaging
-            run: sh -x build.sh release-package-examples
-          - name: Upload examples to artifacts library
-            uses: actions/upload-artifact@v4
-            with:
-              path: realm-examples.zip
-              name: realm-examples
+        - uses: actions/checkout@v4
+        - name: Prepare examples for packaging
+          run: sh -x build.sh release-package-examples
+        - name: Upload examples to artifacts library
+          uses: actions/upload-artifact@v4
+          with:
+            name: realm-examples
+            path: realm-examples.zip
   build-product: # Creates framework for each platform, xcode version, target and configuration
       runs-on: macos-13
-      name: Package framework 
+      name: Package framework
       needs: prepare
       strategy:
         max-parallel: 20 # Blocks of 20, therefore if any of the build fails, we don't get a lot of XCode Clouds builds hanging, which are expensive.
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.BUILD_PLATFORM_MATRIX) }}
-          target: [RealmSwift, Realm]
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
           configuration: [release, static]
           exclude:
@@ -107,8 +103,6 @@ jobs:
               configuration: static
             - platform: visionossimulator
               configuration: static
-            - target: RealmSwift
-              configuration: static
             - platform: visionos
               xcode-version: 14.2
             - platform: visionossimulator
@@ -122,8 +116,7 @@ jobs:
             - platform: visionossimulator
               xcode-version: 15.1
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Get Token
           id: token
           run: |
@@ -136,13 +129,13 @@ jobs:
             timeout_minutes: 10
             max_attempts: 3
             command: |
-              workflow_id=$(ruby ./scripts/xcode_cloud_helper.rb create-workflow release-package-build ${{ matrix.platform }} ${{ matrix.xcode-version }} ${{ matrix.target }} ${{ matrix.configuration }} -t ${{ steps.token.outputs.TOKEN }})
+              workflow_id=$(ruby ./scripts/xcode_cloud_helper.rb create-workflow release-package-build ${{ matrix.platform }} ${{ matrix.xcode-version }} RealmSwift ${{ matrix.configuration }} -t ${{ steps.token.outputs.TOKEN }})
               echo "WORKFLOW_ID=$workflow_id" >> $GITHUB_OUTPUT
         - name: Runs the XCode Cloud workflow created by the previous step
           id: build-run
           uses: nick-fields/retry@v2
           with:
-            timeout_minutes: 10
+            timeout_minutes: 15
             max_attempts: 3
             command: |
               build_run_id=$(ruby ./scripts/xcode_cloud_helper.rb build-workflow ${{ steps.create-workflow.outputs.WORKFLOW_ID }} ${{ github.ref_name }} -t ${{ steps.token.outputs.TOKEN }})
@@ -150,7 +143,7 @@ jobs:
         - name: Check build status and wait for it to finish
           uses: nick-fields/retry@v2
           with:
-            timeout_minutes: 10
+            timeout_minutes: 15
             max_attempts: 3
             command: |
               while [ "$status" != 'COMPLETE' ]
@@ -176,76 +169,12 @@ jobs:
             command: |
               token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }} --key-id ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }} --pk "${{ secrets.APPLE_STORE_CONNECT_API_KEY }}" get-token)
               ruby ./scripts/xcode_cloud_helper.rb download-artifact ${{ steps.build-run.outputs.BUILD_RUN_ID }} -t $token
-        - name: Prepare product folder
-          uses: nick-fields/retry@v2
-          with:
-            timeout_minutes: 10
-            max_attempts: 3
-            command: |
-              sh -x build.sh release-package-product
         - name: Upload framework
           uses: actions/upload-artifact@v4
           with:
-            name: product-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}
-            path: product-package
-  # build-product: # Creates framework for each platform, xcode version, target and configuration
-  #     runs-on: macos-13
-  #     name: Package framework 
-  #     needs: prepare
-  #     strategy:
-  #       matrix:
-  #         platform: ${{ fromJSON(needs.prepare.outputs.BUILD_PLATFORM_MATRIX) }}
-  #         target: [RealmSwift, Realm]
-  #         xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
-  #         configuration: [release, static]
-  #         exclude:
-  #           - platform: osx
-  #             configuration: static
-  #           - platform: tvos
-  #             configuration: static
-  #           - platform: watchos
-  #             configuration: static
-  #           - platform: visionos
-  #             configuration: static
-  #           - platform: catalyst
-  #             configuration: static
-  #           - platform: tvossimulator
-  #             configuration: static
-  #           - platform: watchossimulator
-  #             configuration: static
-  #           - platform: visionossimulator
-  #             configuration: static
-  #           - target: RealmSwift
-  #             configuration: static
-  #           - platform: visionos
-  #             xcode-version: 14.2
-  #           - platform: visionossimulator
-  #             xcode-version: 14.2
-  #           - platform: visionos
-  #             xcode-version: 14.3.1
-  #           - platform: visionossimulator
-  #             xcode-version: 14.3.1
-  #           - platform: visionos
-  #             xcode-version: 15.1
-  #           - platform: visionossimulator
-  #             xcode-version: 15.1
-  #     steps:
-  #       - name: Checkout
-  #         uses: actions/checkout@v4
-  #       - name: Select Xcode Version
-  #         run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode-version }}.app
-  #       - name: Download visionOS, only for 15.2
-  #         if: ${{ matrix.platform == 'visionos' || matrix.platform == 'visionossimulator' }}
-  #         run: xcodebuild -downloadPlatform visionOS
-  #       - name: Create framework
-  #         run: sh -x build.sh release-package-build_${{ matrix.platform }}-${{ matrix.target }}-${{ matrix.configuration }}
-  #       - name: Prepare product folder
-  #         run: sh -x build.sh release-package-product
-  #       - name: Upload build product
-  #         uses: actions/upload-artifact@v4
-  #         with:
-  #           name: product-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.target }}-${{ matrix.configuration }}
-  #           path: product-package
+            name: build-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.configuration }}
+            path: xcode-cloud-build-${{ steps.build-run.outputs.BUILD_RUN_ID }}.zip
+            compression-level: 0
   package-xcframework-platform: # Creates xcframework for each platform and xcode version
       runs-on: macos-13
       name: Package xcframework for platform
@@ -254,7 +183,7 @@ jobs:
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
-          exclude: 
+          exclude:
             - platform: visionos
               xcode-version: 14.2
             - platform: visionos
@@ -262,17 +191,16 @@ jobs:
             - platform: visionos
               xcode-version: 15.1
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode-version }}.app
         - name: Restore frameworks
           uses: actions/download-artifact@v4
           with:
-            pattern: product-${{ matrix.platform }}*-${{ matrix.xcode-version }}-*
+            pattern: build-${{ matrix.platform }}*-${{ matrix.xcode-version }}-*
         - name: Create xcframework
-          run: sh -x build.sh release-create-xcframework_${{ matrix.xcode-version }} ${{ matrix.platform }}
-        - name: Upload xcframework  
+          run: sh -x build.sh release-create-xcframework-${{ matrix.xcode-version }} ${{ matrix.platform }}
+        - name: Upload xcframework
           uses: actions/upload-artifact@v4
           with:
             name: realm-${{ matrix.platform }}-${{ matrix.xcode-version }}
@@ -282,8 +210,7 @@ jobs:
       name: Package release file
       needs: [package-xcframework-platform, prepare]
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Restore packages xcframeworks
@@ -301,14 +228,13 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: realm-swift-${{ needs.prepare.outputs.VERSION }}
-            path: pkg/realm-swift-${{ needs.prepare.outputs.VERSION }}.zip 
+            path: pkg/realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
   test-package-examples:
       runs-on: macos-13
       name: Test examples
       needs: [package-release, prepare]
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
         - name: Restore release
@@ -322,8 +248,7 @@ jobs:
       name: Run tests on iOS with configuration Static
       needs: package-release
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
         - name: Test ios static
@@ -333,8 +258,7 @@ jobs:
       name: Run tests on macOS
       needs: package-release
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
         - name: Test osx static
@@ -363,12 +287,12 @@ jobs:
               installation: xcframework
               linkage: static
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
-        - name: Install FileUtils
-          run: gem install fileutils
         - name: Restore release
           uses: actions/download-artifact@v4
           if: ${{ matrix.installation == 'xcframework' }}
@@ -380,10 +304,10 @@ jobs:
             mkdir -p build
             unzip realm-${{ matrix.platform }}-${{ env.TEST_VERSION }}.zip -d build
         - name: Run installation test
-          run: | 
+          run: |
             echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             cd examples/installation
-            ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
+            bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
   test-installation-xcframework:
       runs-on: macos-13
       name: Run installation test for xcframework
@@ -394,10 +318,10 @@ jobs:
         matrix:
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
       steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-        - name: Install FileUtils
-          run: gem install fileutils
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode-version }}.app
         - name: Restore release
@@ -412,5 +336,5 @@ jobs:
           run: |
             echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             cd examples/installation
-            ./build.rb osx xcframework dynamic
-        
+            bundle exec ./build.rb osx xcframework dynamic
+
