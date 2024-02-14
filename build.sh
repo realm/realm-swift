@@ -286,7 +286,6 @@ create_xcframework() {
     local platform="$3"
 
     local out_path="$ROOT_WORKSPACE/$config/$platform/$product.xcframework"
-    # find "$ROOT_WORKSPACE" -maxdepth 5
     find "$ROOT_WORKSPACE" -path "*/$config*/$product.framework" \
         | sed 's/.*/-framework &/' \
         | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "$out_path"
@@ -1083,7 +1082,7 @@ case "$COMMAND" in
 
     release-create-xcframework-*)
         platform="$2"
-        xcode_version=$(echo "$COMMAND" | cut -d- -f4 )
+        xcode_version=$(echo "$COMMAND" | cut -d- -f4)
 
         # Artifacts are nested zips so need to be extracted twice
         find . -name 'build-*.zip' -exec unzip {} \;

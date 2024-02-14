@@ -74,8 +74,8 @@ jobs:
         - name: Upload examples to artifacts library
           uses: actions/upload-artifact@v4
           with:
-            path: realm-examples.zip
             name: realm-examples
+            path: realm-examples.zip
   build-product: # Creates framework for each platform, xcode version, target and configuration
       runs-on: macos-13
       name: Package framework
