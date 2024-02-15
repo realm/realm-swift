@@ -6,21 +6,16 @@ set -eo pipefail
 # Dependency Installer
 ######################################
 
-JAZZY_VERSION="0.14.4"
-RUBY_VERSION="3.1.2"
-COCOAPODS_VERSION="1.14.2"
-
+USE_BUNDLE_EXEC=''
 install_dependencies() {
     echo ">>> Installing dependencies for ${CI_WORKFLOW}"
 
     if [[ "$CI_WORKFLOW" == "docs"* ]]; then
         install_ruby
-        gem install jazzy -v ${JAZZY_VERSION} --no-document
     elif [[ "$CI_WORKFLOW" == "swiftlint"* ]]; then
         brew install swiftlint
     elif [[ "$CI_WORKFLOW" == "cocoapods"* ]]; then
         install_ruby
-        gem install cocoapods -v ${COCOAPODS_VERSION} --no-document
     elif [[ "$CI_WORKFLOW" == "objectserver"* ]] || [[ "$target" == "swiftpm"* ]]; then
         sh build.sh setup-baas
         sh build.sh download-core
@@ -36,16 +31,13 @@ install_dependencies() {
 install_ruby() {
     echo ">>> Installing new Version of ruby"
     brew install rbenv ruby-build
-    rbenv install ${RUBY_VERSION}
-    rbenv global ${RUBY_VERSION}
+    rbenv install
     eval "$(rbenv init -)"
+    bundle install
+    USE_BUNDLE_EXEC=true
 }
 
 env
-
-# Setup environment
-export GEM_HOME="$HOME/gems"
-export PATH="$GEM_HOME/bin:$PATH"
 
 cd "$(dirname "$0")"/..
 install_dependencies
@@ -90,5 +82,9 @@ fi
 # step on the CI target as that results in nested invocations of xcodebuild,
 # which doesn't work.
 if [[ "$CI_XCODE_SCHEME" == CI ]]; then
-    sh build.sh ci-pr
+    if [[ -n "$USE_BUNDLE_EXEC" ]]; then
+        bundle exec sh build.sh ci-pr
+    else
+        sh build.sh ci-pr
+    fi
 fi
