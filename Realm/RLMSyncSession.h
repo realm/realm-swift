@@ -97,7 +97,38 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
  `transferredBytes` refers to the number of bytes that have been uploaded or downloaded.
  `transferrableBytes` refers to the total number of bytes transferred, and pending transfer.
  */
-typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes);
+typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes) __attribute__((deprecated("Use RLMSyncProgressNotificationBlock instead", "RLMSyncProgressNotificationBlock")));
+
+/**
+ A struct encapsulating progress information, as well as useful helper methods.
+ */
+typedef struct SyncProgress {
+    /// The number of bytes that have been transferred.
+    NSUInteger transferredBytes;
+    
+    /**
+     The total number of transferrable bytes (bytes that have been transferred,
+     plus bytes pending transfer).
+     */
+    NSUInteger transferrableBytes;
+    
+    /**
+     A value between 0.0 and 1.0 representing the estimated transfer progress. This value is precise for
+     uploads, but will be based on historical data and certain heuristics applied by the server for downloads.
+     
+     Whenever the progress reporting mode is `forCurrentlyOutstandingWork`, that value
+     will monotonically increase until it reaches 1.0. If the progress mode is `reportIndefinitely`, the
+     value will monotonically increase until it reaches 1.0, but may subsequently decrease if new server data
+     becomes available.
+     */
+    double progressEstimate;
+} SyncProgress;
+
+/**
+ The type of a progress notification block intended for reporting a session's network
+ activity to the user.
+ */
+typedef void(^RLMSyncProgressNotificationBlock)(SyncProgress progress);
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
@@ -209,8 +240,14 @@ RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
  */
 - (nullable RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                           mode:(RLMSyncProgressMode)mode
-                                                                         block:(RLMProgressNotificationBlock)block
-NS_REFINED_FOR_SWIFT;
+block:(RLMProgressNotificationBlock)block __attribute__((deprecated("Use addSyncProgressNotificationForDirection instead", "addSyncProgressNotificationForDirection")))
+    NS_REFINED_FOR_SWIFT;
+
+
+- (nullable RLMProgressNotificationToken *)addSyncProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+                                                                              mode:(RLMSyncProgressMode)mode
+                                                                             block:(RLMSyncProgressNotificationBlock)block
+    NS_REFINED_FOR_SWIFT;
 
 
 /// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.

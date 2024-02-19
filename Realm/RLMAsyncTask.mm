@@ -58,11 +58,12 @@ __attribute__((objc_direct_members))
     RLMRealm *_backgroundRealm;
 }
 
-- (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMProgressNotificationBlock)block {
-    auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes, double) {
+- (void)addSyncProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMSyncProgressNotificationBlock)block {
+    auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes, double estimate) {
         dispatch_async(queue, ^{
             @autoreleasepool {
-                block(transferred_bytes, transferrable_bytes);
+                SyncProgress progress = {.transferredBytes = transferred_bytes, .transferrableBytes = transferrable_bytes, .progressEstimate = estimate};
+                block(progress);
             }
         });
     };
@@ -76,8 +77,18 @@ __attribute__((objc_direct_members))
     }
 }
 
+- (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMProgressNotificationBlock)block {
+    [self addSyncProgressNotificationOnQueue:queue block:^(SyncProgress progress) {
+        block(progress.transferredBytes, progress.transferrableBytes);
+    }];
+}
+
 - (void)addProgressNotificationBlock:(RLMProgressNotificationBlock)block {
     [self addProgressNotificationOnQueue:dispatch_get_main_queue() block:block];
+}
+
+- (void)addSyncProgressNotificationBlock:(RLMSyncProgressNotificationBlock)block {
+    [self addSyncProgressNotificationOnQueue:dispatch_get_main_queue() block:block];
 }
 
 - (void)cancel {

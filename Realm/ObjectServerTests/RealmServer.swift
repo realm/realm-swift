@@ -196,9 +196,11 @@ struct AdminProfile: Codable {
     struct Role: Codable {
         enum CodingKeys: String, CodingKey {
             case groupId = "group_id"
+            case roleName = "role_name"
         }
 
-        let groupId: String
+        let roleName: String
+        let groupId: String?
     }
 
     let roles: [Role]
@@ -463,7 +465,9 @@ class Admin {
             }
             .flatMap { (accessToken: String) -> Result<AdminSession, Error> in
                 self.userProfile(accessToken: accessToken).map {
-                    AdminSession(accessToken: accessToken, groupId: $0.roles[0].groupId)
+                    AdminSession(accessToken: accessToken, groupId: $0.roles.first(where: { role in
+                        role.roleName == "GROUP_OWNER"
+                    })!.groupId!)
                 }
             }
             .get()

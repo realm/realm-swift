@@ -205,23 +205,32 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
     return NO;
 }
 
-- (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+- (RLMProgressNotificationToken *)addSyncProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                  mode:(RLMSyncProgressMode)mode
-                                                                block:(RLMProgressNotificationBlock)block {
+                                                                block:(RLMSyncProgressNotificationBlock)block {
     if (auto session = _session.lock()) {
         dispatch_queue_t queue = RLMSyncSession.notificationsQueue;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
                                    ? SyncSession::ProgressDirection::upload
                                    : SyncSession::ProgressDirection::download);
         bool is_streaming = (mode == RLMSyncProgressModeReportIndefinitely);
-        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable, double) {
+        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable, double estimate) {
             dispatch_async(queue, ^{
-                block((NSUInteger)transferred, (NSUInteger)transferrable);
+                SyncProgress progress = { .transferredBytes = transferred, .transferrableBytes = transferrable, .progressEstimate = estimate };
+                block(progress);
             });
         }, notifier_direction, is_streaming);
         return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:session];
     }
     return nil;
+}
+
+- (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+                                                                 mode:(RLMSyncProgressMode)mode
+                                                                block:(RLMProgressNotificationBlock)block {
+    return [self addSyncProgressNotificationForDirection:direction mode:mode block:([=](SyncProgress progress) {
+        block(progress.transferredBytes, progress.transferrableBytes);
+    })];
 }
 
 + (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token {
