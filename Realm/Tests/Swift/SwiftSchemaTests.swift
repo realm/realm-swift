@@ -133,11 +133,10 @@ class NoProps: FakeObject {
 }
 
 class OnlyComputedSource: RLMObject {
-    @objc dynamic var link: OnlyComputedProps?
+    @objc dynamic var link: OnlyComputedTarget?
 }
 
-class OnlyComputedProps: RLMObject {
-    @objc dynamic var id = 0
+class OnlyComputedTarget: RLMObject {
     @objc dynamic var backlinks: RLMLinkingObjects<OnlyComputedSource>?
 
     override class func linkingObjectsProperties() -> [String : RLMPropertyDescriptor] {
@@ -188,11 +187,11 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
     
     func testShouldNotThrowForObjectWithOnlyComputedProps() {
         let config = RLMRealmConfiguration.default()
-        config.objectClasses = [OnlyComputedProps.self, OnlyComputedSource.self]
+        config.objectClasses = [OnlyComputedTarget.self, OnlyComputedSource.self]
         config.inMemoryIdentifier = #function
         let r = try! RLMRealm(configuration: config)
         try! r.transaction {
-            _ = OnlyComputedProps.create(in: r, withValue: [])
+            _ = OnlyComputedTarget.create(in: r, withValue: [])
         }
     }
 
