@@ -1,11 +1,42 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Added `SyncConfiguration.initialSubscriptions` which describes the initial subscription configuration that was passed when constructing the `SyncConfiguration`. ([#8548](https://github.com/realm/realm-swift/issues/8548))
+* Added `SyncConfiguration.initialSubscriptions` which describes the initial
+  subscription configuration that was passed when constructing the
+  `SyncConfiguration`. ([#8548](https://github.com/realm/realm-swift/issues/8548))
+* When connecting to multiple server apps, a unique encryption key is used for
+  each of the metadata Realms rather than sharing one between them
+  ([Core #7552](https://github.com/realm/realm-core/pull/7552)).
+* Improve perfomance of IN queries and chained OR equality queries for
+  UUID/ObjectId types. ([.Net * #3566](https://github.com/realm/realm-dotnet/issues/3566))
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* `-[RLMUser allSessions]` did not include sessions which were currently
+  waiting for an access token despite including sessions in other non-active
+  states. ([Core #7300](https://github.com/realm/realm-core/pull/7300), since v10.0.0).
+* `[RLMApp allUsers]` included users which were logged out during the current
+  run of the app, but not users which had previously been logged out. It now
+  always includes all logged out users. ([Core #7300](https://github.com/realm/realm-core/pull/7300), since v10.0.0).
+* Deleting the active user (via `User.delete()`) left the active user
+  unset rather than selecting another logged-in user as the active user like
+  logging out and removing users does. ([Core #7300](https://github.com/realm/realm-core/pull/7300), since v10.23.0).
+* Fixed several issues around copying an encrypted Realm between platforms with
+  different page sizes (such as between x86_64 and arm64 Apple platforms):
+  - Fixed `Assertion failed: new_size % (1ULL << m_page_shift) == 0` when
+    opening an encrypted Realm less than 64Mb that was generated on a platform
+    with a different page size than the current platform.
+    ([Core #7322](https://github.com/realm/realm-core/issues/7322), since v10.42.0)
+  - Fixed a `DecryptionFailed` exception thrown when opening a small (<4k of
+    data) Realm generated on a device with a page size of 4k if it was bundled
+    and opened on a device with a larger page size (since the beginning).
+  - Fixed an issue during a subsequent open of an encrypted Realm for some rare
+    allocation patterns when the top ref was within ~50 bytes of the end of a
+    page. This could manifest as a DecryptionFailed exception or as an
+    assertion: `encrypted_file_mapping.hpp:183: Assertion failed: local_ndx <
+    m_page_state.size()`. ([Core #7319](https://github.com/realm/realm-core/issues/7319))
+* Schema initialization could hit an assertion failure if the sync client
+  applied a downloaded changeset while the Realm file was in the process of
+  being opened ([#7041](https://github.com/realm/realm-core/issues/7041), since v10.15.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -14,10 +45,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.3.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.2-15.3.0.
+* Xcode: 14.2-15.3.0. Note that this will be the final release to support Xcode 14.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v14.5.2 to 14.6.0
 
 10.49.2 Release notes (2024-04-17)
 =============================================================

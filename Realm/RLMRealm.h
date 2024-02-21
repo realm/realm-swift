@@ -579,7 +579,9 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          *not* cancel the commit itself.
 */
 - (RLMAsyncTransactionId)commitAsyncWriteTransaction:(nullable void(^)(NSError *_Nullable))completionBlock
-                                       allowGrouping:(BOOL)allowGrouping;
+                                       allowGrouping:(BOOL)allowGrouping
+    __attribute__((swift_async(not_swift_private, 1)))
+    __attribute__((swift_attr("@_unsafeInheritExecutor")));
 
 /**
  Asynchronously commits a write transaction.

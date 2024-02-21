@@ -37,6 +37,7 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 - (RLMAppSubscriptionToken *)subscribe:(RLMAppNotificationBlock)block;
 
 + (instancetype)appWithConfiguration:(RLMAppConfiguration *)configuration;
++ (RLMApp *_Nullable)cachedAppWithId:(NSString *)appId;
 
 + (void)resetAppCache;
 @end

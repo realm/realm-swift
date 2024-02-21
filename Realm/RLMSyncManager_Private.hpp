@@ -19,7 +19,9 @@
 #import <Realm/RLMSyncManager.h>
 
 #import "RLMNetworkTransport.h"
-#import <realm/object-store/sync/sync_manager.hpp>
+
+#import <realm/object-store/sync/app_config.hpp>
+#import <memory>
 
 namespace realm {
 struct SyncConfig;
@@ -37,10 +39,10 @@ class Logger;
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMSyncManager ()
-- (std::weak_ptr<realm::app::App>)app;
-- (std::shared_ptr<realm::SyncManager>)syncManager;
+- (std::shared_ptr<realm::SyncManager> const&)syncManager;
 - (instancetype)initWithSyncManager:(std::shared_ptr<realm::SyncManager>)syncManager;
 
+- (bool)hasAnySessions;
 - (void)resetForTesting;
 - (void)waitForSessionTermination;
 - (void)populateConfig:(realm::SyncConfig&)config;
