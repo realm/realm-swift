@@ -293,7 +293,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 ex.fulfill()
             }
         }
-        
+
         waitForExpectations(timeout: 60.0, handler: nil)
 
         XCTAssertGreaterThanOrEqual(callCount, 1)
@@ -305,14 +305,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // Run a second time to upload more data and verify that the callback continues to be called
         ex = expectation(description: "second download")
         try populateRealm()
-        
+
         session.wait(for: .download) { e in
             DispatchQueue.main.async { @MainActor in
                 XCTAssertNil(e)
                 ex.fulfill()
             }
         }
-        
+
         waitForExpectations(timeout: 60.0, handler: nil)
         XCTAssertGreaterThan(callCount, initialCallCount)
         let p2 = try XCTUnwrap(progress)
@@ -339,7 +339,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
         XCTAssertNotNil(token)
-        
+
         session.wait(for: .download) { e in
             DispatchQueue.main.async { @MainActor in
                 XCTAssertNil(e)
@@ -357,14 +357,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftHugeSyncObject.create())
                 }
             }
-            
+
             session.wait(for: .download) { e in
                 DispatchQueue.main.async { @MainActor in
                     XCTAssertNil(e)
                     ex.fulfill()
                 }
             }
-            
+
             waitForExpectations(timeout: 10.0, handler: nil)
         }
         token!.invalidate()

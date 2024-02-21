@@ -877,7 +877,7 @@ public extension SyncSession {
          */
         @available(*, deprecated, message: "Use progressEstimate")
         public let transferrableBytes: Int
-        
+
         /**
          A value between 0.0 and 1.0 representing the estimated transfer progress. This value is precise for
          uploads, but will be based on historical data and certain heuristics applied by the server for downloads.
