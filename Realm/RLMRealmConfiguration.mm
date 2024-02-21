@@ -360,13 +360,12 @@ static bool isSync(realm::Realm::Config const& config) {
         _config.sync_config = nullptr;
         return;
     }
-    RLMUser *user = syncConfiguration.user;
-    if (user.state == RLMUserStateRemoved) {
-        @throw RLMException(@"Cannot set a sync configuration which has an errored-out user.");
+    auto& rawConfig = syncConfiguration.rawConfiguration;
+    if (rawConfig.user->state() == realm::SyncUser::State::Removed) {
+        @throw RLMException(@"Cannot set a sync configuration which has a removed user.");
     }
 
-    NSAssert(user.identifier, @"Cannot call this method on a user that doesn't have an identifier.");
-    _config.sync_config = std::make_shared<realm::SyncConfig>(syncConfiguration.rawConfiguration);
+    _config.sync_config = std::make_shared<realm::SyncConfig>(rawConfig);
     _config.path = syncConfiguration.path;
 
     // The manual client reset handler doesn't exist on the raw config,

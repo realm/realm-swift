@@ -27,6 +27,7 @@
 #import "RLMUpdateResult_Private.hpp"
 #import "RLMUser_Private.hpp"
 
+#import <realm/object-store/sync/app_user.hpp>
 #import <realm/object-store/sync/mongo_client.hpp>
 #import <realm/object-store/sync/mongo_collection.hpp>
 #import <realm/object-store/sync/mongo_database.hpp>
@@ -125,7 +126,7 @@ __attribute__((objc_direct_members))
 }
 
 - (realm::app::MongoCollection)collection:(NSString *)name {
-    return _user._syncUser->mongo_client(self.serviceName.UTF8String)
+    return _user.user->mongo_client(self.serviceName.UTF8String)
         .db(self.databaseName.UTF8String).collection(name.UTF8String);
 }
 
@@ -432,7 +433,7 @@ __attribute__((objc_direct_members))
         baseArgs["ids"] = RLMConvertRLMBSONToBson(idFilter);
     }
     auto args = realm::bson::BsonArray{baseArgs};
-    auto app = self.user.app._realmApp;
+    auto app = self.user.user->app();
     auto request = app->make_streaming_request(app->current_user(), "watch", args,
                                                std::optional<std::string>(self.serviceName.UTF8String));
     auto changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate scheduler:scheduler];

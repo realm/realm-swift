@@ -236,7 +236,7 @@ __attribute__((objc_direct_members))
 }
 @end
 
-NSError *makeError(realm::SyncError&& error) {
+NSError *makeError(realm::SyncError&& error, const std::shared_ptr<realm::app::App>& app) {
     auto& status = error.status;
     if (status.is_ok()) {
         return nil;
@@ -257,7 +257,7 @@ NSError *makeError(realm::SyncError&& error) {
     for (auto& pair : error.user_info) {
         if (pair.first == realm::SyncError::c_original_file_path_key) {
             userInfo[kRLMSyncErrorActionTokenKey] =
-                [[RLMSyncErrorActionToken alloc] initWithOriginalPath:pair.second];
+                [[RLMSyncErrorActionToken alloc] initWithOriginalPath:pair.second app:app];
         }
         else if (pair.first == realm::SyncError::c_recovery_file_path_key) {
             userInfo[kRLMSyncPathOfRealmBackupCopyKey] = @(pair.second.c_str());

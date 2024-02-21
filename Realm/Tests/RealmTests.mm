@@ -3048,20 +3048,20 @@
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
                                              logFunction:^(RLMLogLevel level, NSString * message) {
-        [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
+        [logs appendFormat:@" %@ %lu %@\n", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
     RLMApp *app = [RLMApp appWithId:@"test-id"];
     // We don't even need the login to succeed, we only want for the logger
     // to log the values on device info after trying to login.
-    [app loginWithCredential:[RLMCredentials anonymousCredentials] completion:^(RLMUser * _Nullable, NSError * _Nullable) {}];
+    [app loginWithCredential:RLMCredentials.anonymousCredentials completion:^(RLMUser *, NSError *) {}];
     // Verifying that this values are set on device_info.
     // Only the following values are logged by core (sdk, sdk version, platform version).
     NSString *realmVersion = [NSString stringWithFormat:@"sdk version: %@", REALM_COCOA_VERSION];
-    XCTAssertTrue([logs containsString: realmVersion]);
+    XCTAssertTrue([logs containsString:realmVersion]);
     XCTAssertTrue([logs containsString:@"sdk: Realm Swift"]);
     auto processInfo = [NSProcessInfo processInfo];
-    NSString *version = [NSString stringWithFormat:@"version: %@",[processInfo operatingSystemVersionString]];
-    XCTAssertTrue([logs containsString: version]);
+    NSString *version = [NSString stringWithFormat:@"version: %@", processInfo.operatingSystemVersionString];
+    XCTAssertTrue([logs containsString:version]);
 }
 @end

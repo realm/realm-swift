@@ -219,12 +219,16 @@ NS_REFINED_FOR_SWIFT;
 /// Wait for pending downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
 - (BOOL)waitForDownloadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback NS_REFINED_FOR_SWIFT;
 
+/// :nodoc:
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager
+    __attribute__((deprecated("The syncManager: parameter is no longer required")));
+
 /**
  Given an error action token, immediately handle the corresponding action.
- 
- @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+
+ @see ```RLMSyncErrorClientResetError``, ``RLMSyncErrorPermissionDeniedError``
  */
-+ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager;
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
 
 /**
  Get the sync session for the given Realm if it is a synchronized Realm, or `nil`
@@ -246,13 +250,11 @@ NS_REFINED_FOR_SWIFT;
  */
 RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMSyncErrorActionToken : NSObject
-
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
 
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
-
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

@@ -36,7 +36,7 @@
 }
 
 - (void)registerDeviceWithToken:(NSString *)token user:(RLMUser *)user completion:(RLMOptionalErrorBlock)completion {
-    _pushClient->register_device(token.UTF8String, user._syncUser, ^(std::optional<realm::app::AppError> error) {
+    _pushClient->register_device(token.UTF8String, user.user, ^(std::optional<realm::app::AppError> error) {
         if (error) {
             return completion(makeError(*error));
         }
@@ -46,7 +46,7 @@
 
 
 - (void)deregisterDeviceForUser:(RLMUser *)user completion:(RLMOptionalErrorBlock)completion {
-    _pushClient->deregister_device(user._syncUser, ^(std::optional<realm::app::AppError> error) {
+    _pushClient->deregister_device(user.user, ^(std::optional<realm::app::AppError> error) {
         if (error) {
             return completion(makeError(*error));
         }
