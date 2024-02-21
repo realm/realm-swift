@@ -8,14 +8,57 @@ public protocol BSONFilter {
     init()
     mutating func encode() -> RawDocument
 }
-public protocol ExpressibleByExtJSONLiteral {
+
+public protocol ExtJSON {
+}
+
+public protocol ExpressibleByExtJSONLiteral : ExtJSON {
     associatedtype ExtJSONValue: ExtJSONLiteral
     init(extJSONValue value: ExtJSONValue) throws
     var extJSONValue: ExtJSONValue { get }
 }
 
+/**
+ 
+ */
 public protocol ExtJSONLiteral : ExpressibleByExtJSONLiteral {
 }
+
+let extJSONTypes: [any ExtJSONObjectRepresentable.Type] = [
+    Int.self,
+    Int64.self,
+    Double.self,
+    ObjectId.self,
+    Date.self
+]
+
+extension ExpressibleByExtJSONLiteral {
+    public static func from<T>(any extJSONValue: any ExpressibleByExtJSONLiteral) throws -> T {
+        if self is any ExpressibleByExtJSONLiteral {
+            if let extJSONValue = extJSONValue as? ExtJSONDocument {
+                for type in extJSONTypes {
+                    do {
+                        return try type.init(extJSONValue: extJSONValue) as! T
+                    } catch {
+                    }
+                }
+            }
+            
+            return extJSONValue as! T
+        } else {
+            return try Self.init(extJSONValue: extJSONValue as! ExtJSONValue) as! T
+        }
+    }
+//    public static func from(any extJSONValue: any ExpressibleByExtJSONLiteral) throws -> Self {
+//        try Self.init(extJSONValue: extJSONValue as! Self.ExtJSONValue)
+//    }
+}
+
+//extension ExtJSONLiteral where Self : ExtJSONLiteral {
+//    static func initialize(extJSONValue: ExtJSONValue) throws -> Self {
+//        fatalError()
+//    }
+//}
 extension String: ExtJSONLiteral {
     public init(extJSONValue value: Self) throws {
         self = value
@@ -32,8 +75,129 @@ extension Bool: ExtJSONLiteral {
         self
     }
 }
-extension Dictionary: ExtJSONLiteral, ExpressibleByExtJSONLiteral
-    where Key == String, Value == any ExpressibleByExtJSONLiteral {
+extension NSNull: ExtJSON {
+}
+
+public struct ExtJSONSerialization {
+    private init() {}
+    public func serialize(literal: String) {
+    }
+    public func serialize(literal: Bool) {
+    }
+    public func serialize<T>(literal: [String: T]) where T : ExtJSONLiteral {
+    }
+    public func serialize(literal: [String: any ExtJSONLiteral]) {
+    }
+    public func serialize(literal: [any ExtJSONLiteral]) {
+    }
+    public static func deserialize(literal: String) -> String {
+        return literal
+    }
+    public static func deserialize(literal: Bool) {
+    }
+    public static func deserialize<T>(literal: [String: T]) where T : ExtJSONLiteral {
+    }
+    private static func deserialize(literal: NSArray) throws -> ExtJSONArray {
+        try literal.map {
+            try deserialize(literal: $0) as! any ExpressibleByExtJSONLiteral
+        }
+    }
+    public static func deserialize<T>(literal: Any) throws -> T {
+        try deserialize(literal: literal as Any?) as! T
+    }
+    public static func deserialize<T>(literal: Any) throws -> T where T: ExtJSONObjectRepresentable {
+//        let value: ExtJSONDocument = try deserialize(literal: literal)
+        return try T.init(extJSONValue: literal as! ExtJSONDocument)
+    }
+    public static func deserialize<T>(literal: Any?) throws -> T? {
+        try deserialize(literal: literal) as? T
+    }
+    public static func deserialize(literal: Any?) throws -> Any {
+        switch literal {
+        case let literal as String: return literal
+        case let literal as Bool: return literal
+        case let literal as NSDictionary:
+            for type in [any ExtJSONObjectRepresentable.Type](
+                arrayLiteral: Int.self, Double.self, Int64.self
+            ) {
+                do {
+                    return try type.init(extJSONValue: literal as! Dictionary<String, Any>)
+                } catch {
+                }
+            }
+            return try deserialize(literal: literal)
+        case let literal as NSArray: 
+            return try deserialize(literal: literal)
+        case let literal as [String : any ExtJSON]:
+            return try literal.reduce(into: ExtJSONDocument()) { partialResult, element in
+                partialResult[element.key] = try deserialize(literal: element.value)
+            }
+        case nil: 
+            fallthrough
+        case is NSNull:
+            return NSNull()// Optional<Any>.none as Any
+        case let literal as Int: return literal
+        case let literal as Double: return literal
+        case let literal as any OptionalProtocol:
+            return literal
+        default: fatalError()
+        }
+    }
+//    public static func deserialize(literal: Optional<Any>) throws -> Optional<Any> {
+//        literal ?? .none
+//    }
+    public static func deserialize<T>(literal: T?.ExtJSONValue??) throws -> T? where T: ExtJSONObjectRepresentable {
+        try T?.init(extJSONValue: literal as! [String : Any] ?? .none)
+    }
+    public static func deserialize(literal: any ExpressibleByExtJSONLiteral) throws -> any ExtJSON {
+        try deserialize(literal: literal as Any) as! any ExpressibleByExtJSONLiteral
+    }
+    public static func deserialize<T>(literal: T.ExtJSONValue) throws -> T where T : ExpressibleByExtJSONLiteral {
+        return try T(extJSONValue: literal)
+    }
+    
+    private static func deserialize(literal: NSDictionary) throws -> Any {
+        try literal.reduce(into: ExtJSONDocument()) { partialResult, element in
+            partialResult[element.key as! String] = try deserialize(literal: element.value)
+        }
+    }
+    // anyL -> anyL:
+    // t: literal -> t: literal
+    // t: obj -> t: object
+    
+    public static func extJSONObject(with data: Data) throws -> Any {
+        try deserialize(literal: try JSONSerialization.jsonObject(with: data))
+    }
+    public static func extJSONObject<T>(with data: Data) throws -> T where T : ExtJSONLiteral {
+        try deserialize(literal: try JSONSerialization.jsonObject(with: data) as! T.ExtJSONValue)
+    }
+    public static func extJSONObject<T>(with data: Data) throws -> T where T: ExtJSONObjectRepresentable {
+        let value = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
+        return try T(extJSONValue: deserialize(literal: value) as! ExtJSONDocument)
+    }
+    public static func data(with extJSONObject: ExtJSONDocument) throws -> Data {
+        try JSONSerialization.data(withJSONObject: extJSONObject.reduce(into: NSMutableDictionary()) { partialResult, element in
+            partialResult[element.key] = try deserialize(literal: element.value)
+        })
+    }
+    public static func data<T>(with extJSONObject: T) throws -> Data where T: ExtJSONObjectRepresentable {
+        try data(with: extJSONObject.extJSONValue)
+    }
+}
+
+//extension Dictionary: ExpressibleByExtJSONLiteral {
+//    public typealias ExtJSONValue = Self
+//    
+//    public init(extJSONValue value: Self) throws {
+//        self = value
+//    }
+//    public var extJSONValue: Self {
+//        self
+//    }
+//}
+extension Dictionary: ExtJSON {
+}
+extension Dictionary: ExtJSONLiteral, ExpressibleByExtJSONLiteral {
     public typealias ExtJSONValue = Self
     
     public init(extJSONValue value: Self) throws {
@@ -43,15 +207,45 @@ extension Dictionary: ExtJSONLiteral, ExpressibleByExtJSONLiteral
         self
     }
 }
-public typealias ExtJSONDocument = Dictionary<String, any ExpressibleByExtJSONLiteral>
-extension Array: ExtJSONLiteral, ExpressibleByExtJSONLiteral
-    where Element == any ExpressibleByExtJSONLiteral {
-    public typealias ExtJSONValue = Self
-    
+public typealias ExtJSONDocument = Dictionary<String, Any>
+
+protocol _ExtJSONSequence : Collection where Element == any ExpressibleByExtJSONLiteral {
+
+}
+extension _ExtJSONSequence {
     public init(extJSONValue value: Self) throws {
         self = value
     }
     public var extJSONValue: Self {
+        self
+    }
+}
+// MARK: Array Conformance
+extension Array: ExtJSON {
+}
+extension Array: ExtJSONLiteral, ExpressibleByExtJSONLiteral
+where Element : ExpressibleByExtJSONLiteral {
+    public typealias ExtJSONValue = [Element.ExtJSONValue]
+    
+    public init(extJSONValue value: ExtJSONValue) throws {
+        self.init()
+        try append(contentsOf: value.map(Element.init))
+    }
+    public var extJSONValue: ExtJSONValue {
+        map(\.extJSONValue)
+    }
+}
+//extension Array where Element: ExpressibleByExtJSONLiteral {
+//    public typealias ExtJSONValue = Self
+//}
+extension RealmSwift.List: ExtJSONLiteral, ExpressibleByExtJSONLiteral, ExtJSON
+where Element: ExpressibleByExtJSONLiteral {
+    public typealias ExtJSONValue = List
+    
+    public convenience init(extJSONValue value: List) throws {
+        self.init(collection: value._rlmCollection)
+    }
+    public var extJSONValue: List {
         self
     }
 }
@@ -389,7 +583,7 @@ public enum BSONError : Error {
     case invalidType(key: String)
 }
 
-public struct MongoCollection<T : ExtJSONQueryRepresentable> {
+public struct MongoCollection<T : ExtJSONObjectRepresentable> {
     fileprivate let mongoCollection: RLMMongoCollection
     fileprivate let database: MongoDatabase
     fileprivate init(mongoCollection: RLMMongoCollection, database: MongoDatabase) {
@@ -522,7 +716,7 @@ public struct MongoCollection<T : ExtJSONQueryRepresentable> {
     
     @_unsafeInheritExecutor
     public func findOne(options: FindOptions = FindOptions(),
-                        _ filter: ((inout Filter<T>) -> any BSONQueryable)? = nil) async throws -> T? {
+                        _ filter: ExtJSONDocument) async throws -> T? {
 //        let data: String = try await withCheckedThrowingContinuation { continuation in
 //            var document = RawDocument()
 //            if let filter = filter {

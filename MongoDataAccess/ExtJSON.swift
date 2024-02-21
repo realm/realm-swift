@@ -1,7 +1,10 @@
 import Foundation
 
+extension Optional: ExtJSON {
+}
 extension Optional: ExtJSONLiteral, ExpressibleByExtJSONLiteral
-    where Wrapped: ExpressibleByExtJSONLiteral {
+where Wrapped: ExpressibleByExtJSONLiteral {
+    public typealias ExtJSONValue = Optional<Wrapped.ExtJSONValue>
     
     public init(extJSONValue value: Optional<Wrapped.ExtJSONValue>) throws {
         if let value = value {
@@ -21,7 +24,10 @@ extension Optional: ExtJSONLiteral, ExpressibleByExtJSONLiteral
 
 // MARK: ExtJSON Object Representable
 
+// MARK: Int
 extension Int: ExtJSONObjectRepresentable {
+    public typealias ExtJSONValue = ExtJSONDocument
+    
     public init(extJSONValue value: ExtJSONDocument) throws {
         guard let numberLong = value["$numberInt"] as? String,
             let number = Int(numberLong) else {
@@ -33,6 +39,22 @@ extension Int: ExtJSONObjectRepresentable {
     public var extJSONValue: ExtJSONDocument {
         [
             "$numberInt": String(self)
+        ]
+    }
+}
+
+extension Int64: ExtJSONObjectRepresentable {
+    public init(extJSONValue value: ExtJSONDocument) throws {
+        guard let numberLong = value["$numberLong"] as? String,
+            let number = Int64(numberLong) else {
+            throw JSONError.missingKey(key: "$numberLong")
+        }
+        self = number
+    }
+    
+    public var extJSONValue: ExtJSONDocument {
+        [
+            "$numberLong": String(self)
         ]
     }
 }
@@ -84,6 +106,7 @@ extension Date: ExtJSONObjectRepresentable {
         ]
     }
 }
+
 /*
  expressibleByExtJsonLiteral
  –––––––

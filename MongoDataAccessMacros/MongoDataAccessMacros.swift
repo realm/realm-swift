@@ -24,19 +24,17 @@ public struct BSONCodableMacro : ExtensionMacro, MemberMacro, MemberAttributeMac
         let lowercasedType = typeName.lowercasingFirstLetter()
         let members = try declaration.memberBlock.members.compactMap(view(for:))
         var isStruct = declaration is StructDeclSyntax
-//        if type is StructDeclSyntax {
-//            
-//        }
+        ["":2].index(forKey:    "")
         return [.init(extendedType: type, inheritanceClause: InheritanceClauseSyntax.init(inheritedTypes: .init(arrayLiteral: .init(type: TypeSyntax(stringLiteral: "ExtJSONObjectRepresentable")))), memberBlock: """
             {
                 \(raw: !isStruct ? "convenience" : "") init(extJSONValue value: ExtJSONDocument) throws {
                     \(raw: !isStruct ? "self.init()" : "")
                     \(raw: members.compactMap { member in
                         return """
-                        guard let \(member.name)Raw = value["\(member.name)"] as? \(member.type).ExtJSONValue else {
+                        guard value.index(forKey: "\(member.name)") != nil else {
                             throw JSONError.missingKey(key: "\(member.name)")
                         }
-                        self.\(member.name) = try \(member.type)(extJSONValue: \(member.name)Raw)
+                        self.\(member.name) = try ExtJSONSerialization.deserialize(literal: value["\(member.name)"])
                         """
                     }.joined(separator: "\n"))
                 }
@@ -44,7 +42,7 @@ public struct BSONCodableMacro : ExtensionMacro, MemberMacro, MemberAttributeMac
                     [
                         \(raw: members.compactMap { member in
                             return """
-                            "\(member.name)": \(member.name).extJSONValue
+                            "\(member.name)": \(member.isExistential ? member.name : "\(member.name).extJSONValue")
                             """
                         }.joined(separator: ",\n"))
                     ]
@@ -436,7 +434,10 @@ private struct MemberView {
     let type: String
     var attributeKey: String?
     var assignment: String?
+    var isExistential: Bool
+    var isOptional: Bool
 }
+
 enum Error : Swift.Error {
     case blah(String)
 }
@@ -451,7 +452,7 @@ private func view(for member: MemberBlockItemListSyntax.Element) throws -> Membe
             !type.is(StructDeclSyntax.self) else {
         return nil
     }
-    var memberView = MemberView(name: "\(binding.identifier)", type: "\(type)", attributeKey: nil)
+    var memberView = MemberView(name: "\(binding.identifier)", type: "\(type)", attributeKey: nil, isExistential: false, isOptional: false)
     if let macroName = decl.attributes.first(where: { element in
             element.as(AttributeSyntax.self)?.attributeName
             .as(IdentifierTypeSyntax.self)?.name.text == "DocumentKey"
@@ -459,6 +460,14 @@ private func view(for member: MemberBlockItemListSyntax.Element) throws -> Membe
         .arguments?.as(LabeledExprListSyntax.self)?.first?.expression.as(StringLiteralExprSyntax.self) {
         memberView.attributeKey = "\(macroName.segments)"
     }
+    if decl.tokens(viewMode: .sourceAccurate).contains(where: { $0.tokenKind == .keyword(.Any) }) {
+        memberView.isExistential = true
+    }
+    if decl.tokens(viewMode: .sourceAccurate).contains(where: { $0.tokenKind == .postfixQuestionMark || $0.tokenKind == .exclamationMark }) ||
+        (memberView.name.starts(with: "Optional<") && memberView.name.hasSuffix(">")) {
+        memberView.isOptional = true
+    }
+    
     if let assignment = decl.bindings.compactMap({
         $0.initializer?.value
     }).first {

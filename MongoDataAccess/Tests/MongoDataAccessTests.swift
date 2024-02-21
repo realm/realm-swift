@@ -39,7 +39,7 @@ import Realm
     let object: AllTypesA
     let objectArray: [AllTypesA]
     let objectOpt: AllTypesA?
-    var anyValue: any ExtJSONLiteral
+    var anyValue: Any
 }
 
 @BSONCodable final class RealmPerson : Object {
@@ -137,11 +137,10 @@ class MongoDataAccessMacrosTests : XCTestCase {
     func run<T : ExtJSONObjectRepresentable & Equatable>(test: String, answers: [T]) throws {
         let url = Bundle.module.url(forResource: test, withExtension: "json")!
         let data = try Data(contentsOf: url)
-        let test: Test = try Test(extJSONValue: JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as! [String: any ExpressibleByExtJSONLiteral])
+        let test: Test = try ExtJSONSerialization.extJSONObject(with: data)
         for entryIdx in test.valid.indices {
-            let document = try JSONSerialization.jsonObject(with: test.valid[entryIdx].canonical_extjson
-                .data(using: .utf8)!, options: .fragmentsAllowed) as! [String: any ExpressibleByExtJSONLiteral]
-            let parsedEntry = try T(extJSONValue: document)
+            let parsedEntry: T = try ExtJSONSerialization.extJSONObject(with: test.valid[entryIdx].canonical_extjson
+                .data(using: .utf8)!)
             XCTAssertEqual(parsedEntry, answers[entryIdx])
         }
     }
@@ -230,7 +229,8 @@ class MongoDataAccessMacrosTests : XCTestCase {
             "anyValue": {"$numberInt": "16"}
         }
         """.data(using: .utf8)!
-        let allTypes: AllTypesBSONObject = try ExtJSONSerialization.jsonObject(with: extJSONValue)
+        let extJSONObject = try ExtJSONSerialization.extJSONObject(with: extJSONValue)
+        let allTypes: AllTypesBSONObject = try AllTypesBSONObject(extJSONValue: extJSONObject as! ExtJSONDocument)
         XCTAssertEqual(allTypes.int, 42)
         XCTAssertEqual(allTypes.object.intA, 152)
         XCTAssertEqual(allTypes.object.stringA, "world")
@@ -241,7 +241,7 @@ class MongoDataAccessMacrosTests : XCTestCase {
         XCTAssertEqual(allTypes.anyValue as? Int, 16)
         
         let extJSONRoundTripped =
-        String(data: try allTypes.extJSONValue, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        String(data: try ExtJSONSerialization.data(with: allTypes.extJSONValue), encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
         let extJSONOriginal = String(data: extJSONValue, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
         XCTAssertEqual(extJSONRoundTripped, extJSONOriginal)
     }
@@ -473,9 +473,9 @@ class MongoDataAccessMacrosTests : XCTestCase {
             .database(named: "static-queries")
             .collection(named: "RealmPerson", type: RealmPerson.self)
         
-        guard let foundPerson = try await collection.findOne({
-            $0._id == person._id
-        }) else {
+        guard let foundPerson = try await collection.findOne([
+            "_id": person._id
+        ]) else {
             return XCTFail()
         }
         
