@@ -188,7 +188,7 @@ __attribute__((objc_direct_members))
 - (void)insertManyDocuments:(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)documents
                  completion:(RLMMongoInsertManyBlock)completion {
     self.collection.insert_many(toBsonArray(documents),
-                                [completion](std::vector<realm::bson::Bson> insertedIds,
+                                [completion](realm::bson::BsonArray insertedIds,
                                              std::optional<realm::app::AppError> error) {
         if (error) {
             return completion(nil, makeError(*error));

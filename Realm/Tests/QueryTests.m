@@ -3739,7 +3739,6 @@ static NSData *data(const char *str) {
             RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] <[c] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] <[cd] %@", property, values[0]);
         } else {
-
             RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] = %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] != %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] =[c] %@", property, values[0]);

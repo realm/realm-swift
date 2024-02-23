@@ -1,3 +1,66 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+This version introduces a new Realm file format version (v24). Opening existing
+Realm files will automatically upgrade the files, making them unable to be
+opened by older versions. This upgrade process should typically be very fast
+unless you have large Sets of AnyRealmValue, String, or Data, which have to be rewritten.
+
+A backup will automatically be created next to the Realm before performing the
+upgrade. Downgrading to older versions of Realm will attempt to automatically
+restore the backup, or it will be deleted after three months.
+
+### Enhancements
+* Storage of Decimal128 properties has been optimised similarly to Int
+  properties so that the individual values will take up 0 bits (if all nulls),
+  32 bits, 64 bits or 128 bits depending on what is needed.
+  ([Core #6111](https://github.com/realm/realm-core/pull/6111))
+* Improve file compaction performance on arm64 platforms for encrypted files
+  between 16kB and 4MB in size. ([PR #7492](https://github.com/realm/realm-core/pull/7492)).
+
+### Fixed
+* Sorting on binary Data was done by comparing bytes as signed char rather than
+  unsigned char, resulting in very strange orders (since sorting on Data was
+  enabled in v6.0.4)
+* Sorting on AnyRealmValue did not use a valid total ordering, and certain
+  combinations of values could result in values not being sorted or potentially
+  even crashes. The resolution for this will result in some previously-valid
+  combinations of values of different types being sorted in different orders
+  than previously (since the introduction of AnyRealmValue in 10.8.0).
+* RLMSet/MutableSet was inconsistent about if it considered a String and a Data
+  containing the utf-8 encoded bytes of that String to be equivalent. They are
+  now always considered distinct. (since the introduction of sets in v10.8.0).
+* Equality queries on a Mixed property with an index could sometimes return
+  incorrect results if values of different types happened to have the same hash
+  code. ([Core 6407](https://github.com/realm/realm-core/issues/6407) since v10.8.0).
+* Creating more than 8388606 links pointing to a single object would crash.
+  ([Core #6577](https://github.com/realm/realm-core/issues/6577), since v5.0.0)
+* A Realm generated on a non-apple ARM 64 device and copied to another platform
+  (and vice-versa) were non-portable due to a sorting order difference. This
+  impacts strings or binaries that have their first difference at a non-ascii
+  character. These items may not be found in a set, or in an indexed column if
+  the strings had a long common prefix (> 200 characters).
+  ([Core #6670](https://github.com/realm/realm-core/pull/6670), since 2.0.0 for indexes, and since since the introduction of sets in v10.8.0)
+* Fix a spurious crash related to opening a Realm on background thread while
+  the process was in the middle of exiting ([Core #7420](https://github.com/realm/realm-core/pull/7420)).
+* Opening a Realm with a cached user while offline would fail to retry some
+  steps of the connection process and instead report a fatal error.
+  ([#7349](https://github.com/realm/realm-core/issues/7349), since v10.46.0)
+
+### Breaking Changes
+* Drop support for opening pre-v5.0.0 Realm files.
+
+### Compatibility
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.3.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.2-15.3.0. Note that we will be dropping support for Xcode 14 when
+  Apple begins requiring Xcode 15 for app store submissions on April 29.
+
+### Internal
+* Upgraded realm-core from 13.26.0 to 14.3.0
+
 10.48.1 Release notes (2024-03-15)
 =============================================================
 

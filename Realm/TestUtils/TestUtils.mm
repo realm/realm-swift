@@ -183,10 +183,8 @@ static std::string fakeJWT() {
     std::string encoded_prefix, encoded_body;
     encoded_prefix.resize(realm::util::base64_encoded_size(unencoded_prefix.size()));
     encoded_body.resize(realm::util::base64_encoded_size(unencoded_body.size()));
-    realm::util::base64_encode(unencoded_prefix.data(), unencoded_prefix.size(),
-                               &encoded_prefix[0], encoded_prefix.size());
-    realm::util::base64_encode(unencoded_body.data(), unencoded_body.size(),
-                               &encoded_body[0], encoded_body.size());
+    realm::util::base64_encode(unencoded_prefix, encoded_prefix);
+    realm::util::base64_encode(unencoded_body, encoded_body);
     std::string suffix = "Et9HFtf9R3GEMA0IICOfFMVXY7kkTX1wr4qCyhIf58U";
     return encoded_prefix + "." + encoded_body + "." + suffix;
 }

@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
+import Realm
 @_spi(RealmSwiftPrivate) import RealmSwift
 
 final class ObjectCustomPropertiesTests: TestCase {

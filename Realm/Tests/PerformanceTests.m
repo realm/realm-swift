@@ -50,7 +50,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     // Do nothing, as we need to keep our in-memory realms around between tests
 }
 
-- (void)measureBlock:(void (^)(void))block {
+- (void)measureBlock:(__attribute__((noescape)) void (^)(void))block {
     [super measureBlock:^{
         @autoreleasepool {
             block();
@@ -58,7 +58,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
-- (void)measureMetrics:(NSArray *)metrics automaticallyStartMeasuring:(BOOL)automaticallyStartMeasuring forBlock:(void (^)(void))block {
+- (void)measureMetrics:(NSArray *)metrics automaticallyStartMeasuring:(BOOL)automaticallyStartMeasuring forBlock:(__attribute__((noescape)) void (^)(void))block {
     [super measureMetrics:metrics automaticallyStartMeasuring:automaticallyStartMeasuring forBlock:^{
         @autoreleasepool {
             block();
@@ -72,7 +72,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     [realm beginWriteTransaction];
-    for (int i = 0; i < 1000 * factor; ++i) {
+    for (int i = 0; i < 10000 * factor; ++i) {
         [StringObject createInRealm:realm withValue:@[@"a"]];
         [StringObject createInRealm:realm withValue:@[@"b"]];
     }
@@ -92,7 +92,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         RLMRealm *realm = self.realmWithTestPath;
         [self startMeasuring];
         [realm beginWriteTransaction];
-        for (int i = 0; i < 5000; ++i) {
+        for (int i = 0; i < 500000; ++i) {
             StringObject *obj = [[StringObject alloc] init];
             obj.stringCol = @"a";
             [realm addObject:obj];
@@ -106,7 +106,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testInsertSingleLiteral {
     [self measureBlock:^{
         RLMRealm *realm = self.realmWithTestPath;
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < 5000; ++i) {
             [realm beginWriteTransaction];
             [StringObject createInRealm:realm withValue:@[@"a"]];
             [realm commitWriteTransaction];
@@ -119,7 +119,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureBlock:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm beginWriteTransaction];
-        for (int i = 0; i < 5000; ++i) {
+        for (int i = 0; i < 500000; ++i) {
             [StringObject createInRealm:realm withValue:@[@"a"]];
         }
         [realm commitWriteTransaction];
@@ -149,7 +149,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testCountWhereTableView {
     RLMRealm *realm = [self getStringObjects:50];
     [self measureBlock:^{
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 100; ++i) {
             RLMResults *array = [StringObject objectsInRealm:realm where:@"stringCol = 'a'"];
             [array firstObject]; // Force materialization of backing table view
             [array count];
@@ -158,7 +158,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessQuery {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [self measureBlock:^{
         for (StringObject *so in [StringObject objectsInRealm:realm where:@"stringCol = 'a'"]) {
@@ -168,7 +168,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessAll {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [self measureBlock:^{
         for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
@@ -190,7 +190,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessAllSlow {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [self measureBlock:^{
         RLMResults *all = [StringObject allObjectsInRealm:realm];
@@ -202,7 +202,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessArrayProperty {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -217,7 +217,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessArrayPropertySlow {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [realm beginWriteTransaction];
     ArrayPropertyObject *apo = [ArrayPropertyObject createInRealm:realm
@@ -233,7 +233,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessSetProperty {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [realm beginWriteTransaction];
     SetPropertyObject *spo = [SetPropertyObject createInRealm:realm
@@ -248,7 +248,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessSetPropertySlow {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [realm beginWriteTransaction];
     SetPropertyObject *spo = [SetPropertyObject createInRealm:realm
@@ -264,7 +264,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndAccessDictionaryPropertySlow {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [realm beginWriteTransaction];
     DictionaryPropertyObject *dpo = [DictionaryPropertyObject
@@ -285,7 +285,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndMutateAll {
-    RLMRealm *realm = [self getStringObjects:5];
+    RLMRealm *realm = [self getStringObjects:50];
 
     [self measureBlock:^{
         [realm beginWriteTransaction];
@@ -297,7 +297,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testEnumerateAndMutateQuery {
-    RLMRealm *realm = [self getStringObjects:1];
+    RLMRealm *realm = [self getStringObjects:5];
 
     [self measureBlock:^{
         [realm beginWriteTransaction];
@@ -313,7 +313,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"boolCol = false and (intCol = 5 or floatCol = 1.0) and objectCol = nil and longCol != 7 and stringCol IN {'a', 'b', 'c'}"];
 
     [self measureBlock:^{
-        for (int i = 0; i < 500; ++i) {
+        for (int i = 0; i < 5000; ++i) {
             [AllTypesObject objectsInRealm:realm withPredicate:predicate];
         }
     }];
@@ -363,13 +363,13 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testUnIndexedStringLookup {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
         [StringObject createInRealm:realm withValue:@[@(i).stringValue]];
     }
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
-        for (int i = 0; i < 1000; ++i) {
+        for (int i = 0; i < 10000; ++i) {
             [[StringObject objectsInRealm:realm where:@"stringCol = %@", @(i).stringValue] firstObject];
         }
     }];
@@ -378,13 +378,13 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testIndexedStringLookup {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
         [IndexedStringObject createInRealm:realm withValue:@[@(i).stringValue]];
     }
     [realm commitWriteTransaction];
 
     [self measureBlock:^{
-        for (int i = 0; i < 1000; ++i) {
+        for (int i = 0; i < 10000; ++i) {
             [[IndexedStringObject objectsInRealm:realm where:@"stringCol = %@", @(i).stringValue] firstObject];
         }
     }];
@@ -393,8 +393,8 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testLargeINQuery {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    NSMutableArray *ids = [NSMutableArray arrayWithCapacity:3000];
-    for (int i = 0; i < 3000; ++i) {
+    NSMutableArray *ids = [NSMutableArray arrayWithCapacity:300000];
+    for (int i = 0; i < 300000; ++i) {
         [IntObject createInRealm:realm withValue:@[@(i)]];
         if (i % 2) {
             [ids addObject:@(i)];
@@ -410,7 +410,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testSortingAllObjects {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    for (int i = 0; i < 3000; ++i) {
+    for (int i = 0; i < 300000; ++i) {
         [IntObject createInRealm:realm withValue:@[@(arc4random())]];
     }
     [realm commitWriteTransaction];
@@ -427,7 +427,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 
     [self measureBlock:^{
-        for (int i = 0; i < 250; ++i) {
+        for (int i = 0; i < 2500; ++i) {
             @autoreleasepool {
                 [self realmWithTestPath];
             }
@@ -438,7 +438,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
 - (void)testRealmCreationUncached {
     [self measureBlock:^{
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < 500; ++i) {
             @autoreleasepool {
                 [self realmWithTestPath];
             }
@@ -449,7 +449,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testRealmFileCreation {
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     __block int measurement = 0;
-    const int iterations = 10;
+    const int iterations = 100;
     [self measureBlock:^{
         for (int i = 0; i < iterations; ++i) {
             @autoreleasepool {
@@ -464,7 +464,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 - (void)testInvalidateRefresh {
     RLMRealm *realm = [self testRealm];
     [self measureBlock:^{
-        for (int i = 0; i < 50000; ++i) {
+        for (int i = 0; i < 500000; ++i) {
             @autoreleasepool {
                 [realm invalidate];
                 [realm refresh];
@@ -481,7 +481,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         [realm commitWriteTransaction];
 
         [self startMeasuring];
-        while (obj.intCol < 100) {
+        while (obj.intCol < 1000) {
             [realm transactionWithBlock:^{
                 obj.intCol++;
             }];
@@ -499,7 +499,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
         RLMNotificationToken *token = [realm addNotificationBlock:^(__unused NSString *note, __unused RLMRealm *realm) { }];
         [self startMeasuring];
-        while (obj.intCol < 500) {
+        while (obj.intCol < 5000) {
             [realm transactionWithBlock:^{
                 obj.intCol++;
             }];
@@ -510,7 +510,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 }
 
 - (void)testCommitWriteTransactionWithCrossThreadNotification {
-    const int stopValue = 500;
+    const int stopValue = 5000;
 
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = self.testRealm;
@@ -554,7 +554,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = [self getStringObjects:5];
         RLMResults *results = [StringObject allObjectsInRealm:realm];
-        id token = [results addNotificationBlock:^(__unused RLMResults *results, __unused RLMCollectionChange *change, __unused NSError *error) {
+        RLMNotificationToken *token = [results addNotificationBlock:^(__unused RLMResults *results, __unused RLMCollectionChange *change, __unused NSError *error) {
             CFRunLoopStop(CFRunLoopGetCurrent());
         }];
         CFRunLoopRun();
@@ -576,7 +576,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         ArrayPropertyObject *arrayObj = [ArrayPropertyObject createInRealm:realm withValue:@[@"", [StringObject allObjectsInRealm:realm], @[]]];
         [realm commitWriteTransaction];
 
-        id token = [arrayObj.array addNotificationBlock:^(__unused RLMArray *results, __unused RLMCollectionChange *change, __unused NSError *error) {
+        RLMNotificationToken *token = [arrayObj.array addNotificationBlock:^(__unused RLMArray *results, __unused RLMCollectionChange *change, __unused NSError *error) {
             CFRunLoopStop(CFRunLoopGetCurrent());
         }];
         CFRunLoopRun();
@@ -591,8 +591,65 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
+- (void)testCommitWriteTransactionWithObjectNotifications {
+    RLMRealm *realm = [self getStringObjects:5];
+    NSMutableArray *tokens = [NSMutableArray new];
+    for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+        [tokens addObject:[so addNotificationBlock:^(__unused BOOL deleted, __unused NSArray *changes, __unused NSError *error) {
+            CFRunLoopStop(CFRunLoopGetCurrent());
+        }]];
+    }
+
+    // Object notifiers don't have an initial notification, so trigger a
+    // small unmeasured notification we can wait for
+    [realm beginWriteTransaction];
+    [[StringObject allObjectsInRealm:realm].firstObject setStringCol:@"a"];
+    [realm commitWriteTransaction];
+    CFRunLoopRun();
+
+    [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            so.stringCol = @"a";
+        }
+        [realm commitWriteTransaction];
+
+        [self startMeasuring];
+        CFRunLoopRun();
+    }];
+
+    for (RLMNotificationToken *token in tokens) {
+        [token invalidate];
+    }
+}
+
+- (void)testRegisterObjectNotififers {
+    [self measureBlock:^{
+        RLMRealm *realm = [self getStringObjects:1];
+        NSMutableArray *tokens = [NSMutableArray new];
+        for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            [tokens addObject:[so addNotificationBlock:^(__unused BOOL deleted, __unused NSArray *changes, __unused NSError *error) {
+                CFRunLoopStop(CFRunLoopGetCurrent());
+            }]];
+        }
+
+        // Object notifiers don't have an initial notification, so trigger a
+        // small unmeasured notification we can wait for
+        [realm beginWriteTransaction];
+        [[StringObject allObjectsInRealm:realm].firstObject setStringCol:@"a"];
+        [realm commitWriteTransaction];
+        CFRunLoopRun();
+
+        for (RLMNotificationToken *token in tokens) {
+            [token invalidate];
+        }
+
+        // Destroying the Realm waits for the notifiers to tear down
+    }];
+}
+
 - (void)testCrossThreadSyncLatency {
-    const int stopValue = 500;
+    const int stopValue = 5000;
 
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = self.testRealm;
@@ -845,7 +902,6 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         [realm commitWriteTransaction];
 
         const NSUInteger count = [StringObject allObjectsInRealm:realm].count / 8;
-        const NSUInteger factor = count / 10;
 
         [self observeObject:obj keyPath:@"set"
                       until:^(SetPropertyObject *o) { return [o set].count >= count; }];
