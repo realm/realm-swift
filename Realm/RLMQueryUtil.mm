@@ -19,6 +19,7 @@
 #import "RLMQueryUtil.hpp"
 
 #import "RLMAccessor.hpp"
+#import "RLMGeospatial_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.hpp"
 #import "RLMPredicateUtil.hpp"
@@ -26,6 +27,7 @@
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
 
+#import <realm/geospatial.hpp>
 #import <realm/object-store/object_store.hpp>
 #import <realm/object-store/results.hpp>
 #import <realm/query_engine.hpp>
@@ -549,6 +551,7 @@ public:
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, RLMObjectBase *obj);
     void add_link_constraint(NSPredicateOperatorType operatorType, const ColumnReference& column, realm::null);
     void add_link_constraint(NSPredicateOperatorType, const ColumnReference&, const ColumnReference&);
+    void add_within_constraint(const ColumnReference& column, id<RLMGeospatial_Private> geospatial);
 
     template <CollectionOperation::Type Operation, bool IsLinkCollection, bool IsDictionary, typename R>
     void add_collection_operation_constraint(NSPredicateOperatorType operatorType,
@@ -939,6 +942,13 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
     else {
         add_bool_constraint(RLMPropertyTypeObject, operatorType, a.resolve<Link>(), b.resolve<Link>());
     }
+}
+
+#pragma mark Geospatial
+
+void QueryBuilder::add_within_constraint(const ColumnReference& column, id<RLMGeospatial_Private> geospatial) {
+    auto geoQuery = column.resolve<Link>().geo_within(geospatial.geoSpatial);
+    m_query.and_query(std::move(geoQuery));
 }
 
 // iterate over an array of subpredicates, using @func to build a query from each
@@ -1545,13 +1555,18 @@ void QueryBuilder::apply_value_expression(KeyPath&& kp, id value, NSComparisonPr
         return;
     }
 
-    // turn "key.path IN collection" into ored together ==. "collection IN key.path" is handled elsewhere.
     if (pred.predicateOperatorType == NSInPredicateOperatorType) {
-        process_or_group(m_query, value, [&](id item) {
-            id normalized = value_from_constant_expression_or_value(item);
-            column.validate_comparison(normalized);
-            add_constraint(NSEqualToPredicateOperatorType, pred.options, column, normalized);
-        });
+        if ([value conformsToProtocol:@protocol(RLMGeospatial)]) {
+            // In case of `IN` check if the value is a Geo-shape, create a `geoWithin` query
+            add_within_constraint(std::move(column), value);
+        } else {
+            // turn "key.path IN collection" into ored together ==. "collection IN key.path" is handled elsewhere.
+            process_or_group(m_query, value, [&](id item) {
+                id normalized = value_from_constant_expression_or_value(item);
+                column.validate_comparison(normalized);
+                add_constraint(NSEqualToPredicateOperatorType, pred.options, column, normalized);
+            });
+        }
         return;
     }
 

@@ -1,87 +1,90 @@
-#!/bin/sh
+#!/bin/bash
+
+set -eo pipefail
 
 ######################################
 # Dependency Installer
 ######################################
 
-JAZZY_VERSION="0.14.4"
-RUBY_VERSION="3.1.2"
-XCPRETTY_VERSION="0.3.0"
-COCOAPODS_VERSION="1.14.2"
-
+USE_BUNDLE_EXEC=''
 install_dependencies() {
     echo ">>> Installing dependencies for ${CI_WORKFLOW}"
 
-    brew install moreutils
-
     if [[ "$CI_WORKFLOW" == "docs"* ]]; then
         install_ruby
-        gem install jazzy -v ${JAZZY_VERSION}
     elif [[ "$CI_WORKFLOW" == "swiftlint"* ]]; then
         brew install swiftlint
     elif [[ "$CI_WORKFLOW" == "cocoapods"* ]]; then
         install_ruby
-        gem install cocoapods -v ${COCOAPODS_VERSION}
-    elif [[ "$$CI_WORKFLOW" = *"xcode"* ]] || [[ "$target" = "xcframework"* ]]; then
+    elif [[ "$CI_WORKFLOW" == "objectserver"* ]] || [[ "$target" == "swiftpm"* ]]; then
+        sh build.sh setup-baas
+        sh build.sh download-core
+    elif [[ "$$CI_WORKFLOW" = *"spm"* ]] || [[ "$target" = "xcframework"* ]]; then
         install_ruby
+    elif [[ "$CI_WORKFLOW" == *"carthage"* ]]; then
+        brew install carthage
+    else
+        sh build.sh download-core
     fi
 }
 
 install_ruby() {
-    # Ruby Installation
     echo ">>> Installing new Version of ruby"
     brew install rbenv ruby-build
-    rbenv install ${RUBY_VERSION}
-    rbenv global ${RUBY_VERSION}
-    echo 'export PATH=$HOME/.rbenv/bin:$PATH' >>~/.bash_profile
+    rbenv install
     eval "$(rbenv init -)"
+    bundle install
+    USE_BUNDLE_EXEC=true
 }
 
-update_scheme_configuration() {
-    local target="$1"
-    configuration="Release"
-    case "$target" in
-        *-debug)
-            configuration="Debug"
-            ;;
-        *-static)
-            configuration="Static"
-            ;;
-    esac
-
-    schemes=("RealmSwift" "Realm" "Object Server Tests" "SwiftUITestHost" "SwiftUISyncTestHost")
-    for ((i = 0; i < ${#schemes[@]}; i++)) do
-        filename="Realm.xcodeproj/xcshareddata/xcschemes/${schemes[$i]}.xcscheme"
-        sed -i '' "s/buildConfiguration = \"Debug\"/buildConfiguration = \"$configuration\"/" "$filename"
-    done
-}
-
-set -o pipefail
-
-# Set the -e flag to stop running the script in case a command returns
-# a non-zero exit code.
-set -e
-
-# Print env
 env
 
-# Setup environment
-echo 'export GEM_HOME=$HOME/gems' >>~/.bash_profile
-echo 'export PATH=$HOME/gems/bin:$PATH' >>~/.bash_profile
-export GEM_HOME=$HOME/gems
-export PATH="$GEM_HOME/bin:$PATH"
-
-# Dependencies
+cd "$(dirname "$0")"/..
 install_dependencies
 
-# CI Workflows
-cd ..
+# Xcode Cloud doesn't let us set the configuration to build, so set it by
+# modifying the scheme files
+target=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
+configuration="Release"
+case "$target" in
+    *-debug) configuration="Debug" ;;
+    *-static) configuration="Static" ;;
+esac
 
-# Get target name
-TARGET=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
+find Realm.xcodeproj -name '*.xcscheme' \
+    -exec sed -i '' "s/buildConfiguration = \"Debug\"/buildConfiguration = \"$configuration\"/" {} \;
 
-# Update schemes configuration
-update_scheme_configuration ${TARGET}
+# If testing library evolution mode, patch the config to enable it
+if [[ "$target" == *-evolution ]]; then
+    filename='Configuration/RealmSwift/RealmSwift.xcconfig'
+    sed -i '' "s/REALM_BUILD_LIBRARY_FOR_DISTRIBUTION = NO;/REALM_BUILD_LIBRARY_FOR_DISTRIBUTION = YES;/" "$filename"
+fi
 
-export target="${TARGET}"
-sh -x build.sh ci-pr | ts
+# If testing encryption, patch the scheme to enable it
+if [[ "$target" == *-encryption ]]; then
+    filename='Realm.xcodeproj/xcshareddata/xcschemes/Realm.xcscheme'
+    xmllint --shell "$filename" << EOF
+        cd /Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[@key='REALM_ENCRYPT_ALL']/@isEnabled
+        set YES
+        save
+EOF
+fi
+
+# In release we are creating some workflows which build the framework for each platform, target and configuration, 
+# and we need to set the linker flags in the Configuration file.
+if [[ "$target" == "release-package-build-"* ]]; then
+    filename="Configuration/Release.xcconfig"
+    sed -i '' "s/REALM_HIDE_SYMBOLS = NO;/REALM_HIDE_SYMBOLS = YES;/" "$filename"
+fi
+
+# If we're building the dummy CI target then run the test. Other schemes are
+# built via Xcode cloud's xcodebuild invocation. We can't do this via a build
+# step on the CI target as that results in nested invocations of xcodebuild,
+# which doesn't work.
+if [[ "$CI_XCODE_SCHEME" == CI ]]; then
+    if [[ -n "$USE_BUNDLE_EXEC" ]]; then
+        bundle exec sh build.sh ci-pr
+    else
+        sh build.sh ci-pr
+    fi
+fi

@@ -34,7 +34,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
  the code which uses the Realm within an `autoreleasepool {}` and ensure you have no other strong
  references to it.
 
- - warning Non-frozen `RLMRealm` instances are thread-confined and cannot be
+ - warning: Non-frozen `RLMRealm` instances are thread-confined and cannot be
  shared across threads or dispatch queues. Trying to do so will cause an
  exception to be thrown. You must obtain an instance of `RLMRealm` on each
  thread or queue you want to interact with the Realm on. Realms can be confined
@@ -482,7 +482,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      This becomes `true` following a call to `beginAsyncWrite`, `commitAsyncWrite`,
      or `writeAsync`, and remains so until all scheduled async write work has completed.
 
-     @warning If this is `true`, closing or invalidating the Realm will block until scheduled work has completed.
+     - warning: If this is `true`, closing or invalidating the Realm will block until scheduled work has completed.
      */
     public var isPerformingAsynchronousWriteOperations: Bool {
         return rlmRealm.isPerformingAsynchronousWriteOperations

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'FileUtils'
+require 'fileutils'
 
 def usage()
   puts <<~END
@@ -76,12 +76,14 @@ def copy_xcframework(path, framework, dir = '')
   if not Dir.exist? source
     raise "Missing XCFramework to test at '#{source}'"
   end
+
+  puts "Copying xcframework from #{source} into ../../build/#{dir}"
   sh 'cp', '-cR', source, "../../build/#{dir}"
 end
 
 def download_release(version)
   # Download and extract the zip if the extracted directory doesn't already
-  # exist. For CI release testing, we already have a local copy of the zip that
+  # exist. For master-push workflow testing, we already downloaded a local copy of the zip that
   # just needs to be extracted.
   unless Dir.exist? "realm-swift-#{version}"
     unless File.exist? "realm-swift-#{version}.zip"
@@ -118,11 +120,6 @@ def download_realm(platform, method, static)
     end
     File.write 'Cartfile', 'github "realm/realm-swift"' + version
 
-    # Carthage requires that a simulator exist, but `xcodebuild -list` is
-    # sometimes very slow if too many simulators exist, so delete all but one
-    # per platform
-    sh '../../scripts/reset-simulators.rb', '-firstOnly'
-
     platformName = case platform
                    when 'ios' then 'iOS'
                    when 'osx' then 'Mac'
@@ -158,17 +155,17 @@ def download_realm(platform, method, static)
 
   when 'xcframework'
     # If we're testing a branch then we should already have a built zip
-    # supplied by Jenkins, but we need to know what version tag it has. If
+    # supplied by Github actions, but we need to know what version tag it has. If
     # we're testing a release, we'll download the zip.
     version = TEST_BRANCH ? DEPENDENCIES['VERSION'] : TEST_RELEASE
     if version
       download_release version
     else
       if static
-        copy_xcframework '../../build/Static', 'Realm'
+        copy_xcframework "../../build/Static/#{platform}", 'Realm', 'Static'
       else
-        copy_xcframework '../../build/Release', 'Realm'
-        copy_xcframework '../../build/Release', 'RealmSwift'
+        copy_xcframework "../../build/Release/#{platform}", 'Realm'
+        copy_xcframework "../../build/Release/#{platform}", 'RealmSwift'
       end
     end
 
@@ -232,7 +229,7 @@ def test(platform, method, linkage = 'dynamic')
     ENV.delete 'REALM_BUILD_STATIC'
   end
 
-  puts "Testing #{method} for #{platform}"
+  puts "Testing #{method} for #{platform} and #{linkage}"
 
   download_realm(platform, method, static)
   build_app(platform, method, static)

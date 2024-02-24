@@ -21,7 +21,6 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
 
-#import <realm/string_data.hpp>
 #import <realm/object-store/impl/realm_coordinator.hpp>
 
 #import <sys/resource.h>
@@ -860,11 +859,15 @@
     }]);
 }
 
-- (void)testAsyncNotSupportedInWriteTransactions {
-    [RLMRealm.defaultRealm transactionWithBlock:^{
-        XCTAssertThrows([IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
-            XCTFail(@"should not be called");
-        }]);
+- (void)testAsyncNotSupportedAfterMakingChangesInWriteTransactions {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        XCTAssertNoThrow([IntObject.allObjects addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {}]);
+        [IntObject createInRealm:realm withValue:@[@0]];
+        RLMAssertThrowsWithReason([IntObject.allObjects addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {}],
+                                  @"Cannot create asynchronous query after making changes in a write transaction.");
+        RLMAssertThrowsWithReason([IntObject.allObjects[0] addNotificationBlock:^(BOOL, NSArray *, NSError *) {}],
+                                  @"Cannot create asynchronous query after making changes in a write transaction.");
     }];
 }
 

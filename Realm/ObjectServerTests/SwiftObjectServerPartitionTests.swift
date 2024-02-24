@@ -23,15 +23,19 @@ import XCTest
 import RealmSwiftSyncTestSupport
 #endif
 
-@available(OSX 10.14, *)
+@available(macOS 13, *)
 @objc(SwiftObjectServerPartitionTests)
 class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
-    func writeObjects<T: BSON>(_ user: User, _ partitionValue: T) throws {
-        try autoreleasepool {
-            var config = user.configuration(partitionValue: partitionValue)
-            config.objectTypes = [SwiftPerson.self]
-            let realm = try Realm(configuration: config)
+    func configuration(_ user: User, _ partitionValue: some BSON) -> Realm.Configuration {
+        var config = user.configuration(partitionValue: partitionValue)
+        config.objectTypes = [SwiftPerson.self]
+        return config
+    }
 
+
+    func writeObjects(_ user: User, _ partitionValue: some BSON) throws {
+        try autoreleasepool {
+            let realm = try Realm(configuration: configuration(user, partitionValue))
             try realm.write {
                 realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
                 realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
@@ -42,14 +46,13 @@ class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
         }
     }
 
-    func roundTripForPartitionValue<T: BSON>(partitionValue: T) throws {
+    func roundTripForPartitionValue(partitionValue: some BSON) throws {
         let partitionType = partitionBsonType(ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
-        let appId = try RealmServer.shared.createAppForBSONType(partitionType)
-
-        let partitionApp = app(withId: appId)
-        let user = try logInUser(for: basicCredentials(app: partitionApp), app: partitionApp)
-        let user2 = try logInUser(for: Credentials.anonymous, app: partitionApp)
-        let realm = try openRealm(partitionValue: partitionValue, user: user)
+        let appId = try RealmServer.shared.createApp(partitionKeyType: partitionType, types: [SwiftPerson.self])
+        let partitionApp = app(id: appId)
+        let user = createUser(for: partitionApp)
+        let user2 = createUser(for: partitionApp)
+        let realm = try Realm(configuration: configuration(user, partitionValue))
         checkCount(expected: 0, realm, SwiftPerson.self)
 
         try writeObjects(user2, partitionValue)
@@ -61,8 +64,6 @@ class SwiftObjectServerPartitionTests: SwiftSyncTestCase {
         waitForDownloads(for: realm)
         checkCount(expected: 8, realm, SwiftPerson.self)
         XCTAssertEqual(realm.objects(SwiftPerson.self).filter { $0.firstName == "Ringo" }.count, 2)
-
-        try RealmServer.shared.deleteApp(appId)
     }
 
     func testSwiftRoundTripForObjectIdPartitionValue() throws {

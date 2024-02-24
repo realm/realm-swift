@@ -1,0 +1,180 @@
+name: Publish release
+on: workflow_dispatch
+env:
+  XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2']"
+  TEST_XCODE_VERSION: '15.1'
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    name: Prepare outputs
+    outputs:
+      XCODE_VERSIONS_MATRIX: ${{ env.XCODE_VERSION }}
+      VERSION: ${{ steps.get-version.outputs.VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute outputs
+        run: |
+          echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
+      - name: Read SDK version
+        id: get-version
+        run: |
+          version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${GITHUB_WORKSPACE}/dependencies.list")"
+          echo "VERSION=$version" >> $GITHUB_OUTPUT
+  tag-release:
+      runs-on: ubuntu-latest
+      name: Tag Release
+      needs: prepare
+      steps:
+        - uses: actions/checkout@v4
+        - uses: rickstaa/action-create-tag@v1
+          id: "tag_create"
+          with:
+            tag: "v${{ needs.prepare.outputs.VERSION }}"
+            tag_exists_error: false
+            message: ""
+  publish-docs:
+      runs-on: macos-latest
+      name: Publish docs to S3 Bucket
+      needs: tag-release
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DOCS_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DOCS_SECRET_ACCESS_KEY }}
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      steps:
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+        - run: brew install s3cmd
+        - name: Publish docs
+          run: bundle exec sh -x build.sh publish-docs ${{ github.sha }}
+  create-release:
+      runs-on: macos-latest
+      name: Create github release
+      needs: [tag-release, prepare]
+      env:
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      steps:
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+        - name: Create Github release
+          run: bundle exec ./build.sh publish-github ${{ github.sha }}
+  publish-cocoapods:
+      runs-on: macos-latest
+      name: Publish Cocoapods specs
+      needs: [tag-release, prepare]
+      env:
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+      steps:
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+        - name: Publish
+          run: bundle exec ./build.sh publish-cocoapods v${{ needs.prepare.outputs.VERSION }}
+  update-checker:
+      runs-on: macos-latest
+      name: Update to latest version update checker file
+      needs: tag-release
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.UPDATE_CHECKER_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.UPDATE_CHECKER_SECRET_KEY }}
+      steps:
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+        - run: brew install s3cmd
+        - run: bundle exec ./build.sh publish-update-checker
+  test-installation:
+      runs-on: macos-13
+      name: Run installation test for ${{ matrix.platform }}, ${{ matrix.installation }} and ${{ matrix.linkage }}
+      needs: [create-release, prepare, publish-cocoapods]
+      strategy:
+        matrix:
+          platform: [ios, osx, watchos, tvos, catalyst, visionos]
+          installation: [cocoapods, spm, carthage, xcframework]
+          linkage: [static, dynamic]
+          exclude:
+            - installation: carthage
+              linkage: static
+            - platform: catalyst
+              installation: carthage
+            - platform: osx
+              installation: xcframework
+              linkage: static
+            - platform: watchos
+              installation: xcframework
+              linkage: static
+            - platform: tvos
+              installation: xcframework
+              linkage: static
+            - platform: catalyst
+              installation: xcframework
+              linkage: static
+            - platform: visionos
+              installation: xcframework
+              linkage: static
+            - platform: catalyst
+              installation: carthage
+              linkage: static
+            - platform: visionos
+              installation: carthage
+            - platform: visionos
+              installation: cocoapods
+      steps:
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+        - uses: maxim-lobanov/setup-xcode@v1
+          with:
+            xcode-version: ${{ env.TEST_XCODE_VERSION }}
+        - name: Set REALM_TEST_RELEASE
+          run: echo "REALM_TEST_RELEASE=${{ needs.prepare.outputs.VERSION }}" >> $GITHUB_ENV
+        - name: Run installation test
+          run: |
+            cd examples/installation
+            bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
+  post-slack-release:
+      runs-on: macos-latest
+      name: Publish to release Slack channel
+      needs: [test-installation, prepare]
+      env:
+        WEBHOOK_URL: ${{ secrets.SLACK_RELEASES_WEBHOOK }}
+      steps:
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+        - name: Prepare Changelog
+          run: bundle exec ./build.sh prepare-publish-changelog
+        - name: 'Post to #realm-releases'
+          uses: realm/ci-actions/release-to-slack@v3
+          with:
+            changelog: ExtractedChangelog/CHANGELOG.md
+            sdk: Swift
+            webhook-url: ${{ env.WEBHOOK_URL }}
+            version: ${{ needs.prepare.outputs.VERSION }}
+  add-empty-changelog:
+      runs-on: macos-latest
+      permissions:
+        contents: write
+      name: Add empty changelog and commits/push it
+      needs: [post-slack-release]
+      env:
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      steps:
+        - uses: actions/checkout@v4
+        - uses: ruby/setup-ruby@v1
+          with:
+            bundler-cache: true
+        - name: Add template to changelog
+          run: |
+            sh build.sh add-empty-changelog
+        - name: Auto-commit CHANGELOG.md
+          uses: stefanzweifel/git-auto-commit-action@v4
+          with:
+            commit_message: 'Add an empty changelog section'

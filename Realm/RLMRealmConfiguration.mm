@@ -32,7 +32,7 @@
 #import "RLMUser_Private.hpp"
 
 #import <realm/object-store/sync/sync_manager.hpp>
-#import <realm/object-store/util/bson/bson.hpp>
+#import <realm/util/bson/bson.hpp>
 #import <realm/sync/config.hpp>
 #else
 @class RLMSyncConfiguration;
@@ -174,7 +174,6 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     if (inMemoryIdentifier.length == 0) {
         @throw RLMException(@"In-memory identifier must not be empty");
     }
-    _config.sync_config = nullptr;
     _seedFilePath = nil;
 
     RLMNSStringToStdString(_config.path, [NSTemporaryDirectory() stringByAppendingPathComponent:inMemoryIdentifier]);
@@ -367,7 +366,6 @@ static bool isSync(realm::Realm::Config const& config) {
     }
 
     NSAssert(user.identifier, @"Cannot call this method on a user that doesn't have an identifier.");
-    _config.in_memory = false;
     _config.sync_config = std::make_shared<realm::SyncConfig>(syncConfiguration.rawConfiguration);
     _config.path = syncConfiguration.path;
 

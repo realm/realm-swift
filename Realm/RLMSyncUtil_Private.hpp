@@ -20,15 +20,9 @@
 
 #import <realm/object-store/sync/sync_manager.hpp>
 
-class CocoaSyncUserContext;
-
 realm::SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy);
 RLMSyncStopPolicy translateStopPolicy(realm::SyncSessionStopPolicy stop_policy);
 
 typedef NS_ENUM(NSUInteger, RLMClientResetMode);
 RLMClientResetMode translateClientResetMode(realm::ClientResyncMode mode);
 realm::ClientResyncMode translateClientResetMode(RLMClientResetMode mode);
-
-#pragma mark - Get user context
-
-CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user);

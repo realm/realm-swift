@@ -216,13 +216,17 @@ __attribute__((objc_direct_members))
 - (void)countWhere:(NSDictionary<NSString *, id<RLMBSON>> *)document
              limit:(NSInteger)limit
         completion:(RLMMongoCountBlock)completion {
-    self.collection.count(toBsonDocument(document), limit,
-                          [completion](uint64_t count,
-                                       std::optional<realm::app::AppError> error) {
+    self.collection.count_bson(toBsonDocument(document), limit,
+                               [completion](std::optional<realm::bson::Bson>&& value,
+                                            std::optional<realm::app::AppError>&& error) {
         if (error) {
             return completion(0, makeError(*error));
         }
-        completion(static_cast<NSInteger>(count), nil);
+        if (value->type() == realm::bson::Bson::Type::Int64) {
+            return completion(static_cast<NSInteger>(static_cast<int64_t>(*value)), nil);
+        }
+        // If the collection does not exist the call returns undefined
+        return completion(0, nil);
     });
 }
 

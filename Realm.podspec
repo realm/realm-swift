@@ -30,6 +30,7 @@ Pod::Spec.new do |s|
                               'include/RLMDecimal128.h',
                               'include/RLMDictionary.h',
                               'include/RLMEmbeddedObject.h',
+                              'include/RLMGeospatial.h',
                               'include/RLMError.h',
                               'include/RLMLogger.h',
                               'include/RLMMigration.h',
@@ -144,9 +145,10 @@ Pod::Spec.new do |s|
                                 'REALM_LD_CLASSIC_1400' => '',
                                 'REALM_LD_CLASSIC_1500' => '-Wl,-ld_classic',
                                 'REALM_LD_CLASSIC' => '$(REALM_LD_CLASSIC_$(XCODE_VERSION_MAJOR))',
-                                'OTHER_LDFLAGS' => '$(REALM_LD_CLASSIC)',
+                                'OTHER_LDFLAGS' => '$(REALM_LD_CLASSIC) "-Wl,-unexported_symbols_list,${PODS_ROOT}/Realm/Configuration/Realm/PrivateSymbols.txt"',
                               }
-  s.preserve_paths          = %w(include scripts)
+  s.preserve_paths          = %w(include scripts Configuration/Realm/PrivateSymbols.txt)
+  s.resource_bundles        = {'realm_objc_privacy' => ['Realm/PrivacyInfo.xcprivacy']}
 
   s.ios.deployment_target   = '11.0'
   s.osx.deployment_target   = '10.13'

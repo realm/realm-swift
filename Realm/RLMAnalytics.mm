@@ -255,7 +255,9 @@ static NSDictionary *RLMBaseMetrics() {
         @"Target OS Version": [[NSProcessInfo processInfo] operatingSystemVersionString],
         // Minimum OS version the app is targeting
         @"Target OS Minimum Version": info[@"MinimumOSVersion"] ?: info[@"LSMinimumSystemVersion"] ?: kUnknownString,
-#if TARGET_OS_WATCH
+#if defined(TARGET_OS_VISION) && TARGET_OS_VISION // TARGET_OS_VISION first defined in Xcode 15.2
+        @"Target OS Type": @"visionos",
+#elif TARGET_OS_WATCH
         @"Target OS Type": @"watchos",
 #elif TARGET_OS_TV
         @"Target OS Type": @"tvos",
