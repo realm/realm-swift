@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMConstants.h>
+#import <Realm/RLMProperty.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
@@ -34,6 +35,9 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 + (nullable NSString *)_realmObjectName;
 + (nullable NSDictionary<NSString *, NSString *> *)_realmColumnNames;
+
+/// Allow client code to generate properties (ie. via Swift Macros)
++ (nullable NSArray<RLMProperty *> *)_customRealmProperties;
 
 @end
 

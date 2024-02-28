@@ -346,6 +346,10 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     return nil;
 }
 
++ (nullable NSArray<RLMProperty *> *)_customRealmProperties {
+    return nil;
+}
+
 + (bool)_realmIgnoreClass {
     return false;
 }
