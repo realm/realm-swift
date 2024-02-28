@@ -39,6 +39,14 @@ public protocol _RealmSchemaDiscoverable {
     static func _rlmPopulateProperty(_ prop: RLMProperty)
 }
 
+extension RLMObjectBase {
+    /// Allow client code to generate properties (ie. via Swift Macros)
+    @_spi(RealmSwiftPrivate)
+    @objc open class func _customRealmProperties() -> [RLMProperty]? {
+        return nil
+    }
+}
+
 internal protocol SchemaDiscoverable: _RealmSchemaDiscoverable {}
 extension SchemaDiscoverable {
     public static var _rlmOptional: Bool { false }
@@ -63,6 +71,7 @@ extension RLMProperty {
 
     /// Exposed for Macros.
     /// Important: Keep args in same order & default value as `@Persisted` property wrapper
+    @_spi(RealmSwiftPrivate)
     public convenience init<O: ObjectBase, V: _Persistable>(
         name: String,
         objectType _: O.Type,
