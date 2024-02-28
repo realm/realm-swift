@@ -26,9 +26,31 @@ import Realm.Private
 An object representing the Realm App configuration
 
 - see: `RLMAppConfiguration`
+
+- note: `AppConfiguration` options cannot be modified once the `App` using it
+         is created. App's configuration values are cached when the App is created so any modifications after it
+         will not have any effect.
 */
 public typealias AppConfiguration = RLMAppConfiguration
 public extension AppConfiguration {
+    /// :nodoc:
+    @available(*, deprecated, message: "localAppName and localAppVersion are not used for anything and should not be supplied")
+    convenience init(baseURL: String? = nil, transport: RLMNetworkTransport? = nil,
+                     localAppName: String?, localAppVersion: String?,
+                     defaultRequestTimeoutMS: UInt? = nil, enableSessionMultiplexing: Bool? = nil,
+                     syncTimeouts: SyncTimeoutOptions? = nil) {
+        self.init(baseURL: baseURL, transport: transport, localAppName: localAppName, localAppVersion: localAppVersion)
+        if let defaultRequestTimeoutMS {
+            self.defaultRequestTimeoutMS = defaultRequestTimeoutMS
+        }
+        if let enableSessionMultiplexing {
+            self.enableSessionMultiplexing = enableSessionMultiplexing
+        }
+        if let syncTimeouts {
+            self.syncTimeouts = syncTimeouts
+        }
+    }
+
     /**
      Memberwise convenience initializer
 
@@ -37,18 +59,15 @@ public extension AppConfiguration {
      - Parameters:
        - baseURL: A custom Atlas App Services URL for when using a non-standard deployment
        - transport: A network transport used for calls to the server.
-       - localAppName: The app name reported to the server when connecting.
-       - localAppVersion: The app version reported to the server when connecting.
        - defaultRequestTimeoutMS: The default timeout for non-sync HTTP requests made to the server.
        - enableSessionMultiplexing: Use a single network connection per sync user rather than one per sync Realm.
        - syncTimeouts: Timeout options for sync connections.
      */
     @_disfavoredOverload // this is ambiguous with the base init if nil is explicitly passed
     convenience init(baseURL: String? = nil, transport: RLMNetworkTransport? = nil,
-                     localAppName: String? = nil, localAppVersion: String? = nil,
                      defaultRequestTimeoutMS: UInt? = nil, enableSessionMultiplexing: Bool? = nil,
                      syncTimeouts: SyncTimeoutOptions? = nil) {
-        self.init(baseURL: baseURL, transport: transport, localAppName: localAppName, localAppVersion: localAppVersion)
+        self.init(baseURL: baseURL, transport: transport)
         if let defaultRequestTimeoutMS {
             self.defaultRequestTimeoutMS = defaultRequestTimeoutMS
         }

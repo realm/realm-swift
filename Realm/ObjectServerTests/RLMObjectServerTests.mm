@@ -52,20 +52,21 @@
 @property (nonatomic) double delay;
 @end
 
-@interface RLMUser (Test)
-@end
-@implementation RLMUser (Test)
-- (RLMRealmConfiguration *)configurationWithTestSelector:(SEL)sel {
-    auto config = [self configurationWithPartitionValue:NSStringFromSelector(sel)];
-    config.objectClasses = @[Person.class, HugeSyncObject.class];
-    return config;
-}
-
-@end
-
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 @implementation RLMObjectServerTests
+
+- (NSArray *)defaultObjectTypes {
+    return @[
+        AllTypesSyncObject.class,
+        HugeSyncObject.class,
+        IntPrimaryKeyObject.class,
+        Person.class,
+        RLMSetSyncObject.class,
+        StringPrimaryKeyObject.class,
+        UUIDPrimaryKeyObject.class,
+    ];
+}
 
 #pragma mark - App Tests
 
@@ -119,10 +120,8 @@ static NSString *generateRandomString(int num) {
 }
 
 - (void)testLogoutSpecificUser {
-    RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                             register:YES]];
-    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test1@10gen.com"
-                                                                              register:YES]];
+    RLMUser *firstUser = [self createUser];
+    RLMUser *secondUser = [self createUser];
 
     XCTAssertEqualObjects(self.app.currentUser.identifier, secondUser.identifier);
     // `[app currentUser]` will now be `secondUser`, so let's logout firstUser and ensure
@@ -139,22 +138,18 @@ static NSString *generateRandomString(int num) {
 }
 
 - (void)testSwitchUser {
-    RLMApp *app = self.app;
-
-    RLMUser *syncUserA = [self anonymousUser];
-    RLMUser *syncUserB = [self userForTest:_cmd];
+    RLMUser *syncUserA = [self createUser];
+    RLMUser *syncUserB = [self createUser];
 
     XCTAssertNotEqualObjects(syncUserA.identifier, syncUserB.identifier);
-    XCTAssertEqualObjects(app.currentUser.identifier, syncUserB.identifier);
+    XCTAssertEqualObjects(self.app.currentUser.identifier, syncUserB.identifier);
 
-    XCTAssertEqualObjects([app switchToUser:syncUserA].identifier, syncUserA.identifier);
+    XCTAssertEqualObjects([self.app switchToUser:syncUserA].identifier, syncUserA.identifier);
 }
 
 - (void)testRemoveUser {
-    RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                             register:YES]];
-    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test2@10gen.com"
-                                                                              register:YES]];
+    RLMUser *firstUser = [self createUser];
+    RLMUser *secondUser = [self createUser];
 
     XCTAssert([self.app.currentUser.identifier isEqualToString:secondUser.identifier]);
 
@@ -171,10 +166,8 @@ static NSString *generateRandomString(int num) {
 }
 
 - (void)testDeleteUser {
-    [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:YES]];
-    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test3@10gen.com"
-                                                                              register:YES]];
+    [self createUser];
+    RLMUser *secondUser = [self createUser];
 
     XCTAssert([self.app.currentUser.identifier isEqualToString:secondUser.identifier]);
 
@@ -485,19 +478,17 @@ static NSString *randomEmail() {
 /// Valid email/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
 - (void)testEmailPasswordAuthentication {
-    RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                             register:YES]];
-    RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                              register:NO]];
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name register:YES];
+    RLMUser *firstUser = [self logInUserForCredentials:credentials];
+    RLMUser *secondUser = [self logInUserForCredentials:credentials];
     // Two users created with the same credential should resolve to the same actual user.
     XCTAssertTrue([firstUser.identifier isEqualToString:secondUser.identifier]);
 }
 
 /// An invalid email/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
-    (void)[self userForTest:_cmd];
-
-    RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:NSStringFromSelector(_cmd)
+    (void)[self basicCredentialsWithName:self.name register:YES];
+    RLMCredentials *credentials = [RLMCredentials credentialsWithEmail:self.name
                                                               password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
@@ -532,18 +523,18 @@ static NSString *randomEmail() {
 /// Registering a user with existing email should return corresponding error.
 - (void)testExistingEmailRegistration {
     XCTestExpectation *expectationA = [self expectationWithDescription:@"registration should succeed"];
-    [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
-                                               password:@"password"
-                                             completion:^(NSError *error) {
+    [self.app.emailPasswordAuth registerUserWithEmail:self.name
+                                             password:@"password"
+                                           completion:^(NSError *error) {
         XCTAssertNil(error);
         [expectationA fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     XCTestExpectation *expectationB = [self expectationWithDescription:@"registration should fail"];
-    [[self.app emailPasswordAuth] registerUserWithEmail:NSStringFromSelector(_cmd)
-                                               password:@"password"
-                                             completion:^(NSError *error) {
+    [self.app.emailPasswordAuth registerUserWithEmail:self.name
+                                             password:@"password"
+                                           completion:^(NSError *error) {
         RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorAccountNameInUse, @"name already in use");
         XCTAssertNotNil(error.userInfo[RLMServerLogURLKey]);
         [expectationB fulfill];
@@ -553,25 +544,17 @@ static NSString *randomEmail() {
 }
 
 - (void)testSyncErrorHandlerErrorDomain {
-    RLMUser *user = [self userForTest:_cmd];
-    XCTAssertNotNil(user);
-
+    RLMRealmConfiguration *config = self.configuration;
     XCTestExpectation *expectation = [self expectationWithDescription:@"should fail after setting bad token"];
-    self.app.syncManager.errorHandler = ^(NSError *error, __unused RLMSyncSession *session) {
+    self.app.syncManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
         RLMValidateError(error, RLMSyncErrorDomain, RLMSyncErrorClientUserError,
-                         @"Unable to refresh the user access token.");
+                         @"Unable to refresh the user access token: signature is invalid");
         [expectation fulfill];
     };
 
-    [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
-    [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
-
-    [self immediatelyOpenRealmForPartitionValue:NSStringFromSelector(_cmd)
-                                           user:user
-                                  encryptionKey:nil
-                                     stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
-
-    [self waitForExpectationsWithTimeout:30.0 handler:nil];
+    [self setInvalidTokensForUser:config.syncConfiguration.user];
+    [RLMRealm realmWithConfiguration:config error:nil];
+    [self waitForExpectations:@[expectation] timeout:3.0];
 }
 
 #pragma mark - User Profile
@@ -616,18 +599,18 @@ static NSString *randomEmail() {
 
 /// It should be possible to successfully open a Realm configured for sync with a normal user.
 - (void)testOpenRealmWithNormalCredentials {
-    RLMRealm *realm = [self realmForTest:_cmd];
+    RLMRealm *realm = [self openRealm];
     XCTAssertTrue(realm.isEmpty);
 }
 
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjects {
-    RLMRealm *realm = [self realmForTest:_cmd];
+    RLMRealm *realm = [self openRealm];
     NSDictionary *values = [AllTypesSyncObject values:1];
     CHECK_COUNT(0, Person, realm);
     CHECK_COUNT(0, AllTypesSyncObject, realm);
 
-    [self writeToPartition:_cmd block:^(RLMRealm *realm) {
+    [self writeToPartition:self.name block:^(RLMRealm *realm) {
         [realm addObjects:@[[Person john], [Person paul], [Person george]]];
         AllTypesSyncObject *obj = [[AllTypesSyncObject alloc] initWithValue:values];
         obj.objectCol = [Person ringo];
@@ -655,14 +638,8 @@ static NSString *randomEmail() {
 - (void)testAddObjectsWithNilPartitionValue {
     RLMRealm *realm = [self openRealmForPartitionValue:nil user:self.anonymousUser];
 
-    // This test needs the database to be empty of any documents with a nil partition
-    [realm transactionWithBlock:^{
-        [realm deleteAllObjects];
-    }];
-    [self waitForUploadsForRealm:realm];
-
     CHECK_COUNT(0, Person, realm);
-    [self writeToPartition:nil userName:NSStringFromSelector(_cmd) block:^(RLMRealm *realm) {
+    [self writeToPartition:nil block:^(RLMRealm *realm) {
         [realm addObjects:@[[Person john], [Person paul], [Person george], [Person ringo]]];
     }];
     [self waitForDownloadsForRealm:realm];
@@ -670,14 +647,14 @@ static NSString *randomEmail() {
 }
 
 - (void)testRountripForDistinctPrimaryKey {
-    RLMRealm *realm = [self realmForTest:_cmd];
+    RLMRealm *realm = [self openRealm];
 
     CHECK_COUNT(0, Person, realm);
     CHECK_COUNT(0, UUIDPrimaryKeyObject, realm);
     CHECK_COUNT(0, StringPrimaryKeyObject, realm);
     CHECK_COUNT(0, IntPrimaryKeyObject, realm);
 
-    [self writeToPartition:_cmd block:^(RLMRealm *realm) {
+    [self writeToPartition:self.name block:^(RLMRealm *realm) {
         Person *person = [[Person alloc] initWithPrimaryKey:[[RLMObjectId alloc] initWithString:@"1234567890ab1234567890ab" error:nil]
                                                         age:5
                                                   firstName:@"Ringo"
@@ -720,125 +697,102 @@ static NSString *randomEmail() {
     XCTAssertEqual(intPrimaryKeyObject.intCol, 30);
 }
 
-/// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjectsMultipleApps {
-    NSString *appId1;
-    NSString *appId2;
-    if (self.isParent) {
-        appId1 = [RealmServer.shared createAppAndReturnError:nil];
-        appId2 = [RealmServer.shared createAppAndReturnError:nil];
-
-    } else {
-        appId1 = self.appIds[0];
-        appId2 = self.appIds[1];
-    }
-
+    NSString *appId1 = [RealmServer.shared createAppWithPartitionKeyType:@"string" types:@[Person.self] persistent:false error:nil];
+    NSString *appId2 = [RealmServer.shared createAppWithPartitionKeyType:@"string" types:@[Person.self] persistent:false error:nil];
     RLMApp *app1 = [self appWithId:appId1];
     RLMApp *app2 = [self appWithId:appId2];
 
-    [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app1];
-    [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app2];
-    RLMRealm *realm1 = [self openRealmForPartitionValue:appId1 user:app1.currentUser];
-    RLMRealm *realm2 = [self openRealmForPartitionValue:appId2 user:app2.currentUser];
+    auto openRealm = [=](RLMApp *app) {
+        RLMUser *user = [self createUserForApp:app];
+        RLMRealmConfiguration *config = [user configurationWithPartitionValue:self.name];
+        config.objectClasses = @[Person.self];
+        return [self openRealmWithConfiguration:config];
+    };
 
-    if (self.isParent) {
-        CHECK_COUNT(0, Person, realm1);
-        CHECK_COUNT(0, Person, realm2);
-        int code = [self runChildAndWaitWithAppIds:@[appId1, appId2]];
-        XCTAssertEqual(0, code);
-        [self waitForDownloadsForRealm:realm1];
-        [self waitForDownloadsForRealm:realm2];
-        CHECK_COUNT(2, Person, realm1);
-        CHECK_COUNT(2, Person, realm2);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'John'"].count, 1UL);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'Paul'"].count, 1UL);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'Ringo'"].count, 0UL);
-        XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'George'"].count, 0UL);
+    RLMRealm *realm1 = openRealm(app1);
+    RLMRealm *realm2 = openRealm(app2);
 
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'John'"].count, 0UL);
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Paul'"].count, 0UL);
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Ringo'"].count, 1UL);
-        XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'George'"].count, 1UL);
+    CHECK_COUNT(0, Person, realm1);
+    CHECK_COUNT(0, Person, realm2);
 
-        [RealmServer.shared deleteApp:appId1 error:nil];
-        [RealmServer.shared deleteApp:appId2 error:nil];
-    } else {
-        // Add objects.
-        [self addPersonsToRealm:realm1
-                        persons:@[[Person john],
-                                  [Person paul]]];
-        [self addPersonsToRealm:realm2
-                        persons:@[[Person ringo],
-                                  [Person george]]];
-
-        [self waitForUploadsForRealm:realm1];
-        [self waitForUploadsForRealm:realm2];
-        CHECK_COUNT(2, Person, realm1);
-        CHECK_COUNT(2, Person, realm2);
-    }
-}
-
-/// If client B adds objects to a synced Realm, client A should see those objects.
-- (void)testSessionRefresh {
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
-    RLMUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
-
-    [user _syncUser]->update_access_token(self.badAccessToken.UTF8String);
-
-    NSString *realmId = NSStringFromSelector(_cmd);
-    RLMRealm *realm = [self openRealmForPartitionValue:realmId user:user];
-    RLMRealm *realm2 = [self openRealmForPartitionValue:realmId user:user2];
-    if (self.isParent) {
-        CHECK_COUNT(0, Person, realm);
-        RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user
-                               realms:@[realm]
-                      partitionValues:@[realmId] expectedCounts:@[@4]];
-        [self waitForDownloadsForUser:user2
-                               realms:@[realm2]
-                      partitionValues:@[realmId] expectedCounts:@[@4]];
-    } else {
-        // Add objects.
+    @autoreleasepool {
+        RLMRealm *realm = openRealm(app1);
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george]]];
+                        persons:@[[Person john], [Person paul]]];
         [self waitForUploadsForRealm:realm];
     }
+
+    // realm2 should not see realm1's objcets despite being the same partition
+    // as they're from different apps
+    [self waitForDownloadsForRealm:realm1];
+    [self waitForDownloadsForRealm:realm2];
+    CHECK_COUNT(2, Person, realm1);
+    CHECK_COUNT(0, Person, realm2);
+
+    @autoreleasepool {
+        RLMRealm *realm = openRealm(app2);
+        [self addPersonsToRealm:realm
+                        persons:@[[Person ringo], [Person george]]];
+        [self waitForUploadsForRealm:realm];
+    }
+
+    [self waitForDownloadsForRealm:realm1];
+    [self waitForDownloadsForRealm:realm2];
+    CHECK_COUNT(2, Person, realm1);
+    CHECK_COUNT(2, Person, realm2);
+
+    XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'John'"].count, 1UL);
+    XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'Paul'"].count, 1UL);
+    XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'Ringo'"].count, 0UL);
+    XCTAssertEqual([Person objectsInRealm:realm1 where:@"firstName = 'George'"].count, 0UL);
+
+    XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'John'"].count, 0UL);
+    XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Paul'"].count, 0UL);
+    XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'Ringo'"].count, 1UL);
+    XCTAssertEqual([Person objectsInRealm:realm2 where:@"firstName = 'George'"].count, 1UL);
 }
 
-/// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
+- (void)testSessionRefresh {
+    RLMUser *user = [self createUser];
+
+    // Should result in an access token error followed by a refresh when we
+    // open the Realm which is entirely transparent to the user
+    user._syncUser->update_access_token(self.badAccessToken.UTF8String);
+    RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
+
+    RLMRealm *realm2 = [self openRealm];
+    [self addPersonsToRealm:realm2
+                    persons:@[[Person john],
+                              [Person paul],
+                              [Person ringo],
+                              [Person george]]];
+    [self waitForUploadsForRealm:realm2];
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(4, Person, realm);
+}
+
 - (void)testDeleteObjects {
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-    if (self.isParent) {
-        // Add objects.
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(1, Person, realm);
-        RLMRunChildAndWait();
-        [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(0, Person, realm);
-    } else {
-        CHECK_COUNT(1, Person, realm);
-        [realm beginWriteTransaction];
-        [realm deleteAllObjects];
-        [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(0, Person, realm);
-    }
+    RLMRealm *realm1 = [self openRealm];
+    [self addPersonsToRealm:realm1 persons:@[[Person john]]];
+    [self waitForUploadsForRealm:realm1];
+    CHECK_COUNT(1, Person, realm1);
+
+    RLMRealm *realm2 = [self openRealm];
+    CHECK_COUNT(1, Person, realm2);
+    [realm2 beginWriteTransaction];
+    [realm2 deleteAllObjects];
+    [realm2 commitWriteTransaction];
+    [self waitForUploadsForRealm:realm2];
+
+    [self waitForDownloadsForRealm:realm1];
+    CHECK_COUNT(0, Person, realm1);
 }
 
 - (void)testIncomingSyncWritesTriggerNotifications {
-    NSString *baseName = NSStringFromSelector(_cmd);
-    auto user = [&] {
-        NSString *name = [baseName stringByAppendingString:[NSUUID UUID].UUIDString];
-        return [self logInUserForCredentials:[self basicCredentialsWithName:name register:YES]];
-    };
-    RLMRealm *syncRealm = [self openRealmWithConfiguration:[user() configurationWithTestSelector:_cmd]];
-    RLMRealm *asyncRealm = [self asyncOpenRealmWithConfiguration:[user() configurationWithTestSelector:_cmd]];
-    RLMRealm *writeRealm = [self asyncOpenRealmWithConfiguration:[user() configurationWithTestSelector:_cmd]];
+    RLMRealm *syncRealm = [self openRealm];
+    RLMRealm *asyncRealm = [self asyncOpenRealmWithConfiguration:self.configuration];
+    RLMRealm *writeRealm = [self openRealm];
 
     __block XCTestExpectation *ex = [self expectationWithDescription:@"got initial notification"];
     ex.expectedFulfillmentCount = 2;
@@ -859,14 +813,11 @@ static NSString *randomEmail() {
     [token2 invalidate];
 }
 
-#pragma mark - RLMValue Sync with missing schema -
+#pragma mark - RLMValue Sync with missing schema
 
 - (void)testMissingSchema {
     @autoreleasepool {
-        auto c = [self.anonymousUser configurationWithPartitionValue:NSStringFromSelector(_cmd)];
-        c.objectClasses = @[Person.self, AllTypesSyncObject.self, RLMSetSyncObject.self];
-        RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
-        [self waitForDownloadsForRealm:realm];
+        RLMRealm *realm = [self openRealm];
         AllTypesSyncObject *obj = [[AllTypesSyncObject alloc] initWithValue:[AllTypesSyncObject values:0]];
         RLMSetSyncObject *o = [RLMSetSyncObject new];
         Person *p = [Person john];
@@ -880,12 +831,12 @@ static NSString *randomEmail() {
         CHECK_COUNT(1, AllTypesSyncObject, realm);
     }
 
-    RLMUser *user = [self userForTest:_cmd];
-    auto c = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMUser *user = [self createUser];
+    auto c = [user configurationWithPartitionValue:self.name];
     c.objectClasses = @[Person.self, AllTypesSyncObject.self];
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
     [self waitForDownloadsForRealm:realm];
-    RLMResults <AllTypesSyncObject *> *res = [AllTypesSyncObject allObjectsInRealm:realm];
+    RLMResults<AllTypesSyncObject *> *res = [AllTypesSyncObject allObjectsInRealm:realm];
     AllTypesSyncObject *o = res.firstObject;
     Person *p = o.objectCol;
     RLMSet<RLMValue> *anySet = ((RLMObject *)o.anyCol)[@"anySet"];
@@ -904,7 +855,7 @@ static NSString *randomEmail() {
     RLMUser *user = [self userForTest:_cmd];
 
     NSData *key = RLMGenerateKey();
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd)
+    RLMRealm *realm = [self openRealmForPartitionValue:self.name
                                                   user:user
                                          encryptionKey:key
                                             stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
@@ -912,12 +863,9 @@ static NSString *randomEmail() {
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user
-                               realms:@[realm]
-                      partitionValues:@[NSStringFromSelector(_cmd)]
-                       expectedCounts:@[@1]];
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(1, Person, realm);
     } else {
-        // Add objects.
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
@@ -926,11 +874,11 @@ static NSString *randomEmail() {
 
 /// If an encrypted synced Realm is re-opened with the wrong key, throw an exception.
 - (void)testEncryptedSyncedRealmWrongKey {
-    RLMUser *user = [self userForTest:_cmd];
+    RLMUser *user = [self createUser];
 
     NSString *path;
     @autoreleasepool {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd)
+        RLMRealm *realm = [self openRealmForPartitionValue:self.name
                                                       user:user
                                              encryptionKey:RLMGenerateKey()
                                                 stopPolicy:RLMSyncStopPolicyImmediately];
@@ -955,38 +903,33 @@ static NSString *randomEmail() {
 
 /// If a client opens multiple Realms, there should be one session object for each Realm that was opened.
 - (void)testMultipleRealmsSessions {
-    NSString *partitionValueA = NSStringFromSelector(_cmd);
+    NSString *partitionValueA = self.name;
     NSString *partitionValueB = [partitionValueA stringByAppendingString:@"bar"];
     NSString *partitionValueC = [partitionValueA stringByAppendingString:@"baz"];
-    RLMUser *user = [self userForTest:_cmd];
+    RLMUser *user = [self createUser];
 
-    // Open three Realms.
-
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmA = [self openRealmForPartitionValue:partitionValueA
-                                                                                              user:user];
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmB = [self openRealmForPartitionValue:partitionValueB
-                                                                                              user:user];
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmC = [self openRealmForPartitionValue:partitionValueC
-                                                                                              user:user];
+    __attribute__((objc_precise_lifetime))
+    RLMRealm *realmA = [self openRealmForPartitionValue:partitionValueA user:user];
+    __attribute__((objc_precise_lifetime))
+    RLMRealm *realmB = [self openRealmForPartitionValue:partitionValueB user:user];
+    __attribute__((objc_precise_lifetime))
+    RLMRealm *realmC = [self openRealmForPartitionValue:partitionValueC user:user];
     // Make sure there are three active sessions for the user.
-    XCTAssert(user.allSessions.count == 3, @"Expected 3 sessions, but didn't get 3 sessions");
+    XCTAssertEqual(user.allSessions.count, 3U);
     XCTAssertNotNil([user sessionForPartitionValue:partitionValueA],
                     @"Expected to get a session for partition value A");
     XCTAssertNotNil([user sessionForPartitionValue:partitionValueB],
                     @"Expected to get a session for partition value B");
     XCTAssertNotNil([user sessionForPartitionValue:partitionValueC],
                     @"Expected to get a session for partition value C");
-    XCTAssertTrue([user sessionForPartitionValue:partitionValueA].state == RLMSyncSessionStateActive,
-                  @"Expected active session for URL A");
-    XCTAssertTrue([user sessionForPartitionValue:partitionValueB].state == RLMSyncSessionStateActive,
-                  @"Expected active session for URL B");
-    XCTAssertTrue([user sessionForPartitionValue:partitionValueC].state == RLMSyncSessionStateActive,
-                  @"Expected active session for URL C");
+    XCTAssertEqual(realmA.syncSession.state, RLMSyncSessionStateActive);
+    XCTAssertEqual(realmB.syncSession.state, RLMSyncSessionStateActive);
+    XCTAssertEqual(realmC.syncSession.state, RLMSyncSessionStateActive);
 }
 
 /// A client should be able to open multiple Realms and add objects to each of them.
 - (void)testMultipleRealmsAddObjects {
-    NSString *partitionValueA = NSStringFromSelector(_cmd);
+    NSString *partitionValueA = self.name;
     NSString *partitionValueB = [partitionValueA stringByAppendingString:@"bar"];
     NSString *partitionValueC = [partitionValueA stringByAppendingString:@"baz"];
     RLMUser *user = [self userForTest:_cmd];
@@ -1000,12 +943,12 @@ static NSString *randomEmail() {
         CHECK_COUNT(0, Person, realmB);
         CHECK_COUNT(0, Person, realmC);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user
-                               realms:@[realmA, realmB, realmC]
-                      partitionValues:@[partitionValueA,
-                                        partitionValueB,
-                                        partitionValueC]
-                       expectedCounts:@[@3, @2, @5]];
+        [self waitForDownloadsForRealm:realmA];
+        [self waitForDownloadsForRealm:realmB];
+        [self waitForDownloadsForRealm:realmC];
+        CHECK_COUNT(3, Person, realmA);
+        CHECK_COUNT(2, Person, realmB);
+        CHECK_COUNT(5, Person, realmC);
 
         RLMResults *resultsA = [Person objectsInRealm:realmA where:@"firstName == %@", @"Ringo"];
         RLMResults *resultsB = [Person objectsInRealm:realmB where:@"firstName == %@", @"Ringo"];
@@ -1038,7 +981,7 @@ static NSString *randomEmail() {
 
 /// A client should be able to open multiple Realms and delete objects from each of them.
 - (void)testMultipleRealmsDeleteObjects {
-    NSString *partitionValueA = NSStringFromSelector(_cmd);
+    NSString *partitionValueA = self.name;
     NSString *partitionValueB = [partitionValueA stringByAppendingString:@"bar"];
     NSString *partitionValueC = [partitionValueA stringByAppendingString:@"baz"];
     RLMUser *user = [self userForTest:_cmd];
@@ -1069,12 +1012,12 @@ static NSString *randomEmail() {
         CHECK_COUNT(5, Person, realmB);
         CHECK_COUNT(2, Person, realmC);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user
-                               realms:@[realmA, realmB, realmC]
-                      partitionValues:@[partitionValueA,
-                                        partitionValueB,
-                                        partitionValueC]
-                       expectedCounts:@[@0, @0, @0]];
+        [self waitForDownloadsForRealm:realmA];
+        [self waitForDownloadsForRealm:realmB];
+        [self waitForDownloadsForRealm:realmC];
+        CHECK_COUNT(0, Person, realmA);
+        CHECK_COUNT(0, Person, realmB);
+        CHECK_COUNT(0, Person, realmC);
     } else {
         // Delete all the objects from the Realms.
         CHECK_COUNT(4, Person, realmA);
@@ -1102,41 +1045,32 @@ static NSString *randomEmail() {
 /// When a session opened by a Realm goes out of scope, it should stay alive long enough to finish any waiting uploads.
 - (void)testUploadChangesWhenRealmOutOfScope {
     const NSInteger OBJECT_COUNT = 3;
-    RLMUser *user = [self userForTest:_cmd];
 
-    if (self.isParent) {
-        // Open the Realm in an autorelease pool so that it is destroyed as soon as possible.
-        @autoreleasepool {
-            RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-            [self addPersonsToRealm:realm
-                            persons:@[[Person john],
-                                      [Person paul],
-                                      [Person ringo]]];
-            CHECK_COUNT(OBJECT_COUNT, Person, realm);
-        }
-
-        // We have to use a sleep here because explicitly waiting for uploads
-        // would retain the session, defeating the purpose of this test
-        sleep(2);
-
-        RLMRunChildAndWait();
-    } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+    // Open the Realm in an autorelease pool so that it is destroyed as soon as possible.
+    @autoreleasepool {
+        RLMRealm *realm = [self openRealm];
+        [self addPersonsToRealm:realm
+                        persons:@[[Person john], [Person paul], [Person ringo]]];
         CHECK_COUNT(OBJECT_COUNT, Person, realm);
     }
+
+    [self.app.syncManager waitForSessionTermination];
+
+    RLMRealm *realm = [self openRealm];
+    CHECK_COUNT(OBJECT_COUNT, Person, realm);
 }
 
 #pragma mark - Logging Back In
 
 /// A Realm that was opened before a user logged out should be able to resume uploading if the user logs back in.
 - (void)testLogBackInSameRealmUpload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
     RLMRealmConfiguration *config;
     @autoreleasepool {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
         config = realm.configuration;
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         CHECK_COUNT(1, Person, realm);
@@ -1154,16 +1088,16 @@ static NSString *randomEmail() {
 
     // Verify that the post-login objects were actually synced
     XCTAssertTrue([RLMRealm deleteFilesForConfiguration:config error:nil]);
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+    RLMRealm *realm = [self openRealm];
     CHECK_COUNT(4, Person, realm);
 }
 
 /// A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
 - (void)testLogBackInSameRealmDownload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+    RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
 
     if (self.isParent) {
         [self addPersonsToRealm:realm persons:@[[Person john]]];
@@ -1187,36 +1121,29 @@ static NSString *randomEmail() {
 
 /// A Realm that was opened while a user was logged out should be able to start uploading if the user logs back in.
 - (void)testLogBackInDeferredRealmUpload {
-    NSString *partitionValue = NSStringFromSelector(_cmd);
-    RLMCredentials *credentials = [self basicCredentialsWithName:partitionValue
-                                                        register:self.isParent];
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name register:YES];
     RLMUser *user = [self logInUserForCredentials:credentials];
+    [self logOutUser:user];
 
-    if (self.isParent) {
-        [self logOutUser:user];
+    // Open a Realm after the user's been logged out.
+    RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:self.name user:user];
 
-        // Open a Realm after the user's been logged out.
-        RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:partitionValue user:user];
+    [self addPersonsToRealm:realm persons:@[[Person john]]];
+    CHECK_COUNT(1, Person, realm);
 
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
-        CHECK_COUNT(1, Person, realm);
+    [self logInUserForCredentials:credentials];
+    [self addPersonsToRealm:realm
+                    persons:@[[Person john], [Person paul], [Person ringo]]];
+    [self waitForUploadsForRealm:realm];
+    CHECK_COUNT(4, Person, realm);
 
-        user = [self logInUserForCredentials:credentials];
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john], [Person paul], [Person ringo]]];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(4, Person, realm);
-
-        RLMRunChildAndWait();
-    } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
-        CHECK_COUNT(4, Person, realm);
-    }
+    RLMRealm *realm2 = [self openRealm];
+    CHECK_COUNT(4, Person, realm2);
 }
 
 /// A Realm that was opened while a user was logged out should be able to start downloading if the user logs back in.
 - (void)testLogBackInDeferredRealmDownload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
@@ -1225,17 +1152,16 @@ static NSString *randomEmail() {
         RLMRunChildAndWait();
 
         // Open a Realm after the user's been logged out.
-        RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:self.name user:user];
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         CHECK_COUNT(1, Person, realm);
 
         user = [self logInUserForCredentials:credentials];
-        [self waitForDownloadsForUser:user
-                               realms:@[realm]
-                      partitionValues:@[NSStringFromSelector(_cmd)] expectedCounts:@[@4]];
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
 
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
         [self addPersonsToRealm:realm
                         persons:@[[Person john], [Person paul], [Person ringo]]];
         [self waitForUploadsForRealm:realm];
@@ -1246,117 +1172,98 @@ static NSString *randomEmail() {
 
 /// After logging back in, a Realm whose path has been opened for the first time should properly upload changes.
 - (void)testLogBackInOpenFirstTimePathUpload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent];
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name register:YES];
     RLMUser *user = [self logInUserForCredentials:credentials];
-    if (self.isParent) {
-        [self logOutUser:user];
-        user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                   register:NO]];
-        RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul]]];
+    [self logOutUser:user];
 
+    @autoreleasepool {
+        auto c = [user configurationWithPartitionValue:self.name];
+        c.objectClasses = @[Person.self];
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
+        [self addPersonsToRealm:realm
+                        persons:@[[Person john], [Person paul]]];
+
+        [self logInUserForCredentials:credentials];
         [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(2, Person, realm);
-        RLMRunChildAndWait();
-    } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        CHECK_COUNT(2, Person, realm);
     }
+
+    RLMRealm *realm = [self openRealm];
+    CHECK_COUNT(2, Person, realm);
 }
 
 /// After logging back in, a Realm whose path has been opened for the first time should properly download changes.
 - (void)testLogBackInOpenFirstTimePathDownload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent];
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name register:YES];
     RLMUser *user = [self logInUserForCredentials:credentials];
+    [self logOutUser:user];
 
-    if (self.isParent) {
-        [self logOutUser:user];
-        user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                   register:NO]];
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        RLMRunChildAndWait();
-        [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(2, Person, realm);
-    } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+    auto c = [user configurationWithPartitionValue:self.name];
+    c.objectClasses = @[Person.self];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
+
+    @autoreleasepool {
+        RLMRealm *realm = [self openRealm];
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person john], [Person paul]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
     }
+
+    CHECK_COUNT(0, Person, realm);
+    [self logInUserForCredentials:credentials];
+    [self waitForDownloadsForRealm:realm];
+    CHECK_COUNT(2, Person, realm);
 }
 
 /// If a client logs in, connects, logs out, and logs back in, sync should properly upload changes for a new
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmUpload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
-    if (self.isParent) {
-        @autoreleasepool {
-            RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-            [self addPersonsToRealm:realm persons:@[[Person john]]];
-            [self waitForUploadsForRealm:realm];
-            CHECK_COUNT(1, Person, realm);
-            [self logOutUser:user];
-            user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                       register:NO]];
-        }
-
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person george],
-                                  [Person ringo]]];
-        CHECK_COUNT(5, Person, realm);
+    @autoreleasepool {
+        RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
-
-        RLMRunChildAndWait();
-    } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        CHECK_COUNT(5, Person, realm);
+        CHECK_COUNT(1, Person, realm);
+        [self logOutUser:user];
+        user = [self logInUserForCredentials:credentials];
     }
+
+    RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
+    [self addPersonsToRealm:realm
+                    persons:@[[Person john], [Person paul], [Person george], [Person ringo]]];
+    CHECK_COUNT(5, Person, realm);
+    [self waitForUploadsForRealm:realm];
+
+    RLMRealm *realm2 = [self openRealmForPartitionValue:self.name user:self.createUser];
+    CHECK_COUNT(5, Person, realm2);
 }
 
 /// If a client logs in, connects, logs out, and logs back in, sync should properly download changes for a new
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmDownload {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMCredentials *credentials = [self basicCredentialsWithName:self.name
                                                         register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
-    if (self.isParent) {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
-        [self waitForUploadsForRealm:realm];
-        XCTAssert([Person allObjectsInRealm:realm].count == 1, @"Expected 1 item");
-        [self logOutUser:user];
-        user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                   register:NO]];
-        RLMRunChildAndWait();
-        // Open the Realm again and get the items.
-        realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        [self waitForDownloadsForUser:user
-                               realms:@[realm]
-                      partitionValues:@[NSStringFromSelector(_cmd)] expectedCounts:@[@5]];
-    } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-        CHECK_COUNT(1, Person, realm);
-        [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person george],
-                                  [Person ringo]]];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(5, Person, realm);
-    }
+    RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
+    [self addPersonsToRealm:realm persons:@[[Person john]]];
+    [self waitForUploadsForRealm:realm];
+    XCTAssert([Person allObjectsInRealm:realm].count == 1, @"Expected 1 item");
+    [self logOutUser:user];
+    user = [self logInUserForCredentials:credentials];
+    RLMRealm *realm2 = [self openRealmForPartitionValue:self.name user:self.createUser];
+    CHECK_COUNT(1, Person, realm2);
+    [self addPersonsToRealm:realm2
+                    persons:@[[Person john], [Person paul], [Person george], [Person ringo]]];
+    [self waitForUploadsForRealm:realm2];
+    CHECK_COUNT(5, Person, realm2);
+
+    // Open the Realm again and get the items.
+    realm = [self openRealmForPartitionValue:self.name user:user];
+    CHECK_COUNT(5, Person, realm2);
 }
 
 #pragma mark - Session suspend and resume
@@ -1399,12 +1306,10 @@ static NSString *randomEmail() {
         CHECK_COUNT(0, Person, realmA);
         CHECK_COUNT(1, Person, realmB);
         [self addPersonsToRealm:realmA
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person john], [Person paul]]];
         [self waitForUploadsForRealm:realmA];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person john], [Person paul]]];
         [self waitForUploadsForRealm:realmB];
         CHECK_COUNT(2, Person, realmA);
         CHECK_COUNT(3, Person, realmB);
@@ -1417,9 +1322,10 @@ static NSString *randomEmail() {
 - (void)testClientReset {
     RLMUser *user = [self userForTest:_cmd];
     // Open the Realm
-    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id"
-                                                                                         user:user
-                                                                              clientResetMode:RLMClientResetModeManual];
+    __attribute__((objc_precise_lifetime))
+    RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id"
+                                                  user:user
+                                       clientResetMode:RLMClientResetModeManual];
 
     __block NSError *theError = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
@@ -1441,54 +1347,60 @@ static NSString *randomEmail() {
 
 /// Test manually initiating client reset.
 - (void)testClientResetManualInitiation {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMUser *user = [self createUser];
 
     __block NSError *theError = nil;
     @autoreleasepool {
-        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user clientResetMode:RLMClientResetModeManual];
+        __attribute__((objc_precise_lifetime))
+        RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user
+                                           clientResetMode:RLMClientResetModeManual];
         XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
         self.app.syncManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
             theError = error;
             [ex fulfill];
         };
-        [user simulateClientResetErrorForSession:partitionValue];
+        [user simulateClientResetErrorForSession:self.name];
         [self waitForExpectationsWithTimeout:30 handler:nil];
         XCTAssertNotNil(theError);
     }
+
     // At this point the Realm should be invalidated and client reset should be possible.
     NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
     XCTAssertFalse([NSFileManager.defaultManager fileExistsAtPath:pathValue]);
-    [RLMSyncSession immediatelyHandleError:theError.rlmSync_errorActionToken syncManager:self.app.syncManager];
+    [RLMSyncSession immediatelyHandleError:theError.rlmSync_errorActionToken
+                               syncManager:self.app.syncManager];
     XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:pathValue]);
 }
 
 - (void)testSetClientResetMode {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMUser *user = [self createUser];
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:self.name
+                                                          clientResetMode:RLMClientResetModeDiscardLocal];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeDiscardLocal);
     #pragma clang diagnostic pop
 
     // Default is recover
-    config = [user configurationWithPartitionValue:partitionValue];
+    config = [user configurationWithPartitionValue:self.name];
     XCTAssertEqual(config.syncConfiguration.clientResetMode, RLMClientResetModeRecoverUnsyncedChanges);
 
     RLMSyncErrorReportingBlock block = ^(NSError *, RLMSyncSession *) {
         XCTFail("Should never hit");
     };
-    RLMAssertThrowsWithReason([user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardUnsyncedChanges manualClientResetHandler:block], @"A manual client reset handler can only be set with RLMClientResetModeManual");
+    RLMAssertThrowsWithReason([user configurationWithPartitionValue:self.name
+                                                    clientResetMode:RLMClientResetModeDiscardUnsyncedChanges
+                                           manualClientResetHandler:block],
+                              @"A manual client reset handler can only be set with RLMClientResetModeManual");
 }
 
 - (void)testSetClientResetCallbacks {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *partitionValue = NSStringFromSelector(_cmd);
+    RLMUser *user = [self createUser];
 
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    RLMRealmConfiguration *config = [user configurationWithPartitionValue:partitionValue clientResetMode:RLMClientResetModeDiscardLocal];
+    RLMRealmConfiguration *config = [user configurationWithPartitionValue:self.name
+                                                          clientResetMode:RLMClientResetModeDiscardLocal];
 
     XCTAssertNil(config.syncConfiguration.beforeClientReset);
     XCTAssertNil(config.syncConfiguration.afterClientReset);
@@ -1499,7 +1411,7 @@ static NSString *randomEmail() {
     RLMClientResetAfterBlock afterBlock = ^(RLMRealm *before __unused, RLMRealm *after __unused) {
         XCTAssert(false, @"Should not execute callback");
     };
-    RLMRealmConfiguration *config2 = [user configurationWithPartitionValue:partitionValue
+    RLMRealmConfiguration *config2 = [user configurationWithPartitionValue:self.name
                                                            clientResetMode:RLMClientResetModeDiscardLocal
                                                          notifyBeforeReset:beforeBlock
                                                           notifyAfterReset:afterBlock];
@@ -1516,7 +1428,6 @@ static NSString *randomEmail() {
     XCTestExpectation *beforeExpectation = [self expectationWithDescription:@"block called once"];
     syncConfig.clientResetMode = RLMClientResetModeRecoverUnsyncedChanges;
     syncConfig.beforeClientReset = ^(RLMRealm *beforeFrozen) {
-
         XCTAssertNotEqual(RLMNotVersioned, beforeFrozen->_realm->schema_version());
         [beforeExpectation fulfill];
     };
@@ -1573,14 +1484,15 @@ static NSString *randomEmail() {
 
 static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
-- (void)populateDataForUser:(RLMUser *)user partitionValue:(NSString *)partitionValue {
+- (void)populateData {
     NSURL *realmURL;
+    RLMUser *user = [self createUser];
     @autoreleasepool {
-        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
+        RLMRealm *realm = [self openRealmWithUser:user];
         realmURL = realm.configuration.fileURL;
         CHECK_COUNT(0, HugeSyncObject, realm);
         [realm beginWriteTransaction];
-        for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
+        for (NSInteger i = 0; i < NUMBER_OF_BIG_OBJECTS; i++) {
             [realm addObject:[HugeSyncObject hugeSyncObject]];
         }
         [realm commitWriteTransaction];
@@ -1592,27 +1504,19 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testStreamingDownloadNotifier {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent];
-    RLMUser *user = [self logInUserForCredentials:credentials];
+    RLMRealm *realm = [self openRealm];
+    RLMSyncSession *session = realm.syncSession;
+    XCTAssertNotNil(session);
 
-    if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
-        return;
-    }
-
+    XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
     std::atomic<NSInteger> callCount{0};
     std::atomic<NSUInteger> transferred{0};
     std::atomic<NSUInteger> transferrable{0};
     BOOL hasBeenFulfilled = NO;
-    // Register a notifier.
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-    RLMSyncSession *session = realm.syncSession;
-    XCTAssertNotNil(session);
-    XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
-    RLMNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
-                                                                          mode:RLMSyncProgressModeReportIndefinitely
-                                                                         block:[&](NSUInteger xfr, NSUInteger xfb) {
+    RLMNotificationToken *token = [session
+                                   addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
+                                   mode:RLMSyncProgressModeReportIndefinitely
+                                   block:[&](NSUInteger xfr, NSUInteger xfb) {
         // Make sure the values are increasing, and update our stored copies.
         XCTAssertGreaterThanOrEqual(xfr, transferred.load());
         XCTAssertGreaterThanOrEqual(xfb, transferrable.load());
@@ -1624,8 +1528,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
             hasBeenFulfilled = YES;
         }
     }];
-    // Wait for the child process to upload everything.
-    RLMRunChildAndWait();
+
+    [self populateData];
+
     [self waitForExpectationsWithTimeout:30.0 handler:nil];
     [token invalidate];
     // The notifier should have been called at least twice: once at the beginning and at least once
@@ -1635,19 +1540,14 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testStreamingUploadNotifier {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent];
-    RLMUser *user = [self logInUserForCredentials:credentials];
+    RLMRealm *realm = [self openRealm];
+    RLMSyncSession *session = realm.syncSession;
+    XCTAssertNotNil(session);
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"streaming-upload-expectation"];
     std::atomic<NSInteger> callCount{0};
     std::atomic<NSUInteger> transferred{0};
     std::atomic<NSUInteger> transferrable{0};
-    // Open the Realm
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-
-    // Register a notifier.
-    RLMSyncSession *session = realm.syncSession;
-    XCTAssertNotNil(session);
-    XCTestExpectation *ex = [self expectationWithDescription:@"streaming-upload-expectation"];
     auto token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionUpload
                                                          mode:RLMSyncProgressModeReportIndefinitely
                                                         block:[&](NSUInteger xfr, NSUInteger xfb) {
@@ -1661,15 +1561,18 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
             [ex fulfill];
         }
     }];
+
     // Upload lots of data
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
         [realm addObject:[HugeSyncObject hugeSyncObject]];
     }
     [realm commitWriteTransaction];
+
     // Wait for upload to begin and finish
     [self waitForExpectationsWithTimeout:30.0 handler:nil];
     [token invalidate];
+
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
     XCTAssertGreaterThan(callCount.load(), 1);
@@ -1679,12 +1582,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 #pragma mark - Download Realm
 
 - (void)testDownloadRealm {
-    const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
-    RLMUser *user = [self userForTest:_cmd];
-    [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
+    [self populateData];
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
+    RLMRealmConfiguration *c = [self configuration];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
 
     [RLMRealm asyncOpenWithConfiguration:c
@@ -1708,24 +1609,15 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testDownloadAlreadyOpenRealm {
-    const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
-    RLMUser *user = [self userForTest:_cmd];
-
-    if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
-        return;
-    }
-
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
+    RLMRealmConfiguration *c = [self configuration];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
     CHECK_COUNT(0, HugeSyncObject, realm);
     [self waitForUploadsForRealm:realm];
     [realm.syncSession suspend];
 
-    // Wait for the child process to upload everything.
-    RLMRunChildAndWait();
+    [self populateData];
 
     auto fileSize = ^NSUInteger(NSString *path) {
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
@@ -1751,25 +1643,21 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testDownloadCancelsOnAuthError {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent];
-    RLMUser *user = [self logInUserForCredentials:credentials];
-    [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
-    [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
+    auto c = [self configuration];
+    [self setInvalidTokensForUser:c.syncConfiguration.user];
     auto ex = [self expectationWithDescription:@"async open"];
-    auto c = [user configurationWithTestSelector:_cmd];
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(realm);
-        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorUnknown, @"signature is invalid");
+        RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorUnknown,
+                         @"Unable to refresh the user access token: signature is invalid");
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
 }
 
 - (void)testCancelDownload {
-    RLMUser *user = [self userForTest:_cmd];
-    [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
+    [self populateData];
 
     // Use a serial queue for asyncOpen to ensure that the first one adds
     // the completion block before the second one cancels it
@@ -1778,7 +1666,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
     ex.expectedFulfillmentCount = 2;
-    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
+    RLMRealmConfiguration *c = [self configuration];
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
@@ -1801,16 +1689,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testAsyncOpenProgressNotifications {
-    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                        register:self.isParent];
-    RLMUser *user = [self logInUserForCredentials:credentials];
-    [self populateDataForUser:user partitionValue:NSStringFromSelector(_cmd)];
+    [self populateData];
 
     XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
     XCTestExpectation *ex2 = [self expectationWithDescription:@"download progress complete"];
-    RLMRealmConfiguration *c = [user configurationWithTestSelector:_cmd];
 
-    auto task = [RLMRealm asyncOpenWithConfiguration:c
+    auto task = [RLMRealm asyncOpenWithConfiguration:self.configuration
                                        callbackQueue:dispatch_get_main_queue()
                                             callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNil(error);
@@ -1831,17 +1715,17 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [proxy startAndReturnError:&error];
     XCTAssertNil(error);
 
-    RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
-                                                                     transport:[AsyncOpenConnectionTimeoutTransport new]
-                                                                  localAppName:nil
-                                                               localAppVersion:nil
-                                                       defaultRequestTimeoutMS:60];
+    RLMAppConfiguration *config = [[RLMAppConfiguration alloc]
+                                   initWithBaseURL:@"http://localhost:9090"
+                                   transport:[AsyncOpenConnectionTimeoutTransport new]
+                                   defaultRequestTimeoutMS:60];
     RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
     timeoutOptions.connectTimeout = 1000.0;
     config.syncTimeouts = timeoutOptions;
-    NSString *appId = [RealmServer.shared createAppAndReturnError:nil];
-    RLMApp *app = [RLMApp appWithId:appId configuration:config];
-    RLMUser *user = [self logInUserForCredentials:[RLMCredentials anonymousCredentials] app:app];
+    NSString *appId = [RealmServer.shared
+                       createAppWithPartitionKeyType:@"string"
+                       types:@[Person.self] persistent:false error:nil];
+    RLMUser *user = [self createUserForApp:[RLMApp appWithId:appId configuration:config]];
 
     RLMRealmConfiguration *c = [user configurationWithPartitionValue:appId];
     c.objectClasses = @[Person.class];
@@ -1877,19 +1761,17 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:30.0 handler:nil];
 
     [proxy stop];
-    [RealmServer.shared deleteApp:appId error:nil];
 }
 
 #pragma mark - Compact on Launch
 
 - (void)testCompactOnLaunch {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *partitionValue = NSStringFromSelector(_cmd);
-    NSString *path;
+    RLMRealmConfiguration *config = self.configuration;
+    NSString *path = config.fileURL.path;
     // Create a large object and then delete it in the next transaction so that
     // the file is bloated
     @autoreleasepool {
-        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         [realm beginWriteTransaction];
         [realm addObject:[HugeSyncObject hugeSyncObject]];
         [realm commitWriteTransaction];
@@ -1898,18 +1780,15 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
-
-        path = realm.configuration.pathOnDisk;
     }
 
-    RLMWaitForRealmToClose(path);
+    RLMWaitForRealmToClose(config.fileURL.path);
 
     auto fileManager = NSFileManager.defaultManager;
     auto initialSize = [[fileManager attributesOfItemAtPath:path error:nil][NSFileSize] unsignedLongLongValue];
 
     // Reopen the file with a shouldCompactOnLaunch block and verify that it is
     // actually compacted
-    auto config = [user configurationWithTestSelector:_cmd];
     __block bool blockCalled = false;
     __block NSUInteger usedSize = 0;
     config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger used) {
@@ -1929,9 +1808,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testWriteCopy {
-    RLMUser *user = [self userForTest:_cmd];
-    NSString *partitionValue = NSStringFromSelector(_cmd);
-    RLMRealm *syncRealm = [self openRealmForPartitionValue:partitionValue user:user];
+    RLMRealm *syncRealm = [self openRealm];
     [self addPersonsToRealm:syncRealm persons:@[[Person john]]];
 
     NSError *writeError;
@@ -1955,7 +1832,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMUser *user = [self userForTest:_cmd];
 
     if (self.isParent) {
-        RLMRealmConfiguration *config = [user configurationWithTestSelector:_cmd];
+        RLMRealmConfiguration *config = [user configurationWithPartitionValue:self.name];
+        config.objectClasses = self.defaultObjectTypes;
         config.readOnly = true;
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
         CHECK_COUNT(0, Person, realm);
@@ -1963,7 +1841,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
@@ -1971,17 +1849,14 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testAddPropertyToReadOnlyRealmWithExistingLocalCopy {
-    RLMUser *user = [self userForTest:_cmd];
-
-    if (!self.isParent) {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+    @autoreleasepool {
+        RLMRealm *realm = [self openRealm];
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
-        return;
     }
-    RLMRunChildAndWait();
 
-    RLMRealmConfiguration *config = [user configurationWithTestSelector:_cmd];
+    RLMRealmConfiguration *config = [self.createUser configurationWithPartitionValue:self.name];
+    config.objectClasses = self.defaultObjectTypes;
     config.readOnly = true;
     @autoreleasepool {
         RLMRealm *realm = [self asyncOpenRealmWithConfiguration:config];
@@ -2004,17 +1879,14 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testAddPropertyToReadOnlyRealmWithAsyncOpen {
-    RLMUser *user = [self userForTest:_cmd];
-
-    if (!self.isParent) {
-        RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
+    @autoreleasepool {
+        RLMRealm *realm = [self openRealm];
         [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
-        return;
     }
-    RLMRunChildAndWait();
+    [self.app.syncManager waitForSessionTermination];
 
-    RLMRealmConfiguration *config = [user configurationWithTestSelector:_cmd];
+    RLMRealmConfiguration *config = [self configuration];
     config.readOnly = true;
 
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:Person.class];
@@ -2024,20 +1896,17 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     @autoreleasepool {
         NSError *error = [self asyncOpenErrorWithConfiguration:config];
-        XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'Person.dataProp' has been added."].location,
-                          NSNotFound);
+        XCTAssert([error.localizedDescription containsString:@"Property 'Person.dataProp' has been added."]);
     }
 }
 
 - (void)testSyncConfigShouldNotMigrate {
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealm *realm = [self openRealmForPartitionValue:NSStringFromSelector(_cmd) user:user];
-
-    RLMAssertThrowsWithReason([realm.configuration setDeleteRealmIfMigrationNeeded:YES],
+    RLMRealm *realm = [self openRealm];
+    RLMAssertThrowsWithReason(realm.configuration.deleteRealmIfMigrationNeeded = YES,
                               @"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled");
 
     RLMRealmConfiguration *localRealmConfiguration = [RLMRealmConfiguration defaultConfiguration];
-    XCTAssertNoThrow([localRealmConfiguration setDeleteRealmIfMigrationNeeded:YES]);
+    XCTAssertNoThrow(localRealmConfiguration.deleteRealmIfMigrationNeeded = YES);
 }
 
 #pragma mark - Write Copy For Configuration
@@ -2047,8 +1916,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     localConfig.objectClasses = @[Person.class];
     localConfig.fileURL = RLMTestRealmURL();
 
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealmConfiguration *syncConfig = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMRealmConfiguration *syncConfig = self.configuration;
     syncConfig.objectClasses = @[Person.class];
 
     RLMRealm *localRealm = [RLMRealm realmWithConfiguration:localConfig error:nil];
@@ -2073,13 +1941,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testWriteCopyForConfigurationSyncToSyncRealmError {
-    RLMUser *user = [self userForTest:_cmd];
-    RLMRealmConfiguration *syncConfig = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
-    syncConfig.objectClasses = @[Person.class];
-
-    RLMUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"SyncToSyncUser"
-                                                                         register:YES]];
-    RLMRealmConfiguration *syncConfig2 = [user2 configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMRealmConfiguration *syncConfig = self.configuration;
+    RLMRealmConfiguration *syncConfig2 = self.configuration;
 
     RLMRealm *syncedRealm = [RLMRealm realmWithConfiguration:syncConfig error:nil];
     [syncedRealm.syncSession suspend];
@@ -2090,12 +1953,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSError *error;
     [syncedRealm writeCopyForConfiguration:syncConfig2 error:&error];
     XCTAssertEqual(error.code, RLMErrorFail);
-    XCTAssertEqualObjects(error.localizedDescription, @"All client changes must be integrated in server before writing copy");
+    XCTAssertEqualObjects(error.localizedDescription,
+                          @"All client changes must be integrated in server before writing copy");
 }
 
 - (void)testWriteCopyForConfigurationLocalRealmForSyncWithExistingData {
-    RLMUser *initialUser = [self userForTest:_cmd];
-    RLMRealmConfiguration *initialSyncConfig = [initialUser configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMRealmConfiguration *initialSyncConfig = self.configuration;
     initialSyncConfig.objectClasses = @[Person.class];
 
     // Make sure objects with confliciting primary keys sync ok.
@@ -2114,9 +1977,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     localConfig.objectClasses = @[Person.class];
     localConfig.fileURL = RLMTestRealmURL();
 
-    RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:@"SyncWithExistingDataUser"
-                                                                        register:YES]];
-    RLMRealmConfiguration *syncConfig = [user configurationWithPartitionValue:NSStringFromSelector(_cmd)];
+    RLMRealmConfiguration *syncConfig = self.configuration;
     syncConfig.objectClasses = @[Person.class];
 
     RLMRealm *localRealm = [RLMRealm realmWithConfiguration:localConfig error:nil];
@@ -2146,728 +2007,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSPredicate *p = [NSPredicate predicateWithFormat:@"firstName = 'John' AND lastName = 'Doe' AND _id = %@", conflictingObjectId];
     XCTAssertEqual([syncedResults objectsWithPredicate:p].count, 1U);
     XCTAssertEqual([syncedRealm allObjects:@"Person"].count, 4U);
-}
-
-@end
-
-#pragma mark - Mongo Client
-
-@interface RLMMongoClientTests : RLMSyncTestCase
-@end
-
-@implementation RLMMongoClientTests
-- (void)tearDown {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-    [self cleanupRemoteDocuments:collection];
-    [super tearDown];
-}
-
-- (void)testFindOneAndModifyOptions {
-    NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
-    NSArray<id<RLMBSON>> *sorting = @[@{@"age": @1}, @{@"coat": @1}];
-
-    RLMFindOneAndModifyOptions *findOneAndModifyOptions1 = [[RLMFindOneAndModifyOptions alloc] init];
-    XCTAssertNil(findOneAndModifyOptions1.projection);
-    XCTAssertEqual(findOneAndModifyOptions1.sorting.count, 0U);
-    XCTAssertFalse(findOneAndModifyOptions1.shouldReturnNewDocument);
-    XCTAssertFalse(findOneAndModifyOptions1.upsert);
-
-    RLMFindOneAndModifyOptions *findOneAndModifyOptions2 = [[RLMFindOneAndModifyOptions alloc] init];
-    findOneAndModifyOptions2.projection = projection;
-    findOneAndModifyOptions2.sorting = sorting;
-    findOneAndModifyOptions2.shouldReturnNewDocument = YES;
-    findOneAndModifyOptions2.upsert = YES;
-    XCTAssertNotNil(findOneAndModifyOptions2.projection);
-    XCTAssertEqual(findOneAndModifyOptions2.sorting.count, 2U);
-    XCTAssertTrue(findOneAndModifyOptions2.shouldReturnNewDocument);
-    XCTAssertTrue(findOneAndModifyOptions2.upsert);
-    XCTAssertFalse([findOneAndModifyOptions2.projection isEqual:@{}]);
-    XCTAssertTrue([findOneAndModifyOptions2.projection isEqual:projection]);
-    XCTAssertFalse([findOneAndModifyOptions2.sorting isEqual:@{}]);
-    XCTAssertTrue([findOneAndModifyOptions2.sorting isEqual:sorting]);
-
-    RLMFindOneAndModifyOptions *findOneAndModifyOptions3 = [[RLMFindOneAndModifyOptions alloc]
-                                                            initWithProjection:projection
-                                                            sorting:sorting
-                                                            upsert:YES
-                                                            shouldReturnNewDocument:YES];
-    XCTAssertNotNil(findOneAndModifyOptions3.projection);
-    XCTAssertEqual(findOneAndModifyOptions3.sorting.count, 2U);
-    XCTAssertTrue(findOneAndModifyOptions3.shouldReturnNewDocument);
-    XCTAssertTrue(findOneAndModifyOptions3.upsert);
-    XCTAssertFalse([findOneAndModifyOptions3.projection isEqual:@{}]);
-    XCTAssertTrue([findOneAndModifyOptions3.projection isEqual:projection]);
-    XCTAssertFalse([findOneAndModifyOptions3.sorting isEqual:@{}]);
-    XCTAssertTrue([findOneAndModifyOptions3.sorting isEqual:sorting]);
-
-    findOneAndModifyOptions3.projection = nil;
-    findOneAndModifyOptions3.sorting = @[];
-    XCTAssertNil(findOneAndModifyOptions3.projection);
-    XCTAssertEqual(findOneAndModifyOptions3.sorting.count, 0U);
-    XCTAssertTrue([findOneAndModifyOptions3.sorting isEqual:@[]]);
-
-    RLMFindOneAndModifyOptions *findOneAndModifyOptions4 = [[RLMFindOneAndModifyOptions alloc]
-                                                            initWithProjection:nil
-                                                            sorting:@[]
-                                                            upsert:NO
-                                                            shouldReturnNewDocument:NO];
-    XCTAssertNil(findOneAndModifyOptions4.projection);
-    XCTAssertEqual(findOneAndModifyOptions4.sorting.count, 0U);
-    XCTAssertFalse(findOneAndModifyOptions4.upsert);
-    XCTAssertFalse(findOneAndModifyOptions4.shouldReturnNewDocument);
-}
-
-- (void)testFindOptions {
-    NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
-    NSArray<id<RLMBSON>> *sorting = @[@{@"age": @1}, @{@"coat": @1}];
-
-    RLMFindOptions *findOptions1 = [[RLMFindOptions alloc] init];
-    XCTAssertNil(findOptions1.projection);
-    XCTAssertEqual(findOptions1.sorting.count, 0U);
-    XCTAssertEqual(findOptions1.limit, 0);
-
-    findOptions1.limit = 37;
-    findOptions1.projection = projection;
-    findOptions1.sorting = sorting;
-    XCTAssertEqual(findOptions1.limit, 37);
-    XCTAssertTrue([findOptions1.projection isEqual:projection]);
-    XCTAssertEqual(findOptions1.sorting.count, 2U);
-    XCTAssertTrue([findOptions1.sorting isEqual:sorting]);
-
-    RLMFindOptions *findOptions2 = [[RLMFindOptions alloc] initWithProjection:projection
-                                                                      sorting:sorting];
-    XCTAssertTrue([findOptions2.projection isEqual:projection]);
-    XCTAssertEqual(findOptions2.sorting.count, 2U);
-    XCTAssertEqual(findOptions2.limit, 0);
-    XCTAssertTrue([findOptions2.sorting isEqual:sorting]);
-
-    RLMFindOptions *findOptions3 = [[RLMFindOptions alloc] initWithLimit:37
-                                                              projection:projection
-                                                                 sorting:sorting];
-    XCTAssertTrue([findOptions3.projection isEqual:projection]);
-    XCTAssertEqual(findOptions3.sorting.count, 2U);
-    XCTAssertEqual(findOptions3.limit, 37);
-    XCTAssertTrue([findOptions3.sorting isEqual:sorting]);
-
-    findOptions3.projection = nil;
-    findOptions3.sorting = @[];
-    XCTAssertNil(findOptions3.projection);
-    XCTAssertEqual(findOptions3.sorting.count, 0U);
-
-    RLMFindOptions *findOptions4 = [[RLMFindOptions alloc] initWithProjection:nil
-                                                                      sorting:@[]];
-    XCTAssertNil(findOptions4.projection);
-    XCTAssertEqual(findOptions4.sorting.count, 0U);
-    XCTAssertEqual(findOptions4.limit, 0);
-}
-
-- (void)testMongoInsert {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    XCTestExpectation *insertOneExpectation = [self expectationWithDescription:@"should insert one document"];
-    [collection insertOneDocument:@{@"name": @"fido", @"breed": @"cane corso"} completion:^(id<RLMBSON> objectId, NSError *error) {
-        XCTAssertEqual(objectId.bsonType, RLMBSONTypeObjectId);
-        XCTAssertNotEqualObjects(((RLMObjectId *)objectId).stringValue, @"");
-        XCTAssertNil(error);
-        [insertOneExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-    [collection insertManyDocuments:@[
-        @{@"name": @"fido", @"breed": @"cane corso"},
-        @{@"name": @"fido", @"breed": @"cane corso"},
-        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-                         completion:^(NSArray<id<RLMBSON>> *objectIds, NSError *error) {
-        XCTAssertGreaterThan(objectIds.count, 0U);
-        XCTAssertNil(error);
-        [insertManyExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sorting:@[]];
-    [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
-                  options:options
-               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertEqual(documents.count, 3U);
-        XCTAssertNil(error);
-        [findExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-}
-
-- (void)testMongoFind {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-    [collection insertManyDocuments:@[
-        @{@"name": @"fido", @"breed": @"cane corso"},
-        @{@"name": @"fido", @"breed": @"cane corso"},
-        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-                         completion:^(NSArray<id<RLMBSON>> *objectIds, NSError *error) {
-        XCTAssertGreaterThan(objectIds.count, 0U);
-        XCTAssertNil(error);
-        [insertManyExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sorting:@[]];
-    [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
-                  options:options
-               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertEqual(documents.count, 2U);
-        XCTAssertNil(error);
-        [findExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findExpectation2 = [self expectationWithDescription:@"should find documents"];
-    [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
-               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertEqual(documents.count, 2U);
-        XCTAssertNil(error);
-        [findExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findExpectation3 = [self expectationWithDescription:@"should not find documents"];
-    [collection findWhere:@{@"name": @"should not exist", @"breed": @"should not exist"}
-               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertEqual(documents.count, NSUInteger(0));
-        XCTAssertNil(error);
-        [findExpectation3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findExpectation4 = [self expectationWithDescription:@"should not find documents"];
-    [collection findWhere:@{}
-               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertGreaterThan(documents.count, 0U);
-        XCTAssertNil(error);
-        [findExpectation4 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findOneExpectation1 = [self expectationWithDescription:@"should find documents"];
-    [collection findOneDocumentWhere:@{@"name": @"fido", @"breed": @"cane corso"}
-                          completion:^(NSDictionary *document, NSError *error) {
-        XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
-        XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
-        XCTAssertNil(error);
-        [findOneExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findOneExpectation2 = [self expectationWithDescription:@"should find documents"];
-    [collection findOneDocumentWhere:@{@"name": @"fido", @"breed": @"cane corso"}
-                             options:options
-                          completion:^(NSDictionary *document, NSError *error) {
-        XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
-        XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
-        XCTAssertNil(error);
-        [findOneExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-}
-
-- (void)testMongoAggregateAndCount {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-    [collection insertManyDocuments:@[
-        @{@"name": @"fido", @"breed": @"cane corso"},
-        @{@"name": @"fido", @"breed": @"cane corso"},
-        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-                         completion:^(NSArray<id<RLMBSON>> *objectIds, NSError *error) {
-        XCTAssertEqual(objectIds.count, 3U);
-        XCTAssertNil(error);
-        [insertManyExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *aggregateExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
-    [collection aggregateWithPipeline:@[@{@"name" : @"fido"}]
-                           completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        RLMValidateErrorContains(error, RLMAppErrorDomain, RLMAppErrorMongoDBError,
-                                 @"Unrecognized pipeline stage name: 'name'");
-        XCTAssertNil(documents);
-        [aggregateExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *aggregateExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
-    [collection aggregateWithPipeline:@[@{@"$match" : @{@"name" : @"fido"}}, @{@"$group" : @{@"_id" : @"$name"}}]
-                           completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(documents);
-        XCTAssertGreaterThan(documents.count, 0U);
-        [aggregateExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *countExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
-    [collection countWhere:@{@"name" : @"fido"}
-                completion:^(NSInteger count, NSError *error) {
-        XCTAssertGreaterThan(count, 0);
-        XCTAssertNil(error);
-        [countExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *countExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
-    [collection countWhere:@{@"name" : @"fido"}
-                     limit:1
-                completion:^(NSInteger count, NSError *error) {
-        XCTAssertEqual(count, 1);
-        XCTAssertNil(error);
-        [countExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-}
-
-- (void)testMongoUpdate {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    XCTestExpectation *updateExpectation1 = [self expectationWithDescription:@"should update document"];
-    [collection updateOneDocumentWhere:@{@"name" : @"scrabby doo"}
-                        updateDocument:@{@"name" : @"scooby"}
-                                upsert:YES
-                            completion:^(RLMUpdateResult *result, NSError *error) {
-        XCTAssertNotNil(result);
-        XCTAssertNotNil(result.documentId);
-        XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
-        XCTAssertEqual(result.matchedCount, (NSUInteger)0);
-        XCTAssertNil(error);
-        [updateExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *updateExpectation2 = [self expectationWithDescription:@"should update document"];
-    [collection updateOneDocumentWhere:@{@"name" : @"scooby"}
-                        updateDocument:@{@"name" : @"fred"}
-                                upsert:NO
-                            completion:^(RLMUpdateResult *result, NSError *error) {
-        XCTAssertNotNil(result);
-        XCTAssertNil(result.documentId);
-        XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
-        XCTAssertEqual(result.matchedCount, (NSUInteger)1);
-        XCTAssertNil(error);
-        [updateExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *updateExpectation3 = [self expectationWithDescription:@"should update document"];
-    [collection updateOneDocumentWhere:@{@"name" : @"fred"}
-                        updateDocument:@{@"name" : @"scrabby"}
-                            completion:^(RLMUpdateResult *result, NSError *error) {
-        XCTAssertNotNil(result);
-        XCTAssertNil(result.documentId);
-        XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
-        XCTAssertEqual(result.matchedCount, (NSUInteger)1);
-        XCTAssertNil(error);
-        [updateExpectation3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *updateManyExpectation1 = [self expectationWithDescription:@"should update many documents"];
-    [collection updateManyDocumentsWhere:@{@"name" : @"scrabby"}
-                          updateDocument:@{@"name" : @"fred"}
-                              completion:^(RLMUpdateResult *result, NSError *error) {
-        XCTAssertNotNil(result);
-        XCTAssertNil(result.documentId);
-        XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
-        XCTAssertEqual(result.matchedCount, (NSUInteger)1);
-        XCTAssertNil(error);
-        [updateManyExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *updateManyExpectation2 = [self expectationWithDescription:@"should update many documents"];
-    [collection updateManyDocumentsWhere:@{@"name" : @"john"}
-                          updateDocument:@{@"name" : @"alex"}
-                                  upsert:YES
-                              completion:^(RLMUpdateResult *result, NSError *error) {
-        XCTAssertNotNil(result);
-        XCTAssertNotNil(result.documentId);
-        XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
-        XCTAssertEqual(result.matchedCount, (NSUInteger)0);
-        XCTAssertNil(error);
-        [updateManyExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-}
-
-- (void)testMongoFindAndModify {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    NSArray<id<RLMBSON>> *sorting = @[@{@"name": @1}, @{@"breed": @1}];
-    RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc]
-                                                        initWithProjection:@{@"name" : @1, @"breed" : @1}
-                                                        sorting:sorting
-                                                        upsert:YES
-                                                        shouldReturnNewDocument:YES];
-
-    XCTestExpectation *findOneAndUpdateExpectation1 = [self expectationWithDescription:@"should find one document and update"];
-    [collection findOneAndUpdateWhere:@{@"name" : @"alex"}
-                       updateDocument:@{@"name" : @"max"}
-                              options:findAndModifyOptions
-                           completion:^(NSDictionary *document, NSError *error) {
-        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-        XCTAssertNil(error);
-        [findOneAndUpdateExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findOneAndUpdateExpectation2 = [self expectationWithDescription:@"should find one document and update"];
-    [collection findOneAndUpdateWhere:@{@"name" : @"max"}
-                       updateDocument:@{@"name" : @"john"}
-                           completion:^(NSDictionary *document, NSError *error) {
-        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-        XCTAssertNil(error);
-        [findOneAndUpdateExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findOneAndReplaceExpectation1 = [self expectationWithDescription:@"should find one document and replace"];
-    [collection findOneAndReplaceWhere:@{@"name" : @"alex"}
-                   replacementDocument:@{@"name" : @"max"}
-                               options:findAndModifyOptions
-                            completion:^(NSDictionary *document, NSError *error) {
-        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-        XCTAssertNil(error);
-        [findOneAndReplaceExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findOneAndReplaceExpectation2 = [self expectationWithDescription:@"should find one document and replace"];
-    [collection findOneAndReplaceWhere:@{@"name" : @"max"}
-                   replacementDocument:@{@"name" : @"john"}
-                            completion:^(NSDictionary *document, NSError *error) {
-        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-        XCTAssertNil(error);
-        [findOneAndReplaceExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-}
-
-- (void)testMongoDelete {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
-    RLMObjectId *rexObjectId = objectIds[1];
-
-    XCTestExpectation *deleteOneExpectation1 = [self expectationWithDescription:@"should delete first document in collection"];
-    [collection deleteOneDocumentWhere:@{@"_id" : rexObjectId}
-                            completion:^(NSInteger count, NSError *error) {
-        XCTAssertEqual(count, 1);
-        XCTAssertNil(error);
-        [deleteOneExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findExpectation1 = [self expectationWithDescription:@"should find documents"];
-    [collection findWhere:@{}
-               completion:^(NSArray<NSDictionary *> *documents, NSError *error) {
-        XCTAssertEqual(documents.count, 2U);
-        XCTAssertTrue([documents[0][@"name"] isEqualToString:@"fido"]);
-        XCTAssertNil(error);
-        [findExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *deleteManyExpectation1 = [self expectationWithDescription:@"should delete many documents"];
-    [collection deleteManyDocumentsWhere:@{@"name" : @"rex"}
-                              completion:^(NSInteger count, NSError *error) {
-        XCTAssertEqual(count, 0U);
-        XCTAssertNil(error);
-        [deleteManyExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *deleteManyExpectation2 = [self expectationWithDescription:@"should delete many documents"];
-    [collection deleteManyDocumentsWhere:@{@"breed" : @"cane corso"}
-                              completion:^(NSInteger count, NSError *error) {
-        XCTAssertEqual(count, 1);
-        XCTAssertNil(error);
-        [deleteManyExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findOneAndDeleteExpectation1 = [self expectationWithDescription:@"should find one and delete"];
-    [collection findOneAndDeleteWhere:@{@"name": @"john"}
-                           completion:^(NSDictionary<NSString *, id<RLMBSON>> *document, NSError *error) {
-        XCTAssertNotNil(document);
-        NSString *name = (NSString *)document[@"name"];
-        XCTAssertTrue([name isEqualToString:@"john"]);
-        XCTAssertNil(error);
-        [findOneAndDeleteExpectation1 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    XCTestExpectation *findOneAndDeleteExpectation2 = [self expectationWithDescription:@"should find one and delete"];
-    NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
-    NSArray<id<RLMBSON>> *sortDescriptors = @[@{@"_id": @1}, @{@"breed": @1}];
-    RLMFindOneAndModifyOptions *findOneAndModifyOptions = [[RLMFindOneAndModifyOptions alloc]
-                                                           initWithProjection:projection
-                                                           sorting:sortDescriptors
-                                                           upsert:YES
-                                                           shouldReturnNewDocument:YES];
-
-    [collection findOneAndDeleteWhere:@{@"name": @"john"}
-                              options:findOneAndModifyOptions
-                           completion:^(NSDictionary<NSString *, id<RLMBSON>> *document, NSError *error) {
-        XCTAssertNil(document);
-        // FIXME: when a projection is used, the server reports the error
-        // "expected pre-image to match projection matcher" when there are no
-        // matches, rather than simply doing nothing like when there is no projection
-//        XCTAssertNil(error);
-        (void)error;
-        [findOneAndDeleteExpectation2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-}
-
-#pragma mark - Watch
-
-- (void)testWatch {
-    [self performWatchTest:nil];
-}
-
-- (void)testWatchAsync {
-    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
-    [self performWatchTest:asyncQueue];
-}
-
-- (void)performWatchTest:(nullable dispatch_queue_t)delegateQueue {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
-
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    __block RLMWatchTestUtility *testUtility =
-        [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
-                                                  expectation:expectation];
-
-    __block RLMChangeStream *changeStream = [collection watchWithDelegate:testUtility delegateQueue:delegateQueue];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        WAIT_FOR_SEMAPHORE(testUtility.isOpenSemaphore, 30.0);
-        for (int i = 0; i < 3; i++) {
-            [collection insertOneDocument:@{@"name": @"fido"} completion:^(id<RLMBSON> objectId, NSError *error) {
-                XCTAssertNil(error);
-                XCTAssertNotNil(objectId);
-            }];
-            WAIT_FOR_SEMAPHORE(testUtility.semaphore, 30.0);
-        }
-        [changeStream close];
-    });
-
-    [self waitForExpectations:@[expectation] timeout:60.0];
-}
-
-- (void)testWatchWithMatchFilter {
-    [self performWatchWithMatchFilterTest:nil];
-}
-
-- (void)testWatchWithMatchFilterAsync {
-    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
-    [self performWatchWithMatchFilterTest:asyncQueue];
-}
-
-- (NSArray<RLMObjectId *> *)prepareDogDocumentsIn:(RLMMongoCollection *)collection {
-    __block NSArray<RLMObjectId *> *objectIds;
-    XCTestExpectation *ex = [self expectationWithDescription:@"delete existing documents"];
-    [collection deleteManyDocumentsWhere:@{} completion:^(NSInteger, NSError *error) {
-        XCTAssertNil(error);
-        [ex fulfill];
-    }];
-    [self waitForExpectations:@[ex] timeout:60.0];
-
-    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert documents"];
-    [collection insertManyDocuments:@[
-        @{@"name": @"fido", @"breed": @"cane corso"},
-        @{@"name": @"rex", @"breed": @"tibetan mastiff"},
-        @{@"name": @"john", @"breed": @"tibetan mastiff"}]
-                         completion:^(NSArray<id<RLMBSON>> *ids, NSError *error) {
-        XCTAssertEqual(ids.count, 3U);
-        for (id<RLMBSON> objectId in ids) {
-            XCTAssertEqual(objectId.bsonType, RLMBSONTypeObjectId);
-        }
-        XCTAssertNil(error);
-        objectIds = (NSArray *)ids;
-        [insertManyExpectation fulfill];
-    }];
-    [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
-    return objectIds;
-}
-
-- (void)performWatchWithMatchFilterTest:(nullable dispatch_queue_t)delegateQueue {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
-
-    __block RLMWatchTestUtility *testUtility =
-        [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
-                                             matchingObjectId:objectIds[0]
-                                                  expectation:expectation];
-
-    __block RLMChangeStream *changeStream = [collection watchWithMatchFilter:@{@"fullDocument._id": objectIds[0]}
-                                                                    delegate:testUtility
-                                                               delegateQueue:delegateQueue];
-
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        WAIT_FOR_SEMAPHORE(testUtility.isOpenSemaphore, 30.0);
-        for (int i = 0; i < 3; i++) {
-            [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
-                                updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult *, NSError *error) {
-                XCTAssertNil(error);
-            }];
-
-            [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
-                                updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult *, NSError *error) {
-                XCTAssertNil(error);
-            }];
-            WAIT_FOR_SEMAPHORE(testUtility.semaphore, 30.0);
-        }
-        [changeStream close];
-    });
-    [self waitForExpectations:@[expectation] timeout:60.0];
-}
-
-- (void)testWatchWithFilterIds {
-    [self performWatchWithFilterIdsTest:nil];
-}
-
-- (void)testWatchWithFilterIdsAsync {
-    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
-    [self performWatchWithFilterIdsTest:asyncQueue];
-}
-
-- (void)performWatchWithFilterIdsTest:(nullable dispatch_queue_t)delegateQueue {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
-
-    __block RLMWatchTestUtility *testUtility =
-        [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
-                                             matchingObjectId:objectIds[0]
-                                                  expectation:expectation];
-
-    __block RLMChangeStream *changeStream = [collection watchWithFilterIds:@[objectIds[0]]
-                                                                  delegate:testUtility
-                                                             delegateQueue:delegateQueue];
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        WAIT_FOR_SEMAPHORE(testUtility.isOpenSemaphore, 30.0);
-        for (int i = 0; i < 3; i++) {
-            [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
-                                updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult *, NSError *error) {
-                XCTAssertNil(error);
-            }];
-
-            [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
-                                updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult *, NSError *error) {
-                XCTAssertNil(error);
-            }];
-            WAIT_FOR_SEMAPHORE(testUtility.semaphore, 30.0);
-        }
-        [changeStream close];
-    });
-
-    [self waitForExpectations:@[expectation] timeout:60.0];
-}
-
-- (void)testMultipleWatchStreams {
-    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
-    [self performMultipleWatchStreamsTest:asyncQueue];
-}
-
-- (void)testMultipleWatchStreamsAsync {
-    [self performMultipleWatchStreamsTest:nil];
-}
-
-- (void)performMultipleWatchStreamsTest:(nullable dispatch_queue_t)delegateQueue {
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-    NSArray<RLMObjectId *> *objectIds = [self prepareDogDocumentsIn:collection];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
-    expectation.expectedFulfillmentCount = 2;
-
-    __block RLMWatchTestUtility *testUtility1 =
-        [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
-                                             matchingObjectId:objectIds[0]
-                                                  expectation:expectation];
-
-    __block RLMWatchTestUtility *testUtility2 =
-        [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
-                                             matchingObjectId:objectIds[1]
-                                                  expectation:expectation];
-
-    __block RLMChangeStream *changeStream1 = [collection watchWithFilterIds:@[objectIds[0]]
-                                                                   delegate:testUtility1
-                                                              delegateQueue:delegateQueue];
-
-    __block RLMChangeStream *changeStream2 = [collection watchWithFilterIds:@[objectIds[1]]
-                                                                   delegate:testUtility2
-                                                              delegateQueue:delegateQueue];
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        WAIT_FOR_SEMAPHORE(testUtility1.isOpenSemaphore, 30.0);
-        WAIT_FOR_SEMAPHORE(testUtility2.isOpenSemaphore, 30.0);
-        for (int i = 0; i < 3; i++) {
-            [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
-                                updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult *, NSError *error) {
-                XCTAssertNil(error);
-            }];
-
-            [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
-                                updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult *, NSError *error) {
-                XCTAssertNil(error);
-            }];
-
-            [collection updateOneDocumentWhere:@{@"_id": objectIds[2]}
-                                updateDocument:@{@"breed": @"german shepard", @"name": [NSString stringWithFormat:@"fido-%d", i]}
-                                    completion:^(RLMUpdateResult *, NSError *error) {
-                XCTAssertNil(error);
-            }];
-            WAIT_FOR_SEMAPHORE(testUtility1.semaphore, 30.0);
-            WAIT_FOR_SEMAPHORE(testUtility2.semaphore, 30.0);
-        }
-        [changeStream1 close];
-        [changeStream2 close];
-    });
-
-    [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
 #pragma mark - File paths

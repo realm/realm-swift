@@ -20,3 +20,4 @@
 #import "RLMChildProcessEnvironment.h"
 #import "RLMUser+ObjectServerTests.h"
 #import "RLMApp_Private.h"
+#import "TestUtils.h"

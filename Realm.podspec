@@ -30,6 +30,7 @@ Pod::Spec.new do |s|
                               'include/RLMDecimal128.h',
                               'include/RLMDictionary.h',
                               'include/RLMEmbeddedObject.h',
+                              'include/RLMGeospatial.h',
                               'include/RLMError.h',
                               'include/RLMLogger.h',
                               'include/RLMMigration.h',
@@ -126,7 +127,6 @@ Pod::Spec.new do |s|
                                 'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',
                                 'CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF' => 'NO',
                                 'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden',
-                                'OTHER_CPLUSPLUSFLAGS[arch=armv7]' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden -fno-aligned-new',
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"',
 
                                 'IPHONEOS_DEPLOYMENT_TARGET_1400' => '11.0',
@@ -141,8 +141,14 @@ Pod::Spec.new do |s|
                                 'TVOS_DEPLOYMENT_TARGET_1400' => '11.0',
                                 'TVOS_DEPLOYMENT_TARGET_1500' => '12.0',
                                 'TVOS_DEPLOYMENT_TARGET' => '$(TVOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
+
+                                'REALM_LD_CLASSIC_1400' => '',
+                                'REALM_LD_CLASSIC_1500' => '-Wl,-ld_classic',
+                                'REALM_LD_CLASSIC' => '$(REALM_LD_CLASSIC_$(XCODE_VERSION_MAJOR))',
+                                'OTHER_LDFLAGS' => '$(REALM_LD_CLASSIC) "-Wl,-unexported_symbols_list,${PODS_ROOT}/Realm/Configuration/Realm/PrivateSymbols.txt"',
                               }
-  s.preserve_paths          = %w(include scripts)
+  s.preserve_paths          = %w(include scripts Configuration/Realm/PrivateSymbols.txt)
+  s.resource_bundles        = {'realm_objc_privacy' => ['Realm/PrivacyInfo.xcprivacy']}
 
   s.ios.deployment_target   = '11.0'
   s.osx.deployment_target   = '10.13'

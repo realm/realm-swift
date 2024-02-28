@@ -34,7 +34,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
  the code which uses the Realm within an `autoreleasepool {}` and ensure you have no other strong
  references to it.
 
- - warning Non-frozen `RLMRealm` instances are thread-confined and cannot be
+ - warning: Non-frozen `RLMRealm` instances are thread-confined and cannot be
  shared across threads or dispatch queues. Trying to do so will cause an
  exception to be thrown. You must obtain an instance of `RLMRealm` on each
  thread or queue you want to interact with the Realm on. Realms can be confined
@@ -388,7 +388,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     /**
      Asynchronously performs actions contained within the given block inside a write transaction.
      The write transaction is begun asynchronously as if calling `beginAsyncWrite`,
-     and by default the transaction is commited asynchronously after the block completes.
+     and by default the transaction is committed asynchronously after the block completes.
      You can also explicitly call `commitWrite` or `cancelWrite` from
      within the block to synchronously commit or cancel the write transaction.
      Returning without one of these calls is equivalent to calling `commitWrite`.
@@ -482,7 +482,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      This becomes `true` following a call to `beginAsyncWrite`, `commitAsyncWrite`,
      or `writeAsync`, and remains so until all scheduled async write work has completed.
 
-     @warning If this is `true`, closing or invalidating the Realm will block until scheduled work has completed.
+     - warning: If this is `true`, closing or invalidating the Realm will block until scheduled work has completed.
      */
     public var isPerformingAsynchronousWriteOperations: Bool {
         return rlmRealm.isPerformingAsynchronousWriteOperations
@@ -1101,7 +1101,6 @@ extension Realm {
      - returns: A `SyncSubscriptionSet`.
      - Warning: This feature is currently in beta and its API is subject to change.
      */
-    @available(*, message: "This feature is currently in beta.")
     public var subscriptions: SyncSubscriptionSet {
         return SyncSubscriptionSet(rlmRealm.subscriptions)
     }
@@ -1494,7 +1493,7 @@ internal extension Actor {
     }
 
     // A helper to invoke a regular isolated sendable function with this actor
-    func invoke<T>(_ fn: @Sendable (isolated Self) async throws -> T) async rethrows -> T {
+    func invoke<T: Sendable>(_ fn: @Sendable (isolated Self) async throws -> T) async rethrows -> T {
         try await fn(self)
     }
 }

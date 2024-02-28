@@ -821,7 +821,7 @@ public extension SyncSession {
      Progress notification blocks can be registered on sessions if your app wishes to be informed
      how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
      */
-    enum ProgressDirection {
+    enum ProgressDirection: Sendable {
         /// For monitoring upload progress.
         case upload
         /// For monitoring download progress.
@@ -834,7 +834,7 @@ public extension SyncSession {
      Progress notification blocks can be registered on sessions if your app wishes to be informed
      how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
      */
-    enum ProgressMode {
+    enum ProgressMode: Sendable {
         /**
          The block will be called forever, or until it is unregistered by calling
          `ProgressNotificationToken.invalidate()`.
@@ -941,6 +941,50 @@ public extension SyncSession {
                                             ? .reportIndefinitely
                                             : .forCurrentlyOutstandingWork)) { transferred, transferrable in
                                                 block(Progress(transferred: transferred, transferrable: transferrable))
+        }
+    }
+
+    /**
+     Wait for pending uploads or downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
+     - parameter direction: The transfer direction (upload or download) to wait for.
+     - parameter queue:     The queue to dispatch the callback onto.
+     - parameter block:     The block to invoke when waiting is complete.
+
+     - see: `ProgressDirection`
+     - warning: This method is not meant to be used except in special cases, notably for testing.
+     */
+    func wait(for direction: ProgressDirection,
+              queue: DispatchQueue? = nil,
+              block: @Sendable @escaping (Error?) -> Void) {
+        switch direction {
+        case .upload:
+            __waitForUploadCompletion(on: queue) { error in
+                block(error)
+            }
+        case .download:
+            __waitForDownloadCompletion(on: queue) { error in
+                block(error)
+            }
+        }
+    }
+
+    /**
+     Wait for pending uploads or downloads to complete or the session to expire.
+     - parameter direction: The transfer direction (upload or download) to wait for.
+
+     - see: `ProgressDirection`
+     - warning: This method is not meant to be used except in special cases, notably for testing.
+     */
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    func wait(for direction: ProgressDirection) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            wait(for: direction) { error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
         }
     }
 }

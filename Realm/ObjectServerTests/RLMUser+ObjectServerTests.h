@@ -21,8 +21,6 @@
 RLM_HEADER_AUDIT_BEGIN(nullability)
 
 @interface RLMUser (ObjectServerTests)
-- (BOOL)waitForUploadToFinish:(NSString *)partitionValue;
-- (BOOL)waitForDownloadToFinish:(NSString *)partitionValue;
 - (void)simulateClientResetErrorForSession:(NSString *)partitionValue;
 @end
 

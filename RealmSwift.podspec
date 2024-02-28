@@ -28,6 +28,7 @@ Pod::Spec.new do |s|
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift', 'RealmSwift/Impl/*.swift', 'Realm/Swift/*.swift'
   s.exclude_files = 'RealmSwift/Nonsync.swift'
+  s.resource_bundles = {'realm_swift_privacy' => ['RealmSwift/PrivacyInfo.xcprivacy']}
 
   s.pod_target_xcconfig = {
     'APPLICATION_EXTENSION_API_ONLY' => 'YES',
@@ -44,5 +45,10 @@ Pod::Spec.new do |s|
     'TVOS_DEPLOYMENT_TARGET_1400' => '11.0',
     'TVOS_DEPLOYMENT_TARGET_1500' => '12.0',
     'TVOS_DEPLOYMENT_TARGET' => '$(TVOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
+
+    'REALM_LD_CLASSIC_1400' => '',
+    'REALM_LD_CLASSIC_1500' => '-Wl,-ld_classic',
+    'REALM_LD_CLASSIC' => '$(REALM_LD_CLASSIC_$(XCODE_VERSION_MAJOR))',
+    'OTHER_LDFLAGS' => '$(REALM_LD_CLASSIC)',
   }
 end

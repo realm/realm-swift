@@ -40,8 +40,6 @@
 
 #import <objc/message.h>
 
-using namespace realm;
-
 static inline void RLMVerifyRealmRead(__unsafe_unretained RLMRealm *const realm) {
     if (!realm) {
         @throw RLMException(@"Realm must not be nil");
@@ -92,6 +90,7 @@ void RLMVerifyHasPrimaryKey(Class cls) {
     }
 }
 
+using realm::CreatePolicy;
 static CreatePolicy updatePolicyToCreatePolicy(RLMUpdatePolicy policy) {
     CreatePolicy createPolicy = {.create = true, .copy = false, .diff = false, .update = false};
     switch (policy) {

@@ -1,13 +1,14 @@
 #include "TestBase.xcconfig"
 
-CODE_SIGN_IDENTITY = "-";
-COPY_PHASE_STRIP = NO;
-LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks;
-INFOPLIST_FILE = Realm/Tests/TestHost/Info.plist;
-PRODUCT_NAME = $(TARGET_NAME);
-CLANG_MODULES_AUTOLINK = NO;
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+CLANG_MODULES_AUTOLINK = NO;
+CODE_SIGN_IDENTITY = "-";
+COPY_PHASE_STRIP = NO;
+INFOPLIST_FILE = Realm/Tests/TestHost/Info.plist;
+INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks;
+PRODUCT_NAME = $(TARGET_NAME);
 
 REALM_UI_FRAMEWORK_ = Cocoa;
 REALM_UI_FRAMEWORK_uikit = UIKit;

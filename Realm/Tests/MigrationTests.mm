@@ -156,7 +156,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
 
 - (void)createTestRealmWithClasses:(NSArray *)classes block:(void (^)(RLMRealm *realm))block {
     NSMutableArray *objectSchema = [NSMutableArray arrayWithCapacity:classes.count];
-    for (Class cls in classes) {
+    for (::Class cls in classes) {
         [objectSchema addObject:[RLMObjectSchema schemaForObjectClass:cls]];
     }
     [self createTestRealmWithSchema:objectSchema block:block];
@@ -1210,7 +1210,7 @@ RLM_COLLECTION_TYPE(MigrationTestObject);
     }];
 }
 
-- (RLMResults *)objectsOfType:(Class)cls {
+- (RLMResults *)objectsOfType:(::Class)cls {
     auto config = self.config;
     config.schemaVersion = 1;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];

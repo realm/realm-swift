@@ -25,6 +25,7 @@
 #import <realm/util/basic_system_errors.hpp>
 #import <realm/sync/client.hpp>
 
+// NEXT-MAJOR: we should merge these all into a single error domain/error enum
 NSString *const RLMErrorDomain                   = @"io.realm";
 NSString *const RLMUnknownSystemErrorDomain      = @"io.realm.unknown";
 NSString *const RLMSyncErrorDomain               = @"io.realm.sync";
@@ -44,6 +45,7 @@ namespace {
 NSInteger translateFileError(realm::ErrorCodes::Error code) {
     using ec = realm::ErrorCodes::Error;
     switch (code) {
+        // Local errors
         case ec::AddressSpaceExhausted:                return RLMErrorAddressSpaceExhausted;
         case ec::DeleteOnOpenRealm:                    return RLMErrorAlreadyOpen;
         case ec::FileAlreadyExists:                    return RLMErrorFileExists;
@@ -62,10 +64,18 @@ NSInteger translateFileError(realm::ErrorCodes::Error code) {
         case ec::SubscriptionFailed:                   return RLMErrorSubscriptionFailed;
         case ec::UnsupportedFileFormatVersion:         return RLMErrorUnsupportedFileFormatVersion;
 
+        // Sync errors
+        case ec::AuthError:                            return RLMSyncErrorClientUserError;
+        case ec::SyncPermissionDenied:                 return RLMSyncErrorPermissionDeniedError;
+        case ec::SyncCompensatingWrite:                return RLMSyncErrorWriteRejected;
+        case ec::SyncConnectFailed:                    return RLMSyncErrorConnectionFailed;
+        case ec::TlsHandshakeFailed:                   return RLMSyncErrorTLSHandshakeFailed;
+        case ec::SyncConnectTimeout:                   return ETIMEDOUT;
+
+        // App errors
         case ec::APIKeyAlreadyExists:                  return RLMAppErrorAPIKeyAlreadyExists;
         case ec::AccountNameInUse:                     return RLMAppErrorAccountNameInUse;
         case ec::AppUnknownError:                      return RLMAppErrorUnknown;
-        case ec::AuthError:                            return RLMAppErrorAuthError;
         case ec::AuthProviderNotFound:                 return RLMAppErrorAuthProviderNotFound;
         case ec::DomainNotAllowed:                     return RLMAppErrorDomainNotAllowed;
         case ec::ExecutionTimeLimitExceeded:           return RLMAppErrorExecutionTimeLimitExceeded;
@@ -108,13 +118,31 @@ NSInteger translateFileError(realm::ErrorCodes::Error code) {
             if (category.test(realm::ErrorCategory::app_error)) {
                 return RLMAppErrorUnknown;
             }
+            if (category.test(realm::ErrorCategory::sync_error)) {
+                return RLMSyncErrorClientInternalError;
+            }
             return RLMErrorFail;
         }
     }
 }
 
 NSString *errorDomain(realm::ErrorCodes::Error error) {
+    // Special-case errors where our error domain doesn't match core's category
+    // NEXT-MAJOR: we should unify everything into RLMErrorDomain
+    using ec = realm::ErrorCodes::Error;
+    switch (error) {
+        case ec::SubscriptionFailed:
+            return RLMErrorDomain;
+        case ec::SyncConnectTimeout:
+            return NSPOSIXErrorDomain;
+        default:
+            break;
+    }
+
     auto category = realm::ErrorCodes::error_categories(error);
+    if (category.test(realm::ErrorCategory::sync_error)) {
+        return RLMSyncErrorDomain;
+    }
     if (category.test(realm::ErrorCategory::app_error)) {
         return RLMAppErrorDomain;
     }
@@ -137,18 +165,6 @@ NSError *translateSystemError(std::error_code ec, const char *msg) {
     userInfo[@"Error Code"] = @(code);
     userInfo[@"Category"] = @(ec.category().name());
 
-#if REALM_ENABLE_SYNC
-    if (ec.category() == realm::sync::client_error_category()) {
-        if (code == static_cast<int>(realm::sync::Client::Error::connect_timeout)) {
-            errorDomain = NSPOSIXErrorDomain;
-            code = ETIMEDOUT;
-        }
-        else {
-            errorDomain = RLMSyncErrorDomain;
-        }
-    }
-#endif
-
     return [NSError errorWithDomain:errorDomain code:code userInfo:userInfo.copy];
 }
 } // anonymous namespace
@@ -166,13 +182,8 @@ NSError *makeError(realm::Status const& status) {
 }
 
 NSError *makeError(realm::Exception const& exception) {
-    auto status = exception.to_status();
-    if (status.code() == realm::ErrorCodes::SystemError && status.get_std_error_code() != std::error_code{}) {
-        return translateSystemError(status.get_std_error_code(), exception.what());
-    }
-
     NSInteger code = translateFileError(exception.code());
-    return [NSError errorWithDomain:errorDomain(status.code())
+    return [NSError errorWithDomain:errorDomain(exception.code())
                                code:code
                            userInfo:@{NSLocalizedDescriptionKey: @(exception.what()),
                                       RLMDeprecatedErrorCodeKey: @(code),
@@ -226,7 +237,7 @@ __attribute__((objc_direct_members))
 @end
 
 NSError *makeError(realm::SyncError&& error) {
-    auto& status = error.to_status();
+    auto& status = error.status;
     if (status.is_ok()) {
         return nil;
     }
@@ -253,23 +264,40 @@ NSError *makeError(realm::SyncError&& error) {
         }
     }
 
-    RLMSyncError errorCode = RLMSyncErrorClientInternalError;
-    if (error.is_client_reset_requested())
-        errorCode = RLMSyncErrorClientResetError;
-    else if (error.is_session_level_protocol_error()) {
-        using enum realm::sync::ProtocolError;
-        switch (static_cast<realm::sync::ProtocolError>(error.to_status().get_std_error_code().value())) {
-            case permission_denied: errorCode = RLMSyncErrorPermissionDeniedError; break;
-            case bad_authentication: errorCode = RLMSyncErrorClientUserError; break;
-            case compensating_write: errorCode = RLMSyncErrorWriteRejected; break;
-            default: errorCode = RLMSyncErrorClientSessionError;
-        }
-    }
-    else if (!error.is_fatal) {
-        return nil;
+    int errorCode = RLMSyncErrorClientInternalError;
+    NSString *errorDomain = RLMSyncErrorDomain;
+    using enum realm::ErrorCodes::Error;
+    auto code = error.status.code();
+    bool isSyncError = realm::ErrorCodes::error_categories(code).test(realm::ErrorCategory::sync_error);
+    switch (code) {
+        case SyncPermissionDenied:
+            errorCode = RLMSyncErrorPermissionDeniedError;
+            break;
+        case AuthError:
+            errorCode = RLMSyncErrorClientUserError;
+            break;
+        case SyncCompensatingWrite:
+            errorCode = RLMSyncErrorWriteRejected;
+            break;
+        case SyncConnectFailed:
+            errorCode = RLMSyncErrorConnectionFailed;
+            break;
+        case SyncConnectTimeout:
+            errorCode = ETIMEDOUT;
+            errorDomain = NSPOSIXErrorDomain;
+            break;
+
+        default:
+            if (error.is_client_reset_requested())
+                errorCode = RLMSyncErrorClientResetError;
+            else if (isSyncError)
+                errorCode = RLMSyncErrorClientSessionError;
+            else if (!error.is_fatal)
+                return nil;
+            break;
     }
 
-    return [NSError errorWithDomain:RLMSyncErrorDomain code:errorCode userInfo:userInfo.copy];
+    return [NSError errorWithDomain:errorDomain code:errorCode userInfo:userInfo.copy];
 }
 
 NSError *makeError(realm::app::AppError const& appError) {
@@ -278,9 +306,15 @@ NSError *makeError(realm::app::AppError const& appError) {
         return nil;
     }
 
+    // Core uses the same error code for both sync and app auth errors, but we
+    // have separate ones
     auto code = translateFileError(status.code());
-    return [NSError errorWithDomain:errorDomain(status.code())
-                               code:code
+    auto domain = errorDomain(status.code());
+    if (domain == RLMSyncErrorDomain && code == RLMSyncErrorClientUserError) {
+        domain = RLMAppErrorDomain;
+        code = RLMAppErrorAuthError;
+    }
+    return [NSError errorWithDomain:domain code:code
                            userInfo:@{NSLocalizedDescriptionKey: @(status.reason().c_str()),
                                       RLMDeprecatedErrorCodeKey: @(code),
                                       RLMErrorCodeNameKey: errorString(status.code()),

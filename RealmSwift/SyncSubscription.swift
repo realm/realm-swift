@@ -96,6 +96,22 @@ import Realm.Private
         _rlmSyncSubscription.update(with: query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE"))
     }
 
+    /**
+     Updates a Flexible Sync's subscription with an allowed query which will be used to bootstrap data
+     from the server when committed.
+
+     - warning: This method may only be called during a write subscription block.
+
+     - parameter type: The type of the object to be queried.
+     - parameter query: A query which will be used to modify the existing query.
+     */
+    public func updateQuery<T: Object>(toType type: T.Type, where query: (Query<T>) -> Query<Bool>) {
+        guard _rlmSyncSubscription.objectClassName == "\(T.self)" else {
+            throwRealmException("Updating a subscription query of a different Object Type is not allowed.")
+        }
+        _rlmSyncSubscription.update(with: query(Query()).predicate)
+    }
+
     /// :nodoc:
     @available(*, unavailable, renamed: "updateQuery", message: "SyncSubscription update is unavailable, please use `.updateQuery` instead.")
     public func update<T: Object>(toType type: T.Type, where query: @escaping (Query<T>) -> Query<Bool>) {
@@ -170,6 +186,20 @@ import Realm.Private
      Creates a `QuerySubscription` for the given type.
 
      - parameter name: Name of the subscription.
+     - parameter query: The query for the subscription.
+     */
+    public init(name: String? = nil, query: QueryFunction) {
+        // This overload is required to make `query` non-escaping, as optional
+        // function parameters always are.
+        self.name = name
+        self.className = "\(T.self)"
+        self.predicate = query(Query()).predicate
+    }
+
+    /**
+     Creates a `QuerySubscription` for the given type.
+
+     - parameter name: Name of the subscription.
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments,
                                   which will be used to create the subscription.
      */
@@ -218,7 +248,7 @@ import Realm.Private
                              an `Error`describing what went wrong will be returned by the block
      */
     public func update(_ block: (() -> Void), onComplete: (@Sendable (Error?) -> Void)? = nil) {
-        rlmSyncSubscriptionSet.update(block, onComplete: onComplete ?? { _ in })
+        rlmSyncSubscriptionSet.update(block, onComplete: onComplete)
     }
 
     /// :nodoc:
@@ -261,7 +291,7 @@ import Realm.Private
                         the subscription by query and/or name.
      - returns: A query builder that produces a subscription which can used to search for the subscription.
      */
-    public func first<T: Object>(ofType type: T.Type, `where` query: @escaping (Query<T>) -> Query<Bool>) -> SyncSubscription? {
+    public func first<T: Object>(ofType type: T.Type, `where` query: (Query<T>) -> Query<Bool>) -> SyncSubscription? {
         return rlmSyncSubscriptionSet.subscription(withClassName: "\(T.self)", predicate: query(Query()).predicate).map(SyncSubscription.init)
     }
 
@@ -371,12 +401,17 @@ import Realm.Private
     /**
      Removes all subscriptions from the subscription set.
 
+     - parameter unnamedOnly: If true, only unnamed subscriptions are removed.
      - warning: This method may only be called during a write subscription block.
      - warning: Removing all subscriptions will result in an error if no new subscription is added. Server should
                 acknowledge at least one subscription.
      */
-    public func removeAll() {
-        rlmSyncSubscriptionSet.removeAllSubscriptions()
+    public func removeAll(unnamedOnly: Bool = false) {
+        if unnamedOnly {
+            rlmSyncSubscriptionSet.removeAllUnnamedSubscriptions()
+        } else {
+            rlmSyncSubscriptionSet.removeAllSubscriptions()
+        }
     }
 
     /**

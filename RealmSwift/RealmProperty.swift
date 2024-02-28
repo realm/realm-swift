@@ -73,7 +73,8 @@ extension RealmProperty: Codable where Value: Codable {
     }
 
     public func encode(to encoder: Encoder) throws {
-        try self.value.encode(to: encoder)
+        var container = encoder.singleValueContainer()
+        try container.encode(value)
     }
 }
 

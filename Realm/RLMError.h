@@ -265,13 +265,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      */
     RLMSyncErrorClientResetError        = 7,
 
-    /**
-     An error that indicates an authentication error occurred.
-
-     The `kRLMSyncUnderlyingErrorKey` key in the user info dictionary will contain the
-     underlying error, which is guaranteed to be under the `RLMSyncAuthErrorDomain`
-     error domain.
-     */
+    /// :nodoc:
     RLMSyncErrorUnderlyingAuthError     = 8,
 
     /**
@@ -314,56 +308,53 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      This error is informational and does not require any explicit handling.
      */
     RLMSyncErrorWriteRejected = 11,
+
+    /**
+     A connection error without a more specific error code occurred.
+
+     Realm internally handles retrying connections with appropriate backoffs,
+     so connection errors are normally logged and not reported to the error
+     handler. The exception is if
+     ``RLMSyncConfiguration.cancelAsyncOpenOnNonFatalErrors`` is set to `true`,
+     in which case async opens will be canceled on connection failures and the
+     error will be reported to the completion handler.
+
+     Note that connection timeouts are reported as
+     (errorDomain: NSPosixErrorDomain, error: ETIMEDOUT)
+     and not as one of these error codes.
+     */
+    RLMSyncErrorConnectionFailed = 12,
+
+    /**
+     Connecting to the server failed due to a TLS issue such as an invalid certificate.
+     */
+    RLMSyncErrorTLSHandshakeFailed = 13,
 };
 
 #pragma mark - RLMSyncAuthError
 
-/// An error which is related to authentication to Atlas App Services.
+// NEXT-MAJOR: This was a ROS thing and should have been removed in v10
+/// :nodoc:
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
-    /// An error that indicates that the response received from the authentication server was malformed.
     RLMSyncAuthErrorBadResponse                     = 1,
-
-    /// An error that indicates that the supplied Realm path was invalid, or could not be resolved by the authentication
-    /// server.
     RLMSyncAuthErrorBadRemoteRealmPath              = 2,
-
-    /// An error that indicates that the response received from the authentication server was an HTTP error code. The
-    /// `userInfo` dictionary contains the actual error code value.
     RLMSyncAuthErrorHTTPStatusCodeError             = 3,
-
-    /// An error that indicates a problem with the session (a specific Realm opened for sync).
     RLMSyncAuthErrorClientSessionError              = 4,
-
-    /// An error that indicates that the provided credentials are ill-formed.
     RLMSyncAuthErrorInvalidParameters               = 601,
-
-    /// An error that indicates that no Realm path was included in the URL.
     RLMSyncAuthErrorMissingPath                     = 602,
-
-    /// An error that indicates that the provided credentials are invalid.
     RLMSyncAuthErrorInvalidCredential               = 611,
-
-    /// An error that indicates that the user with provided credentials does not exist.
     RLMSyncAuthErrorUserDoesNotExist                = 612,
-
-    /// An error that indicates that the user cannot be registered as it exists already.
     RLMSyncAuthErrorUserAlreadyExists               = 613,
-
-    /// An error that indicates the path is invalid or the user doesn't have access to that Realm.
     RLMSyncAuthErrorAccessDeniedOrInvalidPath       = 614,
-
-    /// An error that indicates the refresh token was invalid.
     RLMSyncAuthErrorInvalidAccessToken              = 615,
-
-    /// An error that indicates the file at the given path can't be shared.
     RLMSyncAuthErrorFileCannotBeShared              = 703,
-};
+} __attribute__((deprecated("Errors of this type are no longer reported")));
 
 #pragma mark - RLMSyncAppError
 
 /// An error which occurred when making a request to Atlas App Services.
 typedef RLM_ERROR_ENUM(NSInteger, RLMAppError, RLMAppErrorDomain) {
-    /// An unknown error has occured
+    /// An unknown error has occurred
     RLMAppErrorUnknown = -1,
 
     /// A HTTP request completed with an error status code. The failing status

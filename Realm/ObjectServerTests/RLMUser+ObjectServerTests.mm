@@ -29,46 +29,12 @@ using namespace realm;
 
 @implementation RLMUser (ObjectServerTests)
 
-- (BOOL)waitForUploadToFinish:(NSString *)partitionValue {
-    const NSTimeInterval timeout = 20;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
-    NSAssert(session, @"Cannot call with invalid URL");
-    BOOL couldWait = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                    callback:^(NSError *){
-                                                        dispatch_semaphore_signal(sema);
-                                                    }];
-    if (!couldWait) {
-        return NO;
-    }
-    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-}
-
-- (BOOL)waitForDownloadToFinish:(NSString *)partitionValue {
-    const NSTimeInterval timeout = 20;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
-    NSAssert(session, @"Cannot call with invalid URL");
-    BOOL couldWait = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                      callback:^(NSError *){
-                                                          dispatch_semaphore_signal(sema);
-                                                      }];
-    if (!couldWait) {
-        return NO;
-    }
-    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-}
-
 - (void)simulateClientResetErrorForSession:(NSString *)partitionValue {
     RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
     NSAssert(session, @"Cannot call with invalid URL");
 
     std::shared_ptr<SyncSession> raw_session = session->_session.lock();
-    std::error_code code = std::error_code{
-        static_cast<int>(realm::sync::ProtocolError::bad_client_file_ident),
-        realm::sync::protocol_error_category()
-    };
-    realm::sync::SessionErrorInfo error = {code, "Not a real error message", true};
+    realm::sync::SessionErrorInfo error = {{realm::ErrorCodes::BadChangeset, "Not a real error message"}, true};
     error.server_requests_action = realm::sync::ProtocolErrorInfo::Action::ClientReset;
     SyncSession::OnlyForTesting::handle_error(*raw_session, std::move(error));
 }

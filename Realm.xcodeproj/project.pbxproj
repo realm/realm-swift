@@ -18,6 +18,16 @@
 			name = "Download BaaS";
 			productName = "Download BaaS";
 		};
+		ACB76B772AA9D9A600C59983 /* CI */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = ACB76B7B2AA9D9A600C59983 /* Build configuration list for PBXAggregateTarget "CI" */;
+			buildPhases = (
+			);
+			dependencies = (
+			);
+			name = CI;
+			productName = CI;
+		};
 		E83EAC791BED3D880085CCD2 /* SwiftLint */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = E83EAC7C1BED3D880085CCD2 /* Build configuration list for PBXAggregateTarget "SwiftLint" */;
@@ -88,6 +98,11 @@
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */; };
 		3F2633C31E9D630000B32D30 /* PrimitiveListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2633C21E9D630000B32D30 /* PrimitiveListTests.swift */; };
+		3F2B40CA2B2900DA00E30319 /* CombineSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2B40C52B2900DA00E30319 /* CombineSyncTests.swift */; };
+		3F2B40CB2B2900DA00E30319 /* AsyncSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2B40C62B2900DA00E30319 /* AsyncSyncTests.swift */; };
+		3F2B40CC2B2900DA00E30319 /* RLMSubscriptionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F2B40C72B2900DA00E30319 /* RLMSubscriptionTests.mm */; };
+		3F2B40CD2B2900DA00E30319 /* RLMMongoClientTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F2B40C82B2900DA00E30319 /* RLMMongoClientTests.mm */; };
+		3F2B40CE2B2900DA00E30319 /* ClientResetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2B40C92B2900DA00E30319 /* ClientResetTests.swift */; };
 		3F2E66641CA0BA11004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
 		3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3F3411A6273433B300EC9D25 /* ObjcBridgeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F3411A5273433B300EC9D25 /* ObjcBridgeable.swift */; };
@@ -99,6 +114,8 @@
 		3F4F3AD723F71C790048DB43 /* RLMObjectId.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F4F3AD023F71C790048DB43 /* RLMObjectId.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F4F3ADB23F71C790048DB43 /* RLMObjectId.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F4F3AD223F71C790048DB43 /* RLMObjectId.mm */; };
 		3F4F3ADD23F71C790048DB43 /* RLMDecimal128.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F4F3AD323F71C790048DB43 /* RLMDecimal128.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3F4FD2FB2B2A389A003E3DFD /* TestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4FD2FA2B2A389A003E3DFD /* TestType.swift */; };
+		3F4FD2FC2B2A389A003E3DFD /* TestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F4FD2FA2B2A389A003E3DFD /* TestType.swift */; };
 		3F558C8722C29A03002F0F30 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C7E22C29A02002F0F30 /* TestUtils.mm */; };
 		3F558C8822C29A03002F0F30 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C7E22C29A02002F0F30 /* TestUtils.mm */; };
 		3F558C8A22C29A03002F0F30 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C7E22C29A02002F0F30 /* TestUtils.mm */; };
@@ -172,6 +189,8 @@
 		3FD0D7C729675A2E0031C196 /* RLMAsyncTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FD0D7C929675A2E0031C196 /* RLMAsyncTask.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */; };
 		3FD0D7CE2967CA1E0031C196 /* RLMMongoCollection_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D224816AAA00890DD2 /* RLMMongoCollection_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3FD6D1A92B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3FD6D1A82B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy */; };
+		3FD6D1AC2B4CA56D00A4FEBE /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3FD6D1AB2B4CA56C00A4FEBE /* PrivacyInfo.xcprivacy */; };
 		3FDAB841290B4CCB00168F24 /* RLMError.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FDAB83E290B4CCB00168F24 /* RLMError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3FDAB845290B4CCB00168F24 /* RLMError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FDAB840290B4CCB00168F24 /* RLMError.mm */; };
 		3FDAB848290B658300168F24 /* file-format-version-21.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3FDAB847290B658300168F24 /* file-format-version-21.realm */; };
@@ -330,11 +349,14 @@
 		AC05380C2885B25A00CE27C4 /* SwiftAsymmetricSyncServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0538062885B1DF00CE27C4 /* SwiftAsymmetricSyncServerTests.swift */; };
 		AC23487E26FC8619009129F2 /* RLMUser+ObjectServerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1AF64DD11DA304A90081EB15 /* RLMUser+ObjectServerTests.mm */; };
 		AC2C2A40268E1B0200B4DA33 /* SwiftServerObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2C2A3E268E1ACE00B4DA33 /* SwiftServerObjects.swift */; };
-		AC2C2A41268E1B0700B4DA33 /* SwiftServerObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2C2A3E268E1ACE00B4DA33 /* SwiftServerObjects.swift */; };
 		AC320BAE268E1F2D0043D484 /* SwiftServerObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2C2A3E268E1ACE00B4DA33 /* SwiftServerObjects.swift */; };
 		AC3B33AE29DC6CEE0042F3A0 /* RLMLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AC3B33AF29DC6CEE0042F3A0 /* RLMLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */; };
 		AC3B33B029DC6CEE0042F3A0 /* RLMLogger_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		AC7825B92ACD90BE007ABA4B /* Geospatial.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7825B82ACD90BE007ABA4B /* Geospatial.swift */; };
+		AC7825BD2ACD90DA007ABA4B /* RLMGeospatial.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */; };
+		AC7825BF2ACD90DA007ABA4B /* RLMGeospatial.h in Headers */ = {isa = PBXBuildFile; fileRef = AC7825BC2ACD90DA007ABA4B /* RLMGeospatial.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		AC7825C22ACD917B007ABA4B /* GeospatialTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7825C02ACD916C007ABA4B /* GeospatialTests.swift */; };
 		AC7D182D261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC7D182B261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm */; };
 		AC7D182E261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7D182C261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift */; };
 		AC81360F287F21350029F15E /* AsymmetricObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC81360E287F21350029F15E /* AsymmetricObject.swift */; };
@@ -675,6 +697,11 @@
 		3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafeReference.swift; sourceTree = "<group>"; };
 		3F2633C21E9D630000B32D30 /* PrimitiveListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitiveListTests.swift; sourceTree = "<group>"; };
 		3F275EBD2433A5DA00161E7F /* RLMApp_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMApp_Private.hpp; sourceTree = "<group>"; };
+		3F2B40C52B2900DA00E30319 /* CombineSyncTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CombineSyncTests.swift; path = Realm/ObjectServerTests/CombineSyncTests.swift; sourceTree = "<group>"; };
+		3F2B40C62B2900DA00E30319 /* AsyncSyncTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AsyncSyncTests.swift; path = Realm/ObjectServerTests/AsyncSyncTests.swift; sourceTree = "<group>"; };
+		3F2B40C72B2900DA00E30319 /* RLMSubscriptionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSubscriptionTests.mm; path = Realm/ObjectServerTests/RLMSubscriptionTests.mm; sourceTree = "<group>"; };
+		3F2B40C82B2900DA00E30319 /* RLMMongoClientTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMMongoClientTests.mm; path = Realm/ObjectServerTests/RLMMongoClientTests.mm; sourceTree = "<group>"; };
+		3F2B40C92B2900DA00E30319 /* ClientResetTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClientResetTests.swift; path = Realm/ObjectServerTests/ClientResetTests.swift; sourceTree = "<group>"; };
 		3F2E66611CA0B9D5004761D5 /* NotificationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationTests.m; sourceTree = "<group>"; };
 		3F3411A5273433B300EC9D25 /* ObjcBridgeable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjcBridgeable.swift; sourceTree = "<group>"; };
 		3F4071342A57472F00D9C4A3 /* PrivateSymbols.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = PrivateSymbols.txt; sourceTree = "<group>"; };
@@ -690,6 +717,7 @@
 		3F4F3AD223F71C790048DB43 /* RLMObjectId.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObjectId.mm; sourceTree = "<group>"; };
 		3F4F3AD323F71C790048DB43 /* RLMDecimal128.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMDecimal128.h; sourceTree = "<group>"; };
 		3F4F3AD423F71C790048DB43 /* RLMObjectId_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObjectId_Private.hpp; sourceTree = "<group>"; };
+		3F4FD2FA2B2A389A003E3DFD /* TestType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestType.swift; sourceTree = "<group>"; };
 		3F558C7E22C29A02002F0F30 /* TestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TestUtils.mm; path = Realm/TestUtils/TestUtils.mm; sourceTree = "<group>"; };
 		3F558C7F22C29A02002F0F30 /* RLMTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTestCase.h; path = Realm/TestUtils/include/RLMTestCase.h; sourceTree = "<group>"; };
 		3F558C8022C29A02002F0F30 /* RLMMultiProcessTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMMultiProcessTestCase.h; path = Realm/TestUtils/include/RLMMultiProcessTestCase.h; sourceTree = "<group>"; };
@@ -739,6 +767,8 @@
 		3FD0D7C529675A2E0031C196 /* RLMAsyncTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask.h; sourceTree = "<group>"; };
 		3FD0D7C629675A2E0031C196 /* RLMAsyncTask.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAsyncTask.mm; sourceTree = "<group>"; };
 		3FD0D7CB29675AE10031C196 /* RLMAsyncTask_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAsyncTask_Private.h; sourceTree = "<group>"; };
+		3FD6D1A82B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3FD6D1AB2B4CA56C00A4FEBE /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3FDAB83E290B4CCB00168F24 /* RLMError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMError.h; sourceTree = "<group>"; };
 		3FDAB83F290B4CCB00168F24 /* RLMError_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMError_Private.hpp; sourceTree = "<group>"; };
 		3FDAB840290B4CCB00168F24 /* RLMError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMError.mm; sourceTree = "<group>"; };
@@ -877,6 +907,11 @@
 		AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger.h; sourceTree = "<group>"; };
 		AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMLogger.mm; sourceTree = "<group>"; };
 		AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger_Private.h; sourceTree = "<group>"; };
+		AC7825B82ACD90BE007ABA4B /* Geospatial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geospatial.swift; sourceTree = "<group>"; };
+		AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMGeospatial.mm; sourceTree = "<group>"; };
+		AC7825BB2ACD90DA007ABA4B /* RLMGeospatial_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMGeospatial_Private.hpp; sourceTree = "<group>"; };
+		AC7825BC2ACD90DA007ABA4B /* RLMGeospatial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMGeospatial.h; sourceTree = "<group>"; };
+		AC7825C02ACD916C007ABA4B /* GeospatialTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeospatialTests.swift; sourceTree = "<group>"; };
 		AC7D182B261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObjectServerPartitionTests.mm; path = Realm/ObjectServerTests/RLMObjectServerPartitionTests.mm; sourceTree = "<group>"; };
 		AC7D182C261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftObjectServerPartitionTests.swift; path = Realm/ObjectServerTests/SwiftObjectServerPartitionTests.swift; sourceTree = "<group>"; };
 		AC81360E287F21350029F15E /* AsymmetricObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsymmetricObject.swift; sourceTree = "<group>"; };
@@ -1330,6 +1365,7 @@
 				5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */,
 				5346B5102B8FB6A4001CADFE /* ExtJSONCodable.swift */,
 				3F7BCEB42834377E00EB6E16 /* Events.swift */,
+				AC7825B82ACD90BE007ABA4B /* Geospatial.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
 				0C3BD4D225C1C5AB007CFDD3 /* Map.swift */,
@@ -1346,6 +1382,7 @@
 				5D660FE71BE98D670021E04F /* ObjectSchema.swift */,
 				5D660FE81BE98D670021E04F /* Optional.swift */,
 				3F149CCA2668112A00111D65 /* PersistedProperty.swift */,
+				3FD6D1AB2B4CA56C00A4FEBE /* PrivacyInfo.xcprivacy */,
 				0CD1632526D3DD7B0027C49B /* Projection.swift */,
 				5D660FE91BE98D670021E04F /* Property.swift */,
 				ACF08B6626DD936200686CBC /* Query.swift */,
@@ -1381,6 +1418,7 @@
 				3F40C612276D1B05007FEF1A /* CustomObjectCreationTests.swift */,
 				3F9F53D42718E8E6000EEB4A /* CustomPersistableTestObjects.swift */,
 				CFFECBA8250646750010F585 /* Decimal128Tests.swift */,
+				AC7825C02ACD916C007ABA4B /* GeospatialTests.swift */,
 				CF0D04F02693652E0038A058 /* KeyPathTests.swift */,
 				5346B51B2B8FB71E001CADFE /* MongoDataAccessTests.swift */,
 				5D660FFF1BE98D880021E04F /* KVOTests.swift */,
@@ -1444,6 +1482,7 @@
 				AC8846772686573B00DF4A65 /* ContentView.swift */,
 				AC8847472687E0AA00DF4A65 /* Info.plist */,
 				AC8846752686573B00DF4A65 /* SwiftUISyncTestHostApp.swift */,
+				3F4FD2FA2B2A389A003E3DFD /* TestType.swift */,
 			);
 			path = SwiftUISyncTestHost;
 			sourceTree = "<group>";
@@ -1576,6 +1615,9 @@
 			isa = PBXGroup;
 			children = (
 				1AA5AEA21D98CA5300ED8C27 /* Utility */,
+				3F2B40C62B2900DA00E30319 /* AsyncSyncTests.swift */,
+				3F2B40C92B2900DA00E30319 /* ClientResetTests.swift */,
+				3F2B40C52B2900DA00E30319 /* CombineSyncTests.swift */,
 				536B7C0B24A4C223006B535D /* dependencies.list */,
 				3FEE4F44281C439D009194C7 /* EventTests.swift */,
 				AC0538052885B1DF00CE27C4 /* RLMAsymmetricSyncServerTests.mm */,
@@ -1584,10 +1626,12 @@
 				CFA3A23D260B8427002C3266 /* RLMCollectionSyncTests.mm */,
 				CF08757C260B98E100B9BE60 /* RLMCollectionSyncTests.mm */,
 				ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */,
+				3F2B40C82B2900DA00E30319 /* RLMMongoClientTests.mm */,
 				AC7D182B261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm */,
 				E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */,
 				531F956F279070A800E497F1 /* RLMServerTestObjects.h */,
 				531F956E279070A800E497F1 /* RLMServerTestObjects.m */,
+				3F2B40C72B2900DA00E30319 /* RLMSubscriptionTests.mm */,
 				1AA5AE9D1D98A6D800ED8C27 /* RLMSyncTestCase.h */,
 				1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */,
 				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
@@ -1691,6 +1735,9 @@
 				3FDAB83F290B4CCB00168F24 /* RLMError_Private.hpp */,
 				3FEE4F3E281C4370009194C7 /* RLMEvent.h */,
 				3FEE4F3F281C4370009194C7 /* RLMEvent.mm */,
+				AC7825BC2ACD90DA007ABA4B /* RLMGeospatial.h */,
+				AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */,
+				AC7825BB2ACD90DA007ABA4B /* RLMGeospatial_Private.hpp */,
 				AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */,
 				AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */,
 				AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */,
@@ -1784,6 +1831,7 @@
 			isa = PBXGroup;
 			children = (
 				023B19F71A423BD20067FB81 /* libc++.dylib */,
+				3FD6D1A82B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy */,
 				E81A1F621955FC9300FDED82 /* Realm-Info.plist */,
 				02E334C21A5F3C45009F8810 /* Realm.modulemap */,
 			);
@@ -1850,6 +1898,7 @@
 				3FEE4F40281C4370009194C7 /* RLMEvent.h in Headers */,
 				CF76F7F324816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */,
 				CF76F7F524816AAB00890DD2 /* RLMFindOptions.h in Headers */,
+				AC7825BF2ACD90DA007ABA4B /* RLMGeospatial.h in Headers */,
 				AC3B33AE29DC6CEE0042F3A0 /* RLMLogger.h in Headers */,
 				AC3B33B029DC6CEE0042F3A0 /* RLMLogger_Private.h in Headers */,
 				5D659EAF1BE04556006515A0 /* RLMMigration.h in Headers */,
@@ -2161,6 +2210,9 @@
 					AC88475926888C6300DF4A65 = {
 						TestTargetID = AC8846722686573B00DF4A65;
 					};
+					ACB76B772AA9D9A600C59983 = {
+						CreatedOnToolsVersion = 15.0;
+					};
 					E8267FB11D90B79000E001C7 = {
 						LastSwiftMigration = 1020;
 					};
@@ -2199,6 +2251,7 @@
 				53124AD325B71AF700771CE4 /* SwiftUITests */,
 				AC8846722686573B00DF4A65 /* SwiftUISyncTestHost */,
 				AC88475926888C6300DF4A65 /* SwiftUISyncTests */,
+				ACB76B772AA9D9A600C59983 /* CI */,
 			);
 		};
 /* End PBXProject section */
@@ -2247,6 +2300,7 @@
 			files = (
 				5D659ED21BE04556006515A0 /* CHANGELOG.md in Resources */,
 				5D659ED51BE04556006515A0 /* LICENSE in Resources */,
+				3FD6D1A92B4C9EFB00A4FEBE /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2254,6 +2308,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FD6D1AC2B4CA56D00A4FEBE /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2440,6 +2495,7 @@
 				3FEE4F42281C4370009194C7 /* RLMEvent.mm in Sources */,
 				CF76F7FD24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */,
 				CF76F7E724816AAB00890DD2 /* RLMFindOptions.mm in Sources */,
+				AC7825BD2ACD90DA007ABA4B /* RLMGeospatial.mm in Sources */,
 				AC3B33AF29DC6CEE0042F3A0 /* RLMLogger.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMManagedArray.mm in Sources */,
 				CF9881C125DABC6500BD7E4F /* RLMManagedDictionary.mm in Sources */,
@@ -2506,6 +2562,7 @@
 				3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				3F7BCEB52834377E00EB6E16 /* Events.swift in Sources */,
+				AC7825B92ACD90BE007ABA4B /* Geospatial.swift in Sources */,
 				3F857A482769291800F9B9B1 /* KeyPathStrings.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
@@ -2562,6 +2619,7 @@
 				3F40C613276D1B05007FEF1A /* CustomObjectCreationTests.swift in Sources */,
 				3F9F53D52718E8E6000EEB4A /* CustomPersistableTestObjects.swift in Sources */,
 				CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */,
+				AC7825C22ACD917B007ABA4B /* GeospatialTests.swift in Sources */,
 				CF0D04F1269365300038A058 /* KeyPathTests.swift in Sources */,
 				3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */,
 				5D6610161BE98D880021E04F /* ListTests.swift in Sources */,
@@ -2619,8 +2677,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				AC8846782686573B00DF4A65 /* ContentView.swift in Sources */,
-				AC2C2A41268E1B0700B4DA33 /* SwiftServerObjects.swift in Sources */,
 				AC8846762686573B00DF4A65 /* SwiftUISyncTestHostApp.swift in Sources */,
+				3F4FD2FB2B2A389A003E3DFD /* TestType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2638,6 +2696,7 @@
 				AC320BAE268E1F2D0043D484 /* SwiftServerObjects.swift in Sources */,
 				ACBD595328364DB0009A664E /* SwiftSyncTestCase.swift in Sources */,
 				AC88478626888CEE00DF4A65 /* SwiftUISyncTestHostUITests.swift in Sources */,
+				3F4FD2FC2B2A389A003E3DFD /* TestType.swift in Sources */,
 				ACBD595B2836541F009A664E /* TestUtils.mm in Sources */,
 				3F95F4A2295B8488006BC287 /* TestUtils.swift in Sources */,
 			);
@@ -2647,6 +2706,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2B40CB2B2900DA00E30319 /* AsyncSyncTests.swift in Sources */,
+				3F2B40CE2B2900DA00E30319 /* ClientResetTests.swift in Sources */,
+				3F2B40CA2B2900DA00E30319 /* CombineSyncTests.swift in Sources */,
 				3FEE4F45281C439D009194C7 /* EventTests.swift in Sources */,
 				537130C824A9E417001FDBBC /* RealmServer.swift in Sources */,
 				AC05380B2885B23E00CE27C4 /* RLMAsymmetricSyncServerTests.mm in Sources */,
@@ -2654,10 +2716,12 @@
 				530BA61626DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */,
 				CF08757D260B98E100B9BE60 /* RLMCollectionSyncTests.mm in Sources */,
 				ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */,
+				3F2B40CD2B2900DA00E30319 /* RLMMongoClientTests.mm in Sources */,
 				3F558C9422C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
 				AC7D182D261F2F560080E1D2 /* RLMObjectServerPartitionTests.mm in Sources */,
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
 				531F9570279070A900E497F1 /* RLMServerTestObjects.m in Sources */,
+				3F2B40CC2B2900DA00E30319 /* RLMSubscriptionTests.mm in Sources */,
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
@@ -3115,6 +3179,30 @@
 			};
 			name = Release;
 		};
+		ACB76B782AA9D9A600C59983 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		ACB76B792AA9D9A600C59983 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		ACB76B7A2AA9D9A600C59983 /* Static */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Static;
+		};
 		E8267FEB1D90B79000E001C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3FB56E7E250D457A00A6216B /* ObjectServerTests.xcconfig */;
@@ -3270,6 +3358,16 @@
 				AC88477F26888C6300DF4A65 /* Debug */,
 				AC88478026888C6300DF4A65 /* Release */,
 				3FEC91532A4B58BD0044BFF5 /* Static */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ACB76B7B2AA9D9A600C59983 /* Build configuration list for PBXAggregateTarget "CI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ACB76B782AA9D9A600C59983 /* Debug */,
+				ACB76B792AA9D9A600C59983 /* Release */,
+				ACB76B7A2AA9D9A600C59983 /* Static */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

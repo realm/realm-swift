@@ -865,8 +865,6 @@ NS_REFINED_FOR_SWIFT;
  Represents the active subscriptions for this realm, which can be used to add/remove/update
  and search flexible sync subscriptions.
  Getting the subscriptions from a local or partition-based configured realm will thrown an exception.
-
- @warning This feature is currently in beta and its API is subject to change.
  */
 @property (nonatomic, readonly, nonnull) RLMSyncSubscriptionSet *subscriptions;
 

@@ -134,7 +134,7 @@
     XCTAssertTrue(nan.isNaN);
 }
 
-- (void)testMininumMaximumValue {
+- (void)testMinimumMaximumValue {
     RLMDecimal128 *min = RLMDecimal128.minimumDecimalNumber;
     RLMDecimal128 *max = RLMDecimal128.maximumDecimalNumber;
     XCTAssertTrue([min isLessThan:max]);

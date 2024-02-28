@@ -31,7 +31,7 @@
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/sync/sync_user.hpp>
-#import <realm/object-store/util/bson/bson.hpp>
+#import <realm/util/bson/bson.hpp>
 
 using namespace realm;
 
@@ -394,12 +394,6 @@ using namespace realm;
 }
 
 #pragma mark - Private API
-
-+ (void)_setUpBindingContextFactory {
-    SyncUser::set_binding_context_factory([] {
-        return std::make_shared<CocoaSyncUserContext>();
-    });
-}
 
 - (NSString *)refreshToken {
     if (!_user || _user->refresh_token().empty()) {

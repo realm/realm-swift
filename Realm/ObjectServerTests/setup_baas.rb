@@ -18,7 +18,7 @@ DEPENDENCIES = File.open("#{BASE_DIR}/dependencies.list").map { |line|
 }.to_h
 
 MONGODB_VERSION='5.0.6'
-GO_VERSION='1.19.5'
+GO_VERSION='1.21.4'
 NODE_VERSION='16.13.1'
 STITCH_VERSION=DEPENDENCIES["STITCH_VERSION"]
 
@@ -161,6 +161,7 @@ def setup_stitch
     exports << "export STITCH_PATH=\"#{stitch_dir}\""
     exports << "export PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
     exports << "export DYLD_LIBRARY_PATH='#{LIB_DIR}'"
+    exports << "export GOPRIVATE=\"github.com/10gen/*\""
 
     puts 'build create_user binary'
 

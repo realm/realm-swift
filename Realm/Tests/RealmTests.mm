@@ -226,7 +226,7 @@
 #define AssertFileUnmodified(oldURL, newURL) do { \
     NSData *oldData = [NSData dataWithContentsOfURL:oldURL]; \
     NSData *newData = [NSData dataWithContentsOfURL:newURL]; \
-    if (oldData.length < realm::util::page_size()) { \
+    if (oldData.length != newData.length && oldData.length < realm::util::page_size()) { \
         XCTAssertEqual(newData.length, realm::util::page_size()); \
         XCTAssertEqualObjects(oldData, ([newData subdataWithRange:{0, oldData.length}])); \
     } \
@@ -1441,13 +1441,16 @@
     config.maximumNumberOfActiveVersions = 3;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
 
-    // Pin this version
-    __attribute((objc_precise_lifetime)) RLMRealm *frozen = [realm freeze];
-
-    // First 3 should work
-    [realm transactionWithBlock:^{ }];
-    [realm transactionWithBlock:^{ }];
-    [realm transactionWithBlock:^{ }];
+    // Create frozen Realms at four different versions so that we have too many
+    // active versions. It's four rather than three as the implementation has
+    // an off-by-one error and checks if we're already over the limit rather than
+    // if a write would put us over the limit.
+    __attribute__((objc_precise_lifetime)) NSMutableArray *pinnedVersions = [NSMutableArray new];
+    [pinnedVersions addObject:realm.freeze];
+    for (int i = 0; i < 3; ++i) {
+        [realm transactionWithBlock:^{ }];
+        [pinnedVersions addObject:realm.freeze];
+    }
 
     XCTAssertThrows([realm beginWriteTransaction]);
     XCTAssertThrows([realm transactionWithBlock:^{ }]);

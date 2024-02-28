@@ -789,7 +789,7 @@ private struct ProjectionProperty: @unchecked Sendable {
 }
 
 // An adaptor for os_unfair_lock to make it implement NSLocking
-@available(OSX 10.12, watchOS 3.0, iOS 10.0, iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, tvOS 10.0, *)
+@available(OSX 10.12, watchOS 3.0, iOS 10.0, tvOS 10.0, *)
 private final class UnfairLock: NSLocking, Sendable {
     func lock() {
         os_unfair_lock_lock(impl)
@@ -806,7 +806,7 @@ private final class UnfairLock: NSLocking, Sendable {
 
 // We want to use os_unfair_lock when it's available, but fall back to NSLock otherwise
 private func createLock() -> NSLocking {
-    if #available(OSX 10.12, watchOS 3.0, iOS 10.0, iOSApplicationExtension 10.0, OSXApplicationExtension 10.12, tvOS 10.0, *) {
+    if #available(macOS 10.12, watchOS 3.0, iOS 10.0, tvOS 10.0, *) {
         return UnfairLock()
     }
     return NSLock()

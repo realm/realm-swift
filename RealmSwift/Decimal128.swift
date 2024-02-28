@@ -85,7 +85,7 @@ public final class Decimal128: RLMDecimal128, Decodable, @unchecked Sendable {
         }
     }
 
-    /// The mininum value for Decimal128
+    /// The minimum value for Decimal128
     public static var min: Decimal128 {
         unsafeDowncast(__minimumDecimalNumber, to: Self.self)
     }
@@ -103,7 +103,8 @@ extension Decimal128: Encodable {
     ///
     /// - Parameter encoder: The encoder to write data to.
     public func encode(to encoder: Encoder) throws {
-        try self.stringValue.encode(to: encoder)
+        var container = encoder.singleValueContainer()
+        try container.encode(stringValue)
     }
 }
 
