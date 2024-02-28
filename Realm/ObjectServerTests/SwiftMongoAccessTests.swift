@@ -24,10 +24,10 @@ class MongoDataAccessCollectionTests : SwiftSyncTestCase {
         let collection = user.mongoClient("mongodb-atlas")
             .database(named: "car")
             .collection(named: "persons", type: Person.self)
-        try await collection.deleteMany()
+        _ = try await collection.deleteMany()
         let person = Person(name: "Jason", age: 32, address: Person.Address(city: "Austin", state: "TX"))
 //        let try await collection.findOne()
-        let id = try await collection.insertOne(person)
+        _ = try await collection.insertOne(person)
 //        XCTAssertNotNil(id.objectIdValue)
         guard let foundPerson = try await collection.findOne() else {
             return XCTFail("Could not find inserted Person")

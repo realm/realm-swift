@@ -145,7 +145,7 @@ public extension SyncSession {
     @available(macOS 10.15, *)
     func waitForUpload() async throws {
         try await withCheckedThrowingContinuation { continuation in
-            self.waitForUploadCompletion(on: nil) { error in
+            self.__waitForUploadCompletion(on: nil) { error in
                 error.map { continuation.resume(throwing: $0) } ?? continuation.resume()
             }
         }
@@ -154,7 +154,7 @@ public extension SyncSession {
     @_unsafeInheritExecutor
     func waitForDownload() async throws {
         try await withCheckedThrowingContinuation { continuation in
-            self.waitForDownloadCompletion(on: nil) { error in
+            self.__waitForDownloadCompletion(on: nil) { error in
                 error.map { continuation.resume(throwing: $0) } ?? continuation.resume()
             }
         }
