@@ -222,6 +222,13 @@
 		531F956C27906F7600E497F1 /* RLMSyncSubscription.mm in Sources */ = {isa = PBXBuildFile; fileRef = 531F956B27906F7600E497F1 /* RLMSyncSubscription.mm */; };
 		531F9570279070A900E497F1 /* RLMServerTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 531F956E279070A800E497F1 /* RLMServerTestObjects.m */; };
 		532E916F24AA533A003FD9DB /* TimeoutProxyServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */; };
+		5346B5112B8FB6A4001CADFE /* ExtJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */; };
+		5346B5122B8FB6A4001CADFE /* ExtJSONCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B5102B8FB6A4001CADFE /* ExtJSONCodable.swift */; };
+		5346B5142B8FB6A9001CADFE /* MongoDataAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */; };
+		5346B5162B8FB6C4001CADFE /* SwiftMongoAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B5152B8FB6C4001CADFE /* SwiftMongoAccessTests.swift */; };
+		5346B5192B8FB6E9001CADFE /* bson-corpus.rst in Resources */ = {isa = PBXBuildFile; fileRef = 5346B5172B8FB6E9001CADFE /* bson-corpus.rst */; };
+		5346B51A2B8FB6E9001CADFE /* BsonCorpus in Resources */ = {isa = PBXBuildFile; fileRef = 5346B5182B8FB6E9001CADFE /* BsonCorpus */; };
+		5346B51C2B8FB71E001CADFE /* MongoDataAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B51B2B8FB71E001CADFE /* MongoDataAccessTests.swift */; };
 		5346E7322487AC9D00595C68 /* RLMBSONTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5346E7312487AC9D00595C68 /* RLMBSONTests.mm */; };
 		535EA9E225B0919800DBF3CD /* SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EA9E125B0919800DBF3CD /* SwiftUI.swift */; };
 		535EAA7525B0B02B00DBF3CD /* SwiftUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535EAA7425B0B02B00DBF3CD /* SwiftUITests.swift */; };
@@ -782,6 +789,13 @@
 		531F956F279070A800E497F1 /* RLMServerTestObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMServerTestObjects.h; path = Realm/ObjectServerTests/RLMServerTestObjects.h; sourceTree = "<group>"; };
 		532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimeoutProxyServer.swift; path = Realm/ObjectServerTests/TimeoutProxyServer.swift; sourceTree = "<group>"; };
 		533489DD26E0F9510085EEE1 /* RLMChildProcessEnvironment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMChildProcessEnvironment.h; path = Realm/TestUtils/include/RLMChildProcessEnvironment.h; sourceTree = "<group>"; };
+		5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtJSON.swift; sourceTree = "<group>"; };
+		5346B5102B8FB6A4001CADFE /* ExtJSONCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtJSONCodable.swift; sourceTree = "<group>"; };
+		5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MongoDataAccess.swift; sourceTree = "<group>"; };
+		5346B5152B8FB6C4001CADFE /* SwiftMongoAccessTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftMongoAccessTests.swift; path = Realm/ObjectServerTests/SwiftMongoAccessTests.swift; sourceTree = "<group>"; };
+		5346B5172B8FB6E9001CADFE /* bson-corpus.rst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "bson-corpus.rst"; sourceTree = "<group>"; };
+		5346B5182B8FB6E9001CADFE /* BsonCorpus */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BsonCorpus; sourceTree = "<group>"; };
+		5346B51B2B8FB71E001CADFE /* MongoDataAccessTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MongoDataAccessTests.swift; sourceTree = "<group>"; };
 		5346E7312487AC9D00595C68 /* RLMBSONTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMBSONTests.mm; path = Realm/ObjectServerTests/RLMBSONTests.mm; sourceTree = "<group>"; };
 		535EA9E125B0919800DBF3CD /* SwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUI.swift; sourceTree = "<group>"; };
 		535EAA7425B0B02B00DBF3CD /* SwiftUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUITests.swift; sourceTree = "<group>"; };
@@ -1312,6 +1326,9 @@
 				3FB6ABD82416A27000E318C2 /* Decimal128.swift */,
 				3FC3F9162419B63100E27322 /* EmbeddedObject.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
+				5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */,
+				5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */,
+				5346B5102B8FB6A4001CADFE /* ExtJSONCodable.swift */,
 				3F7BCEB42834377E00EB6E16 /* Events.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
 				5D660FE41BE98D670021E04F /* List.swift */,
@@ -1353,6 +1370,8 @@
 		5D660FD91BE98C7C0021E04F /* RealmSwift Tests */ = {
 			isa = PBXGroup;
 			children = (
+				5346B5172B8FB6E9001CADFE /* bson-corpus.rst */,
+				5346B5182B8FB6E9001CADFE /* BsonCorpus */,
 				5D6610291BE98DAA0021E04F /* Supporting Files */,
 				CFFC8CC7262310C800929608 /* AnyRealmValueTests.swift */,
 				3FCB1A7422A9B0A2003807FB /* CodableTests.swift */,
@@ -1363,6 +1382,7 @@
 				3F9F53D42718E8E6000EEB4A /* CustomPersistableTestObjects.swift */,
 				CFFECBA8250646750010F585 /* Decimal128Tests.swift */,
 				CF0D04F02693652E0038A058 /* KeyPathTests.swift */,
+				5346B51B2B8FB71E001CADFE /* MongoDataAccessTests.swift */,
 				5D660FFF1BE98D880021E04F /* KVOTests.swift */,
 				5D6610001BE98D880021E04F /* ListTests.swift */,
 				3F1D8D75265B075000593ABA /* MapTests.swift */,
@@ -1560,6 +1580,7 @@
 				3FEE4F44281C439D009194C7 /* EventTests.swift */,
 				AC0538052885B1DF00CE27C4 /* RLMAsymmetricSyncServerTests.mm */,
 				5346E7312487AC9D00595C68 /* RLMBSONTests.mm */,
+				5346B5152B8FB6C4001CADFE /* SwiftMongoAccessTests.swift */,
 				CFA3A23D260B8427002C3266 /* RLMCollectionSyncTests.mm */,
 				CF08757C260B98E100B9BE60 /* RLMCollectionSyncTests.mm */,
 				ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */,
@@ -2188,7 +2209,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				3FDAB84D290B7A0200168F24 /* file-format-version-10.realm in Resources */,
+				5346B5192B8FB6E9001CADFE /* bson-corpus.rst in Resources */,
 				3FDAB849290B659300168F24 /* file-format-version-21.realm in Resources */,
+				5346B51A2B8FB6E9001CADFE /* BsonCorpus in Resources */,
 				2973CCF91C175AB400FEA0FA /* fileformat-pre-null.realm in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2472,6 +2495,7 @@
 				681EE33B25EE8E1400A9DEC5 /* AnyRealmValue.swift in Sources */,
 				CFB4313A243DF87100471C18 /* App.swift in Sources */,
 				AC81360F287F21350029F15E /* AsymmetricObject.swift in Sources */,
+				5346B5122B8FB6A4001CADFE /* ExtJSONCodable.swift in Sources */,
 				3FE267D7264308680030F83C /* BasicTypes.swift in Sources */,
 				4996EA9E2465BB8A003A1F51 /* BSON.swift in Sources */,
 				3FE267D5264308680030F83C /* CollectionAccess.swift in Sources */,
@@ -2493,6 +2517,7 @@
 				5D660FF41BE98D670021E04F /* Object.swift in Sources */,
 				3FB6ABD72416A26100E318C2 /* ObjectId.swift in Sources */,
 				681EE34725EE8E5600A9DEC5 /* ObjectiveCSupport+AnyRealmValue.swift in Sources */,
+				5346B5112B8FB6A4001CADFE /* ExtJSON.swift in Sources */,
 				494566A9246E8C59000FD07F /* ObjectiveCSupport+BSON.swift in Sources */,
 				3FE5818622C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift in Sources */,
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
@@ -2502,6 +2527,7 @@
 				3F149CCB2668112A00111D65 /* PersistedProperty.swift in Sources */,
 				3F857A49276A507200F9B9B1 /* Projection.swift in Sources */,
 				5D660FF71BE98D670021E04F /* Property.swift in Sources */,
+				5346B5142B8FB6A9001CADFE /* MongoDataAccess.swift in Sources */,
 				3FE267D9264308680030F83C /* PropertyAccessors.swift in Sources */,
 				ACF08B6726DD936200686CBC /* Query.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
@@ -2579,6 +2605,7 @@
 				535EAA7525B0B02B00DBF3CD /* SwiftUITests.swift in Sources */,
 				3F88250C1E5E335000586B35 /* SwiftUnicodeTests.swift in Sources */,
 				5D6610271BE98D880021E04F /* TestCase.swift in Sources */,
+				5346B51C2B8FB71E001CADFE /* MongoDataAccessTests.swift in Sources */,
 				3F558C8A22C29A03002F0F30 /* TestUtils.mm in Sources */,
 				3FAF2D4129577100002EAC93 /* TestUtils.swift in Sources */,
 				3F90C1B22716169C0029000E /* TestValueFactory.swift in Sources */,
@@ -2642,6 +2669,7 @@
 				AC7D182E261F2F560080E1D2 /* SwiftObjectServerPartitionTests.swift in Sources */,
 				1AA5AEA11D98C99800ED8C27 /* SwiftObjectServerTests.swift in Sources */,
 				AC2C2A40268E1B0200B4DA33 /* SwiftServerObjects.swift in Sources */,
+				5346B5162B8FB6C4001CADFE /* SwiftMongoAccessTests.swift in Sources */,
 				1AA5AE981D989BE400ED8C27 /* SwiftSyncTestCase.swift in Sources */,
 				AC8846B72687BC4100DF4A65 /* SwiftUIServerTests.swift in Sources */,
 				3F558C8822C29A03002F0F30 /* TestUtils.mm in Sources */,

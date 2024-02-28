@@ -126,37 +126,6 @@ func runCommand() -> String {
     return matches.last ?? ""
 }
 
-let addedTargets: [PackageDescription.Target]
-if #available(macOS 10.15, *) {
-    addedTargets = [
-        .macro(
-            name: "MongoDataAccessMacros",
-            dependencies: [
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
-            ],
-            path: "MongoDataAccessMacros"
-        ),
-        .target(
-            name: "MongoDataAccess",
-            dependencies: ["RealmSwift", "MongoDataAccessMacros"],
-            path: "MongoDataAccess",
-            exclude: ["Tests"]
-//            swiftSettings: [.enableExperimentalFeature("RuntimeDiscoverableAttrs")]
-        ),
-        .testTarget(
-            name: "MongoDataAccessTests",
-            dependencies: ["MongoDataAccess", "MongoDataAccessMacros",
-                           .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")],
-            path: "MongoDataAccess/Tests",
-//            exclude: ["bson-corpus"],
-            resources: [.process("bson-corpus")]),
-    ]
-} else {
-    addedTargets = []
-}
-
 let package = Package(
     name: "Realm",
     platforms: [
@@ -172,9 +141,6 @@ let package = Package(
         .library(
             name: "RealmSwift",
             targets: ["Realm", "RealmSwift"]),
-        .library(
-            name: "MongoDataAccess",
-            targets: ["MongoDataAccess"]),
     ],
     dependencies: [
         .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion),
@@ -299,27 +265,6 @@ let package = Package(
                 "Tests",
             ]
         ),
-
-//        .macro(
-//            name: "MongoDataAccessMacros",
-//            dependencies: [
-//                .product(name: "SwiftSyntax", package: "swift-syntax"),
-//                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-//                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
-//            ],
-//            path: "MongoDataAccessMacros"
-//        ),
-//        .target(
-//            name: "MongoDataAccess",
-//            dependencies: ["RealmSwift", "MongoDataAccessMacros"],
-//            path: "MongoDataAccess",
-//            exclude: ["Tests"]
-//        ),
-//        .testTarget(
-//            name: "MongoDataAccessTests",
-//            dependencies: ["MongoDataAccess", "MongoDataAccessMacros",
-//                           .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax")],
-//            path: "MongoDataAccess/Tests"),
         .target(
             name: "RealmTestSupport",
             dependencies: ["Realm"],
@@ -370,7 +315,8 @@ let package = Package(
                 "RealmSwiftTests-Info.plist",
                 "QueryTests.swift.gyb",
                 "TestUtils.swift"
-            ]
+            ],
+            resources: [.copy("BsonCorpus")]
         ),
 
         // Object server tests have support code written in both obj-c and
@@ -420,6 +366,6 @@ let package = Package(
                 "RLMWatchTestUtility.m"
             ]
         )
-    ] + addedTargets,
+    ],
     cxxLanguageStandard: .cxx20
 )

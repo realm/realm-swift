@@ -142,6 +142,7 @@ public typealias SyncSession = RLMSyncSession
 
 public extension SyncSession {
     @_unsafeInheritExecutor 
+    @available(macOS 10.15, *)
     func waitForUpload() async throws {
         try await withCheckedThrowingContinuation { continuation in
             self.waitForUploadCompletion(on: nil) { error in
@@ -149,6 +150,7 @@ public extension SyncSession {
             }
         }
     }
+    @available(macOS 10.15, *)
     @_unsafeInheritExecutor
     func waitForDownload() async throws {
         try await withCheckedThrowingContinuation { continuation in

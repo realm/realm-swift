@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1430"
-   version = "1.7">
+   version = "1.8">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -98,11 +98,11 @@
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-         <EnvironmentVariable
-            key = "SWIFT_UNEXPECTED_EXECUTOR_LOG_LEVEL"
-            value = "2"
-            isEnabled = "YES">
-         </EnvironmentVariable>
+      <EnvironmentVariable
+         key = "key"
+         value = "value"
+         isEnabled = "isEnabled">
+      </EnvironmentVariable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

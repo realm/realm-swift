@@ -1,6 +1,6 @@
 import Foundation
 import Realm
-@_exported import RealmSwift
+import RealmSwift
 import Realm.Private
 
 public protocol BSONFilter {
@@ -19,7 +19,17 @@ public protocol ExpressibleByExtJSONLiteral : ExtJSON {
 }
 
 /**
- 
+ String
+ Int
+ Data
+ Date
+ Bool
+ Double
+ Long
+ Optionals
+ Any
+ Dictionary<String, Any>
+ Array<Any>
  */
 public protocol ExtJSONLiteral : ExpressibleByExtJSONLiteral {
 }
@@ -54,11 +64,55 @@ extension ExpressibleByExtJSONLiteral {
 //    }
 }
 
-//extension ExtJSONLiteral where Self : ExtJSONLiteral {
-//    static func initialize(extJSONValue: ExtJSONValue) throws -> Self {
-//        fatalError()
+extension ExtJSON {
+}
+
+extension ExtJSONDocument {
+//    public subscript<T>(_ key: String) -> T where T: ExtJSONLiteral {
+//        get throws {
+//            try T.init(extJSONValue: self[key] as! Dictionary<String, Any>)
+//        }
 //    }
-//}
+
+    public subscript<T>(extJSONKey key: String) -> T? {
+        get throws {
+            self[key] as? T
+        }
+    }
+    public subscript<T>(extJSONKey key: String) -> T? where T: OptionalProtocol {
+        get throws {
+            if let value = self[key] {
+                return value as? T
+            } else {
+                return nil
+            }
+        }
+    }
+    public subscript<T>(extJSONKey key: String) -> T where T: ExtJSONQueryRepresentable {
+        get throws {
+            try T.init(extJSONValue: self[key] as! ExtJSONDocument as! T.ExtJSONValue)
+        }
+    }
+    public subscript<T>(extJSONKey key: String) -> Array<T>? where T: ExtJSONQueryRepresentable {
+        get throws {
+            return try (self[key] as! Array<[String: Any]>).map(T.init)
+        }
+    }
+    public subscript(extJSONKey key: String) -> Any? {
+        get throws {
+            return self[key]
+        }
+    }
+    // Special case for Any type
+//    public subscript(key: String) -> Dictionary<String, any ExtJSON> {
+//        get throws {
+//            (self[key] as! Dictionary<String, any ExtJSON>).reduce(into: Dictionary<String, any ExtJSON>()) { partialResult, element in
+//                partialResult[element.key] = element.value
+//            }
+//        }
+//    }
+}
+
 extension String: ExtJSONLiteral {
     public init(extJSONValue value: Self) throws {
         self = value
@@ -67,6 +121,7 @@ extension String: ExtJSONLiteral {
         self
     }
 }
+
 extension Bool: ExtJSONLiteral {
     public init(extJSONValue value: Self) throws {
         self = value
@@ -75,33 +130,12 @@ extension Bool: ExtJSONLiteral {
         self
     }
 }
+
 extension NSNull: ExtJSON {
 }
 
 public struct ExtJSONSerialization {
     private init() {}
-    public func serialize(literal: String) {
-    }
-    public func serialize(literal: Bool) {
-    }
-    public func serialize<T>(literal: [String: T]) where T : ExtJSONLiteral {
-    }
-    public func serialize(literal: [String: any ExtJSONLiteral]) {
-    }
-    public func serialize(literal: [any ExtJSONLiteral]) {
-    }
-    public static func deserialize(literal: String) -> String {
-        return literal
-    }
-    public static func deserialize(literal: Bool) {
-    }
-    public static func deserialize<T>(literal: [String: T]) where T : ExtJSONLiteral {
-    }
-    private static func deserialize(literal: NSArray) throws -> ExtJSONArray {
-        try literal.map {
-            try deserialize(literal: $0) as! any ExpressibleByExtJSONLiteral
-        }
-    }
     public static func deserialize<T>(literal: Any) throws -> T {
         try deserialize(literal: literal as Any?) as! T
     }
@@ -112,22 +146,66 @@ public struct ExtJSONSerialization {
     public static func deserialize<T>(literal: Any?) throws -> T? {
         try deserialize(literal: literal) as? T
     }
-    public static func deserialize(literal: Any?) throws -> Any {
+    public static func read<T>(from document: ExtJSONDocument, 
+                               for key: String) throws -> T where T: ExtJSONLiteral {
+        return document[key] as! T
+    }
+    public static func read<T>(from document: ExtJSONDocument,
+                               for key: String) throws -> T where T: ExtJSONObjectRepresentable {
+        return document[key] as! T
+    }
+    public static func read<T>(from document: ExtJSONDocument,
+                               for key: String) throws -> T where T: ExtJSONQueryRepresentable {
+        try T.init(extJSONValue: document[key] as! ExtJSONDocument)
+    }
+    public static func read<T>(from document: ExtJSONDocument,
+                               for key: String) throws -> T? where T: ExtJSONQueryRepresentable {
+        try? T.init(extJSONValue: document[key] as! ExtJSONDocument)
+    }
+    public static func read<T>(from document: ExtJSONDocument,
+                               for key: String) throws -> [T] where T: ExtJSONQueryRepresentable {
+        return try (document[key] as! Array<[String: Any]>).map(T.init)
+    }
+//    public static func read<C>(from document: ExtJSONDocument,
+//                               for key: String) throws -> C where C: ExtJSONArrayRepresentable, C.Element: ExtJSONQueryRepresentable {
+//        var c = C.init()
+//        let parsed = (document[key] as! Array<[String: Any]>)
+//        for i in 0..<parsed.count {
+//            c[c.count as! C.Index] = try C.Element.init(from: parsed[i])
+//        }
+//        return c
+//    }
+    static let extJSONTypes: [any ExtJSONObjectRepresentable.Type] = {
+        var types: [any ExtJSONObjectRepresentable.Type] = [
+            Int.self, 
+            Double.self,
+            Int64.self,
+            ObjectId.self,
+            Date.self,
+            Data.self,
+            Decimal128.self,
+        ]
+        return types
+    }()
+    
+    public static func deserialize(literal: Any?) throws -> Any? {
         switch literal {
         case let literal as String: return literal
         case let literal as Bool: return literal
         case let literal as NSDictionary:
-            for type in [any ExtJSONObjectRepresentable.Type](
-                arrayLiteral: Int.self, Double.self, Int64.self
-            ) {
+            for type in extJSONTypes {
                 do {
                     return try type.init(extJSONValue: literal as! Dictionary<String, Any>)
                 } catch {
                 }
             }
-            return try deserialize(literal: literal)
-        case let literal as NSArray: 
-            return try deserialize(literal: literal)
+            return try literal.reduce(into: ExtJSONDocument()) { partialResult, element in
+                partialResult[element.key as! String] = try deserialize(literal: element.value)
+            }
+        case let literal as NSArray:
+            return try literal.map {
+                try deserialize(literal: $0)
+            }
         case let literal as [String : any ExtJSON]:
             return try literal.reduce(into: ExtJSONDocument()) { partialResult, element in
                 partialResult[element.key] = try deserialize(literal: element.value)
@@ -135,25 +213,41 @@ public struct ExtJSONSerialization {
         case nil: 
             fallthrough
         case is NSNull:
-            return NSNull()// Optional<Any>.none as Any
+            return Optional<Any>.none
+        case let opt as Optional<Any>:
+            return opt ?? nil
         case let literal as Int: return literal
         case let literal as Double: return literal
         case let literal as any OptionalProtocol:
             return literal
-        default: fatalError()
+        default: throw JSONError.invalidType("\(type(of: literal))")
         }
     }
-//    public static func deserialize(literal: Optional<Any>) throws -> Optional<Any> {
-//        literal ?? .none
-//    }
-    public static func deserialize<T>(literal: T?.ExtJSONValue??) throws -> T? where T: ExtJSONObjectRepresentable {
-        try T?.init(extJSONValue: literal as! [String : Any] ?? .none)
-    }
-    public static func deserialize(literal: any ExpressibleByExtJSONLiteral) throws -> any ExtJSON {
-        try deserialize(literal: literal as Any) as! any ExpressibleByExtJSONLiteral
-    }
-    public static func deserialize<T>(literal: T.ExtJSONValue) throws -> T where T : ExpressibleByExtJSONLiteral {
-        return try T(extJSONValue: literal)
+    public static func serialize(literal: Any?) throws -> Any? {
+        switch literal {
+        case let literal as String: return literal
+        case let literal as Bool: return literal
+        case let literal as any ExtJSONObjectRepresentable: return literal.extJSONValue
+        case let literal as NSDictionary:
+            return try literal.reduce(into: ExtJSONDocument()) { partialResult, element in
+                partialResult[element.key as! String] = try serialize(literal: element.value)
+            }
+        case let literal as NSArray:
+            return try literal.map {
+                try serialize(literal: $0)
+            }
+        case let literal as [String : Any]:
+            return try literal.reduce(into: ExtJSONDocument()) { partialResult, element in
+                partialResult[element.key] = try serialize(literal: element.value)
+            }
+        case nil:
+            fallthrough
+        case is NSNull:
+            return Optional<Any>.none
+        case let literal as any OptionalProtocol:
+            return literal
+        default: fatalError()
+        }
     }
     
     private static func deserialize(literal: NSDictionary) throws -> Any {
@@ -177,11 +271,29 @@ public struct ExtJSONSerialization {
     }
     public static func data(with extJSONObject: ExtJSONDocument) throws -> Data {
         try JSONSerialization.data(withJSONObject: extJSONObject.reduce(into: NSMutableDictionary()) { partialResult, element in
-            partialResult[element.key] = try deserialize(literal: element.value)
+            partialResult[element.key] = try serialize(literal: element.value)
         })
     }
-    public static func data<T>(with extJSONObject: T) throws -> Data where T: ExtJSONObjectRepresentable {
-        try data(with: extJSONObject.extJSONValue)
+    public static func data(with extJSONObject: Any) throws -> Data {
+        switch extJSONObject {
+        case let object as [String : Encodable]:
+            try JSONSerialization.data(withJSONObject: object.reduce(into: [String: Any](), {
+                let encoder = _ExtJSONEncoder()
+                try $1.value.encode(to: encoder)
+                $0[$1.key] = encoder.container?.storage
+            }))
+//            try JSONSerialization.data(withJSONObject: object.reduce(into: NSMutableDictionary()) { partialResult, element in
+//                partialResult[element.key] = try serialize(literal: element.value)
+//            })
+        case let array as NSArray:
+            try JSONSerialization.data(withJSONObject: array.map { element in
+                try serialize(literal: element)
+            })
+        default: throw JSONError.missingKey(key: "")
+        }
+    }
+    public static func data<T>(with extJSONObject: T) throws -> Data where T: Encodable {
+        try ExtJSONEncoder().encode(extJSONObject)
     }
 }
 
@@ -223,21 +335,7 @@ extension _ExtJSONSequence {
 // MARK: Array Conformance
 extension Array: ExtJSON {
 }
-extension Array: ExtJSONLiteral, ExpressibleByExtJSONLiteral
-where Element : ExpressibleByExtJSONLiteral {
-    public typealias ExtJSONValue = [Element.ExtJSONValue]
-    
-    public init(extJSONValue value: ExtJSONValue) throws {
-        self.init()
-        try append(contentsOf: value.map(Element.init))
-    }
-    public var extJSONValue: ExtJSONValue {
-        map(\.extJSONValue)
-    }
-}
-//extension Array where Element: ExpressibleByExtJSONLiteral {
-//    public typealias ExtJSONValue = Self
-//}
+
 extension RealmSwift.List: ExtJSONLiteral, ExpressibleByExtJSONLiteral, ExtJSON
 where Element: ExpressibleByExtJSONLiteral {
     public typealias ExtJSONValue = List
@@ -250,185 +348,17 @@ where Element: ExpressibleByExtJSONLiteral {
     }
 }
 public typealias ExtJSONArray = Array<any ExpressibleByExtJSONLiteral>
-
-public protocol ExtJSONObjectRepresentable: ExpressibleByExtJSONLiteral
-    where ExtJSONValue == ExtJSONDocument {
-}
-
-
-//package struct AnyRawDocumentRepresentable : RawDocumentRepresentable {
-////    package struct SyntaxView : LiteralSyntaxView {
-////        package var endIndex: String.Index
-////        package var startIndex: String.Index
-////        package var rawJSON: String
-////        package var description: String
-////        package var rawDocumentRepresentable: AnyRawDocumentRepresentable
-////        
-////        package init(json: String, at startIndex: String.Index, allowedObjectTypes: [any MongoDataAccess.SyntaxView.Type]) throws {
-////            let syntaxView = SyntaxView.map(json: json, at: startIndex, allowedObjectTypes: allowedObjectTypes)
-////            self.startIndex = syntaxView.startIndex
-////            self.endIndex = syntaxView.endIndex
-////            self.rawJSON = syntaxView.rawJSON
-////            self.description = syntaxView.description
-////            self.rawDocumentRepresentable = AnyRawDocumentRepresentable(rawDocumentRepresentable:  syntaxView.rawDocumentRepresentable)
-////        }
-////        package init(from value: AnyRawDocumentRepresentable) {
-////            let syntaxView = value.rawDocumentRepresentable.syntaxView
-////            self.startIndex = syntaxView.startIndex
-////            self.endIndex = syntaxView.endIndex
-////            self.rawJSON = syntaxView.rawJSON
-////            self.description = syntaxView.description
-////            self.rawDocumentRepresentable = value
-////        }
-////    }
-////    let rawDocumentRepresentable: any RawDocumentRepresentable
-//}
-
-
-
 public protocol RawDocumentKey : RawRepresentable, CaseIterable where RawValue == String {
 }
-//
-//public protocol RawDocumentPrimitiveRepresentable : RawDocumentRepresentable
-//    where SyntaxView: MongoDataAccess.LiteralSyntaxView {
-//    
-//    static var decoder: [String : any MongoDataAccess.LiteralSyntaxView.Type] { get }
-//    init()
-//    func encode() -> RawObjectSyntaxView
-//}
-//
-//extension RawDocumentPrimitiveRepresentable {
-//    public init(from view: RawObjectSyntaxView) throws {
-//        guard let view = view[Self.decoder.0] else {
-//            throw BSONError.missingKey(Self.decoder.0)
-//        }
-//        guard let value = view.rawDocumentRepresentable as? Self else {
-//            throw BSONError.invalidType(key: Self.decoder.0)
-//        }
-//        self = value
-//    }
-//}
-
-//public protocol RawDocumentObjectRepresentable : RawDocumentRepresentable
-//    where SyntaxView: MongoDataAccess.ObjectSyntaxView {
-//    associatedtype RawDocumentKeys : RawDocumentKey
-////    init(from view: RawObjectSyntaxView) throws
-////    func encode() -> SyntaxView
-////    static var decoder: [String : any MongoDataAccess.LiteralSyntaxView.Type] { get }
-//}
-
-//extension RawDocumentObjectRepresentable {
-//    public init(from view: RawObjectSyntaxView) throws {
-//        for key in RawDocumentKeys.allCases {
-//            key
-//        }
-//    }
-//}
 
 public protocol KeyPathIterable {
     static var keyPaths: [PartialKeyPath<Self> : String] { get }
 }
 
-public protocol ExtJSONQueryRepresentable : ExtJSONObjectRepresentable, KeyPathIterable {
+public protocol ExtJSONQueryRepresentable : KeyPathIterable, ExtJSONObjectRepresentable {
 }
 
-//public protocol RawDocumentQueryRepresentable : RawDocumentRepresentable, KeyPathIterable, StructuredDocumentRepresentable  {
-//    static var propertyTypes: [String : RawDocumentRepresentable.Type] { get }
-//    
-//    init(from document: inout LazyDocument<Self>) throws
-//}
-//extension RawDocumentQueryRepresentable {
-//    public init(from document: LazyDocument<Self>) throws {
-//        var document = document
-//        try self.init(from: &document)
-//    }
-//}
-//
-//extension Dictionary : RawDocumentRepresentable where Self.Key == String, 
-//                                                        Self.Value == any RawDocumentRepresentable {
-//    public typealias SyntaxView = RawObjectSyntaxView
-//}
-
-// MARK: Type - ObjectId
-//extension ObjectId : RawDocumentRepresentable {
-//    public struct SyntaxView : ObjectSyntaxView {
-//        public let rawObjectSyntaxView: RawObjectSyntaxView
-//        public let rawDocumentRepresentable: ObjectId
-//        
-//        public init(from view: RawObjectSyntaxView) throws {
-//            self.rawObjectSyntaxView = view
-//            guard let view = view["$oid"] as? StringLiteralSyntaxView else {
-//                throw BSONError.missingKey("$oid")
-//            }
-//            self.rawDocumentRepresentable = try ObjectId(string: view.string)
-//        }
-//        
-//        public init(from rawDocumentValue: ObjectId) {
-//            self.rawDocumentRepresentable = rawDocumentValue
-//            self.rawObjectSyntaxView = [
-//                "$oid": StringLiteralSyntaxView(stringLiteral: rawDocumentRepresentable.stringValue)
-//            ]
-//        }
-//    }
-//}
-
-//extension Int32 : RawDocumentRepresentable {
-//    public var rawValue: RawDocument {
-//        ["$int32": self]
-//    }
-//    public init(from rawDocumentValue: RawDocument) {
-//        self = rawDocumentValue["$int32"] as! Int32
-//    }
-//}
-//extension Int64 : RawDocumentRepresentable {
-//    public var rawValue: RawDocument {
-//        ["$int64": self]
-//    }
-//    public init(from rawDocumentValue: RawDocument) {
-//        self = rawDocumentValue["$int64"] as! Int64
-//    }
-//}
-//extension Bool : RawDocumentRepresentable {
-//    public typealias SyntaxView = BoolSyntaxView
-//}
-//extension Double : RawDocumentRepresentable {
-//    public var rawValue: RawDocument {
-//        ["$numberDouble": self]
-//    }
-//    public init(from rawDocumentValue: RawDocument) {
-//        self = rawDocumentValue["$numberDouble"] as! Double
-//    }
-//}
-
-// MARK: Type - Regex
-//@available(macOS 13.0, *)
-//extension Regex : RawDocumentRepresentable {
-////    public struct SyntaxView : ObjectSyntaxView {
-////        public var rawDocumentRepresentable: Regex<Output>
-////        
-////        public var rawObjectSyntaxView: RawObjectSyntaxView
-////        public typealias RawDocumentValue = Regex
-////        
-////        public init(from value: Regex<Output>) {
-////            fatalError()
-////        }
-////        public init(from view: RawObjectSyntaxView) throws {
-////            fatalError()
-////        }
-////    }
-//}
-
-// MARK: Type - Array
-//extension Array : RawDocumentRepresentable where Element: RawDocumentRepresentable {
-//    public typealias SyntaxView = ArraySyntaxView<Element>
-//}
-//extension Array : RawDocumentRepresentable where Element == any RawDocumentRepresentable {
-////    public typealias SyntaxView = RawArraySyntaxView
-//}
-//extension Array where Element : RawDocumentRepresentable {
-//    public typealias SyntaxView = ArraySyntaxView<Element>
-//}
-@BSONCodable struct Person {
+struct Person: Codable {
     let name: String
     let age: Int
 }
@@ -583,7 +513,41 @@ public enum BSONError : Error {
     case invalidType(key: String)
 }
 
-public struct MongoCollection<T : ExtJSONObjectRepresentable> {
+public struct QueryObject {
+}
+
+enum AnyBSONKey : Codable {
+    case string(String)
+    case objectId(ObjectId)
+    case int(Int)
+    
+    func encode(to encoder: Encoder) throws {
+        switch self {
+        case .string(let a0): try a0.encode(to: encoder)
+        case .objectId(let a0): try a0.encode(to: encoder)
+        case .int(let a0): try a0.encode(to: encoder)
+        }
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        do {
+            self = .string(try container.decode(String.self))
+        } catch {
+        }
+        do {
+            self = .int(try container.decode(Int.self))
+        } catch {
+        }
+        self = .objectId(try container.decode(ObjectId.self))
+    }
+}
+
+public struct InsertOneResult : Codable {
+    let insertedId: AnyBSONKey
+}
+
+public struct MongoTypedCollection<T : Codable> {
     fileprivate let mongoCollection: RLMMongoCollection
     fileprivate let database: MongoDatabase
     fileprivate init(mongoCollection: RLMMongoCollection, database: MongoDatabase) {
@@ -591,40 +555,64 @@ public struct MongoCollection<T : ExtJSONObjectRepresentable> {
         self.database = database
     }
     
+    struct Arguments : Codable {
+        let database: String
+        let collection: String
+        let document: T
+    }
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
     /// - Parameters:
     ///   - object: object  A `T` value to insert.
     ///   - completion: The result of attempting to perform the insert. An Id will be returned for the inserted object on sucess
-//    @preconcurrency
-//    public func insertOne(_ object: T,
-//                          _ completion: @Sendable @escaping (Result<T.Id, Error>) -> Void) -> Void {
-//        var document = RawDocument()
-//        object.encode(to: &document)
-//        mongoCollection.user.callFunctionNamed("insertOne", 
-//                                               arguments: document.description,
-//                                               serviceName: "mongodb-atlas", completionBlock: {
-//            completion($0.map({ $0. }))
-//        })
-//        mongoCollection.app.insertOne(document, {
-//            
-//        })
-//    }
-//    
-//    @_unsafeInheritExecutor
-//    public func insertOne(_ object: T) async throws -> AnyBSON {
-//        try await withCheckedThrowingContinuation { continuation in
-//            insertOne(object) { returnValue in
-//                
-//                switch returnValue {
-//                case .success(let value):
-//                    continuation.resume(returning: value)
-//                case .failure(let error):
-//                    continuation.resume(throwing: error)
-//                }
-//            }
-//        }
-//    }
+    @preconcurrency
+    public func insertOne(_ object: T,
+                          _ completion: @Sendable @escaping (Result<InsertOneResult, Error>) -> Void) -> Void {
+        let data: Data
+        do {
+            var document = RawDocument()
+            document["database"] = mongoCollection.databaseName
+            document["collection"] = mongoCollection.name
+            document["query"] = try ExtJSONEncoder().encode(object)
+            data = try ExtJSONEncoder().encode([Arguments(database: mongoCollection.databaseName,
+                                                         collection: mongoCollection.name,
+                                                          document: object)])
+        } catch {
+            return completion(.failure(error))
+        }
+
+        mongoCollection.user.callFunctionNamed("insertOne",
+                                               arguments: String(data: data, encoding: .utf8)!,
+                                               serviceName: "mongodb-atlas", completionBlock: { data, error in
+            guard let data = data else {
+                guard let error = error else {
+                    return completion(.failure(AppError(RLMAppError.Code.httpRequestFailed)))
+                }
+                return completion(.failure(error))
+            }
+            do {
+                let object = try ExtJSONDecoder().decode(InsertOneResult.self, from: data.data(using: .utf8)!)
+                completion(.success(object))
+            } catch {
+                return completion(.failure(error))
+            }
+        })
+    }
+    
+    @_unsafeInheritExecutor
+    @available(macOS 10.15, *)
+    public func insertOne(_ object: T) async throws -> Any {
+        try await withCheckedThrowingContinuation { continuation in
+            insertOne(object) { returnValue in
+                switch returnValue {
+                case .success(let value):
+                    continuation.resume(returning: value)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
 //    
 //    /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
 //    /// they will be generated.
@@ -714,42 +702,185 @@ public struct MongoCollection<T : ExtJSONObjectRepresentable> {
 //        }
 //    }
     
+    @dynamicMemberLookup struct Filter<T> where T: Codable {
+        class Encoder : Swift.Encoder {
+            class _KeyedEncodingContainer<Key>: Swift.KeyedEncodingContainerProtocol where Key: CodingKey {
+                func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
+                    fatalError()
+                }
+                
+                func superEncoder() -> Swift.Encoder {
+                    fatalError()
+                }
+                
+                func superEncoder(forKey key: Key) -> Swift.Encoder {
+                    fatalError()
+                }
+                
+                var codingPath: [CodingKey]
+                init(codingPath: [CodingKey]) {
+                    self.codingPath = codingPath
+                }
+                func encodeNil(forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Bool, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: String, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Double, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Float, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Int, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Int8, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Int16, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Int32, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: Int64, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: UInt, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: UInt8, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: UInt16, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: UInt32, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode(_ value: UInt64, forKey key: Key) throws {
+                    fatalError()
+                }
+                
+                func encode<T>(_ value: T, forKey key: Key) throws where T : Encodable {
+                    fatalError()
+                }
+                
+                func nestedUnkeyedContainer(forKey key: Key) -> UnkeyedEncodingContainer {
+                    fatalError()
+                }
+            }
+            var codingPath: [CodingKey]
+            
+            var userInfo: [CodingUserInfoKey : Any]
+            
+            init(codingPath: [CodingKey], userInfo: [CodingUserInfoKey : Any]) {
+                self.codingPath = codingPath
+                self.userInfo = userInfo
+            }
+            
+            func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
+                fatalError()
+            }
+            
+            func unkeyedContainer() -> UnkeyedEncodingContainer {
+                fatalError()
+            }
+            
+            func singleValueContainer() -> SingleValueEncodingContainer {
+                fatalError()
+            }
+        }
+        subscript<V>(dynamicMember member: KeyPath<T, V>) -> V {
+            fatalError()
+        }
+    }
+    struct D<T: Codable> : ExpressibleByDictionaryLiteral {
+        typealias Key = PartialKeyPath<T>
+        
+        init(dictionaryLiteral elements: (PartialKeyPath<T>, F<T>)...) {
+            
+        }
+    }
+    func f(_ d: D<Person>) {
+        f([
+            \.name: F<Person>.name
+        ])
+    }
+    
+    @dynamicMemberLookup public struct F<V> {
+        public static func greaterThan() -> Self {
+            fatalError()
+        }
+        
+        public static subscript<W>(dynamicMember member: KeyPath<V, W>) -> Self {
+            fatalError()
+        }
+    }
+//    public typealias Tuple<V> = (KeyPath<T, V>, F<V>)
+//    public func findOne(options: FindOptions = FindOptions(),
+//                                _ filter: T? = nil) async throws -> T? {
+//        withCheckedThrowingContinuation { continuation in
+//            findOne(nil) {
+//                
+//            }
+//        }
+//    }
     @_unsafeInheritExecutor
+    @available(macOS 10.15, *)
     public func findOne(options: FindOptions = FindOptions(),
-                        _ filter: ExtJSONDocument) async throws -> T? {
-//        let data: String = try await withCheckedThrowingContinuation { continuation in
-//            var document = RawDocument()
-//            if let filter = filter {
+                        _ filter: T? = nil) async throws -> T? {
+        let data: String = try await withCheckedThrowingContinuation { continuation in
+            var document = RawDocument()
+            if let filter = filter {
 //                var filterDocument = Filter<T>()
 //                _ = filter(&filterDocument)
-//                document["query"] = filterDocument.documentRef.document
-//            }
-//            document["database"] = mongoCollection.databaseName
-//            document["collection"] = mongoCollection.name
-//            mongoCollection.user.callFunctionNamed(
-//                "findOne",
-//                arguments: String(data: [document].extJSONValue, encoding: .utf8)!,
-//                serviceName: mongoCollection.serviceName) { data, error in
-//                    guard let data = data else {
-//                    guard let error = error else {
-//                        return continuation.resume(throwing: AppError(RLMAppError.Code.httpRequestFailed))
-//                    }
-//                    return continuation.resume(throwing: error)
-//                }
-//                continuation.resume(returning: data)
-//            }
-//        }
-
-        fatalError()
-//        let objectTypes = T.schema.compactMap {
-//            $0.value as? any StructuredDocumentRepresentable.Type
-//        }
-//        var scanner: Scanner = ExtJSONScanner(string: data, objectTypes: objectTypes)
-        
-//        let node = try SyntaxNode(from: &scanner)
-//        var document = LazyDocument<T>(from: &scanner)
-        fatalError()
-//        return try T(from: &document) try T.SyntaxView(from: view).rawDocumentRepresentable
+                document["query"] = filter//filterDocument.documentRef.document
+            }
+            document["database"] = mongoCollection.databaseName
+            document["collection"] = mongoCollection.name
+            do {
+                try mongoCollection.user.callFunctionNamed(
+                    "findOne",
+                    arguments: String(data: ExtJSONSerialization.data(with: [document]),
+                                      encoding: .utf8)!,
+                    serviceName: mongoCollection.serviceName) { data, error in
+                        guard let data = data else {
+                            guard let error = error else {
+                                return continuation.resume(throwing: AppError(RLMAppError.Code.httpRequestFailed))
+                            }
+                            return continuation.resume(throwing: error)
+                        }
+                        continuation.resume(returning: data)
+                    }
+            } catch {
+                return continuation.resume(throwing: error)
+            }
+        }
+        do {
+            return try ExtJSONDecoder().decode(T.self, from: data.data(using: .utf8)!)
+        } catch {
+            return nil
+        }
     }
     
 //    @_unsafeInheritExecutor
@@ -862,77 +993,79 @@ public struct MongoCollection<T : ExtJSONObjectRepresentable> {
 //        }
 //    }
 //    
-//    /// Deletes a single matching document from the collection.
-//    /// - Parameters:
-//    ///   - filter: A `Document` as bson that should match the query.
-//    ///   - completion: The result of performing the deletion. Returns the count of deleted objects
-//    @preconcurrency
-//    public func deleteOne(filter: T.Filter? = nil,
-//                          _ completion: @escaping @Sendable (Result<Int, Error>) -> Void) -> Void {
-//        var document = Document()
-//        if var filter = filter {
-//            document = filter.encode()
-//        }
-//        mongoCollection.deleteOneDocument(filter: document, completion)
-//    }
-//    
-//    @_unsafeInheritExecutor
-//    public func deleteOne(filter: ((inout T.Filter) -> Bool)? = nil) async throws -> Int {
-//        try await withCheckedThrowingContinuation { continuation in
+    /// Deletes a single matching document from the collection.
+    /// - Parameters:
+    ///   - filter: A `Document` as bson that should match the query.
+    ///   - completion: The result of performing the deletion. Returns the count of deleted objects
+    @preconcurrency
+    public func deleteOne(filter: T? = nil,
+                          _ completion: @escaping @Sendable (Result<Int, Error>) -> Void) -> Void {
+        do {
+            mongoCollection.deleteOneDocument(filter: [:], completion)
+        } catch {
+            
+        }
+    }
+    
+    @available(macOS 10.15, *)
+    @_unsafeInheritExecutor
+    public func deleteOne(filter: ((inout T) -> Bool)? = nil) async throws -> Int {
+        try await withCheckedThrowingContinuation { continuation in
 //            var query = T.Filter()
 //            _ = filter?(&query)
-//            deleteOne(filter: query) { returnValue in
-//                switch returnValue {
-//                case .success(let value):
-//                    continuation.resume(returning: value)
-//                case .failure(let error):
-//                    continuation.resume(throwing: error)
-//                }
-//            }
-//        }
-//    }
-//    
-//    /// Deletes multiple documents
-//    /// - Parameters:
-//    ///   - filter: Document representing the match criteria
-//    ///   - completion: The result of performing the deletion. Returns the count of the deletion
-//    @preconcurrency
-//    public func deleteMany(filter: T.Filter? = nil,
-//                           _ completion: @escaping @Sendable (Result<Int, Error>) -> Void) -> Void {
+            deleteOne(filter: nil) { returnValue in
+                switch returnValue {
+                case .success(let value):
+                    continuation.resume(returning: value)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
+    /// Deletes multiple documents
+    /// - Parameters:
+    ///   - filter: Document representing the match criteria
+    ///   - completion: The result of performing the deletion. Returns the count of the deletion
+    @preconcurrency
+    public func deleteMany(filter: T? = nil,
+                           _ completion: @escaping @Sendable (Result<Int, Error>) -> Void) -> Void {
 //        var document = Document()
 //        if var filter = filter {
 //            document = filter.encode()
 //        }
-//        mongoCollection.deleteManyDocuments(filter: document, completion)
-//    }
-//    
-//    @_unsafeInheritExecutor
-//    public func deleteMany(filter: T.Filter? = nil) async throws -> Int {
-//        try await withCheckedThrowingContinuation { continuation in
-//            deleteMany(filter: filter) { returnValue in
-//                switch returnValue {
-//                case .success(let value):
-//                    continuation.resume(returning: value)
-//                case .failure(let error):
-//                    continuation.resume(throwing: error)
-//                }
-//            }
-//        }
-//    }
+        mongoCollection.deleteManyDocuments(filter: [:], completion)
+    }
+    
+    @_unsafeInheritExecutor
+    @available(macOS 10.15, *)
+    public func deleteMany(filter: T? = nil) async throws -> Int {
+        try await withCheckedThrowingContinuation { continuation in
+            deleteMany(filter: filter) { returnValue in
+                switch returnValue {
+                case .success(let value):
+                    continuation.resume(returning: value)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
 }
 
-public struct MongoDatabase {
-    fileprivate let mongoDatabase: RLMMongoDatabase
-    public func collection<T: ExtJSONObjectRepresentable>(named name: String, type: T.Type) -> MongoCollection<T> {
-        MongoCollection<T>(mongoCollection: mongoDatabase.collection(withName: name),
-                           database: self)
+extension MongoDatabase {
+//    fileprivate let mongoDatabase: RLMMongoDatabase
+    public func collection<T: Codable>(named name: String, type: T.Type) -> MongoTypedCollection<T> {
+        MongoTypedCollection<T>(mongoCollection: self.collection(withName: name),
+                                database: self)
     }
 }
 
 public extension MongoClient {
-    func database(named name: String) -> MongoDatabase {
-        MongoDatabase(mongoDatabase: self.database(named: name))
-    }
+//    func database(named name: String) -> MongoDatabase {
+//        MongoDatabase(mongoDatabase: self.database(named: name))
+//    }
 }
 
 //extension ExtJSON {
@@ -959,11 +1092,23 @@ public extension MongoClient {
 //    }
 //}
 
-@attached(extension, conformances: ExtJSONObjectRepresentable, names: arbitrary)
-@attached(member, names: named(init(extJSONValue:)), named(rawDocument), arbitrary)
+@attached(extension, conformances: ExtJSONQueryRepresentable, names: prefixed(_), arbitrary)
+@attached(member, 
+          names: named(init(extJSONValue:)),
+          prefixed(_), arbitrary, suffixed(Key))
 @available(swift 5.9)
-public macro BSONCodable(key: String? = nil) = #externalMacro(module: "MongoDataAccessMacros",
-                                                              type: "BSONCodableMacro")
+public macro BSONCodable() = #externalMacro(module: "MongoDataAccessMacros",
+                                            type: "BSONCodableMacro")
+//@attached(extension, conformances: ExtJSONQueryRepresentable, names: arbitrary)
+//@attached(member, names: named(init(extJSONValue:)), named(rawDocument), arbitrary)
+@attached(peer, names: suffixed(Key), prefixed(_))
+@available(swift 5.9)
+public macro BSONCodable(key: String) = #externalMacro(module: "MongoDataAccessMacros",
+                                                       type: "BSONCodableMacro")
+@attached(peer, names: suffixed(Key), prefixed(_))
+@available(swift 5.9)
+public macro BSONCodable(ignore: Bool) = #externalMacro(module: "MongoDataAccessMacros",
+                                                          type: "BSONCodableMacro")
 
 @attached(peer)
 @available(swift 5.9)
