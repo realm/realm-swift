@@ -115,9 +115,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             config = user.configuration(partitionValue: partitionValue)
         }
         let realm = try Realm(configuration: config)
-        if wait {
+//        if wait {
             waitForDownloads(for: realm)
-        }
+//        }
         return realm
     }
     public func openRealm(app: App? = nil, wait: Bool = true) throws -> Realm {
@@ -184,7 +184,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         }
     }
 
-    public func checkCount<T: Object>(expected: Int,
+    public func checkCount<FieldType: Object>(expected: Int,
                                       _ realm: Realm,
                                       _ type: FieldType.Type,
                                       file: StaticString = #file,
@@ -218,7 +218,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     public static let bigObjectCount = 2
-<<<<<<< HEAD
     public func populateRealm<FieldType: BSON>(user: User? = nil, partitionValue: FieldType) throws {
         try autoreleasepool {
             let user = try (user ?? logInUser(for: basicCredentials()))
@@ -229,16 +228,16 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
                 }
-=======
+            }
+        }
+    }
     public func populateRealm() throws {
         try write { realm in
             for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                 realm.add(SwiftHugeSyncObject.create())
->>>>>>> aea16af78a0bbfb2c964801becaecb9cade9335f
             }
         }
     }
-
     // MARK: - Mongo Client
 
     public func setupMongoCollection(for type: ObjectBase.Type) throws -> MongoCollection {
