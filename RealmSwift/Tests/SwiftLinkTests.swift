@@ -121,28 +121,26 @@ class SwiftLinkTests: TestCase {
         source1.value = 1
         source1.link = target
 
-        XCTAssertEqual(0, target.backlinks.count, "Linking objects are not available until the object is persisted")
+        XCTAssertEqual(target.backlinks.count, 0, "Linking objects are not available until the object is persisted")
 
         try! realm.write {
             realm.add(source1)
         }
 
-        XCTAssertEqual(1, target.backlinks.count)
-        XCTAssertEqual(source1.value, target.backlinks.first!.value)
+        XCTAssertEqual(target.backlinks.count, 1)
+        XCTAssertEqual(target.backlinks.first!.value, source1.value)
 
         let source2 = LinkToOnlyComputed()
         source2.value = 2
         source2.link = target
 
-        XCTAssertEqual(1, target.backlinks.count, "Linking objects to an unpersisted object are not available")
+        XCTAssertEqual(target.backlinks.count, 1, "Linking objects to an unpersisted object are not available")
         try! realm.write {
             realm.add(source2)
         }
 
-        XCTAssertEqual(2, target.backlinks.count)
-        XCTAssertTrue(target.backlinks.contains(where: { o in
-            o.value == 2
-        }))
+        XCTAssertEqual(target.backlinks.count, 2)
+        XCTAssertTrue(target.backlinks.contains(where: { $0.value == 2 }))
 
         let targetWithNoLinks = OnlyComputedProps()
         try! realm.write {
@@ -151,6 +149,6 @@ class SwiftLinkTests: TestCase {
             realm.add(targetWithNoLinks)
         }
 
-        XCTAssertEqual(0, targetWithNoLinks.backlinks.count, "Linking objects are not available until the object is persisted")
+        XCTAssertEqual(targetWithNoLinks.backlinks.count, 0, "No object is linking to targetWithNoLinks")
     }
 }

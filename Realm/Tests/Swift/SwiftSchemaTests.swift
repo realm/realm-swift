@@ -144,6 +144,12 @@ class OnlyComputedTarget: RLMObject {
     }
 }
 
+class OnlyComputedNoBacklinksProps: FakeObject {
+    var computedProperty: String {
+        return "Test_String"
+    }
+}
+
 @MainActor
 class RequiresObjcName: RLMObject {
     static var enable = false
@@ -185,7 +191,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
                                        "No properties are defined for 'NoProps'. Did you remember to mark them with '@objc' or '@Persisted' in your model?")
     }
     
-    func testShouldNotThrowForObjectWithOnlyComputedProps() {
+    func testShouldNotThrowForObjectWithOnlyBacklinksProps() {
         let config = RLMRealmConfiguration.default()
         config.objectClasses = [OnlyComputedTarget.self, OnlyComputedSource.self]
         config.inMemoryIdentifier = #function
@@ -193,6 +199,15 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
         try! r.transaction {
             _ = OnlyComputedTarget.create(in: r, withValue: [])
         }
+
+        let schema = OnlyComputedTarget().objectSchema
+        XCTAssertEqual(schema.computedProperties.count, 1)
+        XCTAssertEqual(schema.properties.count, 0)
+    }
+
+    func testShouldThrowForObjectWithOnlyComputedNoBacklinksProps() {
+        assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: OnlyComputedNoBacklinksProps.self),
+                                       "No properties are defined for 'OnlyComputedNoBacklinksProps'. Did you remember to mark them with '@objc' or '@Persisted' in your model?")
     }
 
     func testSchemaInitWithLinkedToObjectUsingInitWithValue() {
