@@ -2,10 +2,14 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Code sign our published xcframeworks. By Apple's requirements, we should sign our release
-  binaries so Xcode can validate it was signed by the same developer on every new version. 
+  binaries so Xcode can validate it was signed by the same developer on every new version.
   ([Apple](https://developer.apple.com/support/third-party-SDK-requirements/)).
 * Report sync warnings from the server such as sync being disabled server-side to the sync error handler.
   ([#8020](https://github.com/realm/realm-swift/issues/8020)).
+* Add support for string comparison queries, which allows building string
+  queries with the following operators (`>`, `>=`, `<`, `<=`).
+  This is a case sensitive lexicographical comparison.
+  ([#8008](https://github.com/realm/realm-swift/issues/8008)).
 
 ### Fixed
 * `-[RLMAsymmetricObject createObject:withValue:]` was marked as having a

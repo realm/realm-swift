@@ -1027,10 +1027,10 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     %man RLMAssertCount($class, 0, @"ANY $prop = %@", $v0);
     %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop >= %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop <= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop >= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop <= %@", $v0);
 
     [self createObjectWithValueIndex:0];
 
@@ -1038,11 +1038,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v0);
     %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
     %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v1);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop >= %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop >= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
 
     [self createObjectWithValueIndex:1];
 
@@ -1050,14 +1050,14 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v1);
     %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v0);
     %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v1);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop > %@", $v0);
-    %man %minmax RLMAssertCount($class, 2, @"ANY $prop >= %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
-    %man %minmax RLMAssertCount($class, 2, @"ANY $prop <= %@", $v1);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop > %@", $v0);
+    %man %comp RLMAssertCount($class, 2, @"ANY $prop >= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %man %comp RLMAssertCount($class, 2, @"ANY $prop <= %@", $v1);
 
-    %man %nominmax %noany RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
+    %man %nocomp %noany RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testQueryBetween {
@@ -1303,10 +1303,10 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop = %@", $v0);
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop != %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop >= %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop <= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop >= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop <= %@", $v0);
 
     [self createObjectWithValueIndex:0];
 
@@ -1314,11 +1314,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop = %@", $v0);
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop != %@", $v0);
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop != %@", $v1);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v1);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v1);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v0);
 
     [self createObjectWithValueIndex:1];
 
@@ -1326,14 +1326,14 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop = %@", $v1);
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop != %@", $v0);
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop != %@", $v1);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop > %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 2, @"ANY link.$prop >= %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v1);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 2, @"ANY link.$prop <= %@", $v1);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop > %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 2, @"ANY link.$prop >= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v1);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 2, @"ANY link.$prop <= %@", $v1);
 
-    %man %nominmax %noany RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
+    %man %nocomp %noany RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testSubstringQueries {

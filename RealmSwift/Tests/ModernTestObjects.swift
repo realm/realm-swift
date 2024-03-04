@@ -176,6 +176,7 @@ enum ModernStringEnum: String, Codable, PersistableEnum {
     case value1 = "a"
     case value2 = "c"
     case value3 = "e"
+    case value4 = "Foó"
 }
 
 class ModernImplicitlyUnwrappedOptionalObject: Object {
