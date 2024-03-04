@@ -1,7 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for string comparison queries, which allows building string 
+  queries with the following operators (`>`, `>=`, `<`, `<=`). 
+  This is a case sensitive lexicographical comparison.
+  ([#8008](https://github.com/realm/realm-swift/issues/8008)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
