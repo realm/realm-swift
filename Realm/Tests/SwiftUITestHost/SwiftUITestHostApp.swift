@@ -163,6 +163,7 @@ struct Footer: View {
     }
 }
 
+@MainActor
 struct ContentView: View {
     @State var searchFilter: String = ""
 

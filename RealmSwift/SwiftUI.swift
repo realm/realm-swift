@@ -117,10 +117,22 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
     /// Objects must have observers removed before being added to a realm.
     /// They are stored here so that if they are appended through the Bound Property
     /// system, they can be de-observed before hand.
-    @Unchecked
-    fileprivate static var observedObjects = [NSObject: SwiftUIKVO.Subscription]()
+    private static let observedObjects = AllocatedUnfairLock([NSObject: Subscription]())
 
-    @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+    static func store(_ obj: NSObject, _ subscription: Subscription) {
+        SwiftUIKVO.observedObjects.withLock {
+            $0[obj] = subscription
+        }
+    }
+
+    static func cancel(_ obj: NSObject) {
+        SwiftUIKVO.observedObjects.withLock {
+            if let subscription: Subscription = $0.removeValue(forKey: obj) {
+                subscription.removeObservers()
+            }
+        }
+    }
+
     struct Subscription: Combine.Subscription {
         let observer: NSObject
         let value: NSObject
@@ -134,23 +146,16 @@ private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
         }
 
         func cancel() {
-            removeObservers()
-            SwiftUIKVO.observedObjects.removeValue(forKey: value)
+            SwiftUIKVO.cancel(value)
         }
 
         fileprivate func removeObservers() {
-            guard SwiftUIKVO.observedObjects.keys.contains(value) else {
-                return
-            }
             keyPaths.forEach {
                 value.removeObserver(observer, forKeyPath: $0)
             }
         }
 
         fileprivate func addObservers() {
-            guard SwiftUIKVO.observedObjects.keys.contains(value) else {
-                return
-            }
             keyPaths.forEach {
                 value.addObserver(observer, forKeyPath: $0, options: .init(), context: nil)
             }
@@ -230,7 +235,7 @@ private final class ObservableStoragePublisher<ObjectType>: Publisher where Obje
             }
             let subscription = SwiftUIKVO.Subscription(observer: kvo, value: value, keyPaths: keyPaths)
             subscriber.receive(subscription: subscription)
-            SwiftUIKVO.observedObjects[value] = subscription
+            SwiftUIKVO.store(value, subscription)
         }
     }
 }
@@ -1163,7 +1168,7 @@ public extension BoundCollection where Value == List<Element>, Element: ObjectBa
     func append(_ value: Value.Element) {
         write { list in
             if value.realm == nil && list.realm != nil {
-                SwiftUIKVO.observedObjects[value]?.cancel()
+                SwiftUIKVO.cancel(value)
             }
             list.append(thawObjectIfFrozen(value))
         }
@@ -1217,7 +1222,7 @@ public extension BoundCollection where Value == MutableSet<Element>, Element: Ob
     func insert(_ value: Value.Element) {
         write { mutableSet in
             if value.realm == nil && mutableSet.realm != nil {
-                SwiftUIKVO.observedObjects[value]?.cancel()
+                SwiftUIKVO.cancel(value)
             }
             mutableSet.insert(thawObjectIfFrozen(value))
         }
@@ -1230,7 +1235,7 @@ public extension BoundCollection where Value == Results<Element>, Element: Objec
     func append(_ value: Value.Element) {
         write { results in
             if value.realm == nil && results.realm != nil {
-                SwiftUIKVO.observedObjects[value]?.cancel()
+                SwiftUIKVO.cancel(value)
             }
             results.realm?.add(thawObjectIfFrozen(value))
         }
@@ -1243,7 +1248,7 @@ public extension BoundCollection where Value == Results<Element>, Element: Proje
     func append(_ value: Value.Element) {
         write { results in
             if value.realm == nil && results.realm != nil {
-                SwiftUIKVO.observedObjects[value.rootObject]?.cancel()
+                SwiftUIKVO.cancel(value.rootObject)
             }
             results.realm?.add(thawObjectIfFrozen(value.rootObject))
         }
@@ -1305,7 +1310,7 @@ public extension BoundMap where Value.Value: ObjectBase & ThreadConfined {
         }
         // if the value is unmanaged but the map is managed, we are adding this value to the realm
         if value.realm == nil && self.wrappedValue.realm != nil {
-            SwiftUIKVO.observedObjects[value]?.cancel()
+            SwiftUIKVO.cancel(value)
         }
         write(self.wrappedValue) { map in
             var m = map
@@ -1854,17 +1859,18 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension SwiftUIKVO {
     @objc(removeObserversFromObject:) static func removeObservers(object: NSObject) -> Bool {
-        if let subscription = SwiftUIKVO.observedObjects[object] {
-            subscription.removeObservers()
-            return true
-        } else {
+        Self.observedObjects.withLock {
+            if let subscription = $0[object] {
+                subscription.removeObservers()
+                return true
+            }
             return false
         }
     }
 
     @objc(addObserversToObject:) static func addObservers(object: NSObject) {
-        if let subscription = SwiftUIKVO.observedObjects[object] {
-            subscription.addObservers()
+        Self.observedObjects.withLock {
+            $0[object]?.addObservers()
         }
     }
 }

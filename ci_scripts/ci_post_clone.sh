@@ -77,6 +77,11 @@ if [[ "$target" == "release-package-build-"* ]]; then
     sed -i '' "s/REALM_HIDE_SYMBOLS = NO;/REALM_HIDE_SYMBOLS = YES;/" "$filename"
 fi
 
+# Xcode cloud currently doesn't have visionOS installed for Xcode 15.3
+if [[ "$CI_WORKFLOW" == release-package-build-vision*_15.3 ]]; then
+    xcodebuild -downloadAllPlatforms
+fi
+
 # If we're building the dummy CI target then run the test. Other schemes are
 # built via Xcode cloud's xcodebuild invocation. We can't do this via a build
 # step on the CI target as that results in nested invocations of xcodebuild,

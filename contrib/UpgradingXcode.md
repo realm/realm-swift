@@ -12,7 +12,7 @@ Check https://developer.apple.com/documentation/xcode-release-notes to see new X
 3. Enable manually the new created workflows.
 4. If needed, add environment values to the newly created workflows.
 5. Update version(s) from xcode_versions in `scripts/package-examples.rb`.
-6. Update XCODE_VERSION in `master-push.yml` and check if DOC_VERSION, RELEASE_VERSION and TEST_VERSION needs to be updated.
+6. Update XCODE_VERSION in `.github/workflows/master-push.yml` and check if DOC_VERSION, RELEASE_VERSION and TEST_VERSION needs to be updated.
 7. Search for `#if swift` and see if there's any we can remove.
 8. Update the Carthage version in CHANGELOG.md (and add a changelog entry).
 9. If there's new project settings migrations, open each of the Xcode projects and apply/skip them as applicable. Note that we generally do *not* want to use the Swift version migrations as we support multiple Swift versions at once.
