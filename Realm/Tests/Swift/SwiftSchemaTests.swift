@@ -132,6 +132,24 @@ class NoProps: FakeObject {
     // no @objc properties
 }
 
+class OnlyComputedSource: RLMObject {
+    @objc dynamic var link: OnlyComputedTarget?
+}
+
+class OnlyComputedTarget: RLMObject {
+    @objc dynamic var backlinks: RLMLinkingObjects<OnlyComputedSource>?
+
+    override class func linkingObjectsProperties() -> [String : RLMPropertyDescriptor] {
+        return ["backlinks": RLMPropertyDescriptor(with: OnlyComputedSource.self, propertyName: "link")]
+    }
+}
+
+class OnlyComputedNoBacklinksProps: FakeObject {
+    var computedProperty: String {
+        return "Test_String"
+    }
+}
+
 @MainActor
 class RequiresObjcName: RLMObject {
     static var enable = false
@@ -170,7 +188,26 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
 
     func testShouldRaiseObjectWithoutProperties() {
         assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: NoProps.self),
-                                       "No properties are defined for 'NoProps'. Did you remember to mark them with '@objc' in your model?")
+                                       "No properties are defined for 'NoProps'. Did you remember to mark them with '@objc' or '@Persisted' in your model?")
+    }
+    
+    func testShouldNotThrowForObjectWithOnlyBacklinksProps() {
+        let config = RLMRealmConfiguration.default()
+        config.objectClasses = [OnlyComputedTarget.self, OnlyComputedSource.self]
+        config.inMemoryIdentifier = #function
+        let r = try! RLMRealm(configuration: config)
+        try! r.transaction {
+            _ = OnlyComputedTarget.create(in: r, withValue: [])
+        }
+
+        let schema = OnlyComputedTarget().objectSchema
+        XCTAssertEqual(schema.computedProperties.count, 1)
+        XCTAssertEqual(schema.properties.count, 0)
+    }
+
+    func testShouldThrowForObjectWithOnlyComputedNoBacklinksProps() {
+        assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: OnlyComputedNoBacklinksProps.self),
+                                       "No properties are defined for 'OnlyComputedNoBacklinksProps'. Did you remember to mark them with '@objc' or '@Persisted' in your model?")
     }
 
     func testSchemaInitWithLinkedToObjectUsingInitWithValue() {

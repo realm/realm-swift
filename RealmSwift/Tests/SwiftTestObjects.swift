@@ -868,3 +868,12 @@ class ObjectWithNestedEmbeddedObject: Object {
 private class PrivateObjectSubclass: Object {
     @objc dynamic var value = 0
 }
+
+class LinkToOnlyComputed: Object {
+    @Persisted var value: Int = 0
+    @Persisted var link: OnlyComputedProps?
+}
+
+class OnlyComputedProps: Object {
+    @Persisted(originProperty: "link") var backlinks: LinkingObjects<LinkToOnlyComputed>
+}

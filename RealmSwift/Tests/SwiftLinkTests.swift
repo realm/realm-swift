@@ -111,4 +111,44 @@ class SwiftLinkTests: TestCase {
 
         XCTAssertEqual(0, owners.count)
     }
+
+    func testLinkingObjectsWithNoPersistedProps() {
+        let realm = realmWithTestPath()
+
+        let target = OnlyComputedProps()
+
+        let source1 = LinkToOnlyComputed()
+        source1.value = 1
+        source1.link = target
+
+        XCTAssertEqual(target.backlinks.count, 0, "Linking objects are not available until the object is persisted")
+
+        try! realm.write {
+            realm.add(source1)
+        }
+
+        XCTAssertEqual(target.backlinks.count, 1)
+        XCTAssertEqual(target.backlinks.first!.value, source1.value)
+
+        let source2 = LinkToOnlyComputed()
+        source2.value = 2
+        source2.link = target
+
+        XCTAssertEqual(target.backlinks.count, 1, "Linking objects to an unpersisted object are not available")
+        try! realm.write {
+            realm.add(source2)
+        }
+
+        XCTAssertEqual(target.backlinks.count, 2)
+        XCTAssertTrue(target.backlinks.contains(where: { $0.value == 2 }))
+
+        let targetWithNoLinks = OnlyComputedProps()
+        try! realm.write {
+            // Implicitly verify we can persist a RealmObject with no persisted properties and
+            // no objects linking to it
+            realm.add(targetWithNoLinks)
+        }
+
+        XCTAssertEqual(targetWithNoLinks.backlinks.count, 0, "No object is linking to targetWithNoLinks")
+    }
 }
