@@ -6,7 +6,10 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2']"
+  XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2', '15.3']"
+  # Github actions doesn't have Xcode 15.3 on any runners yet, so we can't run
+  # installation tests for it
+  XCODE_TEST_VERSIONS: "['14.2', '14.3.1', '15.1', '15.2']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
   DOC_VERSION: '15.2'
@@ -31,6 +34,7 @@ jobs:
       needs: [cleanup]
       outputs:
         XCODE_VERSIONS_MATRIX: ${{ env.XCODE_VERSION }}
+        XCODE_TEST_VERSIONS_MATRIX: ${{ env.XCODE_TEST_VERSIONS }}
         BUILD_PLATFORM_MATRIX: ${{ env.BUILD_PLATFORM }}
         PLATFORM_MATRIX: ${{ env.PLATFORM }}
         VERSION: ${{ steps.get-version.outputs.VERSION }}
@@ -47,7 +51,7 @@ jobs:
             version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${GITHUB_WORKSPACE}/dependencies.list")"
             echo "VERSION=$version" >> $GITHUB_OUTPUT
   build-docs:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Package docs
       needs: prepare
       steps:
@@ -65,7 +69,7 @@ jobs:
             name: realm-docs
             path: docs/realm-docs.zip
   build-examples:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Package examples
       needs: prepare
       steps:
@@ -78,7 +82,7 @@ jobs:
             name: realm-examples
             path: realm-examples.zip
   build-product: # Creates framework for each platform, xcode version, target and configuration
-      runs-on: macos-13
+      runs-on: macos-14
       name: Package framework
       needs: prepare
       strategy:
@@ -177,7 +181,7 @@ jobs:
             path: xcode-cloud-build-${{ steps.build-run.outputs.BUILD_RUN_ID }}.zip
             compression-level: 0
   package-xcframework-platform: # Creates xcframework for each platform and xcode version
-      runs-on: macos-13
+      runs-on: macos-14
       name: Package xcframework for platform
       needs: [build-product, prepare]
       strategy:
@@ -194,7 +198,7 @@ jobs:
       steps:
         - uses: actions/checkout@v4
         - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode-version }}.app
+          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Restore frameworks
           uses: actions/download-artifact@v4
           with:
@@ -207,7 +211,7 @@ jobs:
             name: realm-${{ matrix.platform }}-${{ matrix.xcode-version }}
             path: realm-${{ matrix.platform }}-${{ matrix.xcode-version }}.zip
   package-release: # Creates xcframework for each platform and xcode version
-      runs-on: macos-13
+      runs-on: macos-14
       name: Package release file
       needs: [package-xcframework-platform, prepare]
       steps:
@@ -231,7 +235,7 @@ jobs:
             name: realm-swift-${{ needs.prepare.outputs.VERSION }}
             path: pkg/realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
   test-package-examples:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Test examples
       needs: [package-release, prepare]
       steps:
@@ -245,7 +249,7 @@ jobs:
         - name: Test examples
           run: sh -x build.sh release-test-examples
   test-ios-static:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Run tests on iOS with configuration Static
       needs: package-release
       steps:
@@ -255,7 +259,7 @@ jobs:
         - name: Test ios static
           run: sh -x build.sh test-ios-static
   test-osx-static:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Run tests on macOS
       needs: package-release
       steps:
@@ -267,7 +271,7 @@ jobs:
             export REALM_DISABLE_METADATA_ENCRYPTION=1
             sh -x build.sh test-osx
   test-installation:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Run installation test
       needs: [package-release, prepare]
       strategy:
@@ -317,7 +321,7 @@ jobs:
         PLATFORM: 'osx'
       strategy:
         matrix:
-          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
+          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_TEST_VERSIONS_MATRIX) }}
       steps:
         - uses: actions/checkout@v4
         - uses: ruby/setup-ruby@v1

@@ -2,19 +2,21 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Lifted a limitation that would prevent declaring a model with only computed properties. ([#8414](https://github.com/realm/realm-swift/issues/8414))
+* Add Xcode 15.3 to the release package ([PR #8502](https://github.com/realm/realm-swift/pull/8502)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * Fix multiple arguments support via the `REALM_EXTRA_BUILD_ARGUMENTS` environment variable in `build.sh`. ([PR #8413](https://github.com/realm/realm-swift/pulls/8413)). Thanks, [@hisaac](https://github.com/hisaac)!
+* Fix some of the new sendability warnings introduced in Xcode 15.3 ([PR #8502](https://github.com/realm/realm-swift/pull/8502)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 15.2.0.
+* Carthage release for Swift is built with Xcode 15.3.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.2-15.2.0.
+* Xcode: 14.2-15.3.0.
 
 ### Internal
 * Upgraded realm-core from ? to ?

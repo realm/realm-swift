@@ -145,15 +145,15 @@ def get_artifact_info(id)
     get("/ciArtifacts/#{id}")
 end
 
-def create_workflow(target, xcode_version)
-    result = post('ciWorkflows', create_workflow_request(target, xcode_version))
+def create_workflow(target, xcode_version, pull_request)
+    result = post('ciWorkflows', create_workflow_request(target, xcode_version, pull_request))
     id = result["data"]["id"]
     return id
 end
 
-def create_workflow_request(target, xcode_version)
+def create_workflow_request(target, xcode_version, pull_request)
     xcode_version_id = get_xcode_id(xcode_version)
-    return {
+    data = {
         data: {
             type: 'ciWorkflows',
             attributes: {
@@ -161,19 +161,8 @@ def create_workflow_request(target, xcode_version)
                 description: 'Create by Github Action Update XCode Cloud Workflows',
                 isLockedForEditing: false,
                 containerFilePath: 'Realm.xcodeproj',
-                isEnabled: false,
+                isEnabled: true,
                 clean: false,
-                pullRequestStartCondition: {
-                    source: {
-                        isAllMatch: true,
-                        patterns: []
-                    },
-                    destination: {
-                        isAllMatch: true,
-                        patterns: []
-                    },
-                    autoCancel: true
-                },
                 actions: [target.action]
             },
             relationships: {
@@ -204,6 +193,30 @@ def create_workflow_request(target, xcode_version)
             }
         }
     }
+
+    if pull_request
+        data[:data][:attributes][:pullRequestStartCondition] = {
+            source: {
+                isAllMatch: true,
+            },
+            destination: {
+                isAllMatch: true,
+            },
+            autoCancel: true
+        }
+    else
+        data[:data][:attributes][:manualBranchStartCondition] = {
+            source: {
+                isAllMatch: true,
+            },
+            destination: {
+                isAllMatch: true,
+            },
+            autoCancel: true
+        }
+    end
+
+    data
 end
 
 def enable_workflow(id)
@@ -274,6 +287,8 @@ def synchronize_workflows()
     }
     current_workflows = get_workflows.filter_map { |workflow|
         name = workflow['attributes']['name']
+        # don't touch release pipeline jobs
+        next if name.start_with? 'release-'
         pieces = name.partition('_')
         {name: pieces.first, version: pieces.last, id: workflow['id']}
     }
@@ -316,7 +331,7 @@ def synchronize_workflows()
     end
 
     workflows_to_create.each { |w|
-        id = create_workflow(w[:target], w[:version])
+        id = create_workflow(w[:target], w[:version], true)
         puts "#{w[:target]}: https://appstoreconnect.apple.com/teams/69a6de86-7f37-47e3-e053-5b8c7c11a4d1/frameworks/#{get_realm_product_id}/workflows/#{id}"
     }
     workflows_to_remove.each { |w|
@@ -559,7 +574,7 @@ when 'create-workflow'
     configuration = ARGV.shift
     usage unless platform and xcode_version and target and configuration
     release_target = ReleaseTarget.new("#{prefix}-#{platform}-#{target}-#{configuration}", target, platform)
-    id = create_workflow(release_target, xcode_version)
+    id = create_workflow(release_target, xcode_version, false)
     puts id
 when 'delete-workflow'
     workflow_id = ARGV.shift
