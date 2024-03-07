@@ -19,7 +19,7 @@ jobs:
         template: [ bug.yml, feature.yml ]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Parse issue form
         uses: stefanbuck/github-issue-parser@c1a559d78bfb8dd05216dab9ffd2b91082ff5324  # v3.0.1
