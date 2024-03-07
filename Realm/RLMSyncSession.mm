@@ -206,8 +206,8 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
 }
 
 - (RLMProgressNotificationToken *)addSyncProgressNotificationForDirection:(RLMSyncProgressDirection)direction
-                                                                 mode:(RLMSyncProgressMode)mode
-                                                                block:(RLMSyncProgressNotificationBlock)block {
+                                                                     mode:(RLMSyncProgressMode)mode
+                                                                    block:(RLMSyncProgressNotificationBlock)block {
     if (auto session = _session.lock()) {
         dispatch_queue_t queue = RLMSyncSession.notificationsQueue;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload

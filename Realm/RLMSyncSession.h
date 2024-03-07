@@ -100,7 +100,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
 typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes) __attribute__((deprecated("Use RLMSyncProgressNotificationBlock instead", "RLMSyncProgressNotificationBlock")));
 
 /**
- A struct encapsulating progress information, as well as useful helper methods.
+ A struct encapsulating progress information.
  */
 typedef struct SyncProgress {
     /// The number of bytes that have been transferred.

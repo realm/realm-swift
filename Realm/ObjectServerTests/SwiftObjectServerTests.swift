@@ -287,9 +287,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertNotNil(token)
 
         try populateRealm()
-        session.wait(for: .download) { e in
+        session.wait(for: .download) { err in
             DispatchQueue.main.async { @MainActor in
-                XCTAssertNil(e)
+                XCTAssertNil(err)
                 ex.fulfill()
             }
         }
@@ -300,6 +300,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let p1 = try XCTUnwrap(progress)
         XCTAssertEqual(p1.transferredBytes, p1.transferrableBytes)
         XCTAssertEqual(p1.progressEstimate, 1.0)
+        XCTAssertTrue(p1.isTransferComplete)
         let initialCallCount = callCount
 
         // Run a second time to upload more data and verify that the callback continues to be called
@@ -318,6 +319,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let p2 = try XCTUnwrap(progress)
         XCTAssertEqual(p2.transferredBytes, p2.transferrableBytes)
         XCTAssertEqual(p2.progressEstimate, 1.0)
+        XCTAssertTrue(p2.isTransferComplete)
 
         token!.invalidate()
     }
@@ -340,9 +342,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         XCTAssertNotNil(token)
 
-        session.wait(for: .download) { e in
+        session.wait(for: .upload) { err in
             DispatchQueue.main.async { @MainActor in
-                XCTAssertNil(e)
+                XCTAssertNil(err)
                 ex.fulfill()
             }
         }
@@ -358,9 +360,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
-            session.wait(for: .download) { e in
+            session.wait(for: .upload) { err in
                 DispatchQueue.main.async { @MainActor in
-                    XCTAssertNil(e)
+                    XCTAssertNil(err)
                     ex.fulfill()
                 }
             }
@@ -372,6 +374,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let p = try XCTUnwrap(progress)
         XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
         XCTAssertEqual(p.progressEstimate, 1.0)
+        XCTAssertTrue(p.isTransferComplete)
     }
 
     func testStreamingNotifierInvalidate() throws {

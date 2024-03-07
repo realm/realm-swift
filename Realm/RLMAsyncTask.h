@@ -75,7 +75,7 @@ RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
  the supplied queue.
  */
 - (void)addSyncProgressNotificationOnQueue:(dispatch_queue_t)queue
-                                 block:(RLMSyncProgressNotificationBlock)block;
+                                     block:(RLMSyncProgressNotificationBlock)block;
 
 /**
  Cancel the asynchronous open.
