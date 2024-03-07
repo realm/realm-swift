@@ -1,8 +1,8 @@
 name: Publish release
 on: workflow_dispatch
 env:
-  XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2']"
-  TEST_XCODE_VERSION: '15.1'
+  XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2', '15.3']"
+  TEST_XCODE_VERSION: '15.2'
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
         - run: brew install s3cmd
         - run: bundle exec ./build.sh publish-update-checker
   test-installation:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Run installation test for ${{ matrix.platform }}, ${{ matrix.installation }} and ${{ matrix.linkage }}
       needs: [create-release, prepare, publish-cocoapods]
       strategy:
