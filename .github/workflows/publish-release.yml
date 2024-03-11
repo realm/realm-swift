@@ -168,13 +168,11 @@ jobs:
         GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
         - uses: actions/checkout@v4
-        - uses: ruby/setup-ruby@v1
-          with:
-            bundler-cache: true
         - name: Add template to changelog
           run: |
             sh build.sh add-empty-changelog
         - name: Auto-commit CHANGELOG.md
           uses: stefanzweifel/git-auto-commit-action@v4
           with:
+            file_pattern: 'CHANGELOG.md'
             commit_message: 'Add an empty changelog section'
