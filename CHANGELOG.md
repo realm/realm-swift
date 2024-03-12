@@ -2,12 +2,19 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * None.
+* Update release packaging for Xcode 15.4.
+* Added support for filtering logs by category. Users wil have more fine grained control over 
+  the log level for each category as well.
+  ```swift
+  Logger.shared.setLogLevel(.info, category: Category.Storage.transactions)
+  ```
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Deprecations
+* `RLMLogger.level`/`Logger.level` has been deprecated in favor of using `RLMLogger.setLevel:category:`/`Logger.setLevel(:category:)` and `RLMLogger.getLevelForCategory:`/`Logger.getLevel(for:)`.
 
 ### Compatibility
 * Realm Studio: 15.0.0 or later.

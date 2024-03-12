@@ -55,6 +55,12 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
 RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 
+/// A log callback function which can be set on RLMLogger.
+///
+/// The log function may be called from multiple threads simultaneously, and is
+/// responsible for performing its own synchronization if any is required.
+RLM_SWIFT_SENDABLE // invoked on a background thread
+typedef void (^RLMLogCategoryFunction)(RLMLogLevel level, NSString *category, NSString *message) NS_REFINED_FOR_SWIFT;
 /**
  `RLMLogger` is used for creating your own custom logging logic.
 
@@ -63,8 +69,9 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
  Set this custom logger as you default logger using `setDefaultLogger`.
 
      RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                                logFunction:^(RLMLogLevel level, NSString * message) {
-         NSLog(@"Realm Log - %lu, %@", (unsigned long)level, message);
+                                                category:RLMLogCategoryRealm
+                                                logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
+         NSLog(@"Realm Log - %lu, %@, %@", (unsigned long)level, category, message);
      }];
 
  @note By default default log threshold level is `RLMLogLevelInfo`, and logging strings are output to Apple System Logger.
@@ -74,7 +81,8 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 /**
   Gets the logging threshold level used by the logger.
  */
-@property (nonatomic) RLMLogLevel level;
+@property (nonatomic) RLMLogLevel level
+__attribute__((deprecated("Use `setLevel(level:category)` or `setLevel:category` instead.")));
 
 /// :nodoc:
 - (instancetype)init NS_UNAVAILABLE;
@@ -85,7 +93,19 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
  @param level The log level to be set for the logger.
  @param logFunction The log function which will be invoked whenever there is a log message.
 */
-- (instancetype)initWithLevel:(RLMLogLevel)level logFunction:(RLMLogFunction)logFunction;
+- (instancetype)initWithLevel:(RLMLogLevel)level logFunction:(RLMLogFunction)logFunction
+__attribute__((deprecated("Use `initWithLevel:logFunction:` instead.")));
+
+/**
+ Creates a logger with the associated log level and the logic function to define your own logging logic.
+
+ @param level The log level to be set for the logger.
+ @param category The log category to be set for the logger.
+ @param logFunction The log function which will be invoked whenever there is a log message.
+*/
+- (instancetype)initWithLevel:(RLMLogLevel)level
+                     category:(NSString *)category
+                  logFunction:(RLMLogCategoryFunction)logFunction;
 
 #pragma mark RLMLogger Default Logger API
 
@@ -93,6 +113,22 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
  The current default logger. When setting a logger as default, this logger will be used whenever information must be logged.
  */
 @property (class) RLMLogger *defaultLogger NS_SWIFT_NAME(shared);
+
+/**
+ Sets the logger's associated log and category.
+
+ @param level The log level to be set for the logger.
+ @param category The log function which will be invoked whenever there is a log message.
+*/
+- (void)setLevel:(RLMLogLevel)level category:(NSString *)category NS_REFINED_FOR_SWIFT;
+
+/**
+ Gets the logger's associated level for the specified category.
+
+ @param category The log category which we need the level.
+ @returns The log level for the specified category
+*/
+- (RLMLogLevel)getLevelForCategory:(NSString *)category NS_REFINED_FOR_SWIFT;
 
 @end
 

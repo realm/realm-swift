@@ -198,7 +198,7 @@ class LoginHelper: ObservableObject {
     private let appConfig = AppConfiguration(baseURL: "http://localhost:9090")
 
     func login(email: String, password: String, completion: @escaping (User) -> Void) {
-        Logger.shared.level = .all
+        Logger.shared.setLogLevel(.all, category: Category.Realm)
         let app = RealmSwift.App(id: ProcessInfo.processInfo.environment["app_id"]!, configuration: appConfig)
         app.login(credentials: .emailPassword(email: email, password: password))
             .receive(on: DispatchQueue.main)

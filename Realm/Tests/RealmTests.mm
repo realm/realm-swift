@@ -1475,7 +1475,7 @@
         [asyncComplete fulfill];
         XCTAssertNil(error);
     }];
-    
+
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
@@ -1774,7 +1774,7 @@
 
         [realm beginAsyncWriteTransaction:^{
             [StringObject createInRealm:realm withValue:@[@"string"]];
-            
+
             [realm commitAsyncWriteTransaction:^(NSError *error) {
                 XCTAssertEqual(0U, [StringObject allObjects].count);
                 [transaction1 fulfill];
@@ -1801,7 +1801,7 @@
 
         [realm beginWriteTransaction];
         [StringObject createInRealm:realm withValue:@[@"string"]];
-        
+
         [realm beginAsyncWriteTransaction:^{
             [StringObject createInRealm:realm withValue:@[@"string"]];
 
@@ -1823,7 +1823,7 @@
 
     [self dispatchAsync:^{
         RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
-        
+
         [realm beginAsyncWriteTransaction:^{
             [StringObject createInRealm:realm withValue:@[@"string 1"]];
 
@@ -1941,7 +1941,7 @@
             }];
         }];
     });
-    
+
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:[RLMRealm defaultRealm]].count);
 }
@@ -1977,7 +1977,7 @@
     }];
 
     [realm cancelAsyncTransaction:transId+1];
-    
+
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:[RLMRealm defaultRealm]].count);
 }
@@ -2008,7 +2008,7 @@
 
     XCTAssertFalse(realm.isPerformingAsynchronousWriteOperations);
     XCTAssertFalse(realm.inWriteTransaction);
-    
+
     [realm beginWriteTransaction];
     XCTAssertFalse(realm.isPerformingAsynchronousWriteOperations);
     XCTAssertTrue(realm.inWriteTransaction);
@@ -2589,7 +2589,7 @@
 - (void)testThawDifferentThread {
     RLMRealm *frozenRealm = [[RLMRealm defaultRealm] freeze];
     XCTAssertTrue(frozenRealm.frozen);
-    
+
     // Thaw on a thread which already has a Realm should use existing reference.
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = [RLMRealm defaultRealm];
@@ -2597,7 +2597,7 @@
         XCTAssertFalse(thawed.frozen);
         XCTAssertEqual(thawed, realm);
     }];
-    
+
     // Thaw on thread without existing refernce.
     [self dispatchAsyncAndWait:^{
         RLMRealm *thawed = [frozenRealm thaw];
@@ -2960,45 +2960,48 @@
 }
 - (void)testSetDefaultLogLevel {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
-    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll logFunction:^(RLMLogLevel level, NSString *message) {
+    NSString *category = @"Realm";
+    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll category:category logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelAll);
+    XCTAssertEqual([[RLMLogger defaultLogger] getLevelForCategory:category], RLMLogLevelAll);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertTrue([logs containsString:@"7 DB:"]); // Trace
 
     [logs setString: @""];
-    logger.level = RLMLogLevelDetail;
+    [logger setLevel:RLMLogLevelDetail category:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertEqual([RLMLogger defaultLogger].level, RLMLogLevelDetail);
+    XCTAssertEqual([[RLMLogger defaultLogger] getLevelForCategory:category], RLMLogLevelDetail);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 }
 
 - (void)testDefaultLogger {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
+    NSString *category = @"Realm";
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelOff
-                                             logFunction:^(RLMLogLevel level, NSString *message) {
+                                                category:category
+                                             logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
-    XCTAssertEqual(RLMLogger.defaultLogger.level, RLMLogLevelOff);
+    XCTAssertEqual([[RLMLogger defaultLogger] getLevelForCategory:category], RLMLogLevelOff);
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] == 0);
 
     // Test LogLevel Detail
-    logger.level = RLMLogLevelDetail;
+    [logger setLevel:RLMLogLevelDetail category:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] > 0);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 
     // Test LogLevel All
-    logger.level = RLMLogLevelAll;
+    [logger setLevel:RLMLogLevelAll category:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] > 0);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
@@ -3007,11 +3010,12 @@
     [logs setString: @""];
     // Init Custom Logger
     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                                   logFunction:^(RLMLogLevel level, NSString * message) {
+                                                      category:category
+                                                   logFunction:^(RLMLogLevel level, NSString *category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
 
-    XCTAssertEqual(RLMLogger.defaultLogger.level, RLMLogLevelDebug);
+    XCTAssertEqual([RLMLogger.defaultLogger getLevelForCategory:category], RLMLogLevelDebug);
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
@@ -3019,8 +3023,10 @@
 
 - (void)testCustomLoggerLogMessage {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
+    NSString *category = @"Realm";
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelInfo
-                                             logFunction:^(RLMLogLevel level, NSString * message) {
+                                                category:category
+                                             logFunction:^(RLMLogLevel level, NSString *category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
@@ -3046,9 +3052,11 @@
 
 - (void)testSyncConnectionMetrics {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
+    NSString *category = @"Realm";
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                             logFunction:^(RLMLogLevel level, NSString * message) {
-        [logs appendFormat:@" %@ %lu %@\n", [NSDate date], level, message];
+                                                category:category
+                                             logFunction:^(RLMLogLevel level, NSString *category, NSString * message) {
+        [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
     RLMApp *app = [RLMApp appWithId:@"test-id"];

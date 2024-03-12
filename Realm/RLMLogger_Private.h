@@ -30,7 +30,20 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
  @param message The message to log.
  */
 - (void)logWithLevel:(RLMLogLevel)logLevel message:(NSString *)message, ... NS_SWIFT_UNAVAILABLE("");
-- (void)logLevel:(RLMLogLevel)logLevel message:(NSString *)message;
+
+/**
+ Log a message to the supplied level.
+
+ @param logLevel The log level for the message.
+ @param category The log category for the message.
+ @param message The message to log.
+ */
+- (void)logWithLevel:(RLMLogLevel)logLevel category:(NSString *)category message:(NSString *)message;
+
+/**
+Gets all the categories from Core. This is to be used for testing purposes only.
+ */
++ (NSArray<NSString *> *)getAllCategories;
 @end
 
 RLM_HEADER_AUDIT_END(nullability)
