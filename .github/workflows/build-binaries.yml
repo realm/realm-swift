@@ -6,7 +6,7 @@ on:
         type: string
         required: false
         default: ''
-        description: Core version (tag/ref) to use to generate the binaries for. If not provided, the version in dependencies.list will be used
+        description: Core version to use to generate the binaries. It should either be a tag or the version returned by (git describe). If not provided, the version in dependencies.list will be used.
 
 jobs:
   build-packages:
