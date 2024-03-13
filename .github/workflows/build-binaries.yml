@@ -19,3 +19,31 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
           xcode-version: ${{ matrix.xcode }}
+      - name: Get core version
+        id: get-core-version
+        run: |
+          REALM_CORE_VERSION=sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list
+          echo "core-version=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
+
+          cd core
+          CORE_VERSION_STRING=git describe --tags
+          echo "core-version-string=$CORE_VERSION_STRING" >> "$GITHUB_OUTPUT"
+      - name: Checkout Core
+        uses: actions/checkout@v4
+        with:
+          repository: realm/realm-core
+          path: core
+          ref: ${{ steps.get-core-version.outputs.core-version }}
+      - name: Build for ${{ matrix.target }}
+        if: ${{ matrix.target != 'macosx' }}
+        run: sh tools/build-apple-device.sh -p ${{ matrix.target }} -c Release -v ${{ steps.get-core-version.outputs.core-version-string }}
+        shell: bash
+        working-directory: core
+      - name: Build for macosx
+        if: ${{ matrix.target == 'macosx' }}
+        run: sh tools/build-cocoa.sh -bm -v ${{ steps.get-core-version.outputs.core-version-string }}
+      - name: Archive binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name:
+          path: core/realm-Release-*.tar.gz
