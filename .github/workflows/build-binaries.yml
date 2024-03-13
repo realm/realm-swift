@@ -105,7 +105,7 @@ jobs:
       - name: Upload release folder to S3
         id: upload-to-s3
         run: |
-          s3_folder="static.realm.io/downloads/core/${{ needs.build-packages.outputs.core-version }}/cocoa/"
+          s3_folder="static.realm.io/downloads/core/${{ needs.build-packages.outputs.core-version }}/cocoa"
           aws s3 sync --acl public-read . "s3://$s3_folder"
           echo "url=https://$s3_folder/realm-monorepo-xcframework-${{ needs.build-packages.outputs.core-version }}.tar.xz" >> $GITHUB_OUTPUT
         working-directory: release
