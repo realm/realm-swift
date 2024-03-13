@@ -3,7 +3,7 @@ on: workflow_dispatch
 jobs:
   build-packages:
     runs-on: macos-14
-    name: Prepare outputs
+    name: Build for ${{ matrix.target }}
     outputs:
       core-version: ${{ steps.get-core-version.outputs.version }}
     strategy:
@@ -70,9 +70,10 @@ jobs:
 
       - name: Combine xcframework
         run: |
+          mv binaries-*/* ./
           sh tools/build-cocoa.sh -v ${{ needs.build-packages.outputs.core-version }}
           mkdir ../release
-          find . -name "realm-*.tar.xz" -exec mv '{}' ../release/ \;
+          mv realm-*.tar.xz ../release/
         working-directory: core
 
       - name: Archive xcframework
