@@ -4,6 +4,9 @@ jobs:
   build-packages:
     runs-on: macos-14
     name: Prepare outputs
+    outputs:
+      core-ref: ${{ steps.get-core-ref.outputs.ref }}
+      core-version: ${{ steps.get-core-version.outputs.core-version }}
     strategy:
       matrix:
         # target: [macosx, iphoneos, iphonesimulator, tvos, tvsimulator, watchos, watchsimulator, maccatalyst]
@@ -26,14 +29,14 @@ jobs:
         id: get-core-ref
         run: |
           REALM_CORE_VERSION=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list)
-          echo "core-version=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "ref=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Checkout Core
         uses: actions/checkout@v4
         with:
           repository: realm/realm-core
           path: core
-          ref: ${{ steps.get-core-ref.outputs.core-version }}
+          ref: ${{ steps.get-core-ref.outputs.ref }}
           submodules: recursive
 
       - name: Get binary version
@@ -44,12 +47,40 @@ jobs:
         working-directory: core
 
       - name: Build for ${{ matrix.target }}
-        if: ${{ matrix.target != 'macosx' }}
         run: sh tools/${{ matrix.target != 'macosx' && format('build-apple-device.sh -p {0} -c Release', matrix.target) || 'build-cocoa.sh -bm' }} -v ${{ steps.get-core-version.outputs.core-version-string }}
         working-directory: core
 
       - name: Archive binaries
         uses: actions/upload-artifact@v4
         with:
-          name:
+          name: binaries-${{ matrix.target }}
           path: core/realm-Release-*.tar.gz
+
+  combine-xcframework:
+    runs-on: macos-14
+    name: Combine xcframework
+    needs:
+      - build-packages
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout Core
+        uses: actions/checkout@v4
+        with:
+          repository: realm/realm-core
+          path: core
+          ref: ${{ needs.build-packages.outputs.core-ref }}
+
+      - name: Download binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: core
+
+      - name: Combine xcframework
+        run: sh tools/build-cocoa.sh -v ${{ needs.build-packages.outputs.core-version }}
+
+      - name: Archive xcframework
+        uses: actions/upload-artifact@v4
+        with:
+          name: Realm-${{ needs.build-packages.outputs.core-version }}.xcframework
+          path: core/realm-*.tar.xz
