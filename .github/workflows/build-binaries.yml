@@ -40,7 +40,7 @@ jobs:
           fi
           echo "version=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout Core
+      - name: Clone Core
         uses: actions/checkout@v4
         with:
           repository: realm/realm-core
@@ -50,7 +50,7 @@ jobs:
           fetch-tags: true
 
       - name: Checkout Core@${{ steps.get-core-version.outputs.version }}
-        run: git checkout ${{ steps.get-core-version.outputs.version }}
+        run: git checkout ${{ steps.get-core-version.outputs.version }} --recurse-submodules -f
         working-directory: core
 
       - name: Build for ${{ matrix.target }}
@@ -74,12 +74,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Checkout Core
+      - name: Clone Core
         uses: actions/checkout@v4
         with:
           repository: realm/realm-core
           path: core
-          ref: ${{ needs.build-packages.outputs.core-version }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Checkout Core@${{ needs.build-packages.outputs.core-version }}
+        run: git checkout ${{ needs.build-packages.outputs.core-version }}
+        working-directory: core
 
       - name: Download binaries
         uses: actions/download-artifact@v4
