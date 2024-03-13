@@ -45,8 +45,13 @@ jobs:
         with:
           repository: realm/realm-core
           path: core
-          ref: ${{ steps.get-core-version.outputs.version }}
           submodules: recursive
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Checkout Core@${{ steps.get-core-version.outputs.version }}
+        run: git checkout ${{ steps.get-core-version.outputs.version }}
+        working-directory: core
 
       - name: Build for ${{ matrix.target }}
         run: sh tools/${{ matrix.target != 'macosx' && format('build-apple-device.sh -p {0} -c Release', matrix.target) || 'build-cocoa.sh -bm' }} -v ${{ steps.get-core-version.outputs.version }}
