@@ -118,8 +118,7 @@ typedef struct SyncProgress {
      
      Whenever the progress reporting mode is `forCurrentlyOutstandingWork`, that value
      will monotonically increase until it reaches 1.0. If the progress mode is `reportIndefinitely`, the
-     value will monotonically increase until it reaches 1.0, but may subsequently decrease if new server data
-     becomes available.
+     value may either increase or decrease as new data needs to be transferred.
      */
     double progressEstimate;
 } SyncProgress;

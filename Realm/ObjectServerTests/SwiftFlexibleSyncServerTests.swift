@@ -36,7 +36,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     override var objectTypes: [ObjectBase.Type] {
-        [SwiftPerson.self, SwiftTypesSyncObject.self]
+        [SwiftPerson.self, SwiftTypesSyncObject.self, SwiftHugeSyncObject.self]
     }
 
     override func createApp() throws -> String {
@@ -940,6 +940,218 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
 
         proxy.stop()
+    }
+
+    // MARK: - Progress notifiers
+    @MainActor
+    func testAsyncOpenProgress() throws {
+        try populateRealm()
+
+        let asyncOpenEx = expectation(description: "async open")
+
+        let user = createUser()
+        var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>())
+        })
+        config.objectTypes = objectTypes
+        let task = Realm.asyncOpen(configuration: config) { result in
+            XCTAssertNotNil(try? result.get())
+            asyncOpenEx.fulfill()
+        }
+
+        var callCount = 0
+        var progress: SyncSession.Progress?
+
+        task.addProgressNotification { p in
+            DispatchQueue.main.async { @MainActor in
+                if let progress = progress {
+                    if (progress.progressEstimate < 1.0) {
+                        XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
+                    }
+                }
+                progress = p
+                callCount += 1
+            }
+        }
+
+        waitForExpectations(timeout: 10.0, handler: nil)
+
+        let p1 = try XCTUnwrap(progress)
+        XCTAssertEqual(p1.progressEstimate, 1.0)
+        XCTAssertTrue(p1.isTransferComplete)
+    }
+
+    @MainActor
+    func testStreamingDownloadNotifier() throws {
+        try populateRealm()
+
+        let realm = try openRealm(wait: false)
+
+        let session = try XCTUnwrap(realm.syncSession)
+        var ex = expectation(description: "first download")
+        var callCount = 0
+        var progress: SyncSession.Progress?
+        let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
+            DispatchQueue.main.async { @MainActor in
+                // Verify that progress increases. If it has reached 1.0, it may decrease again
+                // since we're adding more data
+                if let progress = progress {
+                    if (progress.progressEstimate < 1.0) {
+                        XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
+                    }
+                }
+                progress = p
+                callCount += 1
+            }
+        }
+        XCTAssertNotNil(token)
+
+        let subscriptions = realm.subscriptions
+        subscriptions.update({
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
+        }, onComplete: { err in
+            DispatchQueue.main.async { @MainActor in
+                XCTAssertNil(err)
+                ex.fulfill()
+            }
+        })
+
+        waitForExpectations(timeout: 60.0)
+
+        XCTAssertGreaterThanOrEqual(callCount, 1)
+        let p1 = try XCTUnwrap(progress)
+        XCTAssertEqual(p1.progressEstimate, 1.0)
+        XCTAssertTrue(p1.isTransferComplete)
+        let initialCallCount = callCount
+        progress = nil
+
+        // Run a second time to upload more data and verify that the callback continues to be called
+        ex = expectation(description: "second download")
+        try populateRealm()
+
+        session.wait(for: .download) { e in
+            DispatchQueue.main.async { @MainActor in
+                XCTAssertNil(e)
+                ex.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 60.0)
+        XCTAssertGreaterThan(callCount, initialCallCount)
+        let p2 = try XCTUnwrap(progress)
+        XCTAssertEqual(p2.progressEstimate, 1.0)
+        XCTAssertTrue(p2.isTransferComplete)
+
+        token!.invalidate()
+    }
+
+    @MainActor
+    func testStreamingUploadNotifier() throws {
+        let realm = try openRealm(wait: false)
+        let subscriptions = realm.subscriptions
+        subscriptions.update {
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
+        }
+        let session = try XCTUnwrap(realm.syncSession)
+
+        var ex = expectation(description: "initial upload")
+        var progress: SyncSession.Progress?
+
+        let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
+            DispatchQueue.main.async { @MainActor in
+                if let progress = progress {
+                    if (progress.progressEstimate < 1) {
+                        XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
+                    }
+                }
+                progress = p
+            }
+        }
+        XCTAssertNotNil(token)
+
+        session.wait(for: .upload) { err in
+            DispatchQueue.main.async { @MainActor in
+                XCTAssertNil(err)
+                ex.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 10.0, handler: nil)
+
+        for i in 0..<5 {
+            ex = expectation(description: "write transaction upload \(i)")
+            progress = nil
+            try realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+
+            session.wait(for: .upload) { err in
+                DispatchQueue.main.async { @MainActor in
+                    XCTAssertNil(err)
+                    ex.fulfill()
+                }
+            }
+
+            waitForExpectations(timeout: 10.0, handler: nil)
+        }
+        token!.invalidate()
+
+        let p = try XCTUnwrap(progress)
+        XCTAssertEqual(p.progressEstimate, 1.0)
+        XCTAssertTrue(p.isTransferComplete)
+    }
+
+    func testStreamingNotifierInvalidate() throws {
+        let realm = try openRealm()
+        RLMRealmSubscribeToAll(ObjectiveCSupport.convert(object: realm))
+
+        let session = try XCTUnwrap(realm.syncSession)
+        let downloadCount = Locked(0)
+        let uploadCount = Locked(0)
+        let tokenDownload = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { _ in
+            downloadCount.wrappedValue += 1
+        }
+        let tokenUpload = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { _ in
+            uploadCount.wrappedValue += 1
+        }
+
+        try populateRealm()
+        waitForDownloads(for: realm)
+        try realm.write {
+            realm.add(SwiftHugeSyncObject.create())
+        }
+        waitForUploads(for: realm)
+
+        tokenDownload!.invalidate()
+        tokenUpload!.invalidate()
+        RLMSyncSession.notificationsQueue().sync { }
+
+        XCTAssertGreaterThan(downloadCount.wrappedValue, 1)
+        XCTAssertGreaterThan(uploadCount.wrappedValue, 1)
+
+        // There's inherently a race condition here: notification callbacks can
+        // be called up to one more time after they're invalidated if the sync
+        // worker thread is in the middle of processing a change at the time
+        // that the invalidation is requested, and there's no way to wait for that.
+        // This whole test takes 250ms, so we don't need a very long sleep.
+        Thread.sleep(forTimeInterval: 0.2)
+
+        downloadCount.wrappedValue = 0
+        uploadCount.wrappedValue = 0
+
+        try populateRealm()
+        waitForDownloads(for: realm)
+        try realm.write {
+            realm.add(SwiftHugeSyncObject.create())
+        }
+        waitForUploads(for: realm)
+
+        // We check that the notification block is not called after we reset the
+        // counters on the notifiers and call invalidated().
+        XCTAssertEqual(downloadCount.wrappedValue, 0)
+        XCTAssertEqual(uploadCount.wrappedValue, 0)
     }
 }
 
