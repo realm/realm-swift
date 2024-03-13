@@ -5,8 +5,7 @@ jobs:
     runs-on: macos-14
     name: Prepare outputs
     outputs:
-      core-ref: ${{ steps.get-core-ref.outputs.ref }}
-      core-version: ${{ steps.get-core-version.outputs.core-version }}
+      core-version: ${{ steps.get-core-version.outputs.version }}
     strategy:
       matrix:
         # target: [macosx, iphoneos, iphonesimulator, tvos, tvsimulator, watchos, watchsimulator, maccatalyst]
@@ -25,29 +24,22 @@ jobs:
         with:
           xcode-version: ${{ matrix.xcode }}
 
-      - name: Get core ref
-        id: get-core-ref
+      - name: Get Core Version
+        id: get-core-version
         run: |
           REALM_CORE_VERSION=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list)
-          echo "ref=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Checkout Core
         uses: actions/checkout@v4
         with:
           repository: realm/realm-core
           path: core
-          ref: ${{ steps.get-core-ref.outputs.ref }}
+          ref: ${{ steps.get-core-version.outputs.version }}
           submodules: recursive
 
-      - name: Get binary version
-        id: get-core-version
-        run: |
-          CORE_VERSION_STRING=$(git describe --tags)
-          echo "core-version-string=$CORE_VERSION_STRING" >> "$GITHUB_OUTPUT"
-        working-directory: core
-
       - name: Build for ${{ matrix.target }}
-        run: sh tools/${{ matrix.target != 'macosx' && format('build-apple-device.sh -p {0} -c Release', matrix.target) || 'build-cocoa.sh -bm' }} -v ${{ steps.get-core-version.outputs.core-version-string }}
+        run: sh tools/${{ matrix.target != 'macosx' && format('build-apple-device.sh -p {0} -c Release', matrix.target) || 'build-cocoa.sh -bm' }} -v ${{ steps.get-core-version.outputs.version }}
         working-directory: core
 
       - name: Archive binaries
@@ -69,7 +61,7 @@ jobs:
         with:
           repository: realm/realm-core
           path: core
-          ref: ${{ needs.build-packages.outputs.core-ref }}
+          ref: ${{ needs.build-packages.outputs.core-version }}
 
       - name: Download binaries
         uses: actions/download-artifact@v4
@@ -77,10 +69,29 @@ jobs:
           path: core
 
       - name: Combine xcframework
-        run: sh tools/build-cocoa.sh -v ${{ needs.build-packages.outputs.core-version }}
+        run: |
+          sh tools/build-cocoa.sh -v ${{ needs.build-packages.outputs.core-version }}
+          mkdir ../release
+          find . -name "realm-*.tar.xz" -exec mv '{}' ../release/ \;
+        working-directory: core
 
       - name: Archive xcframework
         uses: actions/upload-artifact@v4
         with:
-          name: Realm-${{ needs.build-packages.outputs.core-version }}.xcframework
-          path: core/realm-*.tar.xz
+          name: Realm-${{ needs.build-packages.outputs.core-version }}.xcframework.tar.xz
+          path: release/realm-*.tar.xz
+
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_S3_ACCESS_KEY }}
+      #     aws-secret-access-key: ${{ secrets.AWS_S3_SECRET_KEY }}
+      #     aws-region: us-east-1
+
+      # - name: Upload release folder to S3
+      #   id: upload-to-s3
+      #   run: |
+      #     s3_folder="static.realm.io/downloads/core/${{ needs.build-packages.outputs.core-version }}/cocoa/"
+      #     aws s3 sync --acl public-read . "s3://$s3_folder"
+      #     echo "url=https://$s3_folder/packages.tar.gz" >> $GITHUB_OUTPUT
+      #   working-directory: release
