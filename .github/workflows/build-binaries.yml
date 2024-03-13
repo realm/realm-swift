@@ -8,7 +8,7 @@ jobs:
       core-version: ${{ steps.get-core-version.outputs.version }}
     strategy:
       matrix:
-        target: [macosx, iphoneos, iphonesimulator, tvos, tvsimulator, watchos, watchsimulator, maccatalyst]
+        target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst]
         xcode: ["14.3.1"]
         include:
           - target: xros
@@ -50,6 +50,7 @@ jobs:
   combine-xcframework:
     runs-on: macos-14
     name: Combine xcframework
+    environment: Prebuilds
     needs:
       - build-packages
     steps:
