@@ -1,0 +1,21 @@
+name: Build Core binaries
+on: workflow_dispatch
+jobs:
+  build-packages:
+    runs-on: macos-14
+    name: Prepare outputs
+    strategy:
+      matrix:
+        target: [macosx, iphoneos, iphonesimulator, tvos, tvsimulator, watchos, watchsimulator, maccatalyst]
+        xcode: ["14.3.1"]
+        include:
+          - target: xros
+            xcode: "15.2.0"
+          - target: xrsimulator
+            xcode: "15.2.0"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Switch to Xcode ${{ matrix.xcode }}
+        uses: maxim-lobanov/setup-xcode@v1.6.0
+        with:
+          xcode-version: ${{ matrix.xcode }}
