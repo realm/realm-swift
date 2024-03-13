@@ -1,5 +1,13 @@
 name: Build Core binaries
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      core-version:
+        type: string
+        required: false
+        default: ''
+        description: Core version (tag/ref) to use to generate the binaries for. If not provided, the version in dependencies.list will be used
+
 jobs:
   build-packages:
     runs-on: macos-14
@@ -26,7 +34,10 @@ jobs:
       - name: Get Core Version
         id: get-core-version
         run: |
-          REALM_CORE_VERSION=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list)
+          REALM_CORE_VERSION=${{ inputs.core-version }}
+          if [[ -z $REALM_CORE_VERSION ]]; then
+            REALM_CORE_VERSION=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list)
+          fi
           echo "version=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Checkout Core
@@ -73,26 +84,26 @@ jobs:
           mv binaries-*/* ./
           sh tools/build-cocoa.sh -v ${{ needs.build-packages.outputs.core-version }}
           mkdir ../release
-          mv realm-*.tar.xz ../release/
+          mv realm-monorepo-xcframework-${{ needs.build-packages.outputs.core-version }}.tar.xz ../release/
         working-directory: core
 
       - name: Archive xcframework
         uses: actions/upload-artifact@v4
         with:
           name: Realm-${{ needs.build-packages.outputs.core-version }}.xcframework.tar.xz
-          path: release/realm-*.tar.xz
+          path: release
 
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_S3_ACCESS_KEY }}
-      #     aws-secret-access-key: ${{ secrets.AWS_S3_SECRET_KEY }}
-      #     aws-region: us-east-1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_S3_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_S3_SECRET_KEY }}
+          aws-region: us-east-1
 
-      # - name: Upload release folder to S3
-      #   id: upload-to-s3
-      #   run: |
-      #     s3_folder="static.realm.io/downloads/core/${{ needs.build-packages.outputs.core-version }}/cocoa/"
-      #     aws s3 sync --acl public-read . "s3://$s3_folder"
-      #     echo "url=https://$s3_folder/packages.tar.gz" >> $GITHUB_OUTPUT
-      #   working-directory: release
+      - name: Upload release folder to S3
+        id: upload-to-s3
+        run: |
+          s3_folder="static.realm.io/downloads/core/${{ needs.build-packages.outputs.core-version }}/cocoa/"
+          aws s3 sync --acl public-read . "s3://$s3_folder"
+          echo "url=https://$s3_folder/realm-monorepo-xcframework-${{ needs.build-packages.outputs.core-version }}.tar.xz >> $GITHUB_OUTPUT
+        working-directory: release
