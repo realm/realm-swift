@@ -22,11 +22,11 @@ jobs:
       - name: Get core version
         id: get-core-version
         run: |
-          REALM_CORE_VERSION=sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list
+          REALM_CORE_VERSION=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list)
           echo "core-version=$REALM_CORE_VERSION" >> "$GITHUB_OUTPUT"
 
           cd core
-          CORE_VERSION_STRING=git describe --tags
+          CORE_VERSION_STRING=$(git describe --tags)
           echo "core-version-string=$CORE_VERSION_STRING" >> "$GITHUB_OUTPUT"
       - name: Checkout Core
         uses: actions/checkout@v4
