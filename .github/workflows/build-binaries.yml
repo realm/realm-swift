@@ -50,6 +50,7 @@ jobs:
       - name: Build for macosx
         if: ${{ matrix.target == 'macosx' }}
         run: sh tools/build-cocoa.sh -bm -v ${{ steps.get-core-version.outputs.core-version-string }}
+        working-directory: core
 
       - name: Archive binaries
         uses: actions/upload-artifact@v4
