@@ -61,7 +61,9 @@ jobs:
   combine-xcframework:
     runs-on: macos-14
     name: Combine xcframework
-    environment: Prebuilds
+    environment:
+      name: Prebuilds
+      url: ${{ steps.upload-to-s3.outputs.url }}
     needs:
       - build-packages
     steps:
@@ -105,5 +107,5 @@ jobs:
         run: |
           s3_folder="static.realm.io/downloads/core/${{ needs.build-packages.outputs.core-version }}/cocoa/"
           aws s3 sync --acl public-read . "s3://$s3_folder"
-          echo "url=https://$s3_folder/realm-monorepo-xcframework-${{ needs.build-packages.outputs.core-version }}.tar.xz >> $GITHUB_OUTPUT
+          echo "url=https://$s3_folder/realm-monorepo-xcframework-${{ needs.build-packages.outputs.core-version }}.tar.xz" >> $GITHUB_OUTPUT
         working-directory: release
