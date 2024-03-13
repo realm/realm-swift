@@ -34,6 +34,7 @@ jobs:
           repository: realm/realm-core
           path: core
           ref: ${{ steps.get-core-ref.outputs.core-version }}
+          submodules: recursive
 
       - name: Get binary version
         id: get-core-version
@@ -44,12 +45,7 @@ jobs:
 
       - name: Build for ${{ matrix.target }}
         if: ${{ matrix.target != 'macosx' }}
-        run: sh tools/build-apple-device.sh -p ${{ matrix.target }} -c Release -v ${{ steps.get-core-version.outputs.core-version-string }}
-        working-directory: core
-
-      - name: Build for macosx
-        if: ${{ matrix.target == 'macosx' }}
-        run: sh tools/build-cocoa.sh -bm -v ${{ steps.get-core-version.outputs.core-version-string }}
+        run: sh tools/${{ matrix.target != 'macosx' && format('build-apple-device.sh -p {0} -c Release', matrix.target) || 'build-cocoa.sh -bm' }} -v ${{ steps.get-core-version.outputs.core-version-string }}
         working-directory: core
 
       - name: Archive binaries
