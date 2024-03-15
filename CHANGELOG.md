@@ -1,3 +1,20 @@
+10.48.1 Release notes (2024-03-15)
+=============================================================
+
+### Fixed
+
+* The Realm.framework privacy manifest was missing
+  NSPrivacyAccessedAPICategoryDiskSpace, but we check free disk space before
+  attempting to automatically back up Realm files (since 10.46.0).
+
+### Compatibility
+
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.3.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.2-15.3.0.
+
 10.48.0 Release notes (2024-03-07)
 =============================================================
 
