@@ -95,6 +95,7 @@ import Realm.Private
 ///  runtime errors.
 @propertyWrapper
 public struct Persisted<Value: _Persistable> {
+    internal typealias Value = Value
     private var storage: PropertyStorage<Value>
 
     /// :nodoc:
@@ -263,6 +264,17 @@ public protocol OptionalCodingWrapper {
     init(wrappedValue: WrappedType)
 }
 
+internal protocol _PersistedProperty {
+    associatedtype Value: _Persistable
+    static var valueType: Value.Type {
+        get
+    }
+}
+extension Persisted: _PersistedProperty {
+    static var valueType: Value.Type {
+        Value.self
+    }
+}
 /// :nodoc:
 extension KeyedDecodingContainer {
     // This is used to override the default decoding behaviour for OptionalCodingWrapper to allow a value to avoid a missing key Error

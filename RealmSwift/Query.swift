@@ -104,7 +104,7 @@ public struct StringOptions: OptionSet {
 public struct Query<T> {
     /// This initaliser should be used from callers who require queries on primitive collections.
     /// - Parameter isPrimitive: True if performing a query on a primitive collection.
-    internal init(isPrimitive: Bool = false) {
+    package init(isPrimitive: Bool = false) {
         if isPrimitive {
             node = .keyPath(["self"], options: [.isCollection])
         } else {
@@ -112,7 +112,7 @@ public struct Query<T> {
         }
     }
 
-    private let node: QueryNode
+    package let node: QueryNode
 
     /**
      The `Query` struct works by compounding `QueryNode`s together in a tree structure.
@@ -867,8 +867,18 @@ extension Optional: _QueryBinary where Wrapped: _Persistable, Wrapped.PersistedT
 
 // MARK: QueryNode -
 
-private indirect enum QueryNode {
-    enum Operator: String {
+package indirect enum QueryNode {
+    package struct KeyPathOptions: OptionSet {
+        package let rawValue: Int8
+        package init(rawValue: RawValue) {
+            self.rawValue = rawValue
+        }
+
+        static let isCollection = KeyPathOptions(rawValue: 1)
+        static let requiresAny = KeyPathOptions(rawValue: 2)
+    }
+    
+    package enum Operator: String {
         case or = "||"
         case and = "&&"
         case equal = "=="
@@ -896,6 +906,8 @@ private indirect enum QueryNode {
     case mapSubscript(_ keyPath: QueryNode, key: Any)
     case geoWithin(_ keyPath: QueryNode, _ value: QueryNode)
 }
+
+private typealias KeyPathOptions = QueryNode.KeyPathOptions
 
 private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (String, [Any]) {
     let formatStr = NSMutableString()
@@ -1009,15 +1021,6 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
     return (formatStr as String, (arguments as! [Any]))
 }
 
-private struct KeyPathOptions: OptionSet {
-    let rawValue: Int8
-    init(rawValue: RawValue) {
-        self.rawValue = rawValue
-    }
-
-    static let isCollection = KeyPathOptions(rawValue: 1)
-    static let requiresAny = KeyPathOptions(rawValue: 2)
-}
 
 private struct SubqueryRewriter {
     private var collectionName: String?

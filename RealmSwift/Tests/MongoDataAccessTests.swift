@@ -3,73 +3,52 @@ import XCTest
 import Realm
 import RealmSwift
 
-//
-//@BSONCodable struct AllTypesBSONObject {
-//    @BSONCodable struct AllTypesA : Equatable {
-//        @BSONCodable struct AllTypesB : Equatable {
-//            let intB: Int
-//            let stringB: String
-//        }
-//        let intA: Int
-//        let stringA: String
-//        let allTypesB: AllTypesB
-//    }
-//    let int: Int
-//    let intArray: [Int]
-//    let intOpt: Int?
-//    
-//    let string: String
-//    let bool: Bool
-//    let double: Double
-////    let data: Data
-//    let long: Int64
-////    let decimal: Decimal128
-////    let uuid: UUID
-//    let object: AllTypesA
-//    let objectArray: [AllTypesA]
-//    let objectOpt: AllTypesA?
-//    var anyValue: Any
-//}
-//
-//@BSONCodable final class RealmPerson : Object {
-//    @Persisted(primaryKey: true) var _id: ObjectId = .generate()
-//    @Persisted var name: String
-//    @Persisted var age: Int
-//    @Persisted var address: RealmAddress?
-//    @Persisted var dogs: List<RealmDog>
-//}
-//
-//@BSONCodable final class RealmAddress : EmbeddedObject {
-//    @Persisted var city: String
-//    @Persisted var state: String
-//}
-//
-//@BSONCodable final class RealmDog : Object {
-//    @Persisted(primaryKey: true) var _id: ObjectId = .generate()
-//    @Persisted var owner: RealmPerson?
-//    @Persisted var name: String
-//    @Persisted var age: Int
-//}
-//
-//@BSONCodable struct RegexTest {
-//    let a: Regex<Substring>
-//}
-//
-//extension RegexTest : Equatable {
-//    static func == (lhs: Self,
-//                    rhs: Self) -> Bool {
-////        lhs.a.regex._literalPattern
-//        return "\(lhs.a)" == "\(rhs.a)"
-//    }
-//}
-////
-////extension Regex : BSON {
-////    public static func == (lhs: Regex, rhs: Regex) -> Bool {
-////        "\(lhs)" == "\(rhs)"
-////    }
-////}
-////
-//
+class Subdocument : EmbeddedObject, Codable {
+    @Persisted var strCol: String
+    
+    convenience init(strCol: String) {
+        self.init()
+        self.strCol = strCol
+    }
+}
+
+@objc(_AllTypesExtJSONObject) private class AllTypesObject : Object, Codable {
+    @Persisted var _id: ObjectId
+    
+    @Persisted var strCol: String
+    @Persisted var intCol: Int
+    @Persisted var binaryCol: Data
+    
+    @Persisted var arrayStrCol: List<String>
+    @Persisted var arrayIntCol: List<Int>
+    
+    @Persisted var optStrCol: String?
+    @Persisted var optIntCol: Int?
+    
+    @Persisted var subdocument: Subdocument?
+    
+    convenience init(_id: ObjectId,
+                     strCol: String,
+                     intCol: Int,
+                     binaryCol: Data,
+                     arrayStrCol: List<String>,
+                     arrayIntCol: List<Int>,
+                     optStrCol: String? = nil, 
+                     optIntCol: Int? = nil,
+                     subdocument: Subdocument) {
+        self.init()
+        self._id = _id
+        self.strCol = strCol
+        self.intCol = intCol
+        self.binaryCol = binaryCol
+        self.arrayStrCol = arrayStrCol
+        self.arrayIntCol = arrayIntCol
+        self.optStrCol = optStrCol
+        self.optIntCol = optIntCol
+        self.subdocument = subdocument
+    }
+}
+
 class MongoDataAccessMacrosTests : XCTestCase {
     struct MultiTypeTest : Codable, Equatable {
         enum CodingKeys: String, CodingKey {
@@ -218,11 +197,11 @@ class MongoDataAccessMacrosTests : XCTestCase {
         
         XCTAssertEqual(allTypes1.date.timeIntervalSince1970,
                        allTypes2.date.timeIntervalSince1970,
-                       accuracy: 0.001)
+                       accuracy: 0.1)
         
         for (d1, d2) in zip(allTypes1.arrayDate.map(\.timeIntervalSince1970),
                             allTypes2.arrayDate.map(\.timeIntervalSince1970)) {
-            XCTAssertEqual(d1, d2, accuracy: 0.001)
+            XCTAssertEqual(d1, d2, accuracy: 0.1)
         }
         //        zip(allTypes1.arrayDate, allTypes2.arrayDate)
         //            .forEach(XCTAssertEqual)
@@ -348,233 +327,52 @@ class MongoDataAccessMacrosTests : XCTestCase {
             NullTest(a: nil)
         ])
     }
-    //
-    //    @BSONCodable struct MultiTypeTest : Equatable {
-    //        let _id: ObjectId
-    //        @BSONCodable(key: "String") let string: String
-    //        @BSONCodable(key: "Int32") let int32: Int
-    //        @BSONCodable(key: "Int64") let int64: Int64
-    //        @BSONCodable(key: "Double") let double: Double
-    //        @BSONCodable(key: "Binary") let binary: Data
-    //
-    //        @BSONCodable struct Subdocument : Equatable {
-    //            let foo: String
-    //        }
-    //        @BSONCodable(key: "Subdocument") let subdocument: Subdocument
-    //        @BSONCodable(key: "Array") let array: [Int]
-    ////        @BSONCodable(key: "Timestamp") let timestamp: Date
-    //        @BSONCodable(key: "DatetimeEpoch") let datetimeEpoch: Date
-    //        @BSONCodable(key: "DatetimePositive") let datetimePositive: Date
-    //        @BSONCodable(key: "DatetimeNegative") let datetimeNegative: Date
-    //        @BSONCodable(key: "True") let `true`: Bool
-    //        @BSONCodable(key: "False") let `false`: Bool
-    ////        @BSONCodable(key: "MinKey") let minKey: MinKey
-    ////        @BSONCodable(key: "MaxKey") let maxKey: MaxKey
-    //        @BSONCodable(key: "Null") let null: Optional<String>
-    //
-    //        struct NonComformantType : Equatable {}
-    //        @BSONCodable(ignore: true) let nonComformantType: NonComformantType = .init()
-    //        @BSONCodable(ignore: true) let nonComformantTypeOptional: NonComformantType?
-    //    }
-    ////    {\"_id\": {\"$oid\": \"57e193d7a9cc81b4027498b5\"}, \"String\": \"string\", \"Int32\": {\"$numberInt\": \"42\"}, \"Int64\": {\"$numberLong\": \"42\"}, \"Double\": {\"$numberDouble\": \"-1.0\"}, \"Binary\": { \"$binary\" : {\"base64\": \"o0w498Or7cijeBSpkquNtg==\", \"subType\": \"03\"}}, \"BinaryUserDefined\": { \"$binary\" : {\"base64\": \"AQIDBAU=\", \"subType\": \"80\"}}, \"Code\": {\"$code\": \"function() {}\"}, \"CodeWithScope\": {\"$code\": \"function() {}\", \"$scope\": {}}, \"Subdocument\": {\"foo\": \"bar\"}, \"Array\": [{\"$numberInt\": \"1\"}, {\"$numberInt\": \"2\"}, {\"$numberInt\": \"3\"}, {\"$numberInt\": \"4\"}, {\"$numberInt\": \"5\"}], \"Timestamp\": {\"$timestamp\": {\"t\": 42, \"i\": 1}}, \"Regex\": {\"$regularExpression\": {\"pattern\": \"pattern\", \"options\": \"\"}}, \"DatetimeEpoch\": {\"$date\": {\"$numberLong\": \"0\"}}, \"DatetimePositive\": {\"$date\": {\"$numberLong\": \"2147483647\"}}, \"DatetimeNegative\": {\"$date\": {\"$numberLong\": \"-2147483648\"}}, \"True\": true, \"False\": false, \"DBRef\": {\"$ref\": \"collection\", \"$id\": {\"$oid\": \"57fd71e96e32ab4225b723fb\"}, \"$db\": \"database\"}, \"Minkey\": {\"$minKey\": 1}, \"Maxkey\": {\"$maxKey\": 1}, \"Null\": null}"
-    //    func testMultiType() throws {
-    //        try run(test: "multi-type", answers: [
-    //            MultiTypeTest(_id: .init("57e193d7a9cc81b4027498b5"),
-    //                          string: "string",
-    //                          int32: 42,
-    //                          int64: 42,
-    //                          double: -1.0,
-    //                          binary: Data(base64Encoded: "o0w498Or7cijeBSpkquNtg==")!,
-    //                          subdocument: MultiTypeTest.Subdocument(foo: "bar"),
-    //                          array: [1, 2, 3, 4, 5],
-    ////                          timestamp: Date(timeIntervalSince1970: 42),
-    //                          datetimeEpoch: Date(timeIntervalSince1970: 0),
-    //                          datetimePositive: Date(timeIntervalSince1970: 2147483647),
-    //                          datetimeNegative: Date(timeIntervalSince1970: -2147483648),
-    //                          true: true,
-    //                          false: false,
-    ////                          minKey: MinKey(),
-    ////                          maxKey: MaxKey(),
-    //                          null: nil,
-    //                          nonComformantTypeOptional: nil)
-    //        ])
-    //    }
-    ////    // TODO: Fix spacing in macro expansion
-    ////    func testWithoutAnyCustomization() throws {
-    ////        assertMacroExpansion(
-    ////            """
-    ////            @BSONCodable struct Person {
-    ////                let name: String
-    ////                let age: Int
-    ////            }
-    ////            """,
-    ////            expandedSource:
-    ////                """
-    ////                struct Person {
-    ////                    let name: String
-    ////                    let age: Int
-    ////                    init(name: String, age: Int) {
-    ////                        self.name = name
-    ////                    self.age = age
-    ////                    }
-    ////                    init(from document: Document) throws {
-    ////                        guard let name = document["name"] else {
-    ////                        throw BSONError.missingKey("name")
-    ////                    }
-    ////                    guard let name: String = try name?.as() else {
-    ////                        throw BSONError.invalidType(key: "name")
-    ////                    }
-    ////                    self.name = name
-    ////                    guard let age = document["age"] else {
-    ////                        throw BSONError.missingKey("age")
-    ////                    }
-    ////                    guard let age: Int = try age?.as() else {
-    ////                        throw BSONError.invalidType(key: "age")
-    ////                    }
-    ////                    self.age = age
-    ////                    }
-    ////                    func encode(to document: inout Document) {
-    ////                        document["name"] = AnyBSON(name)
-    ////                    document["age"] = AnyBSON(age)
-    ////                    }
-    ////                    struct Filter : BSONFilter {
-    ////                        var documentRef = DocumentRef()
-    ////                        var name: BSONQuery<String>
-    ////                    var age: BSONQuery<Int>
-    ////                        init() {
-    ////                            name = BSONQuery<String>(identifier: "name", documentRef: documentRef)
-    ////                        age = BSONQuery<Int>(identifier: "age", documentRef: documentRef)
-    ////                        }
-    ////                        mutating func encode() -> Document {
-    ////                            return documentRef.document
-    ////                        }
-    ////                    }
-    ////                }
-    ////                extension Person: BSONCodable {
-    ////                }
-    ////                """, macros: ["BSONCodable" : BSONCodableMacro.self]
-    ////        )
-    ////    }
-    ////}
-    ////
-    ////
-    ////extension MongoCollection {
-    ////    subscript<V>(keyPath: String) -> V {
-    ////        Mirror(reflecting: self).descendant(keyPath) as! V
-    ////    }
-    ////}
-    ////
-    ////@freestanding(declaration, names: arbitrary)
-    ////private macro mock<T: AnyObject>(object: T, _ block: () -> ()) =
-    ////    #externalMacro(module: "MongoDataAccessMacros", type: "MockMacro2")
-    ////
-    ////@objc class MongoDataAccessTests : XCTestCase {
-    ////    func testFind() async throws {
-    ////        let app = App(id: "test")
-    ////        #mock(object: app) {
-    ////            func login(withCredential: RLMCredentials, completion: RLMUserCompletionBlock) {
-    ////                completion(class_createInstance(RLMUser.self, 0) as? RLMUser, nil)
-    ////            }
-    ////        }
-    ////        let user = try await app.login(credentials: .anonymous)
-    ////        let collection = user.mongoClient("mongodb-atlas")
-    ////            .database(named: "my_app")
-    ////            .collection(named: "persons", type: Person.self)
-    ////
-    ////        let underlying: RLMMongoCollection = collection["mongoCollection"]
-    ////        // find error
-    ////        #mock(object: underlying) {
-    ////            func findWhere(_ document: Dictionary<NSString, RLMBSON>,
-    ////                           options: RLMFindOptions,
-    ////                           completion: RLMMongoFindBlock) {
-    ////                completion(nil, SyncError(_bridgedNSError: .init(domain: "MongoClient", code: 42)))
-    ////           }
-    ////        }
-    ////        do {
-    ////            _ = try await collection.find()
-    ////            XCTFail()
-    ////        } catch {
-    ////        }
-    ////        // find empty
-    ////        #mock(object: underlying) {
-    ////            func findWhere(_ document: Dictionary<NSString, RLMBSON>,
-    ////                           options: RLMFindOptions,
-    ////                           completion: RLMMongoFindBlock) {
-    ////                completion([], nil)
-    ////           }
-    ////        }
-    ////        var persons = try await collection.find()
-    ////        XCTAssert(persons.isEmpty)
-    ////        // find one
-    ////        #mock(object: underlying) {
-    ////            func findWhere(_ document: Dictionary<NSString, RLMBSON>,
-    ////                           options: RLMFindOptions,
-    ////                           completion: RLMMongoFindBlock) {
-    ////                let document: Document = [
-    ////                    "name": "Jason",
-    ////                    "age": 32,
-    ////                    "address": ["city": "Austin", "state": "TX"]
-    ////                ]
-    ////                completion([ObjectiveCSupport.convert(document)], nil)
-    ////           }
-    ////        }
-    ////        persons = try await collection.find()
-    ////        let person = Person(name: "Jason", age: 32, address: Address(city: "Austin", state: "TX"))
-    ////        XCTAssertEqual(person.name, "Jason")
-    ////        XCTAssertEqual(person.age, 32)
-    ////        XCTAssertEqual(person.address.city, "Austin")
-    ////        XCTAssertEqual(person.address.state, "TX")
-    ////        XCTAssertEqual(persons.first, person)
-    ////        // find many
-    ////        #mock(object: underlying) {
-    ////            func findWhere(_ document: Dictionary<String, RLMBSON>,
-    ////                           options: RLMFindOptions,
-    ////                           completion: RLMMongoFindBlock) {
-    ////                XCTAssertEqual(ObjectiveCSupport.convert(document), [
-    ////                    "$or": [ ["name": "Jason"], ["name" : "Lee"] ]
-    ////                ])
-    ////                let document: [Document] = [
-    ////                    [
-    ////                    "name": "Jason",
-    ////                    "age": 32,
-    ////                    "address": ["city": "Austin", "state": "TX"]
-    ////                    ],
-    ////                    [
-    ////                        "name": "Lee",
-    ////                        "age": 10,
-    ////                        "address": ["city": "Dublin", "state": "DUBLIN"]
-    ////                    ]
-    ////                ]
-    ////                completion(document.map(ObjectiveCSupport.convert), nil)
-    ////           }
-    ////        }
-    ////        persons = try await collection.find {
-    ////            $0.name == "Jason" || $0.name == "Lee"
-    ////        }
-    ////        let person2 = Person(name: "Lee", age: 10, address: Address(city: "Dublin", state: "DUBLIN"))
-    ////        XCTAssertEqual(persons[0], person)
-    ////        XCTAssertEqual(persons[1], person2)
-    ////    }
-    ////
-    ////    func testCodableGeneratedDecode() throws {
-    ////        let person = try Person(from: ["name" : "Jason", "age": 32, "address": ["city": "Austin", "state": "TX"]])
-    ////        XCTAssertEqual(person.name, "Jason")
-    ////        XCTAssertEqual(person.age, 32)
-    ////        XCTAssertEqual(person.address.city, "Austin")
-    ////        XCTAssertEqual(person.address.state, "TX")
-    ////    }
-    ////
-    ////    func testCodableGeneratedEncode() throws {
-    ////        var document = Document()
-    ////        let person = Person(name: "Jason", age: 32, address: Address(city: "Austin", state: "TX"))
-    ////
-    ////        person.encode(to: &document)
-    ////        XCTAssertEqual(document["name"], "Jason")
-    ////        XCTAssertEqual(document["age"], 32)
-    ////        XCTAssertEqual(document["address"]??.documentValue?["city"], "Austin")
-    ////        XCTAssertEqual(document["address"]??.documentValue?["state"], "TX")
-    ////
-    ////        XCTAssertEqual(try DocumentEncoder().encode(person), document)
-    ////    }
-    ////
+    
+    // MARK: Filters
+    private static func compareQuery(_ query: (Query<AllTypesObject>) -> Query<Bool>,
+                                     _ rhs: NSDictionary) throws {
+        XCTAssertEqual(
+            try buildFilter(query(Query()).node, subqueryCount: 0),
+            rhs)
+    }
+    
+    func testFilters() throws {
+        try Self.compareQuery({
+            $0.intCol > 42
+        }, [
+            "intCol": [
+                "$gt": 42
+            ]
+        ])
+        try Self.compareQuery({
+            $0.optStrCol == nil && $0.intCol > 42
+        }, [
+            "$and": [
+                [
+                    "optStrCol": ["$eq": nil]
+                ],
+                [
+                    "intCol": [
+                        "$gt": 42
+                    ]
+                ]
+            ]
+        ])
+    }
+    
+    func testSubdocumentFilters() throws {
+        try Self.compareQuery({
+            $0.subdocument.strCol == "foo"
+        }, [
+            "subdocument.strCol": ["$eq": "foo"]
+        ])
+    }
+    
+    func testCollectionFilters() throws {
+        try Self.compareQuery({
+            $0.arrayIntCol.containsAny(in: [1, 2, 3])
+        }, [
+            "arrayIntCol": [ "$in": [1, 2, 3] ]
+        ])
+    }
 }

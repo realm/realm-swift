@@ -31,7 +31,7 @@ import RealmSyncTestSupport
 extension URLSession {
     fileprivate func resultDataTask(with request: URLRequest,
                                     _ completionHandler: @Sendable @escaping (Result<Data, Error>) -> Void) {
-        URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue()).dataTask(with: request) { (data, response, error) in
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
             if let httpResponse = response as? HTTPURLResponse,
                 httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
                 let data = data {
@@ -65,7 +65,7 @@ extension URLSession {
     }
 }
 
-private func bsonType(_ type: PropertyType) -> String {
+internal func bsonType(_ type: PropertyType) -> String {
     switch type {
     case .UUID: return "uuid"
     case .any: return "mixed"
@@ -142,6 +142,85 @@ extension Optional: Json where Wrapped: Json {}
 typealias Json = Any
 #endif
 
+func stitchRule<T: Codable>(for type: T.Type,
+                            _ partitionKeyType: String?, 
+                            id: String? = nil,
+                            appId: String) -> [String: Json] {
+    fatalError()
+//    var stitchProperties: [String: Json] = [:]
+//
+//    // We only add a partition property for pbs
+//    if let partitionKeyType = partitionKeyType {
+//        stitchProperties["realm_id"] = [
+//            "bsonType": "\(partitionKeyType)"
+//        ]
+//    }
+//
+//    var relationships: [String: Json] = [:]
+//
+//    let mirror = Mirror(reflecting: type)
+//    // First pass we only add the properties to the schema as we can't add
+//    // links until the targets of the links exist.
+//    let pk = primaryKeyProperty!
+//    stitchProperties[pk.columnName] = pk.stitchRule(self)
+//    for property in properties {
+//        if property.type != .object {
+//            stitchProperties[property.columnName] = property.stitchRule(self)
+//        } else if id != nil {
+//            stitchProperties[property.columnName] = property.stitchRule(self)
+//            relationships[property.columnName] = [
+//                "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!) \(appId)",
+//                "foreign_key": "_id",
+//                "is_list": property.isArray || property.isSet || property.isMap
+//            ]
+//        }
+//    }
+//
+//    return [
+//        "_id": id as Json,
+//        "schema": [
+//            "properties": stitchProperties,
+//            // The server currently only supports non-optional collections
+//            // but requires them to be marked as optional
+//            "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isMap || $0.isSet ? nil : $0.columnName },
+//            "title": "\(className)"
+//        ],
+//        "metadata": [
+//            "data_source": "mongodb1",
+//            "database": "test_data",
+//            "collection": "\(className) \(appId)"
+//        ],
+//        "relationships": relationships
+//    ]
+}
+
+struct Rule: Codable {
+    struct Schema: Codable {
+        struct Property: Codable {
+            let bsonType: String
+            let items: [Property]?
+        }
+        var properties: [String: Property]
+        let required: [String]
+        let title: String
+    }
+    struct Metadata: Codable {
+        let dataSource: String
+        let database: String
+        let collection: String
+    }
+    struct Relationship: Codable {
+        let ref: String
+        let foreignKey: String
+        let isList: Bool
+    }
+    
+    let _id: AnyBSONKey
+    var schema: Schema
+    let metadata: Metadata
+    var relationships: [String: Relationship]
+}
+
 private extension ObjectSchema {
     func stitchRule(_ partitionKeyType: String?, id: String? = nil, appId: String) -> [String: Json] {
         var stitchProperties: [String: Json] = [:]
@@ -164,6 +243,9 @@ private extension ObjectSchema {
                 stitchProperties[property.columnName] = property.stitchRule(self)
             } else if id != nil {
                 stitchProperties[property.columnName] = property.stitchRule(self)
+                guard property.objectClassName.map(RLMSchema.shared().schema(forClassName:))?.map(\.isEmbedded).map({ !$0 }) ?? false else {
+                    continue
+                }
                 relationships[property.columnName] = [
                     "ref": "#/relationship/mongodb1/test_data/\(property.objectClassName!) \(appId)",
                     "foreign_key": "_id",
@@ -198,7 +280,7 @@ struct AdminProfile: Codable {
             case groupId = "group_id"
         }
 
-        let groupId: String
+        let groupId: String?
     }
 
     let roles: [Role]
@@ -303,15 +385,17 @@ class AdminSession {
             ]
             if let data = data {
                 do {
-                    request.httpBody = try JSONSerialization.data(withJSONObject: data)
+                    if let data = data as? Encodable {
+                        request.httpBody = try JSONEncoder().encode(data)
+                    } else {
+                        request.httpBody = try JSONSerialization.data(withJSONObject: data)
+                    }
                 } catch {
                     completionHandler(.failure(error))
                 }
             }
 
-            URLSession(configuration: URLSessionConfiguration.default,
-                       delegate: nil, delegateQueue: OperationQueue())
-            .resultDataTask(with: request) { result in
+            URLSession.shared.resultDataTask(with: request) { result in
                 completionHandler(result.flatMap { data in
                     Result {
                         data.count > 0 ? try JSONSerialization.jsonObject(with: data) : nil
@@ -361,6 +445,10 @@ class AdminSession {
             request(httpMethod: "POST", data: data, completionHandler: completionHandler)
         }
 
+        func post<D>(on group: DispatchGroup, _ data: D,
+                     _ completionHandler: @escaping Completion) where D: Encodable {
+            request(on: group, httpMethod: "POST", data: data, completionHandler)
+        }
         func post(on group: DispatchGroup, _ data: [String: Json],
                   _ completionHandler: @escaping Completion) {
             request(on: group, httpMethod: "POST", data: data, completionHandler)
@@ -462,8 +550,10 @@ class Admin {
                 }
             }
             .flatMap { (accessToken: String) -> Result<AdminSession, Error> in
-                self.userProfile(accessToken: accessToken).map {
-                    AdminSession(accessToken: accessToken, groupId: $0.roles[0].groupId)
+                self.userProfile(accessToken: accessToken).flatMap {
+                    $0.roles.compactMap(\.groupId).first.flatMap {
+                        .success(AdminSession(accessToken: accessToken, groupId: $0))
+                    } ?? .failure(URLError(.badServerResponse))
                 }
             }
             .get()
@@ -537,8 +627,8 @@ public class RealmServer: NSObject {
             }
 
             do {
-                try launchMongoProcess()
-                try launchServerProcess()
+//                try launchMongoProcess()
+//                try launchServerProcess()
                 self.session = try Admin().login()
                 try makeUserAdmin()
             } catch {
@@ -549,31 +639,36 @@ public class RealmServer: NSObject {
 
     /// Lazy teardown for exit only.
     private lazy var tearDown: () = {
-        serverProcess.terminate()
+        if serverProcess.isRunning {
+            serverProcess.terminate()
+        }
 
-        let mongo = RealmServer.binDir.appendingPathComponent("mongo").path
-
-        // step down the replica set
-        let rsStepDownProcess = Process()
-        rsStepDownProcess.launchPath = mongo
-        rsStepDownProcess.arguments = [
-            "admin",
-            "--port", "26000",
-            "--eval", "'db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})'"]
-        try? rsStepDownProcess.run()
-        rsStepDownProcess.waitUntilExit()
-
-        // step down the replica set
-        let mongoShutdownProcess = Process()
-        mongoShutdownProcess.launchPath = mongo
-        mongoShutdownProcess.arguments = [
-            "admin",
-            "--port", "26000",
-            "--eval", "'db.shutdownServer({force: true})'"]
-        try? mongoShutdownProcess.run()
-        mongoShutdownProcess.waitUntilExit()
-
-        mongoProcess.terminate()
+        if mongoProcess.isRunning {
+            let mongo = RealmServer.binDir.appendingPathComponent("mongo").path
+            
+            // step down the replica set
+            let rsStepDownProcess = Process()
+            rsStepDownProcess.launchPath = mongo
+            rsStepDownProcess.arguments = [
+                "admin",
+                "--port", "26000",
+                "--eval", "'db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})'"]
+            try? rsStepDownProcess.run()
+            rsStepDownProcess.waitUntilExit()
+            
+            // step down the replica set
+            let mongoShutdownProcess = Process()
+            mongoShutdownProcess.launchPath = mongo
+            mongoShutdownProcess.arguments = [
+                "admin",
+                "--port", "26000",
+                "--eval", "'db.shutdownServer({force: true})'"]
+            try? mongoShutdownProcess.run()
+            mongoShutdownProcess.waitUntilExit()
+            
+            
+            mongoProcess.terminate()
+        }
 
         try? FileManager().removeItem(at: tempDir)
     }()
@@ -760,8 +855,14 @@ public class RealmServer: NSObject {
 
     public typealias AppId = String
 
-    /// Create a new server app
     func createApp(syncMode: SyncMode, types: [ObjectBase.Type], persistent: Bool) throws -> AppId {
+        try createApp(syncMode: syncMode,
+                      schema: types.map { ObjectiveCSupport.convert(object: $0.sharedSchema()!) },
+                      persistent: persistent)
+    }
+    /// Create a new server app
+    func createApp(syncMode: SyncMode, schema: [ObjectSchema],
+                   persistent: Bool) throws -> AppId {
         let session = try XCTUnwrap(session)
 
         let info = try session.apps.post(["name": "test"]).get()
@@ -840,7 +941,7 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        let schema = types.map { ObjectiveCSupport.convert(object: $0.sharedSchema()!) }
+//        let schema = types.map { ObjectiveCSupport.convert(object: $0.sharedSchema()!) }
 
         let partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
@@ -1005,10 +1106,29 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 
+    public func createApp(fields: [String], 
+                          types: [Codable.Type],
+                          persistent: Bool = false) throws -> AppId {
+        return try createApp(syncMode: .flx(fields), schema: types.compactMap { try? BaasRuleEncoder().encode($0)
+        }.map { ObjectiveCSupport.convert(object: $0) }, persistent: persistent)
+    }
+    
     @objc public func createApp(fields: [String], types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
         return try createApp(syncMode: .flx(fields), types: types, persistent: persistent)
     }
 
+    public func createApp<each Ts>(fields: [String],
+                                   types: repeat (each Ts).Type,
+                                   persistent: Bool = false) throws -> AppId where repeat each Ts: Codable & ObjectBase {
+        var schema = [ObjectSchema]()
+        func createSchema<T>(type: T.Type, schema: inout [ObjectSchema])
+        where T: Codable & ObjectBase {
+            schema.append(ObjectiveCSupport.convert(object: type.sharedSchema()!))
+        }
+        repeat createSchema(type: each types, schema: &schema)
+        return try createApp(syncMode: .flx(fields), schema: schema, persistent: persistent)
+    }
+    
     @objc public func createApp(partitionKeyType: String = "string", types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
         return try createApp(syncMode: .pbs(partitionKeyType), types: types, persistent: persistent)
     }

@@ -242,7 +242,6 @@
 		531F9570279070A900E497F1 /* RLMServerTestObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = 531F956E279070A800E497F1 /* RLMServerTestObjects.m */; };
 		532E916F24AA533A003FD9DB /* TimeoutProxyServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */; };
 		5346B5112B8FB6A4001CADFE /* ExtJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */; };
-		5346B5122B8FB6A4001CADFE /* ExtJSONCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B5102B8FB6A4001CADFE /* ExtJSONCodable.swift */; };
 		5346B5142B8FB6A9001CADFE /* MongoDataAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */; };
 		5346B5162B8FB6C4001CADFE /* SwiftMongoAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5346B5152B8FB6C4001CADFE /* SwiftMongoAccessTests.swift */; };
 		5346B5192B8FB6E9001CADFE /* bson-corpus.rst in Resources */ = {isa = PBXBuildFile; fileRef = 5346B5172B8FB6E9001CADFE /* bson-corpus.rst */; };
@@ -254,10 +253,13 @@
 		53626AAF25D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		53626AB025D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
+		538ADD452B9CC54000ADE639 /* ExtJSONCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538ADD442B9CC54000ADE639 /* ExtJSONCodable.swift */; };
+		539A9A392B98D15200AE0E9D /* BaasRuleCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539A9A382B98D15200AE0E9D /* BaasRuleCodable.swift */; };
 		53A34E3625CDA0AC00698930 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 53A34E3325CDA0AC00698930 /* LaunchScreen.storyboard */; };
 		53A34E3725CDA0AC00698930 /* SwiftUITestHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A34E3425CDA0AC00698930 /* SwiftUITestHostApp.swift */; };
 		53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		53CCC6E8257EC8C400A8FC50 /* RLMUser_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		53D7CBB52B9A22D100399257 /* MongoQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D7CBB42B9A22D100399257 /* MongoQuery.swift */; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
 		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D128F2A1BE984E5001F4FBF /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -820,7 +822,6 @@
 		532E916E24AA533A003FD9DB /* TimeoutProxyServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TimeoutProxyServer.swift; path = Realm/ObjectServerTests/TimeoutProxyServer.swift; sourceTree = "<group>"; };
 		533489DD26E0F9510085EEE1 /* RLMChildProcessEnvironment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMChildProcessEnvironment.h; path = Realm/TestUtils/include/RLMChildProcessEnvironment.h; sourceTree = "<group>"; };
 		5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtJSON.swift; sourceTree = "<group>"; };
-		5346B5102B8FB6A4001CADFE /* ExtJSONCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtJSONCodable.swift; sourceTree = "<group>"; };
 		5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MongoDataAccess.swift; sourceTree = "<group>"; };
 		5346B5152B8FB6C4001CADFE /* SwiftMongoAccessTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftMongoAccessTests.swift; path = Realm/ObjectServerTests/SwiftMongoAccessTests.swift; sourceTree = "<group>"; };
 		5346B5172B8FB6E9001CADFE /* bson-corpus.rst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "bson-corpus.rst"; sourceTree = "<group>"; };
@@ -833,11 +834,14 @@
 		53626AAE25D31CAC00D9515D /* Objects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Objects.swift; sourceTree = "<group>"; };
 		536B7C0B24A4C223006B535D /* dependencies.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dependencies.list; sourceTree = "<group>"; };
 		537130C724A9E417001FDBBC /* RealmServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RealmServer.swift; path = Realm/ObjectServerTests/RealmServer.swift; sourceTree = "<group>"; };
+		538ADD442B9CC54000ADE639 /* ExtJSONCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtJSONCodable.swift; sourceTree = "<group>"; };
+		539A9A382B98D15200AE0E9D /* BaasRuleCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaasRuleCodable.swift; sourceTree = "<group>"; };
 		53A34E3325CDA0AC00698930 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		53A34E3425CDA0AC00698930 /* SwiftUITestHostApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostApp.swift; sourceTree = "<group>"; };
 		53A34E3525CDA0AC00698930 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMApp_Private.h; sourceTree = "<group>"; };
 		53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUser_Private.h; sourceTree = "<group>"; };
+		53D7CBB42B9A22D100399257 /* MongoQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MongoQuery.swift; sourceTree = "<group>"; };
 		53E308C927905794002A8D91 /* RLMSyncSubscription_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncSubscription_Private.h; sourceTree = "<group>"; };
 		53E308CA27905794002A8D91 /* RLMSyncSubscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncSubscription.h; sourceTree = "<group>"; };
 		53E308CB27905794002A8D91 /* RLMSyncSubscription_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncSubscription_Private.hpp; sourceTree = "<group>"; };
@@ -1185,6 +1189,7 @@
 				1AA5AE9A1D98A1B000ED8C27 /* Object-Server-Tests-Bridging-Header.h */,
 				3F73BC871E3A876600FE80B6 /* ObjectServerTests-Info.plist */,
 				537130C724A9E417001FDBBC /* RealmServer.swift */,
+				539A9A382B98D15200AE0E9D /* BaasRuleCodable.swift */,
 				1AF64DD01DA304A90081EB15 /* RLMUser+ObjectServerTests.h */,
 				1AF64DD11DA304A90081EB15 /* RLMUser+ObjectServerTests.mm */,
 				CF330BBC24E57D5F00F07EE2 /* RLMWatchTestUtility.h */,
@@ -1297,6 +1302,17 @@
 			path = SwiftUITestHostUITests;
 			sourceTree = "<group>";
 		};
+		538ADD432B9CC52600ADE639 /* MongoDataAccess */ = {
+			isa = PBXGroup;
+			children = (
+				538ADD442B9CC54000ADE639 /* ExtJSONCodable.swift */,
+				5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */,
+				5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */,
+				53D7CBB42B9A22D100399257 /* MongoQuery.swift */,
+			);
+			path = MongoDataAccess;
+			sourceTree = "<group>";
+		};
 		53A34E3225CDA0AC00698930 /* SwiftUITestHost */ = {
 			isa = PBXGroup;
 			children = (
@@ -1350,6 +1366,7 @@
 		5D660FCD1BE98C560021E04F /* RealmSwift */ = {
 			isa = PBXGroup;
 			children = (
+				538ADD432B9CC52600ADE639 /* MongoDataAccess */,
 				3F48201C26307CE2005B40E8 /* Impl */,
 				5D660FE31BE98D670021E04F /* Aliases.swift */,
 				681EE33A25EE8E1400A9DEC5 /* AnyRealmValue.swift */,
@@ -1361,9 +1378,6 @@
 				3FB6ABD82416A27000E318C2 /* Decimal128.swift */,
 				3FC3F9162419B63100E27322 /* EmbeddedObject.swift */,
 				29B7FDF51C0DA6560023224E /* Error.swift */,
-				5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */,
-				5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */,
-				5346B5102B8FB6A4001CADFE /* ExtJSONCodable.swift */,
 				3F7BCEB42834377E00EB6E16 /* Events.swift */,
 				AC7825B82ACD90BE007ABA4B /* Geospatial.swift */,
 				5D1534B71CCFF545008976D7 /* LinkingObjects.swift */,
@@ -2551,7 +2565,6 @@
 				681EE33B25EE8E1400A9DEC5 /* AnyRealmValue.swift in Sources */,
 				CFB4313A243DF87100471C18 /* App.swift in Sources */,
 				AC81360F287F21350029F15E /* AsymmetricObject.swift in Sources */,
-				5346B5122B8FB6A4001CADFE /* ExtJSONCodable.swift in Sources */,
 				3FE267D7264308680030F83C /* BasicTypes.swift in Sources */,
 				4996EA9E2465BB8A003A1F51 /* BSON.swift in Sources */,
 				3FE267D5264308680030F83C /* CollectionAccess.swift in Sources */,
@@ -2580,6 +2593,7 @@
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
+				538ADD452B9CC54000ADE639 /* ExtJSONCodable.swift in Sources */,
 				3FE267D8264308680030F83C /* Persistable.swift in Sources */,
 				3F149CCB2668112A00111D65 /* PersistedProperty.swift in Sources */,
 				3F857A49276A507200F9B9B1 /* Projection.swift in Sources */,
@@ -2594,6 +2608,7 @@
 				CFE9CE3326555BBD00BF96D6 /* RealmKeyedCollection.swift in Sources */,
 				CF44461E26121C6800BAFDB4 /* RealmProperty.swift in Sources */,
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
+				53D7CBB52B9A22D100399257 /* MongoQuery.swift in Sources */,
 				68A7B91D2543538B00C703BC /* RLMSupport.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
 				3FE267DA264308680030F83C /* SchemaDiscovery.swift in Sources */,
@@ -2737,6 +2752,7 @@
 				1AA5AE981D989BE400ED8C27 /* SwiftSyncTestCase.swift in Sources */,
 				AC8846B72687BC4100DF4A65 /* SwiftUIServerTests.swift in Sources */,
 				3F558C8822C29A03002F0F30 /* TestUtils.mm in Sources */,
+				539A9A392B98D15200AE0E9D /* BaasRuleCodable.swift in Sources */,
 				3FAF2D4229577100002EAC93 /* TestUtils.swift in Sources */,
 				532E916F24AA533A003FD9DB /* TimeoutProxyServer.swift in Sources */,
 				CFB674A324EEE9CB00FBF0B8 /* WatchTestUtility.swift in Sources */,
@@ -3083,6 +3099,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
+				OTHER_SWIFT_FLAGS = "-Xfrontend -enable-actor-data-race-checks -module-name RealmSwift -package-name realmPkg";
 			};
 			name = Debug;
 		};
@@ -3097,6 +3114,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
+				OTHER_SWIFT_FLAGS = "-Xfrontend -enable-actor-data-race-checks -module-name RealmSwift -package-name realmPkg";
 			};
 			name = Debug;
 		};
@@ -3117,7 +3135,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				OTHER_SWIFT_FLAGS = "$(inherited) -D BUILDING_REALM_SWIFT_TESTS -D DEBUG";
+				OTHER_SWIFT_FLAGS = "-Xfrontend -enable-actor-data-race-checks -package-name realmPkg -D BUILDING_REALM_SWIFT_TESTS";
 			};
 			name = Debug;
 		};

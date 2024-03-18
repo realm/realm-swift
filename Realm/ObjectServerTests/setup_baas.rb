@@ -156,18 +156,20 @@ def setup_stitch
     puts `ls -l #{stitch_dir}/etc/transpiler/bin`
 
     exports << "export GOROOT=\"#{go_root}\""
-    exports << "export PATH=\"$GOROOT/bin:$PATH\""
+#    exports << "export PATH=\"$PATH:$GOROOT/bin:$PATH\""
 
     exports << "export STITCH_PATH=\"#{stitch_dir}\""
-    exports << "export PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
+#    exports << "export PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
     exports << "export DYLD_LIBRARY_PATH='#{LIB_DIR}'"
     exports << "export GOPRIVATE=\"github.com/10gen/*\""
-
+    exports << "export GOPATH=\"${stitch_dir}\""
+    exports << "export GO111MODULE=off"
+    
+#    puts "GOROOT=#{go_root}"
     puts 'build create_user binary'
 
     puts `#{exports.join(' && ')} && \
-        cd '#{stitch_dir}' && \
-        #{go_root}/bin/go build -o create_user cmd/auth/user.go &&
+        #{go_root}/bin/go build -o create_user #{stitch_dir}/cmd/auth/user.go && \
         cp -c create_user '#{BIN_DIR}'`
 
     puts 'create_user binary built'
@@ -175,8 +177,7 @@ def setup_stitch
     puts 'building server binary'
 
     puts `#{exports.join(' && ')} && \
-        cd '#{stitch_dir}' && \
-        #{go_root}/bin/go build -o stitch_server cmd/server/main.go
+        #{go_root}/bin/go build -o stitch_server #{stitch_dir}/cmd/server/main.go && \
         cp -c stitch_server '#{BIN_DIR}'`
 
     puts 'server binary built'
