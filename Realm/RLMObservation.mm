@@ -374,7 +374,7 @@ void RLMObservationTracker::cascadeNotification(CascadeNotification const& cs) {
             }
 
             NSString *name = observer->columnName(link.origin_col_key);
-            if (observer->getRow().get_table()->get_column_type(link.origin_col_key) != type_LinkList) {
+            if (!link.origin_col_key.is_list()) {
                 _changes.push_back({observer, name});
                 continue;
             }

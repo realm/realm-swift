@@ -205,7 +205,7 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
 
 - (id<RLMBSON>)partitionValue {
     if (!_config->partition_value.empty()) {
-        return RLMConvertBsonToRLMBSON(realm::bson::parse(_config->partition_value.c_str()));
+        return RLMConvertBsonToRLMBSON(realm::bson::parse(_config->partition_value));
     }
     return nil;
 }

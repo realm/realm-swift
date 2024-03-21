@@ -73,7 +73,7 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
 #pragma mark - Loggers
 
 struct CocoaSyncLogger : public realm::util::Logger {
-    void do_log(Level, const std::string& message) override {
+    void do_log(const realm::util::LogCategory&, Level, const std::string& message) override {
         NSLog(@"Sync: %@", RLMStringDataToNSString(message));
     }
 };
@@ -86,7 +86,7 @@ static std::unique_ptr<realm::util::Logger> defaultSyncLogger(realm::util::Logge
 
 struct CallbackLogger : public realm::util::Logger {
     RLMSyncLogFunction logFn;
-    void do_log(Level level, const std::string& message) override {
+    void do_log(const realm::util::LogCategory&, Level level, const std::string& message) override {
         @autoreleasepool {
             logFn(logLevelForLevel(level), RLMStringDataToNSString(message));
         }
@@ -202,7 +202,7 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
     _logger = nil;
     _authorizationHeaderName = nil;
     _customRequestHeaders = nil;
-    _syncManager->reset_for_testing();
+    _syncManager->tear_down_for_testing();
 }
 
 - (std::shared_ptr<realm::SyncManager>)syncManager {

@@ -1256,7 +1256,6 @@ extension OptionalSectionedResultsTestData {
 }
 
 struct SectionedResultsTestDataInt: SectionedResultsTestData {
-
     static var values: [Int] {
         [5, 4, 3, 2, 1]
     }
@@ -1557,7 +1556,7 @@ struct SectionedResultsTestDataAnyRealmValue: SectionedResultsTestData {
     }
 
     static func orderedKeys(ascending: Bool) -> [String] {
-        return ["alphanumeric", "data"]
+        return ascending ? ["alphanumeric", "data"] : ["data", "alphanumeric"]
     }
 
     static func setupObject() -> ModernAllTypesObject {
@@ -1604,14 +1603,14 @@ struct SectionedResultsTestDataBinary: SectionedResultsTestData {
          Data(base64Encoded: "abstract")!]
     }
     static var expectedSectionedValues: [String: [Data]] {
-        ["short": [Data(base64Encoded: "more")!,
-                     Data(base64Encoded: "door")!],
+        ["short": [Data(base64Encoded: "door")!,
+                   Data(base64Encoded: "more")!],
          "long": [Data(base64Encoded: "absolute")!,
-                     Data(base64Encoded: "abstract")!]]
+                  Data(base64Encoded: "abstract")!]]
     }
 
     static func orderedKeys(ascending: Bool) -> [String] {
-        return ["short", "long"]
+        ascending ? ["long", "short"] : ["short", "long"]
     }
 
     static func setupObject() -> ModernAllTypesObject {
@@ -1644,13 +1643,13 @@ struct SectionedResultsTestDataOptionalBinary: OptionalSectionedResultsTestData 
          Data(base64Encoded: "abstract")!]
     }
     static var expectedSectionedValuesOpt: [String?: [Data??]] {
-        ["short": [Data(base64Encoded: "more")!, Data(base64Encoded: "door")!],
+        ["short": [Data(base64Encoded: "door")!, Data(base64Encoded: "more")!],
          "long": [Data(base64Encoded: "absolute")!, Data(base64Encoded: "abstract")!],
          nil: [.some(.none)]]
     }
 
     static func orderedKeysOpt(ascending: Bool) -> [String?] {
-        return ascending ? [nil, "short", "long"] : ["short", "long", nil]
+        ascending ? [nil, "long", "short"] : ["short", "long", nil]
     }
 
     static func setupObject() -> ModernAllTypesObject {

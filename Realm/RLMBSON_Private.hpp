@@ -21,8 +21,7 @@
 
 namespace realm::bson {
 class Bson;
-template <typename> class IndexedMap;
-using BsonDocument = IndexedMap<Bson>;
+class BsonDocument;
 }
 
 realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);

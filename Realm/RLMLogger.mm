@@ -75,7 +75,7 @@ static NSString* levelPrefix(Level logLevel) {
 }
 
 struct CocoaLogger : public Logger {
-    void do_log(Level level, const std::string& message) override {
+    void do_log(const realm::util::LogCategory&, Level level, const std::string& message) override {
         NSLog(@"%@: %@", levelPrefix(level), RLMStringDataToNSString(message));
     }
 };
@@ -83,7 +83,7 @@ struct CocoaLogger : public Logger {
 class CustomLogger : public Logger {
 public:
     RLMLoggerFunction function;
-    void do_log(Level level, const std::string& message) override {
+    void do_log(const realm::util::LogCategory&, Level level, const std::string& message) override {
         @autoreleasepool {
             if (function) {
                 function(logLevelForLevel(level), RLMStringDataToNSString(message));

@@ -705,7 +705,7 @@ static bool s_opensApp;
 @end
 
 int64_t RLMGetClientFileIdent(RLMRealm *realm) {
-    return realm::SyncSession::OnlyForTesting::get_file_ident(*realm->_realm->sync_session()).ident;
+    return realm->_realm->sync_session()->get_file_ident().ident;
 }
 
 #endif // TARGET_OS_OSX
