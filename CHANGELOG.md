@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.49.0 Release notes (2024-03-22)
 =============================================================
 
 This version introduces a new Realm file format version (v24). Opening existing
@@ -11,6 +11,7 @@ upgrade. Downgrading to older versions of Realm will attempt to automatically
 restore the backup, or it will be deleted after three months.
 
 ### Enhancements
+
 * Storage of Decimal128 properties has been optimised similarly to Int
   properties so that the individual values will take up 0 bits (if all nulls),
   32 bits, 64 bits or 128 bits depending on what is needed.
@@ -19,6 +20,7 @@ restore the backup, or it will be deleted after three months.
   between 16kB and 4MB in size. ([PR #7492](https://github.com/realm/realm-core/pull/7492)).
 
 ### Fixed
+
 * Sorting on binary Data was done by comparing bytes as signed char rather than
   unsigned char, resulting in very strange orders (since sorting on Data was
   enabled in v6.0.4)
@@ -48,9 +50,11 @@ restore the backup, or it will be deleted after three months.
   ([#7349](https://github.com/realm/realm-core/issues/7349), since v10.46.0)
 
 ### Breaking Changes
+
 * Drop support for opening pre-v5.0.0 Realm files.
 
 ### Compatibility
+
 * Realm Studio: 14.0.1 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.3.0.
@@ -59,6 +63,7 @@ restore the backup, or it will be deleted after three months.
   Apple begins requiring Xcode 15 for app store submissions on April 29.
 
 ### Internal
+
 * Upgraded realm-core from 13.26.0 to 14.3.0
 
 10.48.1 Release notes (2024-03-15)
