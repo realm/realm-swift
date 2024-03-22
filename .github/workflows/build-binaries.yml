@@ -11,7 +11,7 @@ on:
 jobs:
   build-packages:
     runs-on: macos-14
-    name: Build for ${{ matrix.target }}
+    name: Build Core ${{ inputs.core-version }} for ${{ matrix.target }}
     outputs:
       core-version: ${{ steps.get-core-version.outputs.version }}
     strategy:
@@ -65,7 +65,7 @@ jobs:
 
   combine-xcframework:
     runs-on: macos-14
-    name: Combine xcframework
+    name: Publish xcframework for Core ${{ inputs.core-version }}
     environment:
       name: Prebuilds
       url: ${{ steps.upload-to-s3.outputs.url }}
