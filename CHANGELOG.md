@@ -1,3 +1,29 @@
+10.49.1 Release notes (2024-03-22)
+=============================================================
+
+### Enhancements
+
+* Improve file compaction performance on arm64 platforms for encrypted files
+  between 16kB and 4MB in size. ([PR #7492](https://github.com/realm/realm-core/pull/7492)).
+
+### Fixed
+
+* Opening a Realm with a cached user while offline would fail to retry some
+  steps of the connection process and instead report a fatal error.
+  ([#7349](https://github.com/realm/realm-core/issues/7349), since v10.46.0)
+
+### Compatibility
+
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.3.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.2-15.3.0.
+
+### Internal
+
+* Upgraded realm-core from v14.3.0 to 14.4.1
+
 10.49.0 Release notes (2024-03-22)
 =============================================================
 
@@ -16,8 +42,6 @@ restore the backup, or it will be deleted after three months.
   properties so that the individual values will take up 0 bits (if all nulls),
   32 bits, 64 bits or 128 bits depending on what is needed.
   ([Core #6111](https://github.com/realm/realm-core/pull/6111))
-* Improve file compaction performance on arm64 platforms for encrypted files
-  between 16kB and 4MB in size. ([PR #7492](https://github.com/realm/realm-core/pull/7492)).
 
 ### Fixed
 
@@ -45,9 +69,6 @@ restore the backup, or it will be deleted after three months.
   ([Core #6670](https://github.com/realm/realm-core/pull/6670), since 2.0.0 for indexes, and since since the introduction of sets in v10.8.0)
 * Fix a spurious crash related to opening a Realm on background thread while
   the process was in the middle of exiting ([Core #7420](https://github.com/realm/realm-core/pull/7420)).
-* Opening a Realm with a cached user while offline would fail to retry some
-  steps of the connection process and instead report a fatal error.
-  ([#7349](https://github.com/realm/realm-core/issues/7349), since v10.46.0)
 
 ### Breaking Changes
 

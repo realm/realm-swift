@@ -121,8 +121,9 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (NSURL *)realmURL {
     if (auto session = _session.lock()) {
-        if (auto url = session->full_realm_url()) {
-            return [NSURL URLWithString:@(url->c_str())];
+        auto url = session->full_realm_url();
+        if (!url.empty() && session->state() == SyncSession::State::Active) {
+            return [NSURL URLWithString:@(url.c_str())];
         }
     }
     return nil;
