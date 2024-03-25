@@ -735,6 +735,7 @@ class SwiftUITests: TestCase {
             // add another default inited object for filter comparison
             realm.add(object)
         }
+        realm.refresh()
         XCTAssertEqual(fullResults.wrappedValue.count, 1)
         XCTAssertEqual(fullResults.wrappedValue[0].key, "abc")
 
@@ -780,6 +781,7 @@ class SwiftUITests: TestCase {
             // add another default inited object for filter comparison
             realm.add(object)
         }
+        realm.refresh()
         XCTAssertEqual(fullResults.wrappedValue.count, 1)
         XCTAssertEqual(fullResults.wrappedValue[0].key, "abc")
 
