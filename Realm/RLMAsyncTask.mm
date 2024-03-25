@@ -41,11 +41,14 @@ static NSError *s_canceledError = [NSError errorWithDomain:NSPOSIXErrorDomain
     NSLocalizedDescriptionKey: @"Operation canceled"
 }];
 
+typedef void(^CoreSyncProgressNotificationBlock)(NSUInteger transferred_bytes, NSUInteger transferrable_bytes, double estimate);
+
 __attribute__((objc_direct_members))
 @implementation RLMAsyncOpenTask {
     RLMUnfairMutex _mutex;
     std::shared_ptr<realm::AsyncOpenTask> _task;
-    std::vector<RLMProgressNotificationBlock> _progressBlocks;
+
+    std::vector<CoreSyncProgressNotificationBlock> _progressBlocks;
     bool _cancel;
 
     RLMRealmConfiguration *_configuration;
@@ -56,11 +59,12 @@ __attribute__((objc_direct_members))
     RLMRealm *_backgroundRealm;
 }
 
-- (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMProgressNotificationBlock)block {
-    auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes) {
+- (void)addSyncProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMSyncProgressNotificationBlock)block {
+    auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes, double estimate) {
         dispatch_async(queue, ^{
             @autoreleasepool {
-                block(transferred_bytes, transferrable_bytes);
+                SyncProgress progress = {.transferredBytes = transferred_bytes, .transferrableBytes = transferrable_bytes, .progressEstimate = estimate};
+                block(progress);
             }
         });
     };
@@ -74,8 +78,18 @@ __attribute__((objc_direct_members))
     }
 }
 
+- (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMProgressNotificationBlock)block {
+    [self addSyncProgressNotificationOnQueue:queue block:^(SyncProgress progress) {
+        block(progress.transferredBytes, progress.transferrableBytes);
+    }];
+}
+
 - (void)addProgressNotificationBlock:(RLMProgressNotificationBlock)block {
     [self addProgressNotificationOnQueue:dispatch_get_main_queue() block:block];
+}
+
+- (void)addSyncProgressNotificationBlock:(RLMSyncProgressNotificationBlock)block {
+    [self addSyncProgressNotificationOnQueue:dispatch_get_main_queue() block:block];
 }
 
 - (void)cancel {
