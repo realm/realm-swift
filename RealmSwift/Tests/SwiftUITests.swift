@@ -150,7 +150,6 @@ class SwiftUITests: TestCase {
         state.projectedValue.remove(at: 0)
         XCTAssertEqual(state.wrappedValue.count, 0)
     }
-
     func testManagedListAppendRemoveObservedObject() throws {
         let object = SwiftUIObject()
         var state = StateRealmObject(wrappedValue: object.list)
