@@ -218,8 +218,8 @@ public extension XCTestCase {
 #if swift(>=5.8)
 @_unsafeInheritExecutor
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public func assertThrowsErrorAsync<T, E: Equatable & Error>(
-    _ expression: @autoclosure () async throws -> T,
+public func assertThrowsErrorAsync<FieldType, E: Equatable & Error>(
+    _ expression: @autoclosure () async throws -> FieldType,
     _ expectedError: E,
     file: StaticString = #filePath, line: UInt = #line) async {
     do {
@@ -239,7 +239,7 @@ public func assertThrowsErrorAsync<T, E: Equatable & Error>(
 // likely to break.
 @_unsafeInheritExecutor
 @available(macOS 10.15.4, iOS 13.4, tvOS 13.4, watchOS 6.4, *)
-public func assertPreconditionFailure<T>(_ message: String, _ expression: () async throws -> T,
+public func assertPreconditionFailure<FieldType>(_ message: String, _ expression: () async throws -> FieldType,
                                          file: StaticString = #filePath, line: UInt = #line) async throws {
     // We can't perform these tests on tvOS, watchOS, or on devices
     guard RLMCanFork() else { return }

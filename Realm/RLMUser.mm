@@ -368,6 +368,23 @@ using namespace realm;
     });
 }
 
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSString *)arguments
+              serviceName:(NSString *)serviceName
+          completionBlock:(RLMCallFunctionStringArgsCompletionBlock)completionBlock {
+    _app._realmApp->call_function(_user, name.UTF8String, arguments.UTF8String,
+                                  serviceName.UTF8String,
+                                  [completionBlock](const std::string* response,
+                                                    std::optional<app::AppError> error) {
+        if (error) {
+            return completionBlock(nil, makeError(*error));
+        }
+
+        
+        completionBlock([NSString stringWithCString:response->data() encoding:NSUTF8StringEncoding], nil);
+    });
+}
+
 - (void)handleResponse:(std::optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error) {

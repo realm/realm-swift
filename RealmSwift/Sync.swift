@@ -140,6 +140,26 @@ public extension SyncTimeoutOptions {
  */
 public typealias SyncSession = RLMSyncSession
 
+public extension SyncSession {
+    @_unsafeInheritExecutor 
+    @available(macOS 10.15, *)
+    func waitForUpload() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            self.__waitForUploadCompletion(on: nil) { error in
+                error.map { continuation.resume(throwing: $0) } ?? continuation.resume()
+            }
+        }
+    }
+    @available(macOS 10.15, *)
+    @_unsafeInheritExecutor
+    func waitForDownload() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            self.__waitForDownloadCompletion(on: nil) { error in
+                error.map { continuation.resume(throwing: $0) } ?? continuation.resume()
+            }
+        }
+    }
+}
 /**
  A closure type for a closure which can be set on the `SyncManager` to allow errors to be reported
  to the application.

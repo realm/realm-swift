@@ -52,6 +52,9 @@ typedef void(^RLMUserCustomDataBlock)(NSDictionary * _Nullable, NSError * _Nulla
 RLM_SWIFT_SENDABLE
 typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
 
+RLM_SWIFT_SENDABLE
+typedef void(^RLMCallFunctionStringArgsCompletionBlock)(NSString * _Nullable, NSError * _Nullable);
+
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**

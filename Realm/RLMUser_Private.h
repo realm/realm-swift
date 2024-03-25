@@ -33,6 +33,10 @@ typedef void(^RLMUserNotificationBlock)(RLMUser *);
 @interface RLMUser ()
 /// Subscribe to notifications for this RLMUser.
 - (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock)block;
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSString *)arguments
+              serviceName:(NSString *)serviceName
+          completionBlock:(RLMCallFunctionStringArgsCompletionBlock)completionBlock;
 
 - (void)logOut;
 @end

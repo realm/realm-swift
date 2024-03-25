@@ -28,6 +28,19 @@ import RealmSyncTestSupport
 import RealmSwiftTestSupport
 #endif
 
+
+public extension User {
+    func configuration<FieldType: BSON>(testName: FieldType) -> Realm.Configuration {
+        var config = self.configuration(partitionValue: testName)
+        config.objectTypes = [SwiftPerson.self, SwiftHugeSyncObject.self, SwiftTypesSyncObject.self, SwiftCustomColumnObject.self]
+        return config
+    }
+
+    func collection(for object: ObjectBase.Type) -> MongoCollection {
+        mongoClient("mongodb1").database(named: "test_data").collection(withName: object.className())
+    }
+}
+
 public func randomString(_ length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return String((0..<length).map { _ in letters.randomElement()! })
@@ -85,6 +98,28 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return credentials
     }
 
+    public func openRealm(partitionValue: AnyBSON, user: User) throws -> Realm {
+        let config = user.configuration(partitionValue: partitionValue)
+        return try openRealm(configuration: config)
+    }
+
+    public func openRealm<FieldType: BSON>(partitionValue: FieldType,
+                                   user: User,
+                                   clientResetMode: ClientResetMode? = .recoverUnsyncedChanges(),
+                                   file: StaticString = #file,
+                                   line: UInt = #line) throws -> Realm {
+        let config: Realm.Configuration
+        if clientResetMode != nil {
+            config = user.configuration(partitionValue: partitionValue, clientResetMode: clientResetMode!)
+        } else {
+            config = user.configuration(partitionValue: partitionValue)
+        }
+        let realm = try Realm(configuration: config)
+//        if wait {
+            waitForDownloads(for: realm)
+//        }
+        return realm
+    }
     public func openRealm(app: App? = nil, wait: Bool = true) throws -> Realm {
         let realm = try Realm(configuration: configuration(app: app))
         if wait {
@@ -92,7 +127,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         }
         return realm
     }
-
     public func configuration(app: App? = nil) throws -> Realm.Configuration {
         let user = try createUser(app: app)
         var config = configuration(user: user)
@@ -129,6 +163,8 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         waitForDownloads(for: ObjectiveCSupport.convert(object: realm))
     }
 
+//    public func checkCount<FieldType: Object>(expected: Int,
+
     // Populate the server-side data using the given block, which is called in
     // a write transaction. Note that unlike the obj-c versions, this works for
     // both PBS and FLX sync.
@@ -148,9 +184,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         }
     }
 
-    public func checkCount<T: Object>(expected: Int,
+    public func checkCount<FieldType: Object>(expected: Int,
                                       _ realm: Realm,
-                                      _ type: T.Type,
+                                      _ type: FieldType.Type,
                                       file: StaticString = #file,
                                       line: UInt = #line) {
         realm.refresh()
@@ -163,25 +199,38 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     var exceptionThrown = false
 
-    public func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
+    public func assertThrows<FieldType>(_ block: @autoclosure () -> FieldType, named: String? = RLMExceptionName,
                                 _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
     }
 
-    public func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
+    public func assertThrows<FieldType>(_ block: @autoclosure () -> FieldType, reason: String,
                                 _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
     }
 
-    public func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
+    public func assertThrows<FieldType>(_ block: @autoclosure () -> FieldType, reasonMatching regexString: String,
                                 _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
     public static let bigObjectCount = 2
+    public func populateRealm<FieldType: BSON>(user: User? = nil, partitionValue: FieldType) throws {
+        try autoreleasepool {
+            let user = try (user ?? logInUser(for: basicCredentials()))
+            let config = user.configuration(testName: partitionValue)
+
+            let realm = try openRealm(configuration: config)
+            try realm.write {
+                for _ in 0..<SwiftSyncTestCase.bigObjectCount {
+                    realm.add(SwiftHugeSyncObject.create())
+                }
+            }
+        }
+    }
     public func populateRealm() throws {
         try write { realm in
             for _ in 0..<SwiftSyncTestCase.bigObjectCount {
@@ -189,7 +238,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
             }
         }
     }
-
     // MARK: - Mongo Client
 
     public func setupMongoCollection(for type: ObjectBase.Type) throws -> MongoCollection {
