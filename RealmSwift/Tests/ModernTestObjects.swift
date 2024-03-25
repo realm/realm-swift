@@ -156,7 +156,7 @@ class ModernAllTypesObject: Object {
     @Persisted var mapOptObjectId: Map<String, ObjectId?>
     @Persisted var mapOptUuid: Map<String, UUID?>
 
-    @Persisted(originProperty: "objectCol")
+    @Persisted(originProperty: \.objectCol)
     var linkingObjects: LinkingObjects<ModernAllTypesObject>
 }
 
