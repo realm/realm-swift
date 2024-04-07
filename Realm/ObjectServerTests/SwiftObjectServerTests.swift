@@ -634,6 +634,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testAppBaseUrl() {
         let appConfig = AppConfiguration()
         XCTAssertEqual(appConfig.baseURL, "https://services.cloud.mongodb.com")
+        
+        appConfig.baseURL = "https://foo.bar"
+        XCTAssertEqual(appConfig.baseURL, "https://foo.bar")
+
+        appConfig.baseURL = nil
+        XCTAssertEqual(appConfig.baseURL, "https://services.cloud.mongodb.com")
     }
 
     // MARK: - Authentication
