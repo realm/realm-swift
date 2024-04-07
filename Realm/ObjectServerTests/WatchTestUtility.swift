@@ -23,7 +23,7 @@ import XCTest
 final public class WatchTestUtility: ChangeEventDelegate {
     private let testCase: XCTestCase
     private let matchingObjectId: ObjectId?
-    private var openExpectation: XCTestExpectation
+    private let openExpectation: XCTestExpectation
     private let closeExpectation: XCTestExpectation
     private var changeExpectation: XCTestExpectation?
     private let expectError: Bool
