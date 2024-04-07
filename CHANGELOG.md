@@ -5,9 +5,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* Fix an assertion failure "m_lock_info && m_lock_info->m_file.get_path() == m_filename" that appears to be related to opening a Realm while the file is in the process of being closed on another thread ([#8507](https://github.com/realm/realm-swift/issues/8507)).
-* Fixed diverging history due to a bug in the replication code when setting default null values (embedded objects included) ([Core #7536](https://github.com/realm/realm-core/issues/7536)).
-* Null pointer exception may be triggered when logging out and async commits callbacks not executed ([Core #7434](https://github.com/realm/realm-core/issues/7434))
+* Fix an assertion failure "m_lock_info && m_lock_info->m_file.get_path() == m_filename" that appears to be related to opening a Realm while the file is in the process of being closed on another thread. ([#8507](https://github.com/realm/realm-swift/issues/8507))
+* Fixed diverging history due to a bug in the replication code when setting default null values (embedded objects included). ([Core #7536](https://github.com/realm/realm-core/issues/7536))
+* Null pointer exception may be triggered when logging out and async commits callbacks not executed. ([Core #7434](https://github.com/realm/realm-core/issues/7434))
 * `AppConfiguration.baseUrl` will now return the default value of the url when not set rather than `nil`. ([#8512](https://github.com/realm/realm-swift/issues/8512))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
