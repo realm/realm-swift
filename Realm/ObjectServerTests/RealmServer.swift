@@ -1187,6 +1187,14 @@ public class RealmServer: NSObject {
         return session.apps[appServerId].users[userId].delete()
     }
 
+    public func revokeUserSessions(_ appId: String, userId: String) -> Result<Any?, Error> {
+        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
+              let session = session else {
+            return .failure(URLError(.unknown))
+        }
+        return session.apps[appServerId].users[userId].logout.put([:]);
+    }
+
     public func retrieveSchemaProperties(_ appId: String, className: String, _ completion: @escaping (Result<[String], Error>) -> Void) {
         guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
               let session = session else {
