@@ -60,7 +60,7 @@ final public class WatchTestUtility: ChangeEventDelegate {
     }
 
     public func changeStreamDidClose(with error: Error?) {
-        if (expectError) {
+        if expectError {
             XCTAssertNotNil(error)
         } else {
             XCTAssertNil(error)

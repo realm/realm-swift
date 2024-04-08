@@ -1330,7 +1330,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
 
         let syncUser = app.login(credentials: Credentials.emailPassword(email: email, password: password)).await(self)
-        
+
         // Should succeed refreshing custom data
         syncUser.refreshCustomData().await(self)
 

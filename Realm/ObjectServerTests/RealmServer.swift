@@ -1192,7 +1192,7 @@ public class RealmServer: NSObject {
               let session = session else {
             return .failure(URLError(.unknown))
         }
-        return session.apps[appServerId].users[userId].logout.put([:]);
+        return session.apps[appServerId].users[userId].logout.put([:])
     }
 
     public func retrieveSchemaProperties(_ appId: String, className: String, _ completion: @escaping (Result<[String], Error>) -> Void) {
