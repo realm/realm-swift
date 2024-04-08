@@ -26,10 +26,13 @@ final public class WatchTestUtility: ChangeEventDelegate {
     private let openExpectation: XCTestExpectation
     private let closeExpectation: XCTestExpectation
     private var changeExpectation: XCTestExpectation?
+    private let expectError: Bool
+    public var didCloseError: Error?
 
-    public init(testCase: XCTestCase, matchingObjectId: ObjectId? = nil) {
+    public init(testCase: XCTestCase, matchingObjectId: ObjectId? = nil, expectError: Bool = false) {
         self.testCase = testCase
         self.matchingObjectId = matchingObjectId
+        self.expectError = expectError
         openExpectation = testCase.expectation(description: "Open watch stream")
         closeExpectation = testCase.expectation(description: "Close watch stream")
     }
@@ -57,7 +60,13 @@ final public class WatchTestUtility: ChangeEventDelegate {
     }
 
     public func changeStreamDidClose(with error: Error?) {
-        XCTAssertNil(error)
+        if expectError {
+            XCTAssertNotNil(error)
+        } else {
+            XCTAssertNil(error)
+        }
+
+        didCloseError = error
         closeExpectation.fulfill()
     }
 
