@@ -27,7 +27,7 @@ final public class WatchTestUtility: ChangeEventDelegate {
     private let closeExpectation: XCTestExpectation
     private var changeExpectation: XCTestExpectation?
     private let expectError: Bool
-    public var closeError: Error?
+    public var didCloseError: Error?
 
     public init(testCase: XCTestCase, matchingObjectId: ObjectId? = nil, expectError: Bool = false) {
         self.testCase = testCase
@@ -66,7 +66,7 @@ final public class WatchTestUtility: ChangeEventDelegate {
             XCTAssertNil(error)
         }
 
-        closeError = error
+        didCloseError = error
         closeExpectation.fulfill()
     }
 

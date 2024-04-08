@@ -5,7 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* Fixed a crash that would occur when an http error 401 or 403 is returned upon opening a watch stream for a MongoDB collection. ([#8519](https://github.com/realm/realm-swift/issues/8519))
+* Fixed a crash that would occur when an http error 401 or 403 is returned upon
+  opening a watch stream for a MongoDB collection. ([#8519](https://github.com/realm/realm-swift/issues/8519))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

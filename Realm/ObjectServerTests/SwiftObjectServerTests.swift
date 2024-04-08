@@ -1346,7 +1346,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         watchTestUtility.waitForOpen()
         watchTestUtility.waitForClose()
 
-        XCTAssertEqual(watchTestUtility.closeError?.localizedDescription, "URLSession HTTP error code: 403")
+        let didCloseError = watchTestUtility.didCloseError! as NSError
+        XCTAssertNotNil(didCloseError)
+        XCTAssertEqual(didCloseError.localizedDescription, "URLSession HTTP error code: 403")
+        XCTAssertNil(didCloseError.userInfo[NSUnderlyingErrorKey])
     }
 }
 
