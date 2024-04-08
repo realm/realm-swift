@@ -217,7 +217,7 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
                                    ? SyncSession::ProgressDirection::upload
                                    : SyncSession::ProgressDirection::download);
         bool is_streaming = (mode == RLMSyncProgressModeReportIndefinitely);
-        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable, double progress) {
+        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable, double) {
             dispatch_async(queue, ^{
                 block((NSUInteger)transferred, (NSUInteger)transferrable);
             });

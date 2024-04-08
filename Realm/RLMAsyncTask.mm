@@ -59,7 +59,7 @@ __attribute__((objc_direct_members))
 }
 
 - (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMProgressNotificationBlock)block {
-    auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes, double estimate) {
+    auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes, double) {
         dispatch_async(queue, ^{
             @autoreleasepool {
                 block(transferred_bytes, transferrable_bytes);
