@@ -1333,6 +1333,35 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let objectCol = (obj!.anyCol.dynamicObject?.objectCol as? Object)
         XCTAssertEqual((objectCol?["firstName"] as? String), "Morty")
     }
+
+    func testRevokeUserSessions() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        app.emailPasswordAuth.registerUser(email: email, password: password).await(self)
+
+        let syncUser = app.login(credentials: Credentials.emailPassword(email: email, password: password)).await(self)
+
+        // Should succeed refreshing custom data
+        syncUser.refreshCustomData().await(self)
+
+        _ = try? RealmServer.shared.revokeUserSessions(appId, userId: syncUser.id).get()
+
+        // Should fail refreshing custom data. This verifies we're correctly handling the error in RLMSessionDelegate
+        syncUser.refreshCustomData().awaitFailure(self)
+
+        // This verifies that we don't crash in RLMEventSessionDelegate when creating a watch stream
+        // with a revoked user. See https://github.com/realm/realm-swift/issues/8519
+        let watchTestUtility = WatchTestUtility(testCase: self, expectError: true)
+        _ = syncUser.collection(for: Dog.self, app: app).watch(delegate: watchTestUtility)
+        watchTestUtility.waitForOpen()
+        watchTestUtility.waitForClose()
+
+        let didCloseError = watchTestUtility.didCloseError! as NSError
+        XCTAssertNotNil(didCloseError)
+        XCTAssertEqual(didCloseError.localizedDescription, "URLSession HTTP error code: 403")
+        XCTAssertNil(didCloseError.userInfo[NSUnderlyingErrorKey])
+    }
 }
 
 #endif // os(macOS)
