@@ -41,8 +41,8 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 /// will not have any effect.
 @interface RLMAppConfiguration : NSObject <NSCopying>
 
-/// A custom base URL to request against.
-@property (nonatomic, strong, nullable) NSString *baseURL;
+/// A custom base URL to request against. If not set or set to nil, the default base url for app services will be returned.
+@property (nonatomic, strong, null_resettable) NSString *baseURL;
 
 /// The custom transport for network calls to the server.
 @property (nonatomic, strong, nullable) id<RLMNetworkTransport> transport;
