@@ -43,14 +43,21 @@ class SyncMigrationTests: SwiftSyncTestCase {
         [ObjectWithNullablePropsV0.self]
     }
 
-    func testCanMigratePropertyOptionality() throws {
-        let a = ObjectWithNullablePropsV0.sharedSchema()
-        let b = a?.className
-        let c = a?.objectClass
+    func openMigrationRealm(schemaVersion: UInt64, type: ObjectBase.Type) throws -> Realm {
+        var config = try configuration()
+        config.schemaVersion = schemaVersion
+        config.objectTypes = [type]
 
-        let configv0 = try configuration()
-        let realmv0 = Realm.asyncOpen(configuration: configv0).await(self)
-        
+        let realm = Realm.asyncOpen(configuration: config).await(self)
+        RLMRealmSubscribeToAll(ObjectiveCSupport.convert(object: realm))
+        waitForDownloads(for: realm)
+
+        return realm
+    }
+
+    func testCanMigratePropertyOptionality() throws {
+        let realmv0 = try openMigrationRealm(schemaVersion: 0, type: ObjectWithNullablePropsV0.self)
+
         let oid = ObjectId()
         let uuid = UUID()
         let date = Date(timeIntervalSince1970: -987)
@@ -61,11 +68,7 @@ class SyncMigrationTests: SwiftSyncTestCase {
 
         waitForUploads(for: realmv0)
 
-        var configv1 = try configuration()
-        configv1.schemaVersion = 1
-        configv1.objectTypes = [ObjectWithNullablePropsV1.self]
-
-        let realmv1 = Realm.asyncOpen(configuration: configv1).await(self)
+        let realmv1 =  try openMigrationRealm(schemaVersion: 1, type: ObjectWithNullablePropsV1.self)
         let objv1 = realmv1.objects(ObjectWithNullablePropsV1.self).first!
 
         XCTAssertEqual(objv1.boolCol, true)
@@ -79,11 +82,7 @@ class SyncMigrationTests: SwiftSyncTestCase {
         XCTAssertEqual(objv1.uuidCol, uuid)
         XCTAssertEqual(objv1.objectIdCol, oid)
 
-        var configv2 = try configuration()
-        configv2.schemaVersion = 2
-        configv2.objectTypes = [ObjectWithNullablePropsV0.self]
-
-        let realmv2 = Realm.asyncOpen(configuration: configv2).await(self)
+        let realmv2 =  try openMigrationRealm(schemaVersion: 2, type: ObjectWithNullablePropsV0.self)
         let objv2 = realmv2.objects(ObjectWithNullablePropsV0.self).first!
 
         XCTAssertEqual(objv2.boolCol, true)
