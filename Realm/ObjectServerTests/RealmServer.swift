@@ -374,7 +374,7 @@ class AdminSession {
             request(httpMethod: "PUT", completionHandler: completionHandler)
         }
 
-        func put(on group: DispatchGroup, data: Json? = nil,
+        func put(on group: DispatchGroup, data: [String: Json]? = nil,
                  _ completionHandler: @escaping Completion) {
             request(on: group, httpMethod: "PUT", data: data, completionHandler)
         }
@@ -761,7 +761,7 @@ public class RealmServer: NSObject {
     public typealias AppId = String
 
     /// Create a new server app
-    func createApp(syncMode: SyncMode, types: [ObjectBase.Type], persistent: Bool) throws -> AppId {
+    func createApp(syncMode: SyncMode, types: [ObjectBase.Type], persistent: Bool, typeUpdates: [[ObjectBase.Type]] = []) throws -> AppId {
         let session = try XCTUnwrap(session)
 
         let info = try session.apps.post(["name": "test"]).get()
@@ -872,6 +872,24 @@ public class RealmServer: NSObject {
             app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, id: schemaId, appId: clientAppId), failOnError)
         }
         try group.throwingWait(timeout: .now() + 5.0)
+
+        for update in typeUpdates {
+            for type in update {
+                let objectSchema = ObjectiveCSupport.convert(object: type.sharedSchema()!)
+                let schemaId = schemaIds[objectSchema.className]!
+
+                app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, appId: clientAppId)) {
+                    switch $0 {
+                    case .failure(let error):
+                        XCTFail(error.localizedDescription)
+                    default:
+                        break;
+                    }
+                }
+            }
+
+            try group.throwingWait(timeout: .now() + 5.0)
+        }
 
         let asymmetricTables = schema.compactMap {
             $0.isAsymmetric ? $0.className : nil
@@ -1005,8 +1023,8 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 
-    @objc public func createApp(fields: [String], types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
-        return try createApp(syncMode: .flx(fields), types: types, persistent: persistent)
+    @objc public func createApp(fields: [String], types: [ObjectBase.Type], persistent: Bool = false, typeUpdates: [[ObjectBase.Type]] = []) throws -> AppId {
+        return try createApp(syncMode: .flx(fields), types: types, persistent: persistent, typeUpdates: typeUpdates)
     }
 
     @objc public func createApp(partitionKeyType: String = "string", types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
