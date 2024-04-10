@@ -954,8 +954,10 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
             subscriptions.append(QuerySubscription<SwiftHugeSyncObject>())
         })
         config.objectTypes = objectTypes
+        var downloadRealm: Realm?
         let task = Realm.asyncOpen(configuration: config) { result in
             XCTAssertNotNil(try? result.get())
+            downloadRealm = try! result.get()
             asyncOpenEx.fulfill()
         }
 
@@ -975,6 +977,8 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
 
         waitForExpectations(timeout: 10.0, handler: nil)
+
+        XCTAssertEqual(try XCTUnwrap(downloadRealm).objects(SwiftHugeSyncObject.self).count, 2)
 
         let p1 = try XCTUnwrap(progress)
         XCTAssertEqual(p1.progressEstimate, 1.0)
