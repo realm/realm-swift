@@ -132,6 +132,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     configuration->_migrationObjectClass = _migrationObjectClass;
     configuration->_initialSubscriptions = _initialSubscriptions;
     configuration->_rerunOnOpen = _rerunOnOpen;
+    configuration->_seedFilePath = _seedFilePath;
     return configuration;
 }
 

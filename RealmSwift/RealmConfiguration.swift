@@ -342,6 +342,7 @@ extension Realm {
 
             configuration.initialSubscriptions = rlmConfiguration.initialSubscriptions.map(ObjectiveCSupport.convert(block:))
             configuration.rerunOnOpen = rlmConfiguration.rerunOnOpen
+            configuration.seedFilePath = rlmConfiguration.seedFilePath
 
             return configuration
         }
