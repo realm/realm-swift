@@ -1011,7 +1011,7 @@ public class RealmServer: NSObject {
                     case .failure(let error):
                         XCTFail(error.localizedDescription)
                     default:
-                        break;
+                        break
                     }
                 }
             }
@@ -1020,11 +1020,11 @@ public class RealmServer: NSObject {
         }
 
         let expectedSchemaVersion = schemaUpdates.count
-        while (true) {
+        while true {
             let response = try app.sync.schemas.versions.get().get() as! [String: Any?]
             let versions = response["versions"] as! [[String: Any?]]
             let currentMajor = versions.map({ $0["version_major"] as! Int32 }).max()!
-            if (currentMajor >= expectedSchemaVersion) {
+            if currentMajor >= expectedSchemaVersion {
                 break
             }
         }
