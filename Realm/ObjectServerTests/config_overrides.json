@@ -1,7 +1,7 @@
 {
   "events": {
     "database": {
-      "maxCoordinatorChangeStreams": 50000
+      "maxCoordinatorChangeStreams": "50000"
     },
     "log_forwarder": {
       "enabled": false

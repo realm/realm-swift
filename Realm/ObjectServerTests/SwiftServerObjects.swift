@@ -218,3 +218,79 @@ public class SwiftCustomColumnObject: Object {
         customColumnPropertiesMapping
     }
 }
+
+public class ObjectWithNullablePropsV0: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var boolCol: Bool?
+    @Persisted public var intCol: Int?
+    @Persisted public var doubleCol: Double?
+    @Persisted public var stringCol: String?
+    @Persisted public var binaryCol: Data?
+    @Persisted public var dateCol: Date?
+    @Persisted public var longCol: Int64?
+    @Persisted public var decimalCol: Decimal128?
+    @Persisted public var uuidCol: UUID?
+    @Persisted public var objectIdCol: ObjectId?
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+
+    override public class func _realmObjectName() -> String? {
+        "ObjectWithNullableProps"
+    }
+
+    public convenience init(boolCol: Bool?, intCol: Int?, doubleCol: Double?, stringCol: String?, binaryCol: Data?, dateCol: Date?, longCol: Int64?, decimalCol: Decimal128?, uuidCol: UUID?, objectIdCol: ObjectId?) {
+        self.init()
+        self._id = ObjectId()
+        self.boolCol = boolCol
+        self.intCol = intCol
+        self.doubleCol = doubleCol
+        self.stringCol = stringCol
+        self.binaryCol = binaryCol
+        self.dateCol = dateCol
+        self.longCol = longCol
+        self.decimalCol = decimalCol
+        self.uuidCol = uuidCol
+        self.objectIdCol = objectIdCol
+    }
+}
+
+public class ObjectWithNullablePropsV1: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var boolCol: Bool
+    @Persisted public var intCol: Int
+    @Persisted public var doubleCol: Double
+    @Persisted public var stringCol: String
+    @Persisted public var binaryCol: Data
+    @Persisted public var dateCol: Date
+    @Persisted public var longCol: Int64
+    @Persisted public var decimalCol: Decimal128
+    @Persisted public var uuidCol: UUID
+    @Persisted public var objectIdCol: ObjectId
+    @Persisted public var willBeRemovedCol: String
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+
+    override public class func _realmObjectName() -> String? {
+        "ObjectWithNullableProps"
+    }
+
+    public convenience init(boolCol: Bool, intCol: Int, doubleCol: Double, stringCol: String, binaryCol: Data, dateCol: Date, longCol: Int64, decimalCol: Decimal128, uuidCol: UUID, objectIdCol: ObjectId, willBeRemovedCol: String) {
+        self.init()
+        self._id = ObjectId()
+        self.boolCol = boolCol
+        self.intCol = intCol
+        self.doubleCol = doubleCol
+        self.stringCol = stringCol
+        self.binaryCol = binaryCol
+        self.dateCol = dateCol
+        self.longCol = longCol
+        self.decimalCol = decimalCol
+        self.uuidCol = uuidCol
+        self.objectIdCol = objectIdCol
+        self.willBeRemovedCol = willBeRemovedCol
+    }
+}
