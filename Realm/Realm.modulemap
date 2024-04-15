@@ -27,6 +27,7 @@ framework module Realm {
 
     header "RLMApp.h"
     header "RLMCredentials.h"
+    header "RLMInitialSubscriptionsConfiguration.h"
     header "RLMNetworkTransport.h"
     header "RLMPushClient.h"
     header "RLMRealm+Sync.h"

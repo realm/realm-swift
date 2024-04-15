@@ -55,6 +55,7 @@ Pod::Spec.new do |s|
                               'include/RLMApp.h',
                               'include/RLMAppCredentials.h',
                               'include/RLMBSON.h',
+                              'include/RLMInitialSubscriptionsConfiguration.h',
                               'include/RLMNetworkTransport.h',
                               'include/RLMPushClient.h',
                               'include/RLMProviderClient.h',

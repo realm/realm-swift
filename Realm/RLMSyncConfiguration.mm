@@ -21,6 +21,7 @@
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMError_Private.hpp"
+#import "RLMInitialSubscriptionsConfiguration.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmConfiguration_Private.hpp"
@@ -28,6 +29,7 @@
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
+#import "RLMSyncSubscription.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
@@ -77,6 +79,23 @@ struct AfterClientResetWrapper : CallbackSchema {
                                                            dynamic:dynamic
                                                             freeze:false];
             block(localRealm, remoteRealm);
+        }
+    }
+};
+
+struct InitialSubscriptionsWrapper : CallbackSchema {
+    RLMFlexibleSyncInitialSubscriptionsBlock block;
+    void operator()(std::shared_ptr<Realm> local) {
+        @autoreleasepool {
+            RLMRealm *realm = [RLMRealm realmWithSharedRealm:local
+                                                      schema:customSchema
+                                                     dynamic:dynamic
+                                                      freeze:false];
+
+            RLMSyncSubscriptionSet* subscriptions = realm.subscriptions;
+            [subscriptions update:^{
+                block(subscriptions);
+            }];
         }
     }
 };
@@ -190,6 +209,26 @@ struct AfterClientResetWrapper : CallbackSchema {
     [self assignConfigErrorHandler:self.user];
 }
 
+- (RLMInitialSubscriptionsConfiguration *)initialSubscriptions {
+    if (_config->subscription_initializer) {
+        auto wrapper = _config->subscription_initializer.target<InitialSubscriptionsWrapper>();
+
+        return [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback: wrapper->block
+                                                                  rerunOnOpen: _config->rerun_init_subscription_on_open];
+    }
+
+    return nil;
+}
+
+- (void)setInitialSubscriptions:(RLMInitialSubscriptionsConfiguration *)initialSubscriptions {
+    if (initialSubscriptions) {
+        _config->subscription_initializer = InitialSubscriptionsWrapper{.block = initialSubscriptions.callback};
+        _config->rerun_init_subscription_on_open = initialSubscriptions.rerunOnOpen;
+    } else {
+        _config->subscription_initializer = nil;
+    }
+}
+
 void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config) {
     if (syncConfig.notify_before_client_reset) {
         auto before = syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>();
@@ -200,6 +239,11 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
         auto after = syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>();
         after->dynamic = config.dynamic;
         after->customSchema = config.customSchema;
+    }
+    if (syncConfig.subscription_initializer) {
+        auto initializer = syncConfig.subscription_initializer.target<InitialSubscriptionsWrapper>();
+        initializer->dynamic = config.dynamic;
+        initializer->customSchema = config.customSchema;
     }
 }
 

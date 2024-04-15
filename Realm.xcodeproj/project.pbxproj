@@ -53,9 +53,12 @@
 		0C3BD4B325C1BDF1007CFDD3 /* RLMDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4B125C1BDF1007CFDD3 /* RLMDictionary.mm */; };
 		0C3BD4D325C1C5AB007CFDD3 /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3BD4D225C1C5AB007CFDD3 /* Map.swift */; };
 		0C5796A225643D7500744CAE /* RLMUUID.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0C57969F25643D7500744CAE /* RLMUUID.mm */; };
+		0C63BB902BCD787300E25C3A /* RLMInitialSubscriptionsConfiguration.h in Sources */ = {isa = PBXBuildFile; fileRef = 0CC270AB2BCD665800788EE1 /* RLMInitialSubscriptionsConfiguration.h */; };
 		0C86B33925E15B6000775FED /* PrimitiveDictionaryPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */; };
 		0C9758BF264974660097B48D /* SwiftRLMDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9758BE264974660097B48D /* SwiftRLMDictionaryTests.swift */; };
 		0CBF2DB927286FFD00635902 /* ProjectedCollectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBF2DB827286FFD00635902 /* ProjectedCollectTests.swift */; };
+		0CC270AA2BCD664200788EE1 /* RLMInitialSubscriptionsConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CC270A92BCD664200788EE1 /* RLMInitialSubscriptionsConfiguration.m */; };
+		0CC270AC2BCD665800788EE1 /* RLMInitialSubscriptionsConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 0CC270AB2BCD665800788EE1 /* RLMInitialSubscriptionsConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0CD1632826D3DF1D0027C49B /* ProjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD1632726D3DF1C0027C49B /* ProjectionTests.swift */; };
 		0CED6DB82655087200B80277 /* RLMDictionary_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 0C3BD50125C1DE6F007CFDD3 /* RLMDictionary_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A0512771D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3623651D8384BA00945A54 /* RLMSyncConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -628,6 +631,8 @@
 		0C86B33825E15B6000775FED /* PrimitiveDictionaryPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrimitiveDictionaryPropertyTests.m; sourceTree = "<group>"; };
 		0C9758BE264974660097B48D /* SwiftRLMDictionaryTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftRLMDictionaryTests.swift; sourceTree = "<group>"; };
 		0CBF2DB827286FFD00635902 /* ProjectedCollectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectedCollectTests.swift; sourceTree = "<group>"; };
+		0CC270A92BCD664200788EE1 /* RLMInitialSubscriptionsConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMInitialSubscriptionsConfiguration.m; sourceTree = "<group>"; };
+		0CC270AB2BCD665800788EE1 /* RLMInitialSubscriptionsConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMInitialSubscriptionsConfiguration.h; sourceTree = "<group>"; };
 		0CD1632526D3DD7B0027C49B /* Projection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Projection.swift; sourceTree = "<group>"; };
 		0CD1632726D3DF1C0027C49B /* ProjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProjectionTests.swift; sourceTree = "<group>"; };
 		1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncUtil_Private.hpp; sourceTree = "<group>"; };
@@ -1200,6 +1205,8 @@
 				4993220324129DCD00A0EC8E /* RLMCredentials.h */,
 				4993220424129DCD00A0EC8E /* RLMCredentials.mm */,
 				4993220224129DCD00A0EC8E /* RLMCredentials_Private.hpp */,
+				0CC270AB2BCD665800788EE1 /* RLMInitialSubscriptionsConfiguration.h */,
+				0CC270A92BCD664200788EE1 /* RLMInitialSubscriptionsConfiguration.m */,
 				4993221524129E6600A0EC8E /* RLMNetworkTransport.h */,
 				4993221424129E6500A0EC8E /* RLMNetworkTransport.mm */,
 				CF330BBB24E56E3A00F07EE2 /* RLMNetworkTransport_Private.hpp */,
@@ -1906,6 +1913,7 @@
 				6807E64F2487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				1AD397CF1F72FFC7002AA897 /* RLMRealm+Sync.h in Headers */,
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
+				0CC270AC2BCD665800788EE1 /* RLMInitialSubscriptionsConfiguration.h in Headers */,
 				5D659EC01BE04556006515A0 /* RLMRealm_Dynamic.h in Headers */,
 				5D659EC11BE04556006515A0 /* RLMRealm_Private.h in Headers */,
 				5D659EC21BE04556006515A0 /* RLMRealmConfiguration.h in Headers */,
@@ -2454,6 +2462,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C63BB902BCD787300E25C3A /* RLMInitialSubscriptionsConfiguration.h in Sources */,
 				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
 				5D659E851BE04556006515A0 /* RLMAccessor.mm in Sources */,
 				5D659E861BE04556006515A0 /* RLMAnalytics.mm in Sources */,
@@ -2513,6 +2522,7 @@
 				531F956C27906F7600E497F1 /* RLMSyncSubscription.mm in Sources */,
 				1A84132F1D4BCCE600C5326F /* RLMSyncUtil.mm in Sources */,
 				3F67DB3E1E26D69C0024533D /* RLMThreadSafeReference.mm in Sources */,
+				0CC270AA2BCD664200788EE1 /* RLMInitialSubscriptionsConfiguration.m in Sources */,
 				5D659E9A1BE04556006515A0 /* RLMUpdateChecker.mm in Sources */,
 				CF76F7DD24816AAB00890DD2 /* RLMUpdateResult.mm in Sources */,
 				1ABDCDB01D793008003489E3 /* RLMUser.mm in Sources */,

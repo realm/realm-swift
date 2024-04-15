@@ -2,6 +2,7 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * The default base url in `AppConfiguration` has been updated to point to `services.cloud.mongodb.com`. See https://www.mongodb.com/docs/atlas/app-services/domain-migration/ for more information. ([#8512](https://github.com/realm/realm-swift/issues/8512))
+* Added `SyncConfiguration.initialSubscriptions` which describes the initial subscription configuration that was passed when constructing the `SyncConfiguration`. ([#8548](https://github.com/realm/realm-swift/issues/8548))
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

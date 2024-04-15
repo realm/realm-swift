@@ -151,9 +151,8 @@ using namespace realm;
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
+    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions                                                                                              rerunOnOpen:rerunOnOpen];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-    config.initialSubscriptions = initialSubscriptions;
-    config.rerunOnOpen = rerunOnOpen;
     config.syncConfiguration = syncConfig;
     return config;
 }
@@ -168,8 +167,8 @@ using namespace realm;
     syncConfig.clientResetMode = clientResetMode;
     syncConfig.beforeClientReset = beforeResetBlock;
     syncConfig.afterClientReset = afterResetBlock;
-    config.initialSubscriptions = initialSubscriptions;
-    config.rerunOnOpen = rerunOnOpen;
+    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions                                                                                              rerunOnOpen:rerunOnOpen];
+
     config.syncConfiguration = syncConfig;
     return config;
 }
@@ -182,8 +181,7 @@ using namespace realm;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     syncConfig.clientResetMode = clientResetMode;
     syncConfig.manualClientResetHandler = manualClientResetHandler;
-    config.initialSubscriptions = initialSubscriptions;
-    config.rerunOnOpen = rerunOnOpen;
+    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions                                                                                              rerunOnOpen:rerunOnOpen];
     config.syncConfiguration = syncConfig;
     return config;
 }
