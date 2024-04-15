@@ -113,19 +113,16 @@ class MongoDataAccessCollectionTests : SwiftSyncTestCase {
     }
     
     func testMongoCollection() async throws {
-//        try BaasRuleEncoder().encode(Person.self)
         let app = self.app(id: try RealmServer.shared.createApp(fields: ["_id"], types: [Person.self]))
         let user = try await app.login(credentials: .anonymous)
-//        let app = App(id: "car-wsney")
-//        let user = try await app.login(credentials: .anonymous)
         let collection = user.mongoClient("mongodb1")
             .database(named: "test_data")
             .collection(named: "Person", type: Person.self)
         _ = try await collection.deleteMany()
         let person = Person(name: "Jason", age: 32, address: Person.Address(city: "Austin", state: "TX"))
-//        let try await collection.findOne()
+
         _ = try await collection.insertOne(person)
-//        XCTAssertNotNil(id.objectIdValue)
+
         guard let foundPerson = try await collection.findOne() else {
             return XCTFail("Could not find inserted Person")
         }
