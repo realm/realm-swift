@@ -160,9 +160,7 @@ package func buildFilter(_ root: QueryNode, subqueryCount: Int = 0) throws -> [S
                     }
                     root[kp] = ["$gte": value]
                 case .contains:
-                    root[kp] = [
-                        "$elemMatch": [ value ]
-                    ]
+                    root[kp] = ["$elemMatch": [ value ]]
                 case .in:
                     guard case let .constant(value) = rhs else {
                         fatalError()

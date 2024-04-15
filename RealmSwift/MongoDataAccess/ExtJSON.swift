@@ -1,42 +1,34 @@
 import Foundation
+import Realm
 
-protocol ExtJSONBuiltin {
-    static func initialize(from value: Any) throws -> Self
+protocol ExtJSONSerializable {
     var extJSONValue: any Codable { get }
 }
-protocol ExtJSONCodable: Codable, ExtJSONBuiltin {
+
+protocol ExtJSONCodable: Codable {
     associatedtype ExtJSONValue: Codable
     init(from value: ExtJSONValue) throws
     var extJSONValue: ExtJSONValue { get }
 }
 extension ExtJSONCodable {
-    static func initialize(from value: Any) throws -> Self {
-        try Self.init(from: value as! ExtJSONValue)
-    }
     var extJSONValue: any Codable { self.extJSONValue }
-    var isLiteral: Bool {
-        false
-    }
 }
 extension ExtJSONCodable where ExtJSONValue == Self {
     init(from value: Self) throws {
         self = value//.array
     }
     var extJSONValue: Self {
-        self//ExtJSONValue(array: self)
-    }
-    var isLiteral: Bool {
-        true
+        self
     }
 }
-protocol ExtJSONSingleValue: ExtJSONBuiltin {
+protocol ExtJSONSingleValue: ExtJSONSerializable {
 }
 typealias ExtJSONSingleValueCodable = ExtJSONSingleValue & ExtJSONCodable
-protocol ExtJSONKeyedValue: ExtJSONBuiltin {
+protocol ExtJSONKeyedValue: ExtJSONSerializable {
 }
 protocol ExtJSONKeyedCodable: ExtJSONKeyedValue, ExtJSONCodable {
 }
-protocol ExtJSONUnkeyedValue: ExtJSONBuiltin {
+protocol ExtJSONUnkeyedValue: ExtJSONSerializable {
 }
 protocol ExtJSONUnkeyedCodable: ExtJSONUnkeyedValue, ExtJSONCodable, Collection
 where Element: ExtJSONCodable {
@@ -44,23 +36,31 @@ where Element: ExtJSONCodable {
 
 // MARK: Array
 extension Array: ExtJSONUnkeyedCodable,
-                    ExtJSONUnkeyedValue,
-                    ExtJSONCodable,
-                    ExtJSONBuiltin where Element: ExtJSONCodable {
+                 ExtJSONUnkeyedValue,
+                 ExtJSONCodable,
+                 ExtJSONSerializable where Element: ExtJSONCodable {
     typealias ExtJSONValue = Self
 }
 extension List: ExtJSONUnkeyedCodable,
                 ExtJSONUnkeyedValue,
                 ExtJSONCodable,
-                ExtJSONBuiltin where Element: ExtJSONCodable {
+                ExtJSONSerializable where Element: ExtJSONCodable {
     typealias ExtJSONValue = List
 }
 
-// MARK: Optional
-extension Optional: ExtJSONSingleValueCodable, ExtJSONBuiltin where Wrapped: ExtJSONCodable {
+// MARK: Dictionary
+extension Dictionary: ExtJSONKeyedCodable,
+                      ExtJSONCodable,
+                      ExtJSONKeyedValue,
+                      ExtJSONSerializable where Key == String, Value: ExtJSONCodable {
     typealias ExtJSONValue = Self
 }
-extension NSNull: ExtJSONSingleValue, ExtJSONBuiltin {
+
+// MARK: Optional
+extension Optional: ExtJSONSingleValueCodable, ExtJSONSerializable where Wrapped: ExtJSONCodable {
+    typealias ExtJSONValue = Self
+}
+extension NSNull: ExtJSONSingleValue, ExtJSONSerializable {
     static func initialize(from value: Any) throws -> Self {
         fatalError()
     }
@@ -68,11 +68,13 @@ extension NSNull: ExtJSONSingleValue, ExtJSONBuiltin {
         Optional<String>.none
     }
 }
-extension NSNumber: ExtJSONBuiltin {
+
+// MARK: NSNumber
+extension NSNumber: ExtJSONSerializable {
     static func initialize(from value: Any) -> Self {
         fatalError()
     }
-
+    
     var extJSONValue: any Codable {
         if CFGetTypeID(self) == CFBooleanGetTypeID() {
             return self.boolValue
@@ -95,12 +97,6 @@ extension NSNumber: ExtJSONBuiltin {
 // MARK: String
 extension String: ExtJSONSingleValueCodable {
     typealias ExtJSONValue = Self
-    init(from value: Self) throws {
-        self = value
-    }
-    var extJSONValue: Self {
-        self
-    }
 }
 extension NSString: ExtJSONSingleValue {
     static func initialize(from value: Any) throws -> Self {
@@ -128,6 +124,19 @@ extension Int: ExtJSONKeyedCodable {
     }
     init(from value: ExtJSONValue) throws {
         guard let value = Int(value.numberInt) else {
+            throw DecodingError.valueNotFound(Self.self, DecodingError.Context(codingPath: [],
+                                                                               debugDescription: ""))
+        }
+        self = value
+    }
+    var extJSONValue: ExtJSONValue {
+        ExtJSONValue(numberInt: "\(self)")
+    }
+}
+extension Int32: ExtJSONKeyedCodable {
+    typealias ExtJSONValue = Int.ExtJSONValue
+    init(from value: ExtJSONValue) throws {
+        guard let value = Int32(value.numberInt) else {
             throw DecodingError.valueNotFound(Self.self, DecodingError.Context(codingPath: [],
                                                                                debugDescription: ""))
         }
@@ -180,7 +189,33 @@ extension Double: ExtJSONKeyedCodable {
         ExtJSONValue(numberDouble: String(self))
     }
 }
-//
+// MARK: Decimal128
+extension Decimal128: ExtJSONKeyedCodable {
+    struct ExtJSONValue: Codable {
+        enum CodingKeys: String, CodingKey { case numberDecimal = "$numberDecimal" }
+        let numberDecimal: String
+    }
+    convenience init(from value: ExtJSONValue) throws {
+        try self.init(string: value.numberDecimal)
+    }
+    var extJSONValue: ExtJSONValue {
+        ExtJSONValue(numberDecimal: self.stringValue)
+    }
+}
+// MARK: UUID
+extension UUID: ExtJSONSingleValueCodable {
+    typealias ExtJSONValue = String
+    init(from value: String) throws {
+        guard let uuid = UUID(uuidString: value) else {
+            throw DecodingError.valueNotFound(Self.self, DecodingError.Context(codingPath: [],
+                                                                               debugDescription: "\(value) not valid UUID"))
+        }
+        self = uuid
+    }
+    var extJSONValue: String {
+        self.uuidString
+    }
+}
 // MARK: Date
 extension Date : ExtJSONKeyedCodable {
     struct ExtJSONValue: Codable {
@@ -188,10 +223,10 @@ extension Date : ExtJSONKeyedCodable {
         let date: Int64
     }
     init(from value: ExtJSONValue) throws {
-        self.init(timeIntervalSince1970: TimeInterval(value.date) / 1_000)
+        self.init(timeIntervalSince1970: TimeInterval(value.date) * 1_000.0)
     }
     var extJSONValue: ExtJSONValue {
-        ExtJSONValue(date: Int64(self.timeIntervalSince1970 * 1_000.0))
+        ExtJSONValue(date: Int64(self.timeIntervalSince1970 / 1_000.0))
     }
 }
 extension NSDate: ExtJSONKeyedValue {
@@ -225,3 +260,94 @@ extension Data : ExtJSONKeyedCodable {
                                                  subType: "00"))
     }
 }
+
+// MARK: Regex
+extension NSRegularExpression: ExtJSONKeyedValue {
+    struct ExtJSONValue: Codable {
+        enum CodingKeys: String, CodingKey {
+            case regex = "$regex"
+            case options = "$options"
+        }
+        let regex: String
+        let options: String?
+    }
+
+    var extJSONValue: any Codable {
+        ExtJSONValue(regex: self.pattern, options: self.options.rawValue.description)
+    }
+}
+
+// MARK: MaxKey
+extension MaxKey: ExtJSONSingleValue {
+    struct ExtJSONValue: Codable {
+        enum CodingKeys: String, CodingKey { case maxKey = "$maxKey" }
+        let maxKey = 1
+    }
+    var extJSONValue: any Codable {
+        ExtJSONValue()
+    }
+}
+
+// MARK: MinKey
+extension MinKey: ExtJSONSingleValue {
+    struct ExtJSONValue: Codable {
+        enum CodingKeys: String, CodingKey { case minKey = "$minKey" }
+        let minKey: Int = 1
+    }
+    var extJSONValue: any Codable {
+        ExtJSONValue()
+    }
+}
+
+//// MARK: AnyBSON
+//// For backwards compatibility, if people need an Any value
+//extension AnyBSON: ExtJSONCodable, ExtJSONBuiltin {
+//    static func initialize(from value: Any) throws -> AnyBSON {
+//        fatalError()
+//    }
+//    private var asExtJSON: any ExtJSONBuiltin {
+//        switch self {
+//        case .double(let value): value
+//        case .string(let value): value
+//        case .document(let value): value.reduce(into: [String: any ExtJSONBuiltin](), {
+//            $0[$1.key] = $1.value?.asExtJSON
+//        })
+//        case .array(let value): value
+//        case .binary(let value): value
+//        case .objectId(let value): value
+//        case .bool(let value): value
+//        case .datetime(let value): value
+//        case .regex(let value): value
+//        case .int32(let value): value
+//        case .timestamp(let value): value
+//        case .int64(let value): value
+//        case .decimal128(let value): value
+//        case .uuid(let value): value
+//        case .minKey: RLMMinKey()
+//        case .maxKey: RLMMaxKey()
+//        case .null: NSNull()
+//        }
+//    }
+//    
+//    var extJSONValue: any Codable {
+//        switch self {
+//        case .double(let value): value.extJSONValue
+//        case .string(let value): value.extJSONValue
+//        case .document(_): self.asExtJSON.extJSONValue
+//        case .array(let value): value.extJSONValue
+//        case .binary(let value): value.extJSONValue
+//        case .objectId(let value): value.extJSONValue
+//        case .bool(let value): value.extJSONValue
+//        case .datetime(let value): value.extJSONValue
+//        case .regex(let value): value.extJSONValue
+//        case .int32(let value): value.extJSONValue
+//        case .timestamp(let value): value.extJSONValue
+//        case .int64(let value): value.extJSONValue
+//        case .decimal128(let value): value.extJSONValue
+//        case .uuid(let value): value.extJSONValue
+//        case .minKey: RLMMinKey().extJSONValue
+//        case .maxKey: RLMMaxKey().extJSONValue
+//        case .null: NSNull().extJSONValue
+//        }
+//    }
+//}

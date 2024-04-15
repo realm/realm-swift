@@ -123,10 +123,7 @@ __attribute__((objc_direct_members))
     }
     return self;
 }
-//
-//- (RLMUser *)user {
-//    return self.user;
-//}
+
 - (realm::app::MongoCollection)collection:(NSString *)name {
     return _user._syncUser->mongo_client(self.serviceName.UTF8String)
         .db(self.databaseName.UTF8String).collection(name.UTF8String);

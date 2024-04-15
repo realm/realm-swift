@@ -80,6 +80,10 @@ using namespace realm;
     return self;
 }
 
+- (void)clear {
+    _results.clear();
+}
+
 static void assertKeyPathIsNotNested(NSString *keyPath) {
     if ([keyPath rangeOfString:@"."].location != NSNotFound) {
         @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");

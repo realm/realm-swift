@@ -231,10 +231,12 @@
 		49E12CF0245DB7CC00359DF1 /* RLMBSON.mm in Sources */ = {isa = PBXBuildFile; fileRef = 49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */; };
 		49E12CF2245DB7E800359DF1 /* RLMBSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF1245DB7E800359DF1 /* RLMBSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		49E12CF5245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		53061CB42BAC8DDF00687C34 /* ExtJSONDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53061CB32BAC8DDF00687C34 /* ExtJSONDecoder.swift */; };
 		530BA61426DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
 		530BA61526DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
 		530BA61626DFA1CB008FC550 /* RLMChildProcessEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */; };
 		53124AD925B71AF700771CE4 /* SwiftUITestHostUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */; };
+		531CA3372BADC18800D3BA2E /* ExtJSONCorpusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531CA3362BADC18800D3BA2E /* ExtJSONCorpusTests.swift */; };
 		531F956727906DBC00E497F1 /* RLMSyncSubscription_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53E308C927905794002A8D91 /* RLMSyncSubscription_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		531F956827906EB200E497F1 /* RLMSyncSubscription.h in Headers */ = {isa = PBXBuildFile; fileRef = 53E308CA27905794002A8D91 /* RLMSyncSubscription.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		531F956A27906EF300E497F1 /* RLMSyncSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 531F956927906EF300E497F1 /* RLMSyncSession.mm */; };
@@ -253,10 +255,11 @@
 		53626AAF25D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		53626AB025D31CAC00D9515D /* Objects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53626AAE25D31CAC00D9515D /* Objects.swift */; };
 		537130C824A9E417001FDBBC /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
-		538ADD452B9CC54000ADE639 /* ExtJSONCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538ADD442B9CC54000ADE639 /* ExtJSONCodable.swift */; };
+		538ADD452B9CC54000ADE639 /* ExtJSONEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538ADD442B9CC54000ADE639 /* ExtJSONEncoder.swift */; };
 		539A9A392B98D15200AE0E9D /* BaasRuleCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 539A9A382B98D15200AE0E9D /* BaasRuleCodable.swift */; };
 		53A34E3625CDA0AC00698930 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 53A34E3325CDA0AC00698930 /* LaunchScreen.storyboard */; };
 		53A34E3725CDA0AC00698930 /* SwiftUITestHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53A34E3425CDA0AC00698930 /* SwiftUITestHostApp.swift */; };
+		53B0540D2BA8B9030093FA8B /* Aggregation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B0540C2BA8B9030093FA8B /* Aggregation.swift */; };
 		53CCC6C4257EC8A300A8FC50 /* RLMApp_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		53CCC6E8257EC8C400A8FC50 /* RLMUser_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		53D7CBB52B9A22D100399257 /* MongoQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D7CBB42B9A22D100399257 /* MongoQuery.swift */; };
@@ -809,12 +812,14 @@
 		49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMBSON.mm; sourceTree = "<group>"; };
 		49E12CF1245DB7E800359DF1 /* RLMBSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMBSON.h; sourceTree = "<group>"; };
 		49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMBSON_Private.hpp; sourceTree = "<group>"; };
+		53061CB32BAC8DDF00687C34 /* ExtJSONDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtJSONDecoder.swift; sourceTree = "<group>"; };
 		530BA61326DFA1CB008FC550 /* RLMChildProcessEnvironment.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMChildProcessEnvironment.m; path = Realm/TestUtils/RLMChildProcessEnvironment.m; sourceTree = "<group>"; };
 		53124A4F25B714EC00771CE4 /* SwiftUITestHost.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftUITestHost.xcconfig; sourceTree = "<group>"; };
 		53124AB825B71AF600771CE4 /* SwiftUITestHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUITestHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53124AD425B71AF700771CE4 /* SwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		53124AD825B71AF700771CE4 /* SwiftUITestHostUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostUITests.swift; sourceTree = "<group>"; };
 		53124ADA25B71AF700771CE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		531CA3362BADC18800D3BA2E /* ExtJSONCorpusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtJSONCorpusTests.swift; sourceTree = "<group>"; };
 		531F956927906EF300E497F1 /* RLMSyncSession.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncSession.mm; sourceTree = "<group>"; };
 		531F956B27906F7600E497F1 /* RLMSyncSubscription.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncSubscription.mm; sourceTree = "<group>"; };
 		531F956E279070A800E497F1 /* RLMServerTestObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMServerTestObjects.m; path = Realm/ObjectServerTests/RLMServerTestObjects.m; sourceTree = "<group>"; };
@@ -834,11 +839,12 @@
 		53626AAE25D31CAC00D9515D /* Objects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Objects.swift; sourceTree = "<group>"; };
 		536B7C0B24A4C223006B535D /* dependencies.list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dependencies.list; sourceTree = "<group>"; };
 		537130C724A9E417001FDBBC /* RealmServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RealmServer.swift; path = Realm/ObjectServerTests/RealmServer.swift; sourceTree = "<group>"; };
-		538ADD442B9CC54000ADE639 /* ExtJSONCodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtJSONCodable.swift; sourceTree = "<group>"; };
+		538ADD442B9CC54000ADE639 /* ExtJSONEncoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExtJSONEncoder.swift; sourceTree = "<group>"; };
 		539A9A382B98D15200AE0E9D /* BaasRuleCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaasRuleCodable.swift; sourceTree = "<group>"; };
 		53A34E3325CDA0AC00698930 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		53A34E3425CDA0AC00698930 /* SwiftUITestHostApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUITestHostApp.swift; sourceTree = "<group>"; };
 		53A34E3525CDA0AC00698930 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		53B0540C2BA8B9030093FA8B /* Aggregation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Aggregation.swift; sourceTree = "<group>"; };
 		53CCC6C3257EC8A300A8FC50 /* RLMApp_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMApp_Private.h; sourceTree = "<group>"; };
 		53CCC6E7257EC8C300A8FC50 /* RLMUser_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUser_Private.h; sourceTree = "<group>"; };
 		53D7CBB42B9A22D100399257 /* MongoQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MongoQuery.swift; sourceTree = "<group>"; };
@@ -1305,10 +1311,12 @@
 		538ADD432B9CC52600ADE639 /* MongoDataAccess */ = {
 			isa = PBXGroup;
 			children = (
-				538ADD442B9CC54000ADE639 /* ExtJSONCodable.swift */,
+				538ADD442B9CC54000ADE639 /* ExtJSONEncoder.swift */,
+				53061CB32BAC8DDF00687C34 /* ExtJSONDecoder.swift */,
 				5346B50F2B8FB6A4001CADFE /* ExtJSON.swift */,
 				5346B5132B8FB6A9001CADFE /* MongoDataAccess.swift */,
 				53D7CBB42B9A22D100399257 /* MongoQuery.swift */,
+				53B0540C2BA8B9030093FA8B /* Aggregation.swift */,
 			);
 			path = MongoDataAccess;
 			sourceTree = "<group>";
@@ -1435,6 +1443,7 @@
 				AC7825C02ACD916C007ABA4B /* GeospatialTests.swift */,
 				CF0D04F02693652E0038A058 /* KeyPathTests.swift */,
 				5346B51B2B8FB71E001CADFE /* MongoDataAccessTests.swift */,
+				531CA3362BADC18800D3BA2E /* ExtJSONCorpusTests.swift */,
 				5D660FFF1BE98D880021E04F /* KVOTests.swift */,
 				5D6610001BE98D880021E04F /* ListTests.swift */,
 				3F1D8D75265B075000593ABA /* MapTests.swift */,
@@ -2593,7 +2602,7 @@
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
-				538ADD452B9CC54000ADE639 /* ExtJSONCodable.swift in Sources */,
+				538ADD452B9CC54000ADE639 /* ExtJSONEncoder.swift in Sources */,
 				3FE267D8264308680030F83C /* Persistable.swift in Sources */,
 				3F149CCB2668112A00111D65 /* PersistedProperty.swift in Sources */,
 				3F857A49276A507200F9B9B1 /* Projection.swift in Sources */,
@@ -2608,6 +2617,7 @@
 				CFE9CE3326555BBD00BF96D6 /* RealmKeyedCollection.swift in Sources */,
 				CF44461E26121C6800BAFDB4 /* RealmProperty.swift in Sources */,
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
+				53B0540D2BA8B9030093FA8B /* Aggregation.swift in Sources */,
 				53D7CBB52B9A22D100399257 /* MongoQuery.swift in Sources */,
 				68A7B91D2543538B00C703BC /* RLMSupport.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
@@ -2616,6 +2626,7 @@
 				5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */,
 				535EA9E225B0919800DBF3CD /* SwiftUI.swift in Sources */,
 				1AFEF8431D52D2C900495005 /* Sync.swift in Sources */,
+				53061CB42BAC8DDF00687C34 /* ExtJSONDecoder.swift in Sources */,
 				ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */,
 				3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */,
 				5D660FFE1BE98D670021E04F /* Util.swift in Sources */,
@@ -2631,6 +2642,7 @@
 				3FE2BE0323D8CAD1002860E9 /* CombineTests.swift in Sources */,
 				E8AE7C261EA436F800CDFF9A /* CompactionTests.swift in Sources */,
 				ACFF0EC728EC5ADB0097AEE0 /* CustomColumnNameTests.swift in Sources */,
+				531CA3372BADC18800D3BA2E /* ExtJSONCorpusTests.swift in Sources */,
 				3F40C613276D1B05007FEF1A /* CustomObjectCreationTests.swift in Sources */,
 				3F9F53D52718E8E6000EEB4A /* CustomPersistableTestObjects.swift in Sources */,
 				CFFECBAA250646820010F585 /* Decimal128Tests.swift in Sources */,
@@ -3227,6 +3239,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
+				OTHER_SWIFT_FLAGS = "-Xfrontend -enable-actor-data-race-checks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Realm/ObjectServerTests/Object-Server-Tests-Bridging-Header.h";
 			};

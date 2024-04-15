@@ -22,6 +22,9 @@ class Subdocument : EmbeddedObject, Codable {
     @Persisted var arrayStrCol: List<String>
     @Persisted var arrayIntCol: List<Int>
     
+    @Persisted var arrayOptStrCol: List<String?>
+    @Persisted var arrayOptIntCol: List<Int?>
+    
     @Persisted var optStrCol: String?
     @Persisted var optIntCol: Int?
     
@@ -33,7 +36,9 @@ class Subdocument : EmbeddedObject, Codable {
                      binaryCol: Data,
                      arrayStrCol: List<String>,
                      arrayIntCol: List<Int>,
-                     optStrCol: String? = nil, 
+                     arrayOptStrCol: List<String?>,
+                     arrayOptIntCol: List<Int?>,
+                     optStrCol: String? = nil,
                      optIntCol: Int? = nil,
                      subdocument: Subdocument) {
         self.init()
@@ -48,6 +53,8 @@ class Subdocument : EmbeddedObject, Codable {
         self.subdocument = subdocument
     }
 }
+
+
 
 class MongoDataAccessMacrosTests : XCTestCase {
     struct MultiTypeTest : Codable, Equatable {
@@ -156,6 +163,14 @@ class MongoDataAccessMacrosTests : XCTestCase {
         let arrayData: [Data]
         let arrayDate: [Date]
         
+        let arrayOptString: [String?]
+        let arrayOptInt: [Int?]
+        let arrayOptInt64: [Int64?]
+        let arrayOptBool: [Bool?]
+        let arrayOptDouble: [Double?]
+        let arrayOptData: [Data?]
+        let arrayOptDate: [Date?]
+        
         let optString: Optional<String>
         let optInt: Optional<Int>
         let optInt64: Optional<Int64>
@@ -186,14 +201,24 @@ class MongoDataAccessMacrosTests : XCTestCase {
                                     arrayData: [
                                         Data([0, 1, 2, 3, 4]),
                                         Data([5, 6, 7, 8, 9])
-                                    ], arrayDate: [
-                                        Date()
-                                    ], optString: nil, optInt: nil, optInt64: nil, optDouble: nil, optBinary: nil, subdocument: .init(foo: "bar"), arraySubdocument: [.init(foo: "baz"), .init(foo: "qux")])
+                                    ], arrayDate: [Date()],
+                                    arrayOptString: ["foo", nil],
+                                    arrayOptInt: [42, nil],
+                                    arrayOptInt64: [nil, 42],
+                                    arrayOptBool: [nil, true],
+                                    arrayOptDouble: [42.42, nil],
+                                    arrayOptData: [Data([1, 2, 3]), nil],
+                                    arrayOptDate: [nil, .distantPast],
+                                    optString: nil,
+                                    optInt: nil,
+                                    optInt64: nil,
+                                    optDouble: nil,
+                                    optBinary: nil,
+                                    subdocument: .init(foo: "bar"),
+                                    arraySubdocument: [.init(foo: "baz"), .init(foo: "qux")])
         let data = try encoder.encode(allTypes1)
         let decoder = ExtJSONDecoder()
         let allTypes2 = try decoder.decode(AllTypeTest.self, from: data)
-        let mirror1 = Mirror(reflecting: allTypes1)
-        let mirror2 = Mirror(reflecting: allTypes2)
         
         XCTAssertEqual(allTypes1.date.timeIntervalSince1970,
                        allTypes2.date.timeIntervalSince1970,
@@ -203,20 +228,16 @@ class MongoDataAccessMacrosTests : XCTestCase {
                             allTypes2.arrayDate.map(\.timeIntervalSince1970)) {
             XCTAssertEqual(d1, d2, accuracy: 0.1)
         }
-        //        zip(allTypes1.arrayDate, allTypes2.arrayDate)
-        //            .forEach(XCTAssertEqual)
-        //        XCTAssertEqual(allTypes1.arrayDate.map(\.timeIntervalSince1970),
-        //                       allTypes2.arrayDate.map(\.timeIntervalSince1970),
-        //                       accuracy: 0.001)
         XCTAssertEqual(allTypes1.arrayData, allTypes2.arrayData)
         XCTAssertEqual(allTypes1.binary, allTypes2.binary)
         XCTAssertEqual(allTypes1.arraySubdocument, allTypes2.arraySubdocument)
+        XCTAssertEqual(allTypes1.arrayOptString, allTypes2.arrayOptString)
+        XCTAssertEqual(allTypes1.arrayOptInt, allTypes2.arrayOptInt)
         XCTAssertEqual(allTypes1.subdocument, allTypes2.subdocument)
         XCTAssertEqual(allTypes1.optString, allTypes2.optString)
         XCTAssertEqual(allTypes1.optInt, allTypes2.optInt)
         XCTAssertEqual(allTypes1.optInt64, allTypes2.optInt64)
         XCTAssertEqual(allTypes1.optDouble, allTypes2.optDouble)
-        //        XCTAssertEqual(allTypes1, allTypes2)
     }
     
     struct Test : Codable, Equatable {
@@ -229,9 +250,20 @@ class MongoDataAccessMacrosTests : XCTestCase {
         let valid: Array<Valid>
     }
     
+    func run<T>(test: Test,
+                answer: T,
+                parsedEntry: T,
+                line: UInt) where T: Codable, T: Equatable {
+        XCTAssertEqual(parsedEntry, answer, line: line)
+        let encoder = ExtJSONEncoder()
+        XCTAssertEqual(try encoder.encode(parsedEntry),
+                       try encoder.encode(answer), line: line)
+    }
     func run<T : Codable & Equatable>(test: String,
                                       answers: [T],
-                                      lossy: Bool = false) throws {
+                                      lossy: Bool = false,
+                                      function: String = #function,
+                                      line: UInt = #line) throws {
         #if SWIFT_PACKAGE
         let url = Bundle.module.url(forResource: "BsonCorpus/\(test)", withExtension: "json")!
         #else
@@ -245,69 +277,119 @@ class MongoDataAccessMacrosTests : XCTestCase {
             guard !lossy else {
                 continue
             }
-            XCTAssertEqual(parsedEntry, answers[entryIdx])
-            let encoder = ExtJSONEncoder()
-            XCTAssertEqual(try encoder.encode(parsedEntry),
-                           try encoder.encode(answers[entryIdx]))
+            run(test: test, answer: answers[entryIdx], parsedEntry: parsedEntry, line: line)
         }
     }
     
-    struct ArrayTest : Codable, Equatable {
-        let a: [Int]
-    }
-    func testArray() throws {
-        try run(test: "array", answers: [
-            ArrayTest(a: []),
-            ArrayTest(a: [10]),
-            ArrayTest(a: [10]),
-            ArrayTest(a: [10]),
-            ArrayTest(a: [10, 20]),
-        ])
-    }
+//    func run<T>(test: String, @AnswerBuilder answers: (() -> [(T, UInt)])) throws
+//    where T: Codable, T: Equatable {
+//#if SWIFT_PACKAGE
+//        let url = Bundle.module.url(forResource: "BsonCorpus/\(test)", withExtension: "json")!
+//#else
+//        let url = Bundle(for: Self.self).url(forResource: "BsonCorpus/\(test)", withExtension: "json")!
+//#endif
+//        let data = try Data(contentsOf: url)
+//        let test: Test = try ExtJSONDecoder().decode(Test.self, from: data)
+//        let answers = answers()
+//        for entryIdx in test.valid.indices where entryIdx < answers.count {
+//            let parsedEntry: T = try ExtJSONDecoder().decode(T.self, from: test.valid[entryIdx].canonical_extjson
+//                .data(using: .utf8)!)
+//            run(test: test, answer: answers[entryIdx].0, parsedEntry: parsedEntry, line: answers[entryIdx].1)
+//        }
+//    }
+//    // MARK: Corpus Tests
+//    func testArray() throws {
+//        struct ArrayTest : Codable, Equatable {
+//            let a: [Int]
+//        }
+////        try run(test: "array") {
+////            ArrayTest(a: [])
+////            ArrayTest(a: [10])
+////            ArrayTest(a: [10])
+////            ArrayTest(a: [10])
+////            ArrayTest(a: [10, 20])
+////        }
+//    }
+//    
+//    func testBinary() throws {
+//        struct BinaryTest: Codable, Equatable {
+//            let x: Data
+//        }
+//        try run(test: "binary") {
+//            BinaryTest(x: Data())
+//            BinaryTest(x: Data())
+//            BinaryTest(x: Data(base64Encoded: "//8=")!)
+//            BinaryTest(x: Data(base64Encoded: "//8=")!)
+//            BinaryTest(x: Data(base64Encoded: "//8=")!)
+//            BinaryTest(x: Data(base64Encoded: "//8=")!)
+//            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!)
+//            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!)
+//            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!)
+//            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!)
+//            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!)
+//            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!)
+//            BinaryTest(x: Data(base64Encoded: "//8=")!)
+//        }
+////        try run(test: "binary", answers: [
+////            BinaryTest(x: Data()),
+////            BinaryTest(x: Data()),
+////            BinaryTest(x: Data(base64Encoded: "//8=")!),
+////            BinaryTest(x: Data(base64Encoded: "//8=")!),
+////            BinaryTest(x: Data(base64Encoded: "//8=")!),
+////            BinaryTest(x: Data(base64Encoded: "//8=")!),
+////            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!),
+////            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!),
+////            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!),
+////            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!),
+////            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!),
+////            BinaryTest(x: Data(base64Encoded: "c//SZESzTGmQ6OfR38A11A==")!),
+////            BinaryTest(x: Data(base64Encoded: "//8=")!)
+////        ])
+//    }
     
-    struct BoolTest : Codable, Equatable {
-        let b: Bool
-    }
     func testBoolean() throws {
+        struct BoolTest : Codable, Equatable {
+            let b: Bool
+        }
         try run(test: "boolean", answers: [
             BoolTest(b: true),
             BoolTest(b: false)
         ])
     }
     
-    struct DateTest : Codable, Equatable {
-        let a: Date
-    }
     func testDate() throws {
+        struct DateTest : Codable, Equatable {
+            let a: Date
+        }
         try run(test: "datetime", answers: [
-            DateTest(a: .init(timeIntervalSince1970: 0)),
-            DateTest(a: .init(timeIntervalSince1970: 1356351330501/1000)),
-            DateTest(a: .init(timeIntervalSince1970: -284643869501/1000)),
-            DateTest(a: .init(timeIntervalSince1970: 253402300800000/1000)),
-            DateTest(a: .init(timeIntervalSince1970: 1356351330001/1000))
+            DateTest(a: Date(timeIntervalSince1970: 0)),
+            DateTest(a: Date(timeIntervalSince1970: 1356351330501/1000)),
+            DateTest(a: Date(timeIntervalSince1970: -284643869501/1000)),
+            DateTest(a: Date(timeIntervalSince1970: 253402300800000/1000)),
+            DateTest(a: Date(timeIntervalSince1970: 1356351330001/1000))
         ])
     }
-    //
-    //    @BSONCodable struct DecimalTest : Equatable {
-    //        let d: Decimal128
-    //    }
-    //    public func testDecimal() throws {
-    //        try run(test: "decimal128-1", answers: [
-    //            DecimalTest(d: .init(floatLiteral: .nan)),
-    //            DecimalTest(d: .init(floatLiteral: .nan)),
-    //            DecimalTest(d: .init(floatLiteral: .nan)),
-    //            DecimalTest(d: .init(floatLiteral: .nan)),
-    //            DecimalTest(d: .init(floatLiteral: .nan)),
-    //            DecimalTest(d: .init(floatLiteral: .nan)),
-    //            DecimalTest(d: .init(floatLiteral: .infinity)),
-    //            DecimalTest(d: .init(floatLiteral: .infinity * -1)),
-    //            DecimalTest(d: .init(floatLiteral: 0)),
-    //            DecimalTest(d: .init(floatLiteral: -0)),
-    //            DecimalTest(d: 0E+3),
-    //            DecimalTest(d: 0.000001234567890123456789012345678901234)
-    //        ], lossy: true)
-    //    }
-    //
+    
+    struct DecimalTest : Codable, Equatable {
+        let d: Decimal128
+    }
+    public func testDecimal() throws {
+        try run(test: "decimal128-1", answers: [
+            DecimalTest(d: .init(floatLiteral: .nan)),
+            DecimalTest(d: .init(floatLiteral: .nan)),
+            DecimalTest(d: .init(floatLiteral: .nan)),
+            DecimalTest(d: .init(floatLiteral: .nan)),
+            DecimalTest(d: .init(floatLiteral: .nan)),
+            DecimalTest(d: .init(floatLiteral: .nan)),
+            DecimalTest(d: .init(floatLiteral: .infinity)),
+            DecimalTest(d: .init(floatLiteral: .infinity * -1)),
+            DecimalTest(d: .init(floatLiteral: 0)),
+            DecimalTest(d: .init(floatLiteral: -0)),
+            DecimalTest(d: 0E+3),
+            DecimalTest(d: 0.000001234567890123456789012345678901234)
+        ], lossy: true)
+    }
+    
     struct ObjectIdTest : Codable, Equatable {
         let a: ObjectId
     }
@@ -332,7 +414,7 @@ class MongoDataAccessMacrosTests : XCTestCase {
     private static func compareQuery(_ query: (Query<AllTypesObject>) -> Query<Bool>,
                                      _ rhs: NSDictionary) throws {
         XCTAssertEqual(
-            try buildFilter(query(Query()).node, subqueryCount: 0),
+            try buildFilter(query(Query()).node, subqueryCount: 0) as NSDictionary,
             rhs)
     }
     
@@ -374,5 +456,103 @@ class MongoDataAccessMacrosTests : XCTestCase {
         }, [
             "arrayIntCol": [ "$in": [1, 2, 3] ]
         ])
+    }
+    // MARK: Encodable/Decodable tests
+    private func compare(value: any Codable & Equatable, stringRepresentation: String) throws {
+        let encoder = ExtJSONEncoder()
+        let decoder = ExtJSONDecoder()
+        
+        func compare<T>(value: T, stringRepresentation: String) throws where T: Codable, T: Equatable {
+            // encode the value
+            let data = try encoder.encode(value)
+            // assert the string representation is correct for the value
+            XCTAssertEqual(String(data: data, encoding: .utf8), stringRepresentation)
+            XCTAssertEqual(try decoder.decode(type(of: value), from: data), value)
+        }
+        func optionalCompare<T>(value: T, stringRepresentation: String) throws where T: Codable, T: Equatable {
+            // encode the value as nil (but as the correct type)
+            let data = try encoder.encode(nil as T?)
+            // assert the null encoded value is represented correctly
+            XCTAssertEqual(String(data: data, encoding: .utf8), "null")
+            XCTAssertEqual(try decoder.decode(T?.self, from: data), nil)
+            do {
+                // assert the correct error is thrown
+                _ = try decoder.decode(T.self, from: data)
+                XCTFail()
+            } catch DecodingError.valueNotFound(_, _) {
+            } catch DecodingError.typeMismatch(_, _) {
+            } catch {
+                XCTFail(error.localizedDescription)
+            }
+        }
+        func arrayCompare<T>(value: T, stringRepresentation: String) throws where T: Codable, T: Equatable {
+            // encode the value
+            var data = try encoder.encode([value, value])
+            // assert the string representation is correct for the value
+            XCTAssertEqual(String(data: data, encoding: .utf8),
+                           "[\(stringRepresentation),\(stringRepresentation)]")
+            XCTAssertEqual(try decoder.decode(type(of: [value, value]), from: data),
+                           [value, value])
+            
+            data = try encoder.encode([value, nil, nil])
+            // assert the string representation is correct for the value
+            XCTAssertEqual(String(data: data, encoding: .utf8),
+                           "[\(stringRepresentation),null,null]")
+            XCTAssertEqual(try decoder.decode(type(of: [value, nil, nil]), from: data),
+                           [value, nil, nil])
+        }
+        try compare(value: value, stringRepresentation: stringRepresentation)
+        try optionalCompare(value: value, stringRepresentation: stringRepresentation)
+        try arrayCompare(value: value, stringRepresentation: stringRepresentation)
+    }
+
+    private func invoke<T>(_ fn: (T, String) throws -> Void, _ args: (T, String)) throws {
+        try fn(args.0, args.1)
+    }
+    
+    let str = ("foo", "\"foo\"")
+    let int = (42,
+                """
+                {"$numberInt":"42"}
+                """)
+    let int32 = (Int32(42), """
+                            {"$numberInt":"42"}
+                            """)
+    let int64 = (Int64(42), """
+                            {"$numberLong":"42"}
+                            """)
+    var document: (any Codable & Equatable, String) {
+        struct Document: Codable, Equatable {
+            let strCol: String
+            let optStrCol: String?
+            let intCol: Int
+            struct Subdocument: Codable, Equatable {
+                let strCol: String
+            }
+            let subdocument: Subdocument
+        }
+        return (Document(strCol: "foo", optStrCol: nil, intCol: 42, subdocument: Document.Subdocument(strCol: "bar")),
+                """
+                {"intCol":{"$numberInt":"42"},"strCol":"foo","subdocument":{"strCol":"bar"}}
+                """)
+    }
+    
+    func testCompare() throws {
+        try invoke(compare, str)
+        try invoke(compare, int)
+        try invoke(compare, int32)
+        try invoke(compare, int64)
+        try invoke(compare, document)
+    }
+    
+    func testBehavior() throws {
+        let encoder = JSONEncoder()
+        XCTAssertEqual(try encoder.encode(1), "1".data(using: .utf8))
+        XCTAssertEqual(try encoder.encode("foo"), "\"foo\"".data(using: .utf8))
+        
+        struct Person: Codable {
+            let name: String
+            let age: Int
+        }
     }
 }

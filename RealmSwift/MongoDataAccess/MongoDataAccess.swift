@@ -19,30 +19,26 @@ public enum AnyBSONKey: ExtJSONCodable, Equatable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        switch decoder.userInfo[.storage] {
-        case let value as String: self = .string(value)
-        case let value as [String: String]:
-            if value.keys.first == Int.ExtJSONValue.CodingKeys.numberInt.rawValue {
-                self = .int(try container.decode(Int.self))
-            } else {
-                self = .objectId(try container.decode(ObjectId.self))
-            }
-        default:
-            if let value = try? container.decode(String.self) {
-                self = .string(value)
-            } else if let value = try? container.decode(Int.self) {
-                self = .int(value)
-            } else {
-                self = .objectId(try container.decode(ObjectId.self))
-            }
-        }
+        fatalError()
+//        switch decoder.userInfo[.storage] {
+//        case let value as String: self = .string(value)
+//        case let value as [String: String]:
+//            if value.keys.first == Int.ExtJSONValue.CodingKeys.numberInt.rawValue {
+//                self = .int(try container.decode(Int.self))
+//            } else {
+//                self = .objectId(try container.decode(ObjectId.self))
+//            }
+//        default:
+//            if let value = try? container.decode(String.self) {
+//                self = .string(value)
+//            } else if let value = try? container.decode(Int.self) {
+//                self = .int(value)
+//            } else {
+//                self = .objectId(try container.decode(ObjectId.self))
+//            }
+//        }
     }
 }
-
-@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-@usableFromInline
-typealias Functor<each Args, Res> = (repeat (each Args),
-                                     @Sendable @escaping (Result<Res, Error>) -> Void) -> Void
 
 protocol Resolvable {
     associatedtype Success
@@ -54,14 +50,11 @@ extension Result: Resolvable {
     var result: Result<Success, Failure> { return self }
 }
 
-//@usableFromInline
-public typealias Function<each Args> = (repeat (each Args)) -> Void
-
-
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 func withTypeCheckedThrowingContinuation<each U, V>(_ block: @escaping (repeat (each U), @escaping (V) -> Void) -> Void,
                                                      _ arguments: repeat (each U))
 async throws -> V.Success where V: Resolvable {
+    typealias Function<each Args> = (repeat (each Args)) -> Void
     func curry<each Args>(_ fn: @escaping (repeat each Args) -> Void,
                           arguments: repeat (each Args)) {
         fn(repeat each arguments)
@@ -233,17 +226,15 @@ public struct MongoTypedCollection<T : Codable> {
     public func find(options: FindOptions = FindOptions(),
                      _ filter: [String: Any]? = nil,
                      _ block: @Sendable @escaping (Result<[T], Error>) -> Void) {
-        call(function: "find", arguments: [
-            "query": filter ?? [:]
-        ], block)
+        call(function: "find", arguments: ["query": filter ?? [:]], block)
     }
     @available(macOS 10.15, *)
     @_unsafeInheritExecutor
     public func find(options: FindOptions = FindOptions(),
                      where filter: ((Query<T>) -> Query<Bool>)? = nil) async throws -> [T] {
         try await withTypeCheckedThrowingContinuation(find,
-                                                       options,
-                                                       filter.map { try buildFilter($0(Query()).node) } ?? [:])
+                                                      options,
+                                                      filter.map { try buildFilter($0(Query()).node) } ?? [:])
     }
     
     // MARK: Count
@@ -308,11 +299,7 @@ public struct MongoTypedCollection<T : Codable> {
     @preconcurrency
     public func deleteOne(filter: T? = nil,
                           _ completion: @escaping @Sendable (Result<Deleted, Error>) -> Void) -> Void {
-        call(function: "deleteOne", arguments: [
-            "database": mongoCollection.databaseName,
-            "collection": mongoCollection.name,
-            "query": filter ?? [:]
-        ], completion)
+        call(function: "deleteOne", arguments: ["query": filter ?? [:]], completion)
     }
     
     @available(macOS 10.15, *)
@@ -328,18 +315,13 @@ public struct MongoTypedCollection<T : Codable> {
     @preconcurrency
     public func deleteMany(filter: T? = nil,
                            _ completion: @escaping @Sendable (Result<Deleted, Error>) -> Void) -> Void {
-        call(function: "deleteMany", arguments: [
-            "database": mongoCollection.databaseName,
-            "collection": mongoCollection.name,
-            "query": filter ?? [:]
-        ], completion)
+        call(function: "deleteMany", arguments: ["query": filter ?? [:]], completion)
     }
     
     @_unsafeInheritExecutor
     @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
     public func deleteMany(filter: T? = nil) async throws -> Deleted {
-        try await withTypeCheckedThrowingContinuation(deleteMany,
-                                                       filter)
+        try await withTypeCheckedThrowingContinuation(deleteMany, filter)
     }
 }
 

@@ -59,9 +59,9 @@
 
 - (RLMMongoCollection *)collectionWithName:(NSString *)name {
     return [[RLMMongoCollection alloc] initWithUser:self.user
-                                       serviceName:self.serviceName
-                                      databaseName:self.name
-                                    collectionName:name];
+                                        serviceName:self.serviceName
+                                       databaseName:self.name
+                                     collectionName:name];
 }
 
 @end
