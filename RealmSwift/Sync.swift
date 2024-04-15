@@ -515,35 +515,13 @@ public typealias Provider = RLMIdentityProvider
     case manual(errorHandler: ErrorReportingBlock? = nil)
 }
 
+
 /**
  A configuration controlling how the initial subscriptions are populated when a Realm file is first opened.
 
- - seeAlso ``Realm.subscriptions``
- - seeAlso https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/sync/flexible-sync/ for more information
-   about managing subscriptions with flexible sync.
+ - see: `RLMInitialSubscriptionsConfiguration`
  */
-@frozen public struct InitialSubscriptionsConfiguration: Sendable {
-    /**
-     Controls whether to re-run ``callback`` every time the Realm is opened.
-     */
-    public var rerunOnOpen: Bool {
-        config.rerunOnOpen
-    }
-
-    /**
-     A callback that's executed in an update block to populate the initial subscriptions for that Realm.
-
-     This callback will only be executed when the Realm is first created, unless ``rerunOnOpen`` is `true`, in which case it will be executed every time
-     the Realm is opened.
-     */
-    public var callback: @Sendable (SyncSubscriptionSet) -> Void {
-        ObjectiveCSupport.convert(block: config.callback)
-    }
-
-    @Unchecked internal var config: RLMInitialSubscriptionsConfiguration
-    internal init(config: RLMInitialSubscriptionsConfiguration) {
-        self.config = config
-    }}
+public typealias InitialSubscriptionsConfiguration = RLMInitialSubscriptionsConfiguration
 
 /**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
@@ -603,7 +581,7 @@ public typealias Provider = RLMIdentityProvider
      A configuration that controls how initial subscriptions are populated when the Realm is opened.
      */
     public var initialSubscriptions: InitialSubscriptionsConfiguration? {
-        config.initialSubscriptions == nil ? nil : InitialSubscriptionsConfiguration(config: config.initialSubscriptions!)
+        config.initialSubscriptions
     }
 
     @Unchecked internal var config: RLMSyncConfiguration

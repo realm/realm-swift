@@ -34,6 +34,7 @@ typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet *
 
  @see `RLMSubscriptionSet`
  */
+RLM_SWIFT_SENDABLE RLM_FINAL // immutable final class
 @interface RLMInitialSubscriptionsConfiguration : NSObject
 
 /**
@@ -55,7 +56,7 @@ typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet *
  @param callback Callback that will be invoked to update the subscriptions for this Realm file when it's first created or every time it's opened if `rerunOnOpen` is `true`.
  @param rerunOnOpen A flag controlling whether to run the subscription callback every time the Realm is opened or only the first time.
  */
-- (instancetype)initWithCallback:(RLMFlexibleSyncInitialSubscriptionsBlock)callback rerunOnOpen: (BOOL)rerunOnOpen;
+- (instancetype)initWithCallback:(RLMFlexibleSyncInitialSubscriptionsBlock)callback rerunOnOpen:(BOOL)rerunOnOpen;
 
 
 /**
