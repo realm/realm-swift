@@ -19,24 +19,13 @@ public enum AnyBSONKey: ExtJSONCodable, Equatable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        fatalError()
-//        switch decoder.userInfo[.storage] {
-//        case let value as String: self = .string(value)
-//        case let value as [String: String]:
-//            if value.keys.first == Int.ExtJSONValue.CodingKeys.numberInt.rawValue {
-//                self = .int(try container.decode(Int.self))
-//            } else {
-//                self = .objectId(try container.decode(ObjectId.self))
-//            }
-//        default:
-//            if let value = try? container.decode(String.self) {
-//                self = .string(value)
-//            } else if let value = try? container.decode(Int.self) {
-//                self = .int(value)
-//            } else {
-//                self = .objectId(try container.decode(ObjectId.self))
-//            }
-//        }
+        if let value = try? container.decode(String.self) {
+            self = .string(value)
+        } else if let value = try? container.decode(Int.self) {
+            self = .int(value)
+        } else {
+            self = .objectId(try container.decode(ObjectId.self))
+        }
     }
 }
 
