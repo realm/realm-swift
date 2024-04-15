@@ -264,65 +264,6 @@ extension _ExtJSONEncoder.UnkeyedContainer: UnkeyedEncodingContainer {
 public struct ExtJSONSerialization {
     private init() {}
     
-    public static func extJSONObject(with data: Data) throws -> Any {
-        fatalError()
-//        func decode(_ object: Any) throws -> Any? {
-//            switch object {
-//            case let (key, value) as (String, Any):
-//                return (key, try decode(value))
-//            case let object as [String: Any]:
-//                return try (object.map(decode) as? [(String, Any)])
-//                    .map {
-//                        Dictionary(uniqueKeysWithValues: $0)
-//                    }
-//            case let object as [Any]:
-//                return try object.map(decode)
-//                //            case let object as (any _ExtJSON)?:
-//                //                return try object.map { try ExtJSONDecoder().decode(type(of: $0.extJSONValue),
-//                //                                                                    from: object) }
-//            default:
-//                guard let value = object as? Decodable else {
-//                    throw DecodingError.typeMismatch(type(of: object),
-//                                                     .init(codingPath: [],
-//                                                           debugDescription: String(describing: type(of: object))))
-//                }
-//                return try type(of: value).init(from: _ExtJSONDecoder(storage: value))
-//                //                return try ExtJSONDecoder().decode(type(of: value), from: value)
-//            }
-//        }
-//        return try decode(JSONSerialization.jsonObject(with: data)) as Any
-    }
-    
-    public static func data(with extJSONObject: Any) throws -> Data {
-        fatalError()
-//        func encode(_ object: Any) throws -> Any? {
-//            switch object {
-//            case let (key, value) as (String, Any?):
-//                return (key, try value.map(encode) ?? NSNull())
-//            case let object as [String: Any]:
-//                return try (object.map(encode) as? [(String, Any?)])
-//                    .map {
-//                        Dictionary(uniqueKeysWithValues: $0)
-//                    }
-//            case let object as [Any]:
-//                return try object.map(encode)
-//            case let object as (any ExtJSONBuiltin)?:
-//                return try object.map { try ExtJSONEncoder().encode($0) }
-//            default:
-//                let encoder = _ExtJSONEncoder()
-//                guard let value = object as? Encodable else {
-//                    throw DecodingError.typeMismatch(type(of: object),
-//                                                     .init(codingPath: [],
-//                                                           debugDescription: String(describing: type(of: object))))
-//                }
-//                try value.encode(to: encoder)
-//                return encoder.container?.storage
-//            }
-//        }
-//        let encoded = try encode(extJSONObject)
-//        return try JSONSerialization.data(withJSONObject: encoded as Any)
-    }
-    
     public static func data<T>(with extJSONObject: T) throws -> Data where T: Encodable {
         try ExtJSONEncoder().encode(extJSONObject)
     }
