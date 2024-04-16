@@ -277,8 +277,8 @@ using namespace realm;
     NSMutableArray<RLMUserIdentity *> *buffer = [NSMutableArray array];
     auto identities = _user->identities();
     for (auto& identity : identities) {
-        [buffer addObject: [[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
-                                                                          identifier:@(identity.id.c_str())]];
+        [buffer addObject:[[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
+                                                                         identifier:@(identity.id.c_str())]];
     }
 
     return [buffer copy];

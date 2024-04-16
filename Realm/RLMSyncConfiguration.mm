@@ -213,8 +213,8 @@ struct InitialSubscriptionsWrapper : CallbackSchema {
     if (_config->subscription_initializer) {
         auto wrapper = _config->subscription_initializer.target<InitialSubscriptionsWrapper>();
 
-        return [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback: wrapper->block
-                                                                  rerunOnOpen: _config->rerun_init_subscription_on_open];
+        return [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:wrapper->block
+                                                                  rerunOnOpen:_config->rerun_init_subscription_on_open];
     }
 
     return nil;

@@ -23,10 +23,10 @@
 
 -(id)initWithCallback:(RLMFlexibleSyncInitialSubscriptionsBlock)callback
 {
-    return [self initWithCallback: callback rerunOnOpen: false];
+    return [self initWithCallback:callback rerunOnOpen:false];
 }
 
--(id)initWithCallback:(RLMFlexibleSyncInitialSubscriptionsBlock)callback rerunOnOpen: (BOOL)rerunOnOpen
+-(id)initWithCallback:(RLMFlexibleSyncInitialSubscriptionsBlock)callback rerunOnOpen:(BOOL)rerunOnOpen
 {
     _callback = callback;
     _rerunOnOpen = rerunOnOpen;
