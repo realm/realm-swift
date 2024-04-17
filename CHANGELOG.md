@@ -11,6 +11,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fixed diverging history due to a bug in the replication code when setting default null values (embedded objects included). ([Core #7536](https://github.com/realm/realm-core/issues/7536))
 * Null pointer exception may be triggered when logging out and async commits callbacks not executed. ([Core #7434](https://github.com/realm/realm-core/issues/7434))
 * `AppConfiguration.baseUrl` will now return the default value of the url when not set rather than `nil`. ([#8512](https://github.com/realm/realm-swift/issues/8512))
+* Added privacy manifest to Core's Swift package ([Swift #8535](https://github.com/realm/realm-swift/issues/8535))
+* Fixed crash when integrating removal of already removed dictionary key ([Core #7488](https://github.com/realm/realm-core/issues/7488), since v10.0.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -22,7 +24,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.2-15.3.0.
 
 ### Internal
-* Upgraded realm-core from 14.4.1 to 14.5.0
+
+* Upgraded realm-core from 14.4.1 to 14.5.2
 
 10.49.1 Release notes (2024-03-22)
 =============================================================
