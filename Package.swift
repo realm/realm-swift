@@ -244,6 +244,7 @@ let package = Package(
                 "Realm/RLMEmailPasswordAuth.mm",
                 "Realm/RLMFindOneAndModifyOptions.mm",
                 "Realm/RLMFindOptions.mm",
+                "Realm/RLMInitialSubscriptionsConfiguration.m",
                 "Realm/RLMMongoClient.mm",
                 "Realm/RLMMongoCollection.mm",
                 "Realm/RLMNetworkTransport.mm",

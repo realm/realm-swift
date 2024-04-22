@@ -130,8 +130,6 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     configuration->_customSchema = _customSchema;
     configuration->_eventConfiguration = _eventConfiguration;
     configuration->_migrationObjectClass = _migrationObjectClass;
-    configuration->_initialSubscriptions = _initialSubscriptions;
-    configuration->_rerunOnOpen = _rerunOnOpen;
     return configuration;
 }
 
