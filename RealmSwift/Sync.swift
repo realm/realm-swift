@@ -515,6 +515,14 @@ public typealias Provider = RLMIdentityProvider
     case manual(errorHandler: ErrorReportingBlock? = nil)
 }
 
+
+/**
+ A configuration controlling how the initial subscriptions are populated when a Realm file is first opened.
+
+ - see: `RLMInitialSubscriptionsConfiguration`
+ */
+public typealias InitialSubscriptionsConfiguration = RLMInitialSubscriptionsConfiguration
+
 /**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
  Atlas App Services.
@@ -567,6 +575,13 @@ public typealias Provider = RLMIdentityProvider
      */
     public var cancelAsyncOpenOnNonFatalErrors: Bool {
         config.cancelAsyncOpenOnNonFatalErrors
+    }
+
+    /**
+     A configuration that controls how initial subscriptions are populated when the Realm is opened.
+     */
+    public var initialSubscriptions: InitialSubscriptionsConfiguration? {
+        config.initialSubscriptions
     }
 
     @Unchecked internal var config: RLMSyncConfiguration

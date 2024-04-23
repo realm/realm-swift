@@ -48,6 +48,7 @@
 #import <Realm/RLMEmailPasswordAuth.h>
 #import <Realm/RLMFindOneAndModifyOptions.h>
 #import <Realm/RLMFindOptions.h>
+#import <Realm/RLMInitialSubscriptionsConfiguration.h>
 #import <Realm/RLMMongoClient.h>
 #import <Realm/RLMMongoCollection.h>
 #import <Realm/RLMMongoDatabase.h>

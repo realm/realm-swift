@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersion = Version("14.5.0")
-let cocoaVersion = Version("10.49.1")
+let coreVersion = Version("14.5.2")
+let cocoaVersion = Version("10.49.2")
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
@@ -244,6 +244,7 @@ let package = Package(
                 "Realm/RLMEmailPasswordAuth.mm",
                 "Realm/RLMFindOneAndModifyOptions.mm",
                 "Realm/RLMFindOptions.mm",
+                "Realm/RLMInitialSubscriptionsConfiguration.m",
                 "Realm/RLMMongoClient.mm",
                 "Realm/RLMMongoCollection.mm",
                 "Realm/RLMNetworkTransport.mm",

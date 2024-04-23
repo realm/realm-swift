@@ -1,16 +1,11 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* The default base url in `AppConfiguration` has been updated to point to `services.cloud.mongodb.com`. See https://www.mongodb.com/docs/atlas/app-services/domain-migration/ for more information. ([#8512](https://github.com/realm/realm-swift/issues/8512))
+* Added `SyncConfiguration.initialSubscriptions` which describes the initial subscription configuration that was passed when constructing the `SyncConfiguration`. ([#8548](https://github.com/realm/realm-swift/issues/8548))
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* Fixed a crash that would occur when an http error 401 or 403 is returned upon
-  opening a watch stream for a MongoDB collection. ([#8519](https://github.com/realm/realm-swift/issues/8519))
-* Fix an assertion failure "m_lock_info && m_lock_info->m_file.get_path() == m_filename" that appears to be related to opening a Realm while the file is in the process of being closed on another thread. ([#8507](https://github.com/realm/realm-swift/issues/8507))
-* Fixed diverging history due to a bug in the replication code when setting default null values (embedded objects included). ([Core #7536](https://github.com/realm/realm-core/issues/7536))
-* Null pointer exception may be triggered when logging out and async commits callbacks not executed. ([Core #7434](https://github.com/realm/realm-core/issues/7434))
-* `AppConfiguration.baseUrl` will now return the default value of the url when not set rather than `nil`. ([#8512](https://github.com/realm/realm-swift/issues/8512))
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -22,7 +17,37 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 14.2-15.3.0.
 
 ### Internal
-* Upgraded realm-core from 14.4.1 to 14.5.0
+* Upgraded realm-core from ? to ?
+
+10.49.2 Release notes (2024-04-17)
+=============================================================
+
+### Enhancements
+
+* The default base url in `AppConfiguration` has been updated to point to `services.cloud.mongodb.com`. See https://www.mongodb.com/docs/atlas/app-services/domain-migration/ for more information. ([#8512](https://github.com/realm/realm-swift/issues/8512))
+
+### Fixed
+
+* Fixed a crash that would occur when an http error 401 or 403 is returned upon
+  opening a watch stream for a MongoDB collection. ([#8519](https://github.com/realm/realm-swift/issues/8519))
+* Fix an assertion failure "m_lock_info && m_lock_info->m_file.get_path() == m_filename" that appears to be related to opening a Realm while the file is in the process of being closed on another thread. ([#8507](https://github.com/realm/realm-swift/issues/8507))
+* Fixed diverging history due to a bug in the replication code when setting default null values (embedded objects included). ([Core #7536](https://github.com/realm/realm-core/issues/7536))
+* Null pointer exception may be triggered when logging out and async commits callbacks not executed. ([Core #7434](https://github.com/realm/realm-core/issues/7434))
+* `AppConfiguration.baseUrl` will now return the default value of the url when not set rather than `nil`. ([#8512](https://github.com/realm/realm-swift/issues/8512))
+* Added privacy manifest to Core's Swift package ([Swift #8535](https://github.com/realm/realm-swift/issues/8535))
+* Fixed crash when integrating removal of already removed dictionary key ([Core #7488](https://github.com/realm/realm-core/issues/7488), since v10.0.0)
+
+### Compatibility
+
+* Realm Studio: 15.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.3.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.2-15.3.0.
+
+### Internal
+
+* Upgraded realm-core from 14.4.1 to 14.5.2
 
 10.49.1 Release notes (2024-03-22)
 =============================================================

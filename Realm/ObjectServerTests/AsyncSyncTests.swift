@@ -611,6 +611,11 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
             })
         })
         config.objectTypes = [SwiftPerson.self]
+
+        XCTAssertNotNil(config.syncConfiguration?.initialSubscriptions)
+        XCTAssertNotNil(config.syncConfiguration?.initialSubscriptions?.callback)
+        XCTAssertEqual(config.syncConfiguration?.initialSubscriptions?.rerunOnOpen, false)
+
         let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
         XCTAssertEqual(realm.subscriptions.count, 1)
         checkCount(expected: 10, realm, SwiftPerson.self)
@@ -644,6 +649,11 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
             }
         }, rerunOnOpen: true)
         config.objectTypes = [SwiftPerson.self]
+
+        XCTAssertNotNil(config.syncConfiguration?.initialSubscriptions)
+        XCTAssertNotNil(config.syncConfiguration?.initialSubscriptions?.callback)
+        XCTAssertEqual(config.syncConfiguration?.initialSubscriptions?.rerunOnOpen, false)
+
         try await Task {
             let realm = try await Realm(configuration: config, downloadBeforeOpen: .once)
             XCTAssertEqual(realm.subscriptions.count, 1)

@@ -33,10 +33,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 @property (nonatomic, nullable) Class migrationObjectClass;
 @property (nonatomic) bool disableAutomaticChangeNotifications;
 
-// Flexible Sync
-@property (nonatomic, readwrite, nullable) RLMFlexibleSyncInitialSubscriptionsBlock initialSubscriptions;
-@property (nonatomic, readwrite) BOOL rerunOnOpen;
-
 // Get the default configuration without copying it
 + (RLMRealmConfiguration *)rawDefaultConfiguration;
 
