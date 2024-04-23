@@ -986,6 +986,72 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     @MainActor
+    func testNonStreamingDownloadNotifier() throws {
+        try populateRealm()
+
+        let realm = try openRealm(wait: false)
+
+        let session = try XCTUnwrap(realm.syncSession)
+        var ex = expectation(description: "first download")
+        var callCount = 0
+        var progress: SyncSession.Progress?
+        let token = session.addProgressNotification(for: .download, mode: .forCurrentlyOutstandingWork) { p in
+            DispatchQueue.main.async { @MainActor in
+                // Verify that progress increases.
+                if let progress = progress {
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
+                }
+                progress = p
+                callCount += 1
+            }
+        }
+        XCTAssertNotNil(token)
+
+        let subscriptions = realm.subscriptions
+        subscriptions.update({
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
+        }, onComplete: { err in
+            DispatchQueue.main.async { @MainActor in
+                XCTAssertNil(err)
+                ex.fulfill()
+            }
+        })
+
+        waitForExpectations(timeout: 60.0)
+
+        XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, SwiftSyncTestCase.bigObjectCount)
+
+        XCTAssertGreaterThanOrEqual(callCount, 1)
+        let p1 = try XCTUnwrap(progress)
+        XCTAssertEqual(p1.progressEstimate, 1.0)
+        XCTAssertTrue(p1.isTransferComplete)
+        let initialCallCount = callCount
+        progress = nil
+
+        // Run a second time to upload more data and verify that the callback continues to be called
+        ex = expectation(description: "second download")
+        try populateRealm()
+
+        session.wait(for: .download) { e in
+            DispatchQueue.main.async { @MainActor in
+                XCTAssertNil(e)
+                ex.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 60.0)
+
+        XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2*SwiftSyncTestCase.bigObjectCount)
+
+        // We expect that the progress notifier is not called again since those objects were
+        // added after it has completed.
+        XCTAssertEqual(callCount, initialCallCount)
+        XCTAssertNil(progress)
+
+        token!.invalidate()
+    }
+
+    @MainActor
     func testStreamingDownloadNotifier() throws {
         try populateRealm()
 
@@ -1022,6 +1088,8 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         waitForExpectations(timeout: 60.0)
 
+        XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, SwiftSyncTestCase.bigObjectCount)
+
         XCTAssertGreaterThanOrEqual(callCount, 1)
         let p1 = try XCTUnwrap(progress)
         XCTAssertEqual(p1.progressEstimate, 1.0)
@@ -1041,6 +1109,9 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
 
         waitForExpectations(timeout: 60.0)
+
+        XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2*SwiftSyncTestCase.bigObjectCount)
+
         XCTAssertGreaterThan(callCount, initialCallCount)
         let p2 = try XCTUnwrap(progress)
         XCTAssertEqual(p2.progressEstimate, 1.0)

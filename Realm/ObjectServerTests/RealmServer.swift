@@ -898,6 +898,21 @@ public class RealmServer: NSObject {
                     ]
                 ]
             ]
+
+            // We only need to create the userData rule for .pbs since for .flx we
+            // have a default rule that covers all collections
+            let userDataRule: [String: Json] = [
+                "database": "test_data",
+                "collection": "UserData",
+                "roles": [[
+                    "name": "default",
+                    "apply_when": [:],
+                    "insert": true,
+                    "delete": true,
+                    "additional_fields": [:]
+                ]]
+            ]
+            _ = app.services[serviceId].rules.post(userDataRule)
         case .flx(let fields):
             serviceConfig = [
                 "flexible_sync": [
@@ -954,19 +969,6 @@ public class RealmServer: NSObject {
             """
         ], failOnError)
 
-        let rules = app.services[serviceId].rules
-        let userDataRule: [String: Json] = [
-            "database": "test_data",
-            "collection": "UserData",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]]
-        ]
-        _ = rules.post(userDataRule)
         app.customUserData.patch(on: group, [
             "mongo_service_id": serviceId,
             "enabled": true,
