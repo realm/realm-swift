@@ -441,7 +441,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testSyncRealmCacheLookup() {
-        var config = RLMDummyUser().configuration(partitionValue: "")
+        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
         config.objectTypes = []
         let realm = try! Realm(configuration: config)
 
@@ -453,7 +453,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testSyncRealmCreationCached() {
-        var config = RLMDummyUser().configuration(partitionValue: "")
+        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
         config.objectTypes = []
         var realm: Realm!
         dispatchSyncNewThread {
@@ -468,7 +468,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testSyncRealmMultithreadedCacheLookup() {
-        var config = RLMDummyUser().configuration(partitionValue: "")
+        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
         config.objectTypes = []
         var realm: Realm!
         dispatchSyncNewThread {
@@ -493,7 +493,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func testSyncRealmMultithreadedCreationCached() {
-        var config = RLMDummyUser().configuration(partitionValue: "")
+        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
         config.objectTypes = []
         var realm: Realm!
         dispatchSyncNewThread {
@@ -956,7 +956,7 @@ class SwiftSyncRealmPerformanceTests: TestCase {
     }
 
     var config: Realm.Configuration {
-        var config = RLMDummyUser().configuration(partitionValue: "")
+        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
         config.objectTypes = []
         return config
     }
@@ -1040,7 +1040,7 @@ class SwiftSyncRealmPerformanceTests: TestCase {
 
 class SwiftFlexibleSyncRealmPerformanceTests: SwiftSyncRealmPerformanceTests {
     override var config: Realm.Configuration {
-        var config = RLMDummyUser().flexibleSyncConfiguration()
+        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeFlexibleSync())
         config.objectTypes = []
         return config
     }

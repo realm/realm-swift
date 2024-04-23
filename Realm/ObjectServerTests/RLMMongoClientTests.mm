@@ -22,6 +22,7 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMUser_Private.hpp"
 
+#import <realm/object-store/sync/app_user.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/util/bson/bson.hpp>
 
@@ -735,8 +736,8 @@ static NSString *newPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
     s << RLMConvertRLMBSONToBson(partitionValue);
     // Intentionally not passing the correct partition value here as we (accidentally?)
     // don't use the filename generated from the partition value
-    realm::SyncConfig config(user._syncUser, "null");
-    return @(user._syncUser->sync_manager()->path_for_realm(config, s.str()).c_str());
+    realm::SyncConfig config(user.user, "null");
+    return @(user.user->path_for_realm(config, s.str()).c_str());
 }
 
 - (void)testSyncFilePaths {
@@ -763,10 +764,10 @@ static NSString *newPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
 }
 
 static NSString *oldPathForPartitionValue(RLMUser *user, NSString *oldName) {
-    realm::SyncConfig config(user._syncUser, "null");
+    realm::SyncConfig config(user.user, "null");
     return [NSString stringWithFormat:@"%@/%s%@.realm",
-            [@(user._syncUser->sync_manager()->path_for_realm(config).c_str()) stringByDeletingLastPathComponent],
-            user._syncUser->identity().c_str(), oldName];
+            [@(user.user->path_for_realm(config).c_str()) stringByDeletingLastPathComponent],
+            user.user->user_id().c_str(), oldName];
 }
 
 - (void)testLegacyFilePathsAreUsedIfFilesArePresent {

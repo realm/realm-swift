@@ -119,10 +119,6 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
     return nil;
 }
 
-- (std::weak_ptr<realm::app::App>)app {
-    return _syncManager->app();
-}
-
 - (NSDictionary<NSString *,NSString *> *)customRequestHeaders {
     std::lock_guard lock(_mutex);
     return _customRequestHeaders;
@@ -134,15 +130,13 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
         _customRequestHeaders = customRequestHeaders.copy;
     }
 
-    for (auto&& user : _syncManager->all_users()) {
-        for (auto&& session : user->all_sessions()) {
-            auto config = session->config();
-            config.custom_http_headers.clear();
-            for (NSString *key in customRequestHeaders) {
-                config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
-            }
-            session->update_configuration(std::move(config));
+    for (auto&& session : _syncManager->get_all_sessions()) {
+        auto config = session->config();
+        config.custom_http_headers.clear();
+        for (NSString *key in customRequestHeaders) {
+            config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
         }
+        session->update_configuration(std::move(config));
     }
 }
 
@@ -200,12 +194,10 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
 - (void)resetForTesting {
     _errorHandler = nil;
     _logger = nil;
-    _authorizationHeaderName = nil;
-    _customRequestHeaders = nil;
     _syncManager->tear_down_for_testing();
 }
 
-- (std::shared_ptr<realm::SyncManager>)syncManager {
+- (std::shared_ptr<realm::SyncManager> const&)syncManager {
     return _syncManager;
 }
 
@@ -222,6 +214,10 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
             config.custom_http_headers.emplace(key.UTF8String, header.UTF8String);
         }];
     }
+}
+
+- (bool)hasAnySessions {
+    return _syncManager->get_all_sessions().size() > 0;
 }
 @end
 

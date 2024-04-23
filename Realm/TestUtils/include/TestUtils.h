@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTestCase.h>
 
-@class RLMUser;
+#import <Realm/RLMUser.h>
 
 FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                                               __attribute__((noescape)) dispatch_block_t block,
@@ -28,9 +28,11 @@ FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                                               NSString *fileName,
                                                               NSUInteger lineNumber);
 
-// Return a fake sync user which can be used to create sync configurations
-// for tests which don't actually need to talk to the server
-FOUNDATION_EXTERN RLMUser *RLMDummyUser(void);
+
+@interface RLMRealmConfiguration (TestUser)
++ (RLMRealmConfiguration *_Nonnull)fakeSyncConfiguration;
++ (RLMRealmConfiguration *_Nonnull)fakeFlexibleSyncConfiguration;
+@end
 
 @interface NSUUID (RLMUUIDCompareTests)
 - (NSComparisonResult)compare:(NSUUID *)other;

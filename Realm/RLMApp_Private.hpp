@@ -26,8 +26,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 RLM_DIRECT_MEMBERS
 @interface RLMAppConfiguration ()
-- (const realm::app::App::Config&)config;
-- (const realm::SyncClientConfig&)clientConfig;
+- (const realm::app::AppConfig&)config;
 @end
 
 RLM_DIRECT_MEMBERS

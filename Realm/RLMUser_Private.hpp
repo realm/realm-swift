@@ -20,24 +20,26 @@
 
 #import "RLMSyncConfiguration.h"
 
-#import <realm/object-store/sync/sync_user.hpp>
 #import <realm/sync/config.hpp>
 
 @class RLMSyncConfiguration, RLMApp;
 
+namespace realm::app {
+class User;
+struct UserProfile;
+}
+
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @interface RLMUser ()
-- (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user app:(RLMApp *)app;
+@property (nonatomic, readonly) std::shared_ptr<realm::app::User> user;
+- (instancetype)initWithUser:(std::shared_ptr<realm::SyncUser>)user;
 - (std::string)pathForPartitionValue:(std::string const&)partitionValue;
 - (std::string)pathForFlexibleSync;
-- (std::shared_ptr<realm::SyncUser>)_syncUser;
-@property (weak, readonly) RLMApp *app;
-
 @end
 
 @interface RLMUserProfile ()
-- (instancetype)initWithUserProfile:(realm::SyncUserProfile)userProfile;
+- (instancetype)initWithUserProfile:(realm::app::UserProfile)userProfile;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

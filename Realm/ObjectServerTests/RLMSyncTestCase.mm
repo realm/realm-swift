@@ -22,19 +22,20 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
-#import "RLMRealm_Dynamic.h"
-#import "RLMRealm_Private.hpp"
-#import "RLMRealmConfiguration_Private.h"
-#import "RLMSyncManager_Private.hpp"
-#import "RLMSyncConfiguration_Private.h"
-#import "RLMUtil.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMChildProcessEnvironment.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmUtil.hpp"
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSyncConfiguration_Private.h"
+#import "RLMSyncManager_Private.hpp"
+#import "RLMUser_Private.hpp"
+#import "RLMUtil.hpp"
 
+#import <realm/object-store/sync/app_user.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
-#import <realm/object-store/sync/sync_user.hpp>
 
 #if TARGET_OS_OSX
 
@@ -53,10 +54,6 @@
 @interface RLMSyncSession ()
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
 - (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
-@end
-
-@interface RLMUser ()
-- (std::shared_ptr<realm::SyncUser>)_syncUser;
 @end
 
 @interface TestNetworkTransport : RLMNetworkTransport
@@ -421,9 +418,11 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)setInvalidTokensForUser:(RLMUser *)user {
-    auto token = self.badAccessToken.UTF8String;
-    user._syncUser->log_out();
-    user._syncUser->log_in(token, token);
+    realm::RealmJWT token(std::string_view(self.badAccessToken));
+    user.user->update_data_for_testing([&](auto& data) {
+        data.access_token = token;
+        data.refresh_token = token;
+    });
 }
 
 - (void)writeToPartition:(NSString *)partition block:(void (^)(RLMRealm *))block {
@@ -554,15 +553,13 @@ static bool s_opensApp;
             [user logOutWithCompletion:^(NSError *) {
                 [ex fulfill];
             }];
-
-            // Sessions are removed from the user asynchronously after a logout.
-            // We need to wait for this to happen before calling resetForTesting as
-            // that expects all sessions to be cleaned up first.
-            if (user.allSessions.count) {
-                [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
-                                         evaluatedWithObject:user handler:nil]];
-            }
         }];
+
+        // Sessions are removed from the user asynchronously after a logout.
+        // We need to wait for this to happen before calling resetForTesting as
+        // that expects all sessions to be cleaned up first.
+        [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"hasAnySessions = false"]
+                                 evaluatedWithObject:app.syncManager handler:nil]];
     }
 
     if (exs.count) {
@@ -578,8 +575,8 @@ static bool s_opensApp;
     [RLMApp resetAppCache];
 }
 
-- (NSString *)badAccessToken {
-    return @"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJl"
+- (const char *)badAccessToken {
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJl"
     "eHAiOjE1ODE1MDc3OTYsImlhdCI6MTU4MTUwNTk5NiwiaXNzIjoiN"
     "WU0M2RkY2M2MzZlZTEwNmVhYTEyYmRjIiwic3RpdGNoX2RldklkIjo"
     "iMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwic3RpdGNoX2RvbWFpbk"
