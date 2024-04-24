@@ -60,8 +60,8 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
                                collection:(id)collection
-                                classInfo:(RLMClassInfo&)info 
-                                parentInfo:(RLMClassInfo&)parentInfo
+                                classInfo:(RLMClassInfo&)info
+                               parentInfo:(RLMClassInfo&)parentInfo
                                  property:(RLMProperty *)property {
     self = [super init];
     if (self) {
@@ -87,7 +87,7 @@ static const int RLMEnumerationBufferSize = 16;
                                dictionary:(RLMManagedDictionary *)dictionary
                                 classInfo:(RLMClassInfo&)info
                                parentInfo:(RLMClassInfo&)parentInfo
-                                property:(RLMProperty *)property {
+                                 property:(RLMProperty *)property {
     self = [super init];
     if (self) {
         _info = &info;
@@ -163,8 +163,8 @@ static const int RLMEnumerationBufferSize = 16;
                 batchCount++;
             }
         } else {
-            RLMAccessorContext ctx = RLMAccessorContext(*_parentInfo, *_info);
-            ctx.currentProperty = _property;
+            // This is used by Dicitonary and List for nested collections.
+            RLMAccessorContext ctx = RLMAccessorContext(*_parentInfo, *_info, _property);
             for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
                 _strongBuffer[batchCount] = _results->get(ctx, index);
                 batchCount++;

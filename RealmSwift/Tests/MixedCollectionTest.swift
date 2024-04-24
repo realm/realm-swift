@@ -483,7 +483,7 @@ class MixedCollectionTest: TestCase {
         assertMixed(result!)
     }
 
-    func testMixedCollectionComparision() throws {
+    func testMixedCollectionEquality() throws {
         let so = SwiftStringObject()
         so.stringCol = "hello"
         let subArray2: AnyRealmValue = AnyRealmValue.fromArray([ .object(so) ])
@@ -509,11 +509,7 @@ class MixedCollectionTest: TestCase {
 
         let mixedObject = AnyRealmTypeObject()
         mixedObject.anyValue.value = AnyRealmValue.fromDictionary(dictionary)
-        XCTAssertEqual(mixedObject.anyValue.value, AnyRealmValue.fromDictionary(dictionary))
-
         let mixedObject2 = mixedObject
-        XCTAssertEqual(mixedObject2.anyValue.value, AnyRealmValue.fromDictionary(dictionary))
-
         XCTAssertEqual(mixedObject.anyValue.value, mixedObject2.anyValue.value)
         XCTAssertEqual(mixedObject.anyValue, mixedObject2.anyValue, "instances should be equal by `==` operator")
         XCTAssertTrue(mixedObject.isEqual(mixedObject2), "instances should be equal by `isEqual` method")

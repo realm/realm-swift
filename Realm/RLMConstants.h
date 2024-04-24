@@ -93,13 +93,45 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeObject = 7,
     /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#inverse-relationship) for more information. */
     RLMPropertyTypeLinkingObjects = 8,
+};
 
-#pragma mark - Collection types
+typedef RLM_CLOSED_ENUM(int32_t, RLMMixedValueType) {
+#pragma mark - Primitive types
+    /** Integers: `NSInteger`, `int`, `long`, `Int` (Swift) */
+    RLMMixedValueTypeInt    = 0,
+    /** Booleans: `BOOL`, `bool`, `Bool` (Swift) */
+    RLMMixedValueTypeBool   = 1,
+    /** Floating-point numbers: `float`, `Float` (Swift) */
+    RLMMixedValueTypeFloat  = 5,
+    /** Double-precision floating-point numbers: `double`, `Double` (Swift) */
+    RLMMixedValueTypeDouble = 6,
+    /** NSUUID, UUID */
+    RLMMixedValueTypeUUID   = 12,
+
+#pragma mark - Object types
+
+    /** Strings: `NSString`, `String` (Swift) */
+    RLMMixedValueTypeString = 2,
+    /** Binary data: `NSData` */
+    RLMMixedValueTypeData   = 3,
+    /** Any type: `id<RLMValue>`, `AnyRealmValue` (Swift) */
+    RLMMixedValueTypeAny    = 9,
+    /** Dates: `NSDate` */
+    RLMMixedValueTypeDate   = 4,
+    RLMMixedValueTypeObjectId = 10,
+    RLMMixedValueTypeDecimal128 = 11,
+
+#pragma mark - Linked object types
+
+    /** Realm model objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/) for more information. */
+    RLMMixedValueTypeObject = 7,
+    /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#inverse-relationship) for more information. */
+    RLMMixedValueTypeLinkingObjects = 8,
 
     /** Dictionary: `RLMDictionary`, `Map` (Swift) */
-    RLMPropertyTypeDictionary = 512,
+    RLMMixedValueTypeDictionary = 512,
     /** Set: `RLMArray`, `List` (Swift) */
-    RLMPropertyTypeList = 128
+    RLMMixedValueTypeList = 128,
 };
 
 #pragma mark - Notification Constants

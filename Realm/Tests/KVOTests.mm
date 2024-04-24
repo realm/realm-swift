@@ -506,14 +506,14 @@ public:
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
     XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);
-    
+
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context2]);
 
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col"]);
     XCTAssertThrows([obj removeObserver:self forKeyPath:@"int32Col"]);
-    
+
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context1]);
     XCTAssertNoThrow([obj addObserver:self forKeyPath:@"int32Col" options:0 context:context2]);
     XCTAssertNoThrow([obj removeObserver:self forKeyPath:@"int32Col" context:context1]);

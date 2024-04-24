@@ -485,7 +485,6 @@ public:
 
     void apply_predicate(NSPredicate *predicate, RLMObjectSchema *objectSchema);
 
-
     void apply_collection_operator_expression(KeyPath&& kp, id value, NSComparisonPredicate *pred);
     void apply_value_expression(KeyPath&& kp, id value, NSComparisonPredicate *pred);
     void apply_column_expression(KeyPath&& left, KeyPath&& right, NSComparisonPredicate *predicate);
@@ -567,11 +566,9 @@ public:
                                              const CollectionOperation& collectionOperation, R&& rhs,
                                              NSComparisonPredicateOptions comparisionOptions);
 
-
     CollectionOperation collection_operation_from_key_path(KeyPath&& kp);
     ColumnReference column_reference_from_key_path(KeyPath&& kp, bool isAggregate);
-
-
+    void get_path_elements(std::vector<PathElement> &paths, NSExpression *expression);
 private:
     Query& m_query;
     Group& m_group;
@@ -1132,9 +1129,6 @@ void QueryBuilder::do_add_constraint(RLMPropertyType type, NSPredicateOperatorTy
                                      column.resolve<W<Mixed>>(),
                                      value);
             });
-        case RLMPropertyTypeDictionary:
-        case RLMPropertyTypeList:
-            break;
     }
 }
 
@@ -1504,9 +1498,6 @@ void QueryBuilder::add_collection_operation_constraint(NSPredicateOperatorType o
                 case RLMPropertyTypeObject:
                 case RLMPropertyTypeLinkingObjects:
                     return add_numeric_constraint(type, operatorType, column.resolve<Link>().count(), rhsValue);
-                case RLMPropertyTypeDictionary:
-                case RLMPropertyTypeList:
-                    break;
             }
         }
         case CollectionOperation::Minimum:
@@ -1692,7 +1683,7 @@ void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpress
                                         NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
                                         NSExpression *right) {
     std::vector<PathElement> pathElements;
-    RLMGetPathElements(pathElements, functionExpression);
+    get_path_elements(pathElements, functionExpression);
 
     NSString *keyPath;
     NSExpression *keyPathExpression = functionExpression;
@@ -1861,6 +1852,34 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
                        @"Only support compound, comparison, and constant predicates");
     }
 }
+
+// For nested subscripts in NSPredicate like `anyCol[0]['key'] we need to iterate through the nested NSExpression to get the paths of the query.
+void QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExpression *expression) {
+    for (int i = 0; i < expression.arguments.count; i++) {
+        if ((expression.arguments.count > 1) && (expression.arguments[i].expressionType == NSFunctionExpressionType)) {
+            get_path_elements(paths, expression.arguments[0]);
+        } else {
+            if (expression.arguments[i].expressionType == NSConstantValueExpressionType) {
+                id value = [expression.arguments[i] constantValue];
+                if ([value isKindOfClass:[NSNumber class]]) {
+                    NSNumber *index = (NSNumber *)value;
+                    if (index) {
+                        paths.push_back(PathElement{[index intValue]});
+                    }
+                } else if ([value isKindOfClass:[NSString class]]) {
+                    NSString *key = (NSString *)value;
+                    if ([key isEqual:@"all"]) {
+                        paths.push_back(PathElement{});
+                        break;
+                    }
+                    if (key) {
+                        paths.push_back(PathElement{key.UTF8String});
+                    }
+                }
+            }
+        }
+    }
+}
 } // namespace
 
 realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *objectSchema,
@@ -1891,31 +1910,4 @@ RLMProperty *RLMValidatedProperty(RLMObjectSchema *desc, NSString *columnName) {
     RLMPrecondition(prop, @"Invalid property name",
                     @"Property '%@' not found in object of type '%@'", columnName, desc.className);
     return prop;
-}
-
-void RLMGetPathElements(std::vector<PathElement> &paths, NSExpression *expression) {
-    for (int i = 0; i < 2; i++) {
-        if ((expression.arguments.count > 1) && (expression.arguments[i].expressionType == NSFunctionExpressionType)) {
-            RLMGetPathElements(paths, expression.arguments[0]);
-        } else {
-            if (expression.arguments[i].expressionType == NSConstantValueExpressionType) {
-                id value = [expression.arguments[i] constantValue];
-                if ([value isKindOfClass:[NSNumber class]]) {
-                    NSNumber *index = (NSNumber *)value;
-                    if (index) {
-                        paths.push_back(PathElement{[index intValue]});
-                    }
-                } else if ([value isKindOfClass:[NSString class]]) {
-                    NSString *key = (NSString *)value;
-                    if ([key isEqual:@"all"]) {
-                        paths.push_back(PathElement{});
-                        break;
-                    }
-                    if (key) {
-                        paths.push_back(PathElement{key.UTF8String});
-                    }
-                }
-            }
-        }
-    }
 }

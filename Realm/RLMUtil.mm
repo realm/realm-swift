@@ -182,9 +182,6 @@ static BOOL validateValue(__unsafe_unretained id const value,
         case RLMPropertyTypeUUID:
             return [value isKindOfClass:[NSUUID class]]
                 || ([value isKindOfClass:[NSString class]] && realm::UUID::is_valid_string([value UTF8String]));
-        case RLMPropertyTypeDictionary:
-        case RLMPropertyTypeList:
-            REALM_UNREACHABLE();
     }
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
@@ -412,9 +409,9 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id const value,
     }
     
     switch ([v rlm_valueType]) {
-        case RLMPropertyTypeList:
+        case RLMMixedValueTypeList:
             return realm::Mixed(0, realm::CollectionType::List);
-        case RLMPropertyTypeDictionary:
+        case RLMMixedValueTypeDictionary:
             return realm::Mixed(0, realm::CollectionType::Dictionary);
         default:
             return RLMObjcToMixedPrimitives(v, realm, createPolicy);
@@ -424,7 +421,7 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id const value,
 realm::Mixed RLMObjcToMixedPrimitives(__unsafe_unretained id const value,
                                       __unsafe_unretained RLMRealm *const realm,
                                       realm::CreatePolicy createPolicy) {
-    RLMPropertyType type = [value rlm_valueType];
+    RLMMixedValueType type = [value rlm_valueType];
     return switch_on_type(static_cast<realm::PropertyType>(type), realm::util::overload{[&](realm::Obj*) {
         // The RLMObjectBase may be unmanaged and therefore has no RLMClassInfo attached.
         // So we fetch from the Realm instead.
@@ -478,13 +475,16 @@ id RLMMixedToObjc(realm::Mixed const& mixed,
         }
         case realm::type_UUID:
             return [[NSUUID alloc] initWithRealmUUID:mixed.get<realm::UUID>()];
-        case realm::type_Dictionary:
-            return [[RLMManagedDictionary alloc] initWithParent:obj property:property parentInfo:*classInfo];
-        case realm::type_List:
-            return [[RLMManagedArray alloc] initWithParent:obj property:property parentInfo:*classInfo];
-            break;
         default:
-            @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
+            if (mixed.is_type(realm::type_Dictionary)) {
+                return [[RLMManagedDictionary alloc] initWithParent:obj property:property parentInfo:*classInfo];
+            }
+            else if (mixed.is_type(realm::type_List)) {
+                return [[RLMManagedArray alloc] initWithParent:obj property:property parentInfo:*classInfo];
+            }
+            else {
+                @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
+            }
     }
 }
 

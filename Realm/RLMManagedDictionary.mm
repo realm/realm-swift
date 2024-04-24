@@ -250,8 +250,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 - (nullable id)objectForKey:(id)key {
     return translateErrors([&]() -> id {
         [self.realm verifyThread];
-        RLMAccessorContext context(*_ownerInfo, *_objectInfo);
-        context.currentProperty = _property;
+        RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
         if (auto value = _backingCollection.try_get_any(context.unbox<realm::StringData>(key))) {
             if (value->is_type(realm::type_Dictionary)) {
                 return [[RLMManagedDictionary alloc] initWithBackingCollection:_backingCollection.get_dictionary(context.unbox<realm::StringData>(key)) parentInfo:_ownerInfo property:_property];
@@ -270,8 +269,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 
 - (void)setObject:(id)obj forKey:(id)key {
     changeDictionary(self, ^{
-        RLMAccessorContext context(*_ownerInfo, *_objectInfo);
-        context.currentProperty = _property;
+        RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
         _backingCollection.insert(context, context.unbox<realm::StringData>(RLMDictionaryKey(self, key)),
                                   RLMDictionaryValue(self, obj));
     });
@@ -284,8 +282,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (void)removeObjectsForKeys:(NSArray *)keyArray {
-    RLMAccessorContext context(*_ownerInfo, *_objectInfo);
-    context.currentProperty = _property;
+    RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
     changeDictionary(self, [&] {
         for (id key in keyArray) {
             _backingCollection.try_erase(context.unbox<realm::StringData>(key));
@@ -295,15 +292,13 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 
 - (void)removeObjectForKey:(id)key {
     changeDictionary(self, ^{
-        RLMAccessorContext context(*_ownerInfo, *_objectInfo);
-        context.currentProperty = _property;
+        RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
         _backingCollection.try_erase(context.unbox<realm::StringData>(key));
     });
 }
 
 - (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key, id obj, BOOL *stop))block {
-    RLMAccessorContext context(*_ownerInfo, *_objectInfo);
-    context.currentProperty = _property;
+    RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
     BOOL stop = false;
     @autoreleasepool {
         for (auto&& [key, value] : _backingCollection) {
@@ -326,8 +321,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     }
 
     changeDictionary(self, ^{
-        RLMAccessorContext context(*_ownerInfo, *_objectInfo);
-        context.currentProperty = _property;
+        RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
         if (clear) {
             _backingCollection.remove_all();
         }
@@ -372,7 +366,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (id)minOfProperty:(NSString *)property {
-    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _property->_type, RLMCollectionTypeDictionary);
     auto value = translateErrors([&] {
         return _backingCollection.as_results().min(column);
     });
@@ -380,7 +374,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _property->_type, RLMCollectionTypeDictionary);
     auto value = translateErrors([&] {
         return _backingCollection.as_results().max(column);
     });
@@ -388,7 +382,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _property->_type, RLMCollectionTypeDictionary);
     auto value = translateErrors([&] {
         return _backingCollection.as_results().sum(column);
     });
@@ -396,7 +390,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    auto column = columnForProperty(property, _backingCollection, _objectInfo, _type, RLMCollectionTypeDictionary);
+    auto column = columnForProperty(property, _backingCollection, _objectInfo, _property->_type, RLMCollectionTypeDictionary);
     auto value = translateErrors([&] {
         return _backingCollection.as_results().average(column);
     });
@@ -404,8 +398,9 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (void)deleteObjectsFromRealm {
-    if (_type != RLMPropertyTypeObject) {
-        @throw RLMException(@"Cannot delete objects from RLMManagedDictionary<RLMString, %@%@>: only RLMObjects can be deleted.", RLMTypeToString(_type), _optional? @"?": @"");
+    auto type = _property->_type;
+    if (type != RLMPropertyTypeObject) {
+        @throw RLMException(@"Cannot delete objects from RLMManagedDictionary<RLMString, %@%@>: only RLMObjects can be deleted.", RLMTypeToString(type), _optional? @"?": @"");
     }
     // delete all target rows from the realm
     RLMObservationTracker tracker(_realm, true);
@@ -436,7 +431,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
-    if (_type != RLMPropertyTypeObject) {
+    if (_property->_type != RLMPropertyTypeObject) {
         @throw RLMException(@"Querying is currently only implemented for dictionaries of Realm Objects");
     }
     auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group);

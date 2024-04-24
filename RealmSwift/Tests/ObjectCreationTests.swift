@@ -198,7 +198,7 @@ class ObjectCreationTests: TestCase {
             return
         }
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false,
-            boolObjectListValues: [])
+                                               boolObjectListValues: [])
 
         // test realm properties are populated correctly
         XCTAssertEqual(object.realm!, realm)
@@ -221,7 +221,7 @@ class ObjectCreationTests: TestCase {
         try! realm.write {
             let object = realm.create(SwiftOptionalDefaultValuesObject.self)
             self.verifySwiftOptionalObjectWithDictionaryLiteral(object,
-                dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
+                                                                dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
         }
     }
 
@@ -1474,7 +1474,7 @@ class ObjectCreationTests: TestCase {
         case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
         case .objectId: return ["invalid", 123]
         case .decimal128: return ["invalid"]
-        case .any: return [List<String>()]
+        case .any: fatalError("not invalid")
         case .linkingObjects: fatalError("not supported")
         case .UUID: return ["invalid"]
         default:

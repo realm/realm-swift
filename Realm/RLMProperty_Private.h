@@ -56,10 +56,6 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
             return @"object id";
         case RLMPropertyTypeUUID:
             return @"uuid";
-        case RLMPropertyTypeDictionary:
-            return @"dictionary";
-        case RLMPropertyTypeList:
-            return @"array";
     }
     return @"Unknown";
 }

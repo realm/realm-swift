@@ -135,7 +135,7 @@ public:
     RLMAccessorContext(RLMObjectBase *parentObject, const realm::Property *property = nullptr);
     RLMAccessorContext(RLMObjectBase *parentObject, realm::ColKey);
     RLMAccessorContext(RLMClassInfo& info);
-    RLMAccessorContext(RLMClassInfo& parentInfo, RLMClassInfo& info);
+    RLMAccessorContext(RLMClassInfo& parentInfo, RLMClassInfo& info, RLMProperty *property);
 
     // The property currently being accessed; needed for KVO things for boxing
     // List and Results

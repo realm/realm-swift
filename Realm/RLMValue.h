@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Realm/RLMArray.h>
 #import <Realm/RLMConstants.h>
 #import <Realm/RLMDecimal128.h>
+#import <Realm/RLMDictionary.h>
 #import <Realm/RLMObject.h>
 #import <Realm/RLMObjectBase.h>
 #import <Realm/RLMObjectId.h>
 #import <Realm/RLMProperty.h>
-#import <Realm/RLMDictionary.h>
-#import <Realm/RLMArray.h>
 
 #pragma mark RLMValue
 
@@ -62,7 +62,7 @@
 @protocol RLMValue
 
 /// Describes the type of property stored.
-@property (readonly) RLMPropertyType rlm_valueType;
+@property (readonly) RLMMixedValueType rlm_valueType;
 
 @end
 

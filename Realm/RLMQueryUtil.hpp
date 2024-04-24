@@ -24,7 +24,6 @@ namespace realm {
     class Group;
     class Query;
     class SortDescriptor;
-    struct PathElement; 
 }
 
 @class RLMObjectSchema, RLMProperty, RLMSchema, RLMSortDescriptor;
@@ -38,4 +37,3 @@ realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *object
 
 // return property - throw for invalid column name
 RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *columnName);
-void RLMGetPathElements(std::vector<realm::PathElement> &paths, NSExpression *expression);

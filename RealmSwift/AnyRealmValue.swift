@@ -21,7 +21,7 @@ import Foundation
 import Realm
 
 /// A enum for storing and retrieving values associated with an `AnyRealmValue` property.
-/// `AnyRealmValue` can be as well a collection (List, Dictionary) of `AnyRealmValue`, meaning that you can have
+/// `AnyRealmValue` can also store a collection (List, Dictionary) of `AnyRealmValue`, meaning that you can have
 /// nested collections inside a `AnyRealmValue`.
 public enum AnyRealmValue: Hashable {
     /// Represents `nil`
@@ -197,9 +197,7 @@ public enum AnyRealmValue: Hashable {
     /// - Returns: Returns a `AnyRealmValue` storing a `List`.
     public static func fromArray(_ array: Array<AnyRealmValue>) -> AnyRealmValue {
         let list = List<AnyRealmValue>()
-        array.forEach { item in
-            list.append(item)
-        }
+        list.append(objectsIn: array)
         return AnyRealmValue.list(list)
     }
 }

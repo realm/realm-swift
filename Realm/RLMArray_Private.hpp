@@ -35,10 +35,9 @@ class RLMObservationInfo;
 @interface RLMArray () {
 @protected
     NSString *_objectClassName;
-    RLMPropertyType _type;
     BOOL _optional;
 @public
-    // The name of the property which this RLMArray represents
+    // The property which this RLMArray represents
     RLMProperty *_property;
     __weak RLMObjectBase *_parentObject;
 }

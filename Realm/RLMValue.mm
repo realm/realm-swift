@@ -23,8 +23,8 @@
 
 @implementation NSData (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeData;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeData;
 }
 
 @end
@@ -33,8 +33,8 @@
 
 @implementation NSDate (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeDate;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeDate;
 }
 
 @end
@@ -43,18 +43,18 @@
 
 @implementation NSNumber (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
+- (RLMMixedValueType)rlm_valueType {
     if ([self objCType][0] == 'c' && (self.intValue == 0 || self.intValue == 1)) {
-        return RLMPropertyTypeBool;
+        return RLMMixedValueTypeBool;
     }
     else if (numberIsInteger(self)) {
-        return RLMPropertyTypeInt;
+        return RLMMixedValueTypeInt;
     }
     else if (*@encode(float) == [self objCType][0]) {
-        return RLMPropertyTypeFloat;
+        return RLMMixedValueTypeFloat;
     }
     else if (*@encode(double) == [self objCType][0]) {
-        return RLMPropertyTypeDouble;
+        return RLMMixedValueTypeDouble;
     }
     else {
         @throw RLMException(@"Unknown numeric type on type RLMValue.");
@@ -67,8 +67,8 @@
 
 @implementation NSNull (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeAny;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeAny;
 }
 
 @end
@@ -77,8 +77,8 @@
 
 @implementation NSString (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeString;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeString;
 }
 
 @end
@@ -87,8 +87,8 @@
 
 @implementation NSUUID (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeUUID;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeUUID;
 }
 
 @end
@@ -97,8 +97,8 @@
 
 @implementation RLMDecimal128 (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeDecimal128;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeDecimal128;
 }
 
 @end
@@ -107,8 +107,8 @@
 
 @implementation RLMObjectBase (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeObject;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeObject;
 }
 
 @end
@@ -117,8 +117,8 @@
 
 @implementation RLMObjectId (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeObjectId;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeObjectId;
 }
 
 @end
@@ -127,16 +127,16 @@
 
 @implementation NSDictionary (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeDictionary;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeDictionary;
 }
 
 @end
 
 @implementation RLMDictionary (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeDictionary;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeDictionary;
 }
 
 @end
@@ -145,16 +145,16 @@
 
 @implementation NSArray (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeList;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeList;
 }
 
 @end
 
 @implementation RLMArray (RLMValue)
 
-- (RLMPropertyType)rlm_valueType {
-    return RLMPropertyTypeList;
+- (RLMMixedValueType)rlm_valueType {
+    return RLMMixedValueTypeList;
 }
 
 @end

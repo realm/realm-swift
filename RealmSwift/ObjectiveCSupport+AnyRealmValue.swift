@@ -20,6 +20,17 @@
 import Foundation
 import Realm
 
+/// :nodoc:
+extension RLMDictionary: RLMValue {
+    /// :nodoc:
+    public var rlm_valueType: RLMMixedValueType { .dictionary }
+}
+/// :nodoc:
+extension RLMArray: RLMValue {
+    /// :nodoc:
+    public var rlm_valueType: RLMMixedValueType { .list }
+}
+
 public extension ObjectiveCSupport {
 
     /// Convert an object boxed in `AnyRealmValue` to its
@@ -51,9 +62,11 @@ public extension ObjectiveCSupport {
         case let .object(o):
             return o
         case let .dictionary(d):
-            return d._rlmObjcValue as? RLMDictionary<AnyObject, AnyObject>
+            let rlmDictionary = Map<String, AnyRealmValue>._rlmFromObjc(d)?.rlmDictionary
+            return rlmDictionary
         case let .list(l):
-            return l._rlmObjcValue as? RLMArray<AnyObject>
+            let rlmArray = List<AnyRealmValue>._rlmFromObjc(l)?.rlmArray
+            return rlmArray
         default:
             return nil
         }
@@ -69,68 +82,68 @@ public extension ObjectiveCSupport {
         }
 
         switch value.rlm_valueType {
-        case RLMPropertyType.int:
+        case RLMMixedValueType.int:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .int(val.intValue)
-        case RLMPropertyType.bool:
+        case RLMMixedValueType.bool:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .bool(val.boolValue)
-        case RLMPropertyType.float:
+        case RLMMixedValueType.float:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .float(val.floatValue)
-        case RLMPropertyType.double:
+        case RLMMixedValueType.double:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .double(val.doubleValue)
-        case RLMPropertyType.string:
+        case RLMMixedValueType.string:
             guard let val = value as? String else {
                 return .none
             }
             return .string(val)
-        case RLMPropertyType.data:
+        case RLMMixedValueType.data:
             guard let val = value as? Data else {
                 return .none
             }
             return .data(val)
-        case RLMPropertyType.date:
+        case RLMMixedValueType.date:
             guard let val = value as? Date else {
                 return .none
             }
             return .date(val)
-        case RLMPropertyType.objectId:
+        case RLMMixedValueType.objectId:
             guard let val = value as? ObjectId else {
                 return .none
             }
             return .objectId(val)
-        case RLMPropertyType.decimal128:
+        case RLMMixedValueType.decimal128:
             guard let val = value as? Decimal128 else {
                 return .none
             }
             return .decimal128(val)
-        case RLMPropertyType.UUID:
+        case RLMMixedValueType.UUID:
             guard let val = value as? UUID else {
                 return .none
             }
             return .uuid(val)
-        case RLMPropertyType.object:
+        case RLMMixedValueType.object:
             guard let val = value as? Object else {
                 return .none
             }
             return .object(val)
-        case RLMPropertyType.dictionary:
+        case RLMMixedValueType.dictionary:
             guard let val = value as? RLMDictionary<AnyObject, AnyObject> else {
                 return .none
             }
             let d = Map<String, AnyRealmValue>(objc: val)
             return AnyRealmValue.dictionary(d)
-        case RLMPropertyType.list:
+        case RLMMixedValueType.list:
             guard let val = value as? RLMArray<RLMValue> else {
                 return .none
             }

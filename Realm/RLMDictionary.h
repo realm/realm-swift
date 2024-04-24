@@ -17,11 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMCollection.h>
-#import <Realm/RLMValue.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
-@protocol RLMValue;
 @class RLMObject, RLMResults<RLMObjectType>, RLMDictionaryChange;
 
 /**
@@ -51,7 +49,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  key-value observing compliant when the `RLMDictionary` is attached to a managed
  `RLMObject` (`RLMDictionary`s on unmanaged `RLMObject`s will never become invalidated).
  */
-@interface RLMDictionary<RLMKeyType, RLMObjectType>: NSObject<RLMCollection, RLMValue>
+@interface RLMDictionary<RLMKeyType, RLMObjectType>: NSObject<RLMCollection>
 
 #pragma mark - Properties
 
