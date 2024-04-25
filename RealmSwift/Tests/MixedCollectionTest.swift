@@ -844,4 +844,76 @@ class MixedCollectionTest: TestCase {
         // TODO: Self-assignment - this doesn't work due to https://github.com/realm/realm-core/issues/7422
 //        XCTAssertEqual(mixedObject.anyValue.value.dictionaryValue?["key2"]?.listValue?[0], .string("hello"))
     }
+
+    func testEnumerationNestedCollection() throws {
+        var count = 0
+        var accessNestedValue = false
+        func iterateNestedCollectionKeyValue(_ value: AnyRealmValue) {
+            count+=1
+            switch value {
+            case .list(let l):
+                for item in l {
+                    iterateNestedCollectionKeyValue(item)
+                }
+            case .dictionary(let d):
+                for (_, val) in d.asKeyValueSequence() {
+                    iterateNestedCollectionKeyValue(val)
+                }
+            default:
+                accessNestedValue = true
+            }
+        }
+
+        let so = SwiftStringObject()
+        so.stringCol = "hello"
+
+        let subArray2: AnyRealmValue = AnyRealmValue.fromArray([ .object(so) ])
+        let subDict2: AnyRealmValue = AnyRealmValue.fromDictionary([ "key1": subArray2 ])
+        let subArray3: AnyRealmValue = AnyRealmValue.fromArray([ subDict2 ])
+        let subDict3: AnyRealmValue = AnyRealmValue.fromDictionary([ "key2": subArray3 ])
+        let subArray4: AnyRealmValue = AnyRealmValue.fromArray([ subDict3 ])
+        let subDict4: AnyRealmValue = AnyRealmValue.fromDictionary([ "key3": subArray4 ])
+        let subArray5: AnyRealmValue = AnyRealmValue.fromArray([ subDict4 ])
+        let subDict5: AnyRealmValue = AnyRealmValue.fromDictionary([ "key4": subArray5 ])
+        let subArray6: AnyRealmValue = AnyRealmValue.fromArray([ subDict5 ])
+        let subDict6: AnyRealmValue = AnyRealmValue.fromDictionary([ "key5": subArray6 ])
+        let dictionary: Dictionary<String, AnyRealmValue> = [
+            "key0": subDict6,
+        ]
+
+        let o = AnyRealmTypeObject()
+        o.anyValue.value = AnyRealmValue.fromDictionary(dictionary)
+
+        let realm = realmWithTestPath()
+        try realm.write {
+            realm.add(o)
+        }
+
+        iterateNestedCollectionKeyValue(o.anyValue.value)
+        XCTAssertEqual(count, 12)
+        XCTAssertTrue(accessNestedValue)
+
+        var countValue = 0
+        var accessNestedValueValue = false
+        func iterateNestedCollectionValue(_ value: AnyRealmValue) {
+            countValue+=1
+            switch value {
+            case .list(let l):
+                for item in l {
+                    iterateNestedCollectionValue(item)
+                }
+            case .dictionary(let d):
+                for (val) in d {
+                    iterateNestedCollectionValue(val.value)
+                }
+            default:
+                accessNestedValueValue = true
+            }
+        }
+
+        iterateNestedCollectionValue(o.anyValue.value)
+        XCTAssertEqual(countValue, 12)
+        XCTAssertTrue(accessNestedValueValue)
+
+    }
 }

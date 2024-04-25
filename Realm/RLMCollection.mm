@@ -60,14 +60,14 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
                                collection:(id)collection
-                                classInfo:(RLMClassInfo&)info
-                               parentInfo:(RLMClassInfo&)parentInfo
+                                classInfo:(RLMClassInfo *)info
+                               parentInfo:(RLMClassInfo *)parentInfo
                                  property:(RLMProperty *)property {
     self = [super init];
     if (self) {
-        _info = &info;
+        _info = info;
         _realm = _info->realm;
-        _parentInfo = &parentInfo;
+        _parentInfo = parentInfo;
         _property = property;
 
         if (_realm.inWriteTransaction) {
@@ -85,14 +85,14 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithBackingDictionary:(realm::object_store::Dictionary const&)backingDictionary
                                dictionary:(RLMManagedDictionary *)dictionary
-                                classInfo:(RLMClassInfo&)info
-                               parentInfo:(RLMClassInfo&)parentInfo
+                                classInfo:(RLMClassInfo *)info
+                               parentInfo:(RLMClassInfo *)parentInfo
                                  property:(RLMProperty *)property {
     self = [super init];
     if (self) {
-        _info = &info;
+        _info = info;
         _realm = _info->realm;
-        _parentInfo = &parentInfo;
+        _parentInfo = parentInfo;
         _property = property;
 
         if (_realm.inWriteTransaction) {

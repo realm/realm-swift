@@ -253,10 +253,10 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
         RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
         if (auto value = _backingCollection.try_get_any(context.unbox<realm::StringData>(key))) {
             if (value->is_type(realm::type_Dictionary)) {
-                return [[RLMManagedDictionary alloc] initWithBackingCollection:_backingCollection.get_dictionary(context.unbox<realm::StringData>(key)) parentInfo:_ownerInfo property:_property];
+                return context.box(_backingCollection.get_dictionary(context.unbox<realm::StringData>(key)));
             }
             else if (value->is_type(realm::type_List)) {
-                return [[RLMManagedArray alloc] initWithBackingCollection:_backingCollection.get_list(context.unbox<realm::StringData>(key)) parentInfo:_ownerInfo property:_property];
+                return context.box(_backingCollection.get_list(context.unbox<realm::StringData>(key)));
             }
             else {
                 return context.box(*value);
@@ -302,7 +302,17 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     BOOL stop = false;
     @autoreleasepool {
         for (auto&& [key, value] : _backingCollection) {
-            block(context.box(key), [self objectForKey:context.box(key)], &stop);
+            id nestedValue;
+            if (value.is_type(realm::type_Dictionary)) {
+                nestedValue = context.box(_backingCollection.get_dictionary(key.get_string()));
+            }
+            else if (value.is_type(realm::type_List)) {
+                nestedValue = context.box(_backingCollection.get_list(key.get_string()));
+            }
+            else {
+                nestedValue = context.box(value);
+            }
+            block(context.box(key), nestedValue, &stop);
             if (stop) {
                 break;
             }
@@ -459,8 +469,8 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     return translateErrors([&] {
         return [[RLMFastEnumerator alloc] initWithBackingDictionary:_backingCollection
                                                          dictionary:self
-                                                          classInfo:*_objectInfo
-                                                         parentInfo:*_ownerInfo
+                                                          classInfo:_objectInfo
+                                                         parentInfo:_ownerInfo
                                                            property:_property
         ];
     });

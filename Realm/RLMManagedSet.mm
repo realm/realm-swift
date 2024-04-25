@@ -482,8 +482,8 @@ static void ensureInWriteTransaction(NSString *message, RLMManagedSet *set, RLMM
     return translateErrors([&] {
         return [[RLMFastEnumerator alloc] initWithBackingCollection:_backingSet
                                                          collection:self
-                                                          classInfo:*_objectInfo
-                                                         parentInfo:*_ownerInfo
+                                                          classInfo:_objectInfo
+                                                         parentInfo:_ownerInfo
                                                            property:_property];
     });
 }

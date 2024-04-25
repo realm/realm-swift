@@ -199,16 +199,16 @@ static void changeArray(__unsafe_unretained RLMManagedArray *const ar, NSKeyValu
 
 - (id)objectAtIndex:(NSUInteger)index {
     return translateErrors([&]() -> id {
-        realm::Mixed mixed = _backingList.get_any(index);
-        if (mixed.is_type(realm::type_Dictionary)) {
-            return [[RLMManagedDictionary alloc] initWithBackingCollection:_backingList.get_dictionary(index) parentInfo:_ownerInfo property:_property];
+        realm::Mixed value = _backingList.get_any(index);
+        RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
+        if (value.is_type(realm::type_Dictionary)) {
+            return context.box(_backingList.get_dictionary(index));
         }
-        else if (mixed.is_type(realm::type_List)) {
-            return [[RLMManagedArray alloc] initWithBackingCollection:_backingList.get_list(index) parentInfo:_ownerInfo property:_property];
+        else if (value.is_type(realm::type_List)) {
+            return context.box(_backingList.get_list(index));
         }
         else {
-            RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
-            return _backingList.get(context, index);
+            return context.box(value);
         }
     });
 }
@@ -494,8 +494,8 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     return translateErrors([&] {
         return [[RLMFastEnumerator alloc] initWithBackingCollection:_backingList
                                                          collection:self
-                                                          classInfo:*_objectInfo
-                                                         parentInfo:*_ownerInfo
+                                                          classInfo:_objectInfo
+                                                         parentInfo:_ownerInfo
                                                            property:_property];
     });
 }

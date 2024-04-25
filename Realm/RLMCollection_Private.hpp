@@ -63,14 +63,14 @@ RLM_DIRECT_MEMBERS
 @interface RLMFastEnumerator : NSObject
 - (instancetype)initWithBackingCollection:(realm::object_store::Collection const&)backingCollection
                                collection:(id)collection
-                                classInfo:(RLMClassInfo&)info
-                               parentInfo:(RLMClassInfo&)parentInfo
+                                classInfo:(RLMClassInfo *)info
+                               parentInfo:(RLMClassInfo *)parentInfo
                                  property:(RLMProperty *)property;
 
 - (instancetype)initWithBackingDictionary:(realm::object_store::Dictionary const&)backingDictionary
                                dictionary:(RLMManagedDictionary *)dictionary
-                                classInfo:(RLMClassInfo&)info
-                               parentInfo:(RLMClassInfo&)parentInfo
+                                classInfo:(RLMClassInfo *)info
+                               parentInfo:(RLMClassInfo *)parentInfo
                                  property:(RLMProperty *)property;
 
 - (instancetype)initWithResults:(realm::Results&)results
