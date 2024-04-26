@@ -23,8 +23,12 @@
 
 @implementation NSData (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeData;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeData;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeData;
 }
 
 @end
@@ -33,8 +37,12 @@
 
 @implementation NSDate (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeDate;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeDate;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeDate;
 }
 
 @end
@@ -43,22 +51,29 @@
 
 @implementation NSNumber (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
+- (RLMPropertyType)rlm_valueType {
     if ([self objCType][0] == 'c' && (self.intValue == 0 || self.intValue == 1)) {
-        return RLMMixedValueTypeBool;
+        return RLMPropertyTypeBool;
     }
     else if (numberIsInteger(self)) {
-        return RLMMixedValueTypeInt;
+        return RLMPropertyTypeInt;
     }
     else if (*@encode(float) == [self objCType][0]) {
-        return RLMMixedValueTypeFloat;
+        return RLMPropertyTypeFloat;
     }
     else if (*@encode(double) == [self objCType][0]) {
-        return RLMMixedValueTypeDouble;
+        return RLMPropertyTypeDouble;
     }
     else {
         @throw RLMException(@"Unknown numeric type on type RLMValue.");
     }
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    return (RLMAnyValueType)self.rlm_valueType;
+#pragma clang diagnostic pop
 }
 
 @end
@@ -67,8 +82,12 @@
 
 @implementation NSNull (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeAny;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeAny;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeAny;
 }
 
 @end
@@ -77,8 +96,12 @@
 
 @implementation NSString (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeString;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeString;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeString;
 }
 
 @end
@@ -87,8 +110,12 @@
 
 @implementation NSUUID (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeUUID;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeUUID;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeUUID;
 }
 
 @end
@@ -97,8 +124,12 @@
 
 @implementation RLMDecimal128 (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeDecimal128;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeDecimal128;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeDecimal128;
 }
 
 @end
@@ -107,8 +138,12 @@
 
 @implementation RLMObjectBase (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeObject;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeObject;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeObject;
 }
 
 @end
@@ -117,8 +152,12 @@
 
 @implementation RLMObjectId (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeObjectId;
+- (RLMPropertyType)rlm_valueType {
+    return RLMPropertyTypeObjectId;
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeObjectId;
 }
 
 @end
@@ -127,16 +166,24 @@
 
 @implementation NSDictionary (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeDictionary;
+- (RLMPropertyType)rlm_valueType {
+    REALM_UNREACHABLE();
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeDictionary;
 }
 
 @end
 
 @implementation RLMDictionary (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeDictionary;
+- (RLMPropertyType)rlm_valueType {
+    REALM_UNREACHABLE();
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeDictionary;
 }
 
 @end
@@ -145,16 +192,24 @@
 
 @implementation NSArray (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeList;
+- (RLMPropertyType)rlm_valueType {
+    REALM_UNREACHABLE();
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeList;
 }
 
 @end
 
 @implementation RLMArray (RLMValue)
 
-- (RLMMixedValueType)rlm_valueType {
-    return RLMMixedValueTypeList;
+- (RLMPropertyType)rlm_valueType {
+    REALM_UNREACHABLE();
+}
+
+- (RLMAnyValueType)rlm_anyValueType {
+    return RLMAnyValueTypeList;
 }
 
 @end

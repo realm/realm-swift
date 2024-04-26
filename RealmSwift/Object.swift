@@ -758,8 +758,6 @@ public final class DynamicObject: Object {
             return array.isOptional ? List<ObjectId?>(collection: array) : List<ObjectId>(collection: array)
         case .object:
             return List<DynamicObject>(collection: array)
-        default:
-            fatalError()
         }
     }
 

@@ -569,6 +569,7 @@ public:
     CollectionOperation collection_operation_from_key_path(KeyPath&& kp);
     ColumnReference column_reference_from_key_path(KeyPath&& kp, bool isAggregate);
     void get_path_elements(std::vector<PathElement> &paths, NSExpression *expression);
+
 private:
     Query& m_query;
     Group& m_group;

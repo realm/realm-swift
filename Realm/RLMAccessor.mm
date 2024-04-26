@@ -269,11 +269,10 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     setValueOrNull<realm::UUID>(obj, key, value);
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key, __unsafe_unretained id<RLMValue> const value) {
+void setValue(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const property, __unsafe_unretained id<RLMValue> const value) {
     realm::Object o(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext ctx(obj);
-    RLMProperty *property = obj->_info->propertyForTableColumn(key);
-    o.set_property_value(ctx, getProperty(obj, property).name, value ?: NSNull.null);
+    o.set_property_value(ctx, getProperty(obj, property), value ?: NSNull.null);
 }
 
 RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const obj,
@@ -407,7 +406,7 @@ template<>
 void kvoSetValue<id<RLMValue>>(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index, id<RLMValue> value) {
     RLMVerifyInWriteTransaction(obj);
     auto& prop = getProperty(obj, index);
-    setValue(obj, prop.column_key, static_cast<id<RLMValue>>(value));
+    setValue(obj, obj->_info->propertyForTableColumn(prop.column_key), static_cast<id<RLMValue>>(value));
 }
 
 template<typename ArgType, typename StorageType=ArgType>

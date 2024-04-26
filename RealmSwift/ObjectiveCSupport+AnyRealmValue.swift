@@ -23,12 +23,16 @@ import Realm
 /// :nodoc:
 extension RLMDictionary: RLMValue {
     /// :nodoc:
-    public var rlm_valueType: RLMMixedValueType { .dictionary }
+    public var rlm_anyValueType: RLMAnyValueType { .dictionary }
+    /// :nodoc:
+    public var rlm_valueType: RLMAnyValueType { fatalError("Unreachable, this should use `rlm_anyValueType`") }
 }
 /// :nodoc:
 extension RLMArray: RLMValue {
     /// :nodoc:
-    public var rlm_valueType: RLMMixedValueType { .list }
+    public var rlm_anyValueType: RLMAnyValueType { .list }
+    /// :nodoc:
+    public var rlm_valueType: RLMAnyValueType { fatalError("Unreachable, this should use `rlm_anyValueType`") }
 }
 
 public extension ObjectiveCSupport {
@@ -81,69 +85,69 @@ public extension ObjectiveCSupport {
             return .none
         }
 
-        switch value.rlm_valueType {
-        case RLMMixedValueType.int:
+        switch value.rlm_anyValueType {
+        case RLMAnyValueType.int:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .int(val.intValue)
-        case RLMMixedValueType.bool:
+        case RLMAnyValueType.bool:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .bool(val.boolValue)
-        case RLMMixedValueType.float:
+        case RLMAnyValueType.float:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .float(val.floatValue)
-        case RLMMixedValueType.double:
+        case RLMAnyValueType.double:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .double(val.doubleValue)
-        case RLMMixedValueType.string:
+        case RLMAnyValueType.string:
             guard let val = value as? String else {
                 return .none
             }
             return .string(val)
-        case RLMMixedValueType.data:
+        case RLMAnyValueType.data:
             guard let val = value as? Data else {
                 return .none
             }
             return .data(val)
-        case RLMMixedValueType.date:
+        case RLMAnyValueType.date:
             guard let val = value as? Date else {
                 return .none
             }
             return .date(val)
-        case RLMMixedValueType.objectId:
+        case RLMAnyValueType.objectId:
             guard let val = value as? ObjectId else {
                 return .none
             }
             return .objectId(val)
-        case RLMMixedValueType.decimal128:
+        case RLMAnyValueType.decimal128:
             guard let val = value as? Decimal128 else {
                 return .none
             }
             return .decimal128(val)
-        case RLMMixedValueType.UUID:
+        case RLMAnyValueType.UUID:
             guard let val = value as? UUID else {
                 return .none
             }
             return .uuid(val)
-        case RLMMixedValueType.object:
+        case RLMAnyValueType.object:
             guard let val = value as? Object else {
                 return .none
             }
             return .object(val)
-        case RLMMixedValueType.dictionary:
+        case RLMAnyValueType.dictionary:
             guard let val = value as? RLMDictionary<AnyObject, AnyObject> else {
                 return .none
             }
             let d = Map<String, AnyRealmValue>(objc: val)
             return AnyRealmValue.dictionary(d)
-        case RLMMixedValueType.list:
+        case RLMAnyValueType.list:
             guard let val = value as? RLMArray<RLMValue> else {
                 return .none
             }

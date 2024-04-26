@@ -408,10 +408,10 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id const value,
         REALM_ASSERT([v conformsToProtocol:@protocol(RLMValue)]);
     }
     
-    switch ([v rlm_valueType]) {
-        case RLMMixedValueTypeList:
+    switch ([v rlm_anyValueType]) {
+        case RLMAnyValueTypeList:
             return realm::Mixed(0, realm::CollectionType::List);
-        case RLMMixedValueTypeDictionary:
+        case RLMAnyValueTypeDictionary:
             return realm::Mixed(0, realm::CollectionType::Dictionary);
         default:
             return RLMObjcToMixedPrimitives(v, realm, createPolicy);
@@ -421,7 +421,7 @@ realm::Mixed RLMObjcToMixed(__unsafe_unretained id const value,
 realm::Mixed RLMObjcToMixedPrimitives(__unsafe_unretained id const value,
                                       __unsafe_unretained RLMRealm *const realm,
                                       realm::CreatePolicy createPolicy) {
-    RLMMixedValueType type = [value rlm_valueType];
+    RLMAnyValueType type = [value rlm_anyValueType];
     return switch_on_type(static_cast<realm::PropertyType>(type), realm::util::overload{[&](realm::Obj*) {
         // The RLMObjectBase may be unmanaged and therefore has no RLMClassInfo attached.
         // So we fetch from the Realm instead.

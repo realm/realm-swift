@@ -781,7 +781,7 @@ public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftColle
 
 extension Map: Hashable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(self))
+        hasher.combine(rlmDictionary.hashValue)
     }
 }
 

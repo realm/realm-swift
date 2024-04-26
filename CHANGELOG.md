@@ -104,7 +104,7 @@ store. Xcode 15.1 is now the minimum supported version.
   try realm.write {
     let obj = MixedObject()
     obj.anyValue = AnyRealmValue.fromArray(list)
-    realm.add(o)
+    realm.add(obj)
   }
   ```
 * Added new operators to Swift's Query API for supporting querying nested collections.
@@ -147,6 +147,10 @@ store. Xcode 15.1 is now the minimum supported version.
 * The reported download progress for flexible sync Realms was incorrect. It is now replaced by a
   progress estimate, which is derived by the server based on historical data and other heuristics.
   ([#8476](https://github.com/realm/realm-swift/issues/8476))
+
+### Deprecations
+
+* `rlm_valueType` is deprecated in favour of `rlm_anyValueType` which now includes collections (List and Dictionary).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

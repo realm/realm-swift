@@ -200,4 +200,15 @@ public enum AnyRealmValue: Hashable {
         list.append(objectsIn: array)
         return AnyRealmValue.list(list)
     }
+
+//    public func hash(into hasher: inout Hasher) {
+//        switch self {
+//        case .dictionary(let d):
+//            if
+//        case .list(let l):
+//            break
+//        default:
+//            break
+//        }
+//    }
 }

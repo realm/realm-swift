@@ -365,7 +365,7 @@ extension List: MutableCollection {
 
 extension List: Hashable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(ObjectIdentifier(self))
+        hasher.combine(rlmArray.hashValue)
     }
 }
 
