@@ -414,6 +414,24 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     return [[RLMEmailPasswordAuth alloc] initWithApp:_app];
 }
 
+- (NSString *)baseUrl {
+    return getOptionalString(_app->get_base_url()) ?: RLMStringViewToNSString(_app->default_base_url());
+}
+
+- (void)updateBaseUrl:(NSString *)baseURL
+           completion:(RLMOptionalErrorBlock)completionHandler {
+    auto completion = ^(std::optional<app::AppError> error) {
+        if (error) {
+            return completionHandler(makeError(*error));
+        }
+
+        completionHandler(nil);
+    };
+    return RLMTranslateError([&] {
+        return _app->update_base_url(baseURL.UTF8String, completion);
+    });
+}
+
 - (void)loginWithCredential:(RLMCredentials *)credentials
                  completion:(RLMUserCompletionBlock)completionHandler {
     auto completion = ^(std::shared_ptr<app::User> user, std::optional<app::AppError> error) {

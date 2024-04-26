@@ -78,6 +78,15 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
         }
     }
 
+    func testUpdateBaseUrl() async throws {
+        let app = App(id: appId)
+        XCTAssertNotNil(app.baseURL)
+        XCTAssertEqual(app.baseURL, "http://localhost:9090")
+
+        try await app.updateBaseUrl(to: "http://localhost:8080")
+        XCTAssertEqual(app.baseURL, "http://localhost:8080")
+    }
+
     @MainActor func testAsyncOpenStandalone() async throws {
         try autoreleasepool {
             let configuration = Realm.Configuration(objectTypes: [SwiftPerson.self])

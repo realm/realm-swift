@@ -31,6 +31,8 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 @end
 
 @interface RLMApp ()
+/// A custom base URL to request against. If not set or set to nil, the default base url for app services will be returned.
+@property (nonatomic, readonly) NSString *baseURL;
 /// Returns all currently cached Apps
 + (NSArray<RLMApp *> *)allApps;
 /// Subscribe to notifications for this RLMApp.
@@ -40,6 +42,11 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 + (RLMApp *_Nullable)cachedAppWithId:(NSString *)appId;
 
 + (void)resetAppCache;
+
+/// Updates the base url used by Atlas device sync, in case the need to roam between servers (cloud and/or edge server).
+/// @param baseURL The new base url to connect to.
+- (void)updateBaseURL:(NSString *)baseURL
+           completion:(RLMOptionalErrorBlock)completionHandler NS_SWIFT_NAME(updateBaseUrl(to:completion:));
 @end
 
 @interface RLMAppConfiguration ()
