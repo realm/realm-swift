@@ -1231,7 +1231,6 @@ extension Realm {
         self = Realm(rlmRealm.wrappedValue)
     }
 
-#if swift(>=5.8)
     /**
      Asynchronously obtains a `Realm` instance isolated to the given Actor.
 
@@ -1382,7 +1381,6 @@ extension Realm {
             task.complete(false)
         }
     }
-#endif
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -1461,14 +1459,12 @@ extension RLMAsyncDownloadTask: TaskWithCancellation {}
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 internal extension Actor {
     func verifier() -> (@Sendable () -> Void) {
-#if swift(>=5.9)
         // When possible use the official API for actor checking
         if #available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *) {
             return {
                 self.preconditionIsolated()
             }
         }
-#endif
 
         // This exploits a hole in Swift's type system to construct a function
         // which is isolated to the current actor, and then casts away that

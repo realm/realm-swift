@@ -31,7 +31,6 @@ import RealmTestSupport
 // simplify use. Due to a bug in the Swift compiler
 // (https://github.com/apple/swift/issues/61358), this current doesn't work for
 // local variables.
-@available(macOS 10.12, iOS 10.0, tvOS 10.0, watchOS 3.0, *)
 @propertyWrapper
 public class Locked<T>: @unchecked Sendable {
     private var _value: T
@@ -215,7 +214,6 @@ public extension XCTestCase {
     }
 }
 
-#if swift(>=5.8)
 @_unsafeInheritExecutor
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func assertThrowsErrorAsync<T, E: Equatable & Error>(
@@ -288,4 +286,3 @@ public func assertPreconditionFailure<T>(_ message: String, _ expression: () asy
         XCTFail("Expected \"\(str)\" to contain \"\(message)\")", file: file, line: line)
     }
 }
-#endif

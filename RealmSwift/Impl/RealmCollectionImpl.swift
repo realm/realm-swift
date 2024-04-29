@@ -120,7 +120,6 @@ extension RealmCollectionImpl {
         return collection.addNotificationBlock(wrapped, keyPaths: keyPaths, queue: queue)
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
     public func observe<A: Actor>(
@@ -135,7 +134,6 @@ extension RealmCollectionImpl {
             }
         } ?? NotificationToken()
     }
-#endif
 
     public var isFrozen: Bool {
         return collection.isFrozen
@@ -170,7 +168,6 @@ extension Optional: OptionalProtocol {
     public func _rlmInferWrappedType() -> Wrapped { return self! }
 }
 
-#if swift(>=5.8)
 // `with(object, on: actor) { object, actor in ... }` hands the object over
 // to the given actor and then invokes the callback within the actor.
 // This might make sense to expose publicly.
@@ -221,4 +218,3 @@ internal func with<A: Actor, Value: ThreadConfined, Return: Sendable>(
 #endif
     }
 }
-#endif

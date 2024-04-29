@@ -149,7 +149,6 @@ extension Projection: KeypathSortable {}
 
     // MARK: Flexible Sync
 
-#if swift(>=5.8)
     /**
      Creates a SyncSubscription matching the Results' local query.
      After committing the subscription to the realm's local subscription set, the method
@@ -195,7 +194,6 @@ extension Projection: KeypathSortable {}
         rlmResults = try await rlmResults.subscribe(withName: name, waitForSync: waitForSync, confinedTo: scheduler, timeout: timeout ?? 0)
         return self
     }
-#endif
     /**
      Removes a SyncSubscription matching the Results' local filter.
 

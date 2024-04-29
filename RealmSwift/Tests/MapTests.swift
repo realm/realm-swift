@@ -968,7 +968,6 @@ class MapTests: TestCase {
         token.invalidate()
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @MainActor func testObserveOnActor() async throws {
         let map = createMapObject().swiftObjectMap
@@ -1030,7 +1029,6 @@ class MapTests: TestCase {
         await fulfillment(of: [changeEx])
         token.invalidate()
     }
-#endif // swift(>=5.8)
 }
 
 class MapStandaloneTests: MapTests {
@@ -1081,7 +1079,6 @@ class MapStandaloneTests: MapTests {
         assertThrows(mapObj.observe {_ in })
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @MainActor override func testObserveOnActor() async throws {
     }
@@ -1089,7 +1086,6 @@ class MapStandaloneTests: MapTests {
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @MainActor override func testObserveOnActorTypedKeyPath() async throws {
     }
-#endif
 }
 
 class MapNewlyAddedTests: MapTests {
