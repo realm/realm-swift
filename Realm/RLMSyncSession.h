@@ -243,6 +243,36 @@ block:(RLMProgressNotificationBlock)block __attribute__((deprecated("Use addSync
     NS_REFINED_FOR_SWIFT;
 
 
+/**
+ Register a progress notification block.
+
+ Multiple blocks can be registered with the same session at once. Each block
+ will be invoked on a side queue devoted to progress notifications.
+
+ If the session has already received progress information from the
+ synchronization subsystem, the block will be called immediately. Otherwise, it
+ will be called as soon as progress information becomes available.
+
+ The token returned by this method must be retained as long as progress
+ notifications are desired, and the `-invalidate` method should be called on it
+ when notifications are no longer needed and before the token is destroyed.
+
+ If no token is returned, the notification block will never be called again.
+ There are a number of reasons this might be true. If the session has previously
+ experienced a fatal error it will not accept progress notification blocks. If
+ the block was configured in the `RLMSyncProgressForCurrentlyOutstandingWork`
+ mode but there is no additional progress to report (for example, the number
+ of transferrable bytes and transferred bytes are equal), the block will not be
+ called again.
+
+ @param direction The transfer direction (upload or download) to track in this progress notification block.
+ @param mode      The desired behavior of this progress notification block.
+ @param block     The block to invoke when notifications are available.
+
+ @return A token which must be held for as long as you want notifications to be delivered.
+
+ @see ``RLMSyncProgressDirection``, ``RLMSyncProgress``, ``RLMSyncProgressNotificationBlock``, ``RLMProgressNotificationToken``
+ */
 - (nullable RLMProgressNotificationToken *)addSyncProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                               mode:(RLMSyncProgressMode)mode
                                                                              block:(RLMSyncProgressNotificationBlock)block
