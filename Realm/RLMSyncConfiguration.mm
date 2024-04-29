@@ -18,10 +18,11 @@
 
 #import "RLMSyncConfiguration_Private.hpp"
 
+#import <Realm/RLMInitialSubscriptionsConfiguration.h>
+
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMError_Private.hpp"
-#import "RLMInitialSubscriptionsConfiguration.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmConfiguration_Private.hpp"
