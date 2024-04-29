@@ -24,12 +24,16 @@
 #import <realm/util/optional.hpp>
 
 @implementation RLMProviderClient
-- (instancetype)initWithApp:(RLMApp *)app {
-    self = [super init];
-    if (self) {
-        _app = app;
+
+- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {
+    if (self = [super init]) {
+        _app = std::move(app);
     }
     return self;
+}
+
+- (RLMApp *)app {
+    return [RLMApp appWithId:@(_app->config().app_id.c_str())];
 }
 
 realm::util::UniqueFunction<void(std::optional<realm::app::AppError>)>

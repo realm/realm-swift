@@ -254,8 +254,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      difficult to guarantee).
 
      If `+[RLMSyncSession immediatelyHandleError:]` is not called, the client reset process
-     will be automatically carried out the next time the app is launched and the
-     `RLMSyncManager` is accessed.
+     will be automatically carried out the next time the app is launched and the `App` is initialized.
 
      The value for the `kRLMSyncPathOfRealmBackupCopyKey` key in the `userInfo` dictionary
      describes the path of the recovered copy of the Realm. This copy will not actually be

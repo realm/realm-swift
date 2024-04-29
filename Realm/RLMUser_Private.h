@@ -31,6 +31,8 @@ typedef void(^RLMUserNotificationBlock)(RLMUser *);
 @end
 
 @interface RLMUser ()
+@property (nonatomic, strong, nullable) RLMApp *app;
+
 /// Subscribe to notifications for this RLMUser.
 - (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock)block;
 

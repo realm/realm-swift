@@ -1224,28 +1224,23 @@ RLM_COLLECTION_TYPE(NotARealClass)
 }
 
 - (void)testExplicitlyIncludedEmbeddedOrphanIsRejectedForSyncRealm {
-    RLMUser *user = RLMDummyUser();
-
     // Test each different order of setting properties because there's a bunch of awkward state involved
-    RLMRealmConfiguration *config = [user configurationWithPartitionValue:@"dummy"];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration fakeSyncConfiguration];
     config.objectClasses = @[OrphanObject.class];
     RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
                               @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
 
     config = [RLMRealmConfiguration defaultConfiguration];
-    config.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    config.syncConfiguration = [RLMRealmConfiguration fakeSyncConfiguration].syncConfiguration;
     config.objectClasses = @[OrphanObject.class];
     RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
                               @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
 
     config = [RLMRealmConfiguration defaultConfiguration];
     config.objectClasses = @[OrphanObject.class];
-    config.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    config.syncConfiguration = [RLMRealmConfiguration fakeSyncConfiguration].syncConfiguration;
     RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
                               @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
-
-    [user logOut];
-    [RLMApp resetAppCache];
 }
 
 - (void)testExplicitlyIncludedEmbeddedOrphanIsAllowedForLocalRealm {

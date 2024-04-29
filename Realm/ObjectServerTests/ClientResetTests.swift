@@ -102,7 +102,7 @@ class ClientResetTests: SwiftSyncTestCase {
             }
             XCTAssertTrue(path.contains("mongodb-realm/\(app.appId)/recovered-realms/recovered_realm"))
             XCTAssertFalse(FileManager.default.fileExists(atPath: path))
-            SyncSession.immediatelyHandleError(token, syncManager: app.syncManager)
+            SyncSession.immediatelyHandleError(token)
             XCTAssertTrue(FileManager.default.fileExists(atPath: path))
             ex.fulfill()
         }

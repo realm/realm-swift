@@ -23,6 +23,9 @@
 namespace realm {
 class AsyncOpenTask;
 class SyncSession;
+namespace app {
+class App;
+}
 }
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
@@ -40,7 +43,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 @end
 
 @interface RLMSyncErrorActionToken ()
-- (instancetype)initWithOriginalPath:(std::string)originalPath;
+- (instancetype)initWithOriginalPath:(std::string)originalPath app:(std::shared_ptr<realm::app::App>)app;
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)
