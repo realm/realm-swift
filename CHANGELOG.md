@@ -24,6 +24,10 @@ x.y.z Release notes (yyyy-MM-dd)
      to "Embed & Sign" in the "Frameworks, Libraries, and Embedded Content"
      section on the General tab of your target's settings.
   ([#8561](https://github.com/realm/realm-swift/pull/8561)).
+  UUID/ObjectId types. ([.Net * #3566](https://github.com/realm/realm-dotnet/issues/3566))
+* The `transferredBytes` and `transferrableBytes` fields on `Progress` have been deprecated
+  in favor of `progressEstimate` which is a value between 0.0 and 1.0 indicating the estimated
+  progress toward the upload/download transfer. ([#8476](https://github.com/realm/realm-swift/issues/8476))
 
 ### Fixed
 * `-[RLMUser allSessions]` did not include sessions which were currently
@@ -52,6 +56,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * Schema initialization could hit an assertion failure if the sync client
   applied a downloaded changeset while the Realm file was in the process of
   being opened ([#7041](https://github.com/realm/realm-core/issues/7041), since v10.15.0).
+* The reported download progress for flexible sync Realms was incorrect. It is now replaced by a
+  progress estimate, which is derived by the server based on historical data and other heuristics.
+  ([#8476](https://github.com/realm/realm-swift/issues/8476))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
