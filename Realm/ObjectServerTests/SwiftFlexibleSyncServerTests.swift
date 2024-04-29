@@ -967,7 +967,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         task.addProgressNotification { p in
             DispatchQueue.main.async { @MainActor in
                 if let progress = progress {
-                    if (progress.progressEstimate < 1.0) {
+                    if progress.progressEstimate < 1.0 {
                         XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                     }
                 }
@@ -1066,7 +1066,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
                 // Verify that progress increases. If it has reached 1.0, it may decrease again
                 // since we're adding more data
                 if let progress = progress {
-                    if (progress.progressEstimate < 1.0) {
+                    if progress.progressEstimate < 1.0 {
                         XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                     }
                 }
@@ -1135,7 +1135,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
             DispatchQueue.main.async { @MainActor in
                 if let progress = progress {
-                    if (progress.progressEstimate < 1) {
+                    if progress.progressEstimate < 1 {
                         XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                     }
                 }
