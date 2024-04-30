@@ -442,9 +442,9 @@ extension Object: _RealmCollectionValueInsideOptional {
      */
     @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
-    public func observe<A: Actor, T: Object>(
+    public func observe<A: Actor, FieldType: Object>(
         keyPaths: [String]? = nil, on actor: A,
-        _ block: @Sendable @escaping (isolated A, ObjectChange<T>) -> Void
+        _ block: @Sendable @escaping (isolated A, ObjectChange<FieldType>) -> Void
     ) async -> NotificationToken {
         await with(self, on: actor) { actor, obj in
             await obj._observe(keyPaths: keyPaths, on: actor, block)
@@ -486,9 +486,9 @@ extension Object: _RealmCollectionValueInsideOptional {
      */
     @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
     @_unsafeInheritExecutor
-    public func observe<A: Actor, T: Object>(
-        keyPaths: [PartialKeyPath<T>], on actor: A,
-        _ block: @Sendable @escaping (isolated A, ObjectChange<T>) -> Void
+    public func observe<A: Actor, FieldType: Object>(
+        keyPaths: [PartialKeyPath<FieldType>], on actor: A,
+        _ block: @Sendable @escaping (isolated A, ObjectChange<FieldType>) -> Void
     ) async -> NotificationToken {
         await observe(keyPaths: keyPaths.map(_name(for:)), on: actor, block)
     }

@@ -29,7 +29,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 
 + (instancetype)emptyDetachedResults;
 - (RLMResults *)snapshot;
-
+- (void)clear;
 - (void)subscribeWithName:(NSString *_Nullable)name
               waitForSync:(RLMWaitForSyncMode)waitForSyncMode
                confinedTo:(RLMScheduler *)confinement

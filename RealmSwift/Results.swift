@@ -147,6 +147,7 @@ extension Projection: KeypathSortable {}
         return RLMIterator(collection: collection)
     }
 
+
     // MARK: Flexible Sync
 
 #if swift(>=5.8)
@@ -230,3 +231,8 @@ extension Projection: KeypathSortable {}
 }
 
 extension Results: Encodable where Element: Encodable {}
+extension Results where Element: Object {
+    public func clear() {
+        (self.collection as! RLMResults<Element>).clear()
+    }
+}

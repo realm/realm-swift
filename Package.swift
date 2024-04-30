@@ -1,7 +1,8 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 
 import PackageDescription
 import Foundation
+import CompilerPluginSupport
 
 let coreVersion = Version("14.6.0")
 let cocoaVersion = Version("10.49.2")
@@ -139,10 +140,10 @@ func runCommand() -> String {
 let package = Package(
     name: "Realm",
     platforms: [
-        .macOS(.v10_13),
-        .iOS(.v11),
+        .macOS(.v10_15),
+        .iOS(.v13),
         .tvOS(.v11),
-        .watchOS(.v4)
+        .watchOS(.v4),
     ],
     products: [
         .library(
@@ -155,12 +156,15 @@ let package = Package(
             targets: ["RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion)
+        .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion),
+        .package(url: "https://github.com/apple/swift-syntax.git", branch: "main"),
     ],
     targets: [
       .target(
             name: "Realm",
-            dependencies: [.product(name: "RealmCore", package: "realm-core")],
+            dependencies: [
+                .product(name: "RealmCore", package: "realm-core")
+            ],
             path: ".",
             exclude: [
                 "CHANGELOG.md",
@@ -334,7 +338,8 @@ let package = Package(
                 "RealmSwiftTests-Info.plist",
                 "QueryTests.swift.gyb",
                 "TestUtils.swift"
-            ]
+            ],
+            resources: [.copy("BsonCorpus")]
         ),
 
         // Object server tests have support code written in both obj-c and

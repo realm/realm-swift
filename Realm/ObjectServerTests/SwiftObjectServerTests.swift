@@ -708,6 +708,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         return AppConfiguration(baseURL: "http://localhost:9090")
     }
 
+    func expectSuccess<FieldType>(_ result: Result<FieldType, Error>) -> FieldType? {
+        switch result {
+        case .success(let value):
+            return value
+        case .failure(let error):
+            XCTFail("unexpected error: \(error)")
+            return nil
+        }
+    }
+
     func testAppInit() {
         let appName = "translate-utwuv"
 
@@ -1369,5 +1379,4 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertNil(didCloseError.userInfo[NSUnderlyingErrorKey])
     }
 }
-
 #endif // os(macOS)

@@ -105,9 +105,9 @@ static realm::bson::BsonArray toBsonArray(id<RLMBSON> bson) {
 
 __attribute__((objc_direct_members))
 @interface RLMMongoCollection ()
-@property (nonatomic, strong) RLMUser *user;
-@property (nonatomic, strong) NSString *serviceName;
-@property (nonatomic, strong) NSString *databaseName;
+//@property (nonatomic, strong) RLMUser *user;
+//@property (nonatomic, strong) NSString *serviceName;
+
 @end
 
 __attribute__((objc_direct_members))
