@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-
-#import "RLMInitialSubscriptionsConfiguration.h"
+#import <Realm/RLMInitialSubscriptionsConfiguration.h>
 
 @implementation RLMInitialSubscriptionsConfiguration
 
