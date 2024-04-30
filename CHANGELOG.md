@@ -25,7 +25,6 @@ x.y.z Release notes (yyyy-MM-dd)
      section on the General tab of your target's settings.
   ([#8561](https://github.com/realm/realm-swift/pull/8561)).
   UUID/ObjectId types. ([.Net * #3566](https://github.com/realm/realm-dotnet/issues/3566))
-* Added `SyncConfiguration.initialSubscriptions` which describes the initial subscription configuration that was passed when constructing the `SyncConfiguration`. ([#8548](https://github.com/realm/realm-swift/issues/8548))
 * Added support for updating Atlas Device Sync's base url, in case the need to roam between servers (cloud and/or edge server). ([#8486](https://github.com/realm/realm-swift/issues/8486))
 
 ### Fixed

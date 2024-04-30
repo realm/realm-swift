@@ -85,6 +85,12 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
 
         try await app.updateBaseUrl(to: "http://localhost:8080")
         XCTAssertEqual(app.baseURL, "http://localhost:8080")
+
+        try await app.updateBaseUrl(to: "http://localhost:7070/")
+        XCTAssertEqual(app.baseURL, "http://localhost:7070")
+
+        try await app.updateBaseUrl(to: nil)
+        XCTAssertEqual(app.baseURL, "https://realm.mongodb.com")
     }
 
     @MainActor func testAsyncOpenStandalone() async throws {
