@@ -4,7 +4,7 @@ import PackageDescription
 import Foundation
 
 let coreVersion = Version("13.26.0")
-let cocoaVersion = Version("10.48.1")
+let cocoaVersion = Version("10.48.2")
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
@@ -147,10 +147,12 @@ let package = Package(
     products: [
         .library(
             name: "Realm",
+            type: .dynamic,
             targets: ["Realm"]),
         .library(
             name: "RealmSwift",
-            targets: ["Realm", "RealmSwift"]),
+            type: .dynamic,
+            targets: ["RealmSwift"]),
     ],
     dependencies: [
         .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion)
