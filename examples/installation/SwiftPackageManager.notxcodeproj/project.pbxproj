@@ -10,7 +10,6 @@
 		3FEC916A2A4D3B140044BFF5 /* SwiftExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC91692A4D3B140044BFF5 /* SwiftExampleApp.swift */; };
 		3FEC916E2A4D3B150044BFF5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FEC916D2A4D3B150044BFF5 /* Assets.xcassets */; };
 		3FEC91722A4D3B150044BFF5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3FEC91712A4D3B150044BFF5 /* Preview Assets.xcassets */; };
-		3FEC917A2A4D3DB90044BFF5 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 3FEC91792A4D3DB90044BFF5 /* Realm */; };
 		3FEC917C2A4D3DB90044BFF5 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3FEC917B2A4D3DB90044BFF5 /* RealmSwift */; };
 /* End PBXBuildFile section */
 
@@ -27,7 +26,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FEC917A2A4D3DB90044BFF5 /* Realm in Frameworks */,
 				3FEC917C2A4D3DB90044BFF5 /* RealmSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,7 +85,6 @@
 			);
 			name = App;
 			packageProductDependencies = (
-				3FEC91792A4D3DB90044BFF5 /* Realm */,
 				3FEC917B2A4D3DB90044BFF5 /* RealmSwift */,
 			);
 			productName = SwiftPM;
@@ -383,11 +380,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3FEC91792A4D3DB90044BFF5 /* Realm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 3FEC91782A4D3DB90044BFF5 /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = Realm;
-		};
 		3FEC917B2A4D3DB90044BFF5 /* RealmSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 3FEC91782A4D3DB90044BFF5 /* XCRemoteSwiftPackageReference "realm-swift" */;

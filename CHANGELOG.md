@@ -1,3 +1,32 @@
+10.49.3 Release notes (2024-04-30)
+=============================================================
+
+### Enhancements
+
+* Enable building RealmSwift as a dynamic framework when installing via SPM, which
+  lets us supply a privacy manifest. When RealmSwift is built as a static
+  library you must supply your own manifest, as Xcode does not build static
+  libraries in a way compatible with xcprivacy embedding. Due to some bugs in
+  Xcode, this may require manual changes to your project:
+   - Targets must now depend on only Realm or RealmSwift. If you use both the
+     obj-c and swift API, depending on RealmSwift will let you import Realm.
+     Trying to directly depend on both will give the error "Swift package
+     target 'Realm' is linked as a static library by 'App' and 'Realm', but
+     cannot be built dynamically because there is a package product with the
+     same name."
+   - To actually build RealmSwift as a dynamic framework, change "Do Not Embed"
+     to "Embed & Sign" in the "Frameworks, Libraries, and Embedded Content"
+     section on the General tab of your target's settings.
+  ([#8561](https://github.com/realm/realm-swift/pull/8561)).
+
+### Compatibility
+
+* Realm Studio: 14.0.1 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.3.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 14.2-15.3.0.
+
 10.49.2 Release notes (2024-04-17)
 =============================================================
 
