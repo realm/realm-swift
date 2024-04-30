@@ -24,7 +24,6 @@ x.y.z Release notes (yyyy-MM-dd)
      to "Embed & Sign" in the "Frameworks, Libraries, and Embedded Content"
      section on the General tab of your target's settings.
   ([#8561](https://github.com/realm/realm-swift/pull/8561)).
-  UUID/ObjectId types. ([.Net * #3566](https://github.com/realm/realm-dotnet/issues/3566))
 * The `transferredBytes` and `transferrableBytes` fields on `Progress` have been deprecated
   in favor of `progressEstimate` which is a value between 0.0 and 1.0 indicating the estimated
   progress toward the upload/download transfer. ([#8476](https://github.com/realm/realm-swift/issues/8476))
