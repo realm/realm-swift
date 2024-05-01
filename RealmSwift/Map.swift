@@ -520,7 +520,6 @@ public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftColle
         return rlmDictionary.addNotificationBlock(wrapped, keyPaths: keyPaths, queue: queue)
     }
 
-#if swift(>=5.8)
     /**
     Registers a block to be called each time the map changes.
 
@@ -699,7 +698,6 @@ public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftColle
     ) async -> NotificationToken where Value: OptionalProtocol, Value.Wrapped: ObjectBase {
         await observe(keyPaths: keyPaths.map(_name(for:)), on: actor, block)
     }
-#endif
 
     // MARK: Frozen Objects
 

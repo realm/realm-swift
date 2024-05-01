@@ -738,11 +738,6 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
         watchTestUtility.waitForClose()
     }
 
-#if swift(>=5.8)
-    // wait(for:) doesn't work in async functions because it blocks the calling
-    // thread and doesn't let async tasks run. Xcode 14.3 introduced a new async
-    // version of it which does work, but there doesn't appear to be a workaround
-    // for older Xcode versions.
     @available(macOS 13, *)
     func performAsyncWatchTest(filterIds: Bool = false, matchFilter: Bool = false) async throws {
         let collection = setupMongoCollection()
@@ -802,7 +797,6 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     func testWatchWithFilterIdsAsync() async throws {
         try await performAsyncWatchTest(filterIds: true)
     }
-#endif
 
     func testWatchMultipleFilterStreams() throws {
         try performMultipleWatchStreamsTest(nil)
@@ -868,7 +862,6 @@ class SwiftMongoClientTests: SwiftSyncTestCase {
     }
 }
 
-#if swift(>=5.8)
 // MARK: - AsyncAwaitMongoClientTests
 @available(macOS 13, *)
 class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
@@ -1247,6 +1240,5 @@ class AsyncAwaitMongoClientTests: SwiftSyncTestCase {
         XCTAssertEqual(count5, 1)
     }
 }
-#endif
 
 #endif // os(macOS)

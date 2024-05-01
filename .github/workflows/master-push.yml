@@ -6,15 +6,13 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['14.2', '14.3.1', '15.1', '15.2', '15.3']"
-  # Github actions doesn't have Xcode 15.3 on any runners yet, so we can't run
-  # installation tests for it
-  XCODE_TEST_VERSIONS: "['14.2', '14.3.1', '15.1', '15.2']"
+  XCODE_VERSION: "['15.1', '15.2', '15.3']"
+  XCODE_TEST_VERSIONS: "['15.1', '15.2', '15.3']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
-  DOC_VERSION: '15.2'
-  RELEASE_VERSION: '15.2'
-  TEST_VERSION: '15.2'
+  DOC_VERSION: '15.3'
+  RELEASE_VERSION: '15.3'
+  TEST_VERSION: '15.3'
 jobs:
   cleanup: # Clean-up XCode cloud workflows, before running the pipeline
       runs-on: ubuntu-latest
@@ -109,14 +107,6 @@ jobs:
             - platform: visionossimulator
               configuration: static
             - platform: visionos
-              xcode-version: 14.2
-            - platform: visionossimulator
-              xcode-version: 14.2
-            - platform: visionos
-              xcode-version: 14.3.1
-            - platform: visionossimulator
-              xcode-version: 14.3.1
-            - platform: visionos
               xcode-version: 15.1
             - platform: visionossimulator
               xcode-version: 15.1
@@ -189,10 +179,6 @@ jobs:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
           exclude:
-            - platform: visionos
-              xcode-version: 14.2
-            - platform: visionos
-              xcode-version: 14.3.1
             - platform: visionos
               xcode-version: 15.1
       steps:

@@ -1492,8 +1492,6 @@ class RealmTests: TestCase {
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 extension RealmTests {
-#if swift(>=5.8)
-
     @MainActor
     func testOpenBehaviorForLocalRealm() async throws {
         let realm = try await Realm(downloadBeforeOpen: .always)
@@ -1889,7 +1887,6 @@ extension RealmTests {
         }
         realm.cancelWrite()
     }
-#endif // swift(>=5.8)
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)

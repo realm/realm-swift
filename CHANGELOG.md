@@ -1,5 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Drop support for Xcode 14, as it can no longer be used to submit app to the app
+store. Xcode 15.1 is now the minimum supported version.
+
 ### Enhancements
 * Added `SyncConfiguration.initialSubscriptions` which describes the initial
   subscription configuration that was passed when constructing the
