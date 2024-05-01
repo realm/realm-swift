@@ -20,7 +20,7 @@
 
 import Realm
 import Realm.Private
-@_spi(Private) import RealmSwift
+@_spi(RealmSwiftExperimental) import RealmSwift
 import XCTest
 
 #if canImport(RealmTestSupport)

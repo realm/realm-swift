@@ -221,6 +221,20 @@ public typealias App = RLMApp
 
 public extension App {
     /**
+    Updates the base url used by Atlas device sync, in case the need to roam between servers (cloud and/or edge server).
+     - parameter url: The new base url to connect to. Setting `nil` will reset the base url to the default url.
+     - parameter completion: A callback invoked after completion.
+     - note: Updating the base URL would trigger a client reset.
+     */
+    @preconcurrency
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @_spi(RealmSwiftExperimental) func updateBaseUrl(to url: String?, _ completion: @Sendable @escaping (Error?) -> Void) {
+        self.__updateBaseURL(url, completion: { error in
+            completion(error)
+        })
+    }
+
+    /**
      Login to a user for the Realm app.
      
      - parameter credentials: The credentials identifying the user.
@@ -240,18 +254,19 @@ public extension App {
     /**
     Updates the base url used by Atlas device sync, in case the need to roam between servers (cloud and/or edge server).
      - parameter url: The new base url to connect to. Setting `nil` will reset the base url to the default url.
+     - parameter completion: A callback invoked after completion. Will return `Result.success` or `Result.failure(Error)`.
      - note: Updating the base URL would trigger a client reset.
      */
     @preconcurrency
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    @_spi(Private) func updateBaseUrl(to url: String?, _ completion: @Sendable @escaping (Result<Void, Error>) -> Void) {
-        self.__updateBaseURL(url) { error in
+    @_spi(RealmSwiftExperimental) func updateBaseUrl(to url: String?, _ completion: @Sendable @escaping (Result<Void, Error>) -> Void) {
+        self.__updateBaseURL(url, completion: { error in
             if let error = error {
                 completion(.failure(error))
             } else {
                 completion(.success(()))
             }
-        }
+        })
     }
 
     /**
@@ -279,7 +294,7 @@ public extension App {
      - note: Updating the base URL would trigger a client reset.
      */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    @_spi(Private) func updateBaseUrl(to url: String?) async throws {
+    @_spi(RealmSwiftExperimental) func updateBaseUrl(to url: String?) async throws {
         try await __updateBaseURL(url)
     }
 }

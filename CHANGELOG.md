@@ -9,12 +9,11 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #7552](https://github.com/realm/realm-core/pull/7552)).
 * Improve perfomance of IN queries and chained OR equality queries for
   UUID/ObjectId types. ([.Net #3566](https://github.com/realm/realm-dotnet/issues/3566))
-  UUID/ObjectId types. ([.Net * #3566](https://github.com/realm/realm-dotnet/issues/3566))
 * Added support for updating Atlas Device Sync's base url, in case the need to roam between 
   servers (cloud and/or edge server). This API is private and can only be imported using 
   `@_spi(Private)` 
    ```swift
-   @_spi(Private) import RealmSwift
+   @_spi(RealmSwiftExperimental) import RealmSwift
   
    try await app.updateBaseUrl(to: "https://services.cloud.mongodb.com")
   ```

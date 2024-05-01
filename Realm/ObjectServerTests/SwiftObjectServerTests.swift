@@ -21,7 +21,7 @@
 import Combine
 import Realm
 import Realm.Private
-@_spi(Private) import RealmSwift
+@_spi(RealmSwiftExperimental) import RealmSwift
 import XCTest
 
 #if canImport(RealmTestSupport)
@@ -70,9 +70,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "update base url")
         app.updateBaseUrl(to: "http://localhost:8080", { result in
             switch result {
-            case .success(let realm):
+            case .success:
                 ex.fulfill()
-            case .failure(let error):
+            case .failure:
                 XCTFail("Should not return an error")
             }
         })
@@ -81,9 +81,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let ex1 = expectation(description: "update base url")
         app.updateBaseUrl(to: "http://localhost:7070/", { result in
             switch result {
-            case .success(let realm):
+            case .success:
                 ex1.fulfill()
-            case .failure(let error):
+            case .failure:
                 XCTFail("Should not return an error")
             }
         })
@@ -92,9 +92,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let ex2 = expectation(description: "update base url")
         app.updateBaseUrl(to: nil, { result in
             switch result {
-            case .success(let realm):
+            case .success:
                 ex2.fulfill()
-            case .failure(let error):
+            case .failure:
                 XCTFail("Should not return an error")
             }
         })
