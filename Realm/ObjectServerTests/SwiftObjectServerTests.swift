@@ -271,7 +271,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testStreamingDownloadNotifier() throws {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
-        var ex = expectation(description: "first download")
         var callCount = 0
         var progress: SyncSession.Progress?
         let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
@@ -288,14 +287,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertNotNil(token)
 
         try populateRealm()
-        session.wait(for: .download) { err in
-            DispatchQueue.main.async { @MainActor in
-                XCTAssertNil(err)
-                ex.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 60.0, handler: nil)
+        waitForDownloads(for: realm)
 
         XCTAssertGreaterThanOrEqual(callCount, 1)
         let p1 = try XCTUnwrap(progress)
@@ -305,17 +297,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let initialCallCount = callCount
 
         // Run a second time to upload more data and verify that the callback continues to be called
-        ex = expectation(description: "second download")
         try populateRealm()
+        waitForDownloads(for: realm)
 
-        session.wait(for: .download) { e in
-            DispatchQueue.main.async { @MainActor in
-                XCTAssertNil(e)
-                ex.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 60.0, handler: nil)
         XCTAssertGreaterThan(callCount, initialCallCount)
         let p2 = try XCTUnwrap(progress)
         XCTAssertEqual(p2.transferredBytes, p2.transferrableBytes)
@@ -331,7 +315,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
 
-        var ex = expectation(description: "initial upload")
         var progress: SyncSession.Progress?
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
@@ -344,17 +327,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         XCTAssertNotNil(token)
 
-        session.wait(for: .upload) { err in
-            DispatchQueue.main.async { @MainActor in
-                XCTAssertNil(err)
-                ex.fulfill()
-            }
-        }
+        waitForUploads(for: realm)
 
-        waitForExpectations(timeout: 10.0, handler: nil)
-
-        for i in 0..<5 {
-            ex = expectation(description: "write transaction upload \(i)")
+        for _ in 0..<5 {
             progress = nil
             try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
@@ -362,14 +337,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
-            session.wait(for: .upload) { err in
-                DispatchQueue.main.async { @MainActor in
-                    XCTAssertNil(err)
-                    ex.fulfill()
-                }
-            }
-
-            waitForExpectations(timeout: 10.0, handler: nil)
+            waitForUploads(for: realm)
         }
         token!.invalidate()
 
