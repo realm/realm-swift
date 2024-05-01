@@ -21,7 +21,7 @@
 import Combine
 import Realm
 import Realm.Private
-import RealmSwift
+@_spi(Private) import RealmSwift
 import XCTest
 
 #if canImport(RealmTestSupport)
@@ -60,6 +60,45 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             SwiftMissingObject.self,
             SwiftAnyRealmValueObject.self,
         ]
+    }
+
+    func testUpdateBaseUrl() {
+        let app = App(id: appId)
+        XCTAssertNotNil(app.baseURL)
+        XCTAssertEqual(app.baseURL, "http://localhost:9090")
+
+        let ex = expectation(description: "update base url")
+        app.updateBaseUrl(to: "http://localhost:8080", { result in
+            switch result {
+            case .success(let realm):
+                ex.fulfill()
+            case .failure(let error):
+                XCTFail("Should not return an error")
+            }
+        })
+        XCTAssertEqual(app.baseURL, "http://localhost:8080")
+
+        let ex1 = expectation(description: "update base url")
+        app.updateBaseUrl(to: "http://localhost:7070/", { result in
+            switch result {
+            case .success(let realm):
+                ex1.fulfill()
+            case .failure(let error):
+                XCTFail("Should not return an error")
+            }
+        })
+        XCTAssertEqual(app.baseURL, "http://localhost:7070")
+
+        let ex2 = expectation(description: "update base url")
+        app.updateBaseUrl(to: nil, { result in
+            switch result {
+            case .success(let realm):
+                ex2.fulfill()
+            case .failure(let error):
+                XCTFail("Should not return an error")
+            }
+        })
+        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
     }
 
     func testBasicSwiftSync() throws {

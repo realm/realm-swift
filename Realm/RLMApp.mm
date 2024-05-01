@@ -418,8 +418,7 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     return getOptionalString(_app->get_base_url()) ?: RLMStringViewToNSString(_app->default_base_url());
 }
 
-- (void)updateBaseUrl:(NSString *_Nullable)baseURL
-           completion:(RLMOptionalErrorBlock)completionHandler {
+- (void)updateBaseURL:(NSString * _Nullable)baseURL completion:(nonnull RLMOptionalErrorBlock)completionHandler {
     auto completion = ^(std::optional<app::AppError> error) {
         if (error) {
             return completionHandler(makeError(*error));
@@ -429,7 +428,7 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     };
     return RLMTranslateError([&] {
         NSString *url = (baseURL ?: @"");
-        NSString *newUrl = [url stringByReplacingOccurrencesOfString:@"/" withString:@"" options:0 range:NSMakeRange(url.length, url.length-1)];
+        NSString *newUrl = [url stringByReplacingOccurrencesOfString:@"/" withString:@"" options:0 range:NSMakeRange(url.length-1, 1)];
         return _app->update_base_url(newUrl.UTF8String, completion);
     });
 }

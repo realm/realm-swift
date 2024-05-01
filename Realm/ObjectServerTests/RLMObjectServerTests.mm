@@ -104,7 +104,7 @@ static NSString *generateRandomString(int num) {
         XCTAssertNil(error);
         [expectation2 fulfill];
     }];
-    XCTAssertEqual(app.baseURL, @"https://realm.mongodb.com");
+    XCTAssertEqual(app.baseURL, @"https://services.cloud.mongodb.com");
 }
 
 - (void)testAnonymousAuthentication {

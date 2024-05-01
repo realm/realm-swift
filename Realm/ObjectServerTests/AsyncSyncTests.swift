@@ -20,7 +20,7 @@
 
 import Realm
 import Realm.Private
-import RealmSwift
+@_spi(Private) import RealmSwift
 import XCTest
 
 #if canImport(RealmTestSupport)
@@ -90,7 +90,7 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(app.baseURL, "http://localhost:7070")
 
         try await app.updateBaseUrl(to: nil)
-        XCTAssertEqual(app.baseURL, "https://realm.mongodb.com")
+        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
     }
 
     @MainActor func testAsyncOpenStandalone() async throws {

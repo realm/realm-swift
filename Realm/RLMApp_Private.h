@@ -45,8 +45,10 @@ typedef void(^RLMAppNotificationBlock)(RLMApp *);
 
 /// Updates the base url used by Atlas device sync, in case the need to roam between servers (cloud and/or edge server).
 /// @param baseURL The new base url to connect to. Setting `nil` will reset the base url to the default url.
+/// @note Updating the base URL would trigger a client reset.
 - (void)updateBaseURL:(NSString *_Nullable)baseURL
-           completion:(RLMOptionalErrorBlock)completionHandler NS_SWIFT_NAME(updateBaseUrl(to:completion:));
+           completion:(RLMOptionalErrorBlock)completionHandler NS_REFINED_FOR_SWIFT;
+
 @end
 
 @interface RLMAppConfiguration ()

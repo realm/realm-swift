@@ -237,20 +237,50 @@ public extension App {
         }
     }
 
-    /// Login to a user for the Realm app.
-    /// @param credentials The credentials identifying the user.
-    /// @returns A publisher that eventually return `User` or `Error`.
+    /**
+    Updates the base url used by Atlas device sync, in case the need to roam between servers (cloud and/or edge server).
+     - parameter url: The new base url to connect to. Setting `nil` will reset the base url to the default url.
+     - note: Updating the base URL would trigger a client reset.
+     */
+    @preconcurrency
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @_spi(Private) func updateBaseUrl(to url: String?, _ completion: @Sendable @escaping (Result<Void, Error>) -> Void) {
+        self.__updateBaseURL(url) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
+
+    /**
+    Login to a user for the Realm app.
+    - parameter credentials: The credentials identifying the user.
+    - returns: A publisher that eventually return `User` or `Error`.
+     */
     @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
     func login(credentials: Credentials) -> Future<User, Error> {
         return future { self.login(credentials: credentials, $0) }
     }
 
-    /// Login to a user for the Realm app.
-    /// @param credentials The credentials identifying the user.
-    /// @returns A publisher that eventually return `User` or `Error`.
+    /**
+    Login to a user for the Realm app.
+     - parameter credentials: The credentials identifying the user.
+     */
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func login(credentials: Credentials) async throws -> User {
         try await __login(withCredential: ObjectiveCSupport.convert(object: credentials))
+    }
+
+    /**
+    Updates the base url used by Atlas device sync, in case the need to roam between servers (cloud and/or edge server).
+     - parameter url: The new base url to connect to. Setting `nil` will reset the base url to the default url.
+     - note: Updating the base URL would trigger a client reset.
+     */
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @_spi(Private) func updateBaseUrl(to url: String?) async throws {
+        try await __updateBaseURL(url)
     }
 }
 
