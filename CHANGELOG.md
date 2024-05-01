@@ -67,7 +67,7 @@ store. Xcode 15.1 is now the minimum supported version.
 * Xcode: 14.2-15.3.0. Note that this will be the final release to support Xcode 14.
 
 ### Internal
-* Upgraded realm-core from v14.5.2 to 14.6.0
+* Upgraded realm-core from v14.5.2 to 14.6.2
 
 10.49.2 Release notes (2024-04-17)
 =============================================================
