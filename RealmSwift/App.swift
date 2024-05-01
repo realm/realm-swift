@@ -229,9 +229,7 @@ public extension App {
     @preconcurrency
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @_spi(RealmSwiftExperimental) func updateBaseUrl(to url: String?, _ completion: @Sendable @escaping (Error?) -> Void) {
-        self.__updateBaseURL(url, completion: { error in
-            completion(error)
-        })
+        self.__updateBaseURL(url, completion: completion)
     }
 
     /**
