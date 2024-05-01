@@ -943,7 +943,6 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     // MARK: - Progress notifiers
-    @MainActor
     func testAsyncOpenProgress() throws {
         try populateRealm()
 
@@ -965,7 +964,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         var progress: SyncSession.Progress?
 
         task.addProgressNotification { p in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 if let progress = progress {
                     if progress.progressEstimate < 1.0 {
                         XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
@@ -985,7 +984,6 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertTrue(p1.isTransferComplete)
     }
 
-    @MainActor
     func testNonStreamingDownloadNotifier() throws {
         try populateRealm()
 
@@ -996,7 +994,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         var callCount = 0
         var progress: SyncSession.Progress?
         let token = session.addProgressNotification(for: .download, mode: .forCurrentlyOutstandingWork) { p in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 // Verify that progress increases.
                 if let progress = progress {
                     XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
@@ -1011,7 +1009,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
         }, onComplete: { err in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 XCTAssertNil(err)
                 ex.fulfill()
             }
@@ -1033,7 +1031,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         try populateRealm()
 
         session.wait(for: .download) { e in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 XCTAssertNil(e)
                 ex.fulfill()
             }
@@ -1051,7 +1049,6 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         token!.invalidate()
     }
 
-    @MainActor
     func testStreamingDownloadNotifier() throws {
         try populateRealm()
 
@@ -1062,7 +1059,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         var callCount = 0
         var progress: SyncSession.Progress?
         let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 // Verify that progress increases. If it has reached 1.0, it may decrease again
                 // since we're adding more data
                 if let progress = progress {
@@ -1080,7 +1077,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
         }, onComplete: { err in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 XCTAssertNil(err)
                 ex.fulfill()
             }
@@ -1102,7 +1099,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         try populateRealm()
 
         session.wait(for: .download) { e in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 XCTAssertNil(e)
                 ex.fulfill()
             }
@@ -1120,7 +1117,6 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         token!.invalidate()
     }
 
-    @MainActor
     func testStreamingUploadNotifier() throws {
         let realm = try openRealm(wait: false)
         let subscriptions = realm.subscriptions
@@ -1133,7 +1129,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         var progress: SyncSession.Progress?
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 if let progress = progress {
                     if progress.progressEstimate < 1 {
                         XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
@@ -1145,7 +1141,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertNotNil(token)
 
         session.wait(for: .upload) { err in
-            DispatchQueue.main.async { @MainActor in
+            DispatchQueue.main.async {
                 XCTAssertNil(err)
                 ex.fulfill()
             }
@@ -1163,7 +1159,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
             }
 
             session.wait(for: .upload) { err in
-                DispatchQueue.main.async { @MainActor in
+                DispatchQueue.main.async {
                     XCTAssertNil(err)
                     ex.fulfill()
                 }

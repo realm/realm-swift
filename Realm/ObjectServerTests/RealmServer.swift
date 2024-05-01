@@ -995,9 +995,10 @@ public class RealmServer: NSObject {
         ], failOnError)
 
         // Disable exponential backoff when the server isn't ready for us to connect
-        session.privateApps[appId].settings.patch(on: group, [
-            "sync": ["disable_client_error_backoff": true]
-        ], failOnError)
+        // TODO: this is returning 403 with current server. Reenable once it's fixed - see https://mongodb.slack.com/archives/C0121N9LJ14/p1713885482349059
+        // session.privateApps[appId].settings.patch(on: group, [
+        //    "sync": ["disable_client_error_backoff": true]
+        // ], failOnError)
 
         try group.throwingWait(timeout: .now() + 5.0)
 
