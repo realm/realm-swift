@@ -960,26 +960,24 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
             asyncOpenEx.fulfill()
         }
 
-        var callCount = 0
-        var progress: SyncSession.Progress?
+        let callCount = Locked(0)
+        let progress = Locked<SyncSession.Progress?>(nil)
 
         task.addProgressNotification { p in
-            DispatchQueue.main.async {
-                if let progress {
-                    if progress.progressEstimate < 1.0 {
-                        XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
-                    }
+            if let progress = progress.value {
+                if progress.progressEstimate < 1.0 {
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
-                progress = p
-                callCount += 1
             }
+            progress.value = p
+            callCount.withLock({ $0 += 1 })
         }
 
         waitForExpectations(timeout: 10.0, handler: nil)
 
         XCTAssertEqual(try XCTUnwrap(downloadRealm).objects(SwiftHugeSyncObject.self).count, 2)
 
-        let p1 = try XCTUnwrap(progress)
+        let p1 = try XCTUnwrap(progress.value)
         XCTAssertEqual(p1.progressEstimate, 1.0)
         XCTAssertTrue(p1.isTransferComplete)
     }
