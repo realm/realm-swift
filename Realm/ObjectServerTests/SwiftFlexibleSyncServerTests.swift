@@ -955,7 +955,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         config.objectTypes = objectTypes
         var downloadRealm: Realm?
         let task = Realm.asyncOpen(configuration: config) { result in
-            XCTAssertNotNil(try? result.get())
+            try! { XCTAssertNoThrow(try result.get()) }()
             downloadRealm = try! result.get()
             asyncOpenEx.fulfill()
         }
@@ -965,7 +965,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         task.addProgressNotification { p in
             DispatchQueue.main.async {
-                if let progress = progress {
+                if let progress {
                     if progress.progressEstimate < 1.0 {
                         XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                     }
@@ -990,18 +990,19 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let realm = try openRealm(wait: false)
 
         let session = try XCTUnwrap(realm.syncSession)
-        var ex = expectation(description: "first download")
-        var callCount = 0
-        var progress: SyncSession.Progress?
+        let ex = expectation(description: "first download")
+        let callCount = Locked(0)
+        let progress = Locked<SyncSession.Progress?>(nil)
+
+        let test = Locked<Bool>(false)
+
         let token = session.addProgressNotification(for: .download, mode: .forCurrentlyOutstandingWork) { p in
-            DispatchQueue.main.async {
-                // Verify that progress increases.
-                if let progress = progress {
-                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
-                }
-                progress = p
-                callCount += 1
+            // Verify that progress increases.
+            if let progress = progress.value {
+                XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
             }
+            progress.value = p
+            callCount.withLock { $0 += 1 }
         }
         XCTAssertNotNil(token)
 
@@ -1009,42 +1010,32 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         subscriptions.update({
             subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
         }, onComplete: { err in
-            DispatchQueue.main.async {
-                XCTAssertNil(err)
-                ex.fulfill()
-            }
+            XCTAssertNil(err)
+            ex.fulfill()
         })
 
         waitForExpectations(timeout: 60.0)
 
         XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, SwiftSyncTestCase.bigObjectCount)
 
-        XCTAssertGreaterThanOrEqual(callCount, 1)
-        let p1 = try XCTUnwrap(progress)
+        XCTAssertGreaterThanOrEqual(callCount.value, 1)
+        let p1 = try XCTUnwrap(progress.value)
         XCTAssertEqual(p1.progressEstimate, 1.0)
         XCTAssertTrue(p1.isTransferComplete)
-        let initialCallCount = callCount
-        progress = nil
+        let initialCallCount = callCount.value
+        progress.value = nil
+        test.value = true
 
         // Run a second time to upload more data and verify that the callback continues to be called
-        ex = expectation(description: "second download")
         try populateRealm()
-
-        session.wait(for: .download) { e in
-            DispatchQueue.main.async {
-                XCTAssertNil(e)
-                ex.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 60.0)
+        waitForDownloads(for: realm)
 
         XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2*SwiftSyncTestCase.bigObjectCount)
 
         // We expect that the progress notifier is not called again since those objects were
         // added after it has completed.
-        XCTAssertEqual(callCount, initialCallCount)
-        XCTAssertNil(progress)
+        XCTAssertEqual(callCount.value, initialCallCount)
+        XCTAssertNil(progress.value)
 
         token!.invalidate()
     }
@@ -1055,21 +1046,19 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let realm = try openRealm(wait: false)
 
         let session = try XCTUnwrap(realm.syncSession)
-        var ex = expectation(description: "first download")
-        var callCount = 0
-        var progress: SyncSession.Progress?
+        let ex = expectation(description: "first download")
+        let callCount = Locked(0)
+        let progress = Locked<SyncSession.Progress?>(nil)
         let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
-            DispatchQueue.main.async {
-                // Verify that progress increases. If it has reached 1.0, it may decrease again
-                // since we're adding more data
-                if let progress = progress {
-                    if progress.progressEstimate < 1.0 {
-                        XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
-                    }
+            // Verify that progress increases. If it has reached 1.0, it may decrease again
+            // since we're adding more data
+            if let progress = progress.value {
+                if progress.progressEstimate < 1.0 {
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
-                progress = p
-                callCount += 1
             }
+            progress.value = p
+            callCount.withLock({ $0 += 1 })
         }
         XCTAssertNotNil(token)
 
@@ -1087,30 +1076,21 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, SwiftSyncTestCase.bigObjectCount)
 
-        XCTAssertGreaterThanOrEqual(callCount, 1)
-        let p1 = try XCTUnwrap(progress)
+        XCTAssertGreaterThanOrEqual(callCount.value, 1)
+        let p1 = try XCTUnwrap(progress.value)
         XCTAssertEqual(p1.progressEstimate, 1.0)
         XCTAssertTrue(p1.isTransferComplete)
-        let initialCallCount = callCount
-        progress = nil
+        let initialCallCount = callCount.value
+        progress.value = nil
 
         // Run a second time to upload more data and verify that the callback continues to be called
-        ex = expectation(description: "second download")
         try populateRealm()
-
-        session.wait(for: .download) { e in
-            DispatchQueue.main.async {
-                XCTAssertNil(e)
-                ex.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 60.0)
+        waitForDownloads(for: realm)
 
         XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2*SwiftSyncTestCase.bigObjectCount)
 
-        XCTAssertGreaterThan(callCount, initialCallCount)
-        let p2 = try XCTUnwrap(progress)
+        XCTAssertGreaterThan(callCount.value, initialCallCount)
+        let p2 = try XCTUnwrap(progress.value)
         XCTAssertEqual(p2.progressEstimate, 1.0)
         XCTAssertTrue(p2.isTransferComplete)
 
@@ -1125,51 +1105,37 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         }
         let session = try XCTUnwrap(realm.syncSession)
 
-        var ex = expectation(description: "initial upload")
-        var progress: SyncSession.Progress?
+        let progress = Locked<SyncSession.Progress?>(nil)
+        let callCount = Locked(0)
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-            DispatchQueue.main.async {
-                if let progress = progress {
-                    if progress.progressEstimate < 1 {
-                        XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
-                    }
+            if let progress = progress.value {
+                if progress.progressEstimate < 1 {
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
-                progress = p
             }
+            progress.value = p
+            callCount.withLock({ $0 += 1 })
         }
         XCTAssertNotNil(token)
+        waitForUploads(for: realm)
 
-        session.wait(for: .upload) { err in
-            DispatchQueue.main.async {
-                XCTAssertNil(err)
-                ex.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 10.0, handler: nil)
-
-        for i in 0..<5 {
-            ex = expectation(description: "write transaction upload \(i)")
-            progress = nil
+        for _ in 0..<5 {
+            progress.value = nil
+            let currentCount = callCount.value
             try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
                 }
             }
 
-            session.wait(for: .upload) { err in
-                DispatchQueue.main.async {
-                    XCTAssertNil(err)
-                    ex.fulfill()
-                }
-            }
-
-            waitForExpectations(timeout: 10.0, handler: nil)
+            waitForUploads(for: realm)
+            XCTAssertGreaterThan(callCount.value, currentCount)
         }
+
         token!.invalidate()
 
-        let p = try XCTUnwrap(progress)
+        let p = try XCTUnwrap(progress.value)
         XCTAssertEqual(p.progressEstimate, 1.0)
         XCTAssertTrue(p.isTransferComplete)
     }
@@ -1209,8 +1175,8 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         // This whole test takes 250ms, so we don't need a very long sleep.
         Thread.sleep(forTimeInterval: 0.2)
 
-        downloadCount.wrappedValue = 0
-        uploadCount.wrappedValue = 0
+        downloadCount.value = 0
+        uploadCount.value = 0
 
         try populateRealm()
         waitForDownloads(for: realm)
@@ -1221,8 +1187,8 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         // We check that the notification block is not called after we reset the
         // counters on the notifiers and call invalidated().
-        XCTAssertEqual(downloadCount.wrappedValue, 0)
-        XCTAssertEqual(uploadCount.wrappedValue, 0)
+        XCTAssertEqual(downloadCount.value, 0)
+        XCTAssertEqual(uploadCount.value, 0)
     }
 }
 

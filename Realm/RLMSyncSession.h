@@ -102,7 +102,7 @@ typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInte
 /**
  A struct encapsulating progress information.
  */
-typedef struct SyncProgress {
+typedef struct RLMSyncProgress {
     /// The number of bytes that have been transferred.
     NSUInteger transferredBytes;
     
@@ -121,13 +121,13 @@ typedef struct SyncProgress {
      value may either increase or decrease as new data needs to be transferred.
      */
     double progressEstimate;
-} SyncProgress;
+} RLMSyncProgress;
 
 /**
  The type of a progress notification block intended for reporting a session's network
  activity to the user.
  */
-typedef void(^RLMSyncProgressNotificationBlock)(SyncProgress progress);
+typedef void(^RLMSyncProgressNotificationBlock)(RLMSyncProgress progress);
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 

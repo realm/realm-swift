@@ -62,7 +62,7 @@ __attribute__((objc_direct_members))
     auto wrappedBlock = ^(NSUInteger transferred_bytes, NSUInteger transferrable_bytes, double estimate) {
         dispatch_async(queue, ^{
             @autoreleasepool {
-                SyncProgress progress = {.transferredBytes = transferred_bytes, .transferrableBytes = transferrable_bytes, .progressEstimate = estimate};
+                RLMSyncProgress progress = {.transferredBytes = transferred_bytes, .transferrableBytes = transferrable_bytes, .progressEstimate = estimate};
                 block(progress);
             }
         });
@@ -78,7 +78,7 @@ __attribute__((objc_direct_members))
 }
 
 - (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue block:(RLMProgressNotificationBlock)block {
-    [self addSyncProgressNotificationOnQueue:queue block:^(SyncProgress progress) {
+    [self addSyncProgressNotificationOnQueue:queue block:^(RLMSyncProgress progress) {
         block(progress.transferredBytes, progress.transferrableBytes);
     }];
 }

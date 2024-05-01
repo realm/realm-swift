@@ -267,6 +267,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Progress notifiers
     @MainActor
+    @available(*, deprecated)
     func testStreamingDownloadNotifier() throws {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
@@ -325,6 +326,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     @MainActor
+    @available(*, deprecated)
     func testStreamingUploadNotifier() throws {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
