@@ -4,6 +4,9 @@ x.y.z Release notes (yyyy-MM-dd)
 Drop support for Xcode 14, as it can no longer be used to submit app to the app
 store. Xcode 15.1 is now the minimum supported version.
 
+### Known Issues
+* Accessing `App.currentUser` within an `App.subscribe` callback would lead to a deadlock.
+
 ### Enhancements
 * Added `SyncConfiguration.initialSubscriptions` which describes the initial
   subscription configuration that was passed when constructing the
@@ -13,12 +16,12 @@ store. Xcode 15.1 is now the minimum supported version.
   ([Core #7552](https://github.com/realm/realm-core/pull/7552)).
 * Improve perfomance of IN queries and chained OR equality queries for
   UUID/ObjectId types. ([.Net #3566](https://github.com/realm/realm-dotnet/issues/3566))
-* Added support for updating Atlas Device Sync's base url, in case the need to roam between 
-  servers (cloud and/or edge server). This API is private and can only be imported using 
-  `@_spi(Private)` 
+* Added support for updating Atlas Device Sync's base url, in case the need to roam between
+  servers (cloud and/or edge server). This API is private and can only be imported using
+  `@_spi(Private)`
    ```swift
    @_spi(RealmSwiftExperimental) import RealmSwift
-  
+
    try await app.updateBaseUrl(to: "https://services.cloud.mongodb.com")
   ```
   ([#8486](https://github.com/realm/realm-swift/issues/8486)).
@@ -75,11 +78,10 @@ store. Xcode 15.1 is now the minimum supported version.
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* Realm Studio: 14.0.1 or later.
+* Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.3.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 14.2-15.3.0. Note that this will be the final release to support Xcode 14.
 
 ### Internal
 * Upgraded realm-core from v14.5.2 to 14.6.2
