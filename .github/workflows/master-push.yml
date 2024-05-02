@@ -300,7 +300,7 @@ jobs:
             cd examples/installation
             bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
   test-installation-xcframework:
-      runs-on: macos-13
+      runs-on: macos-14
       name: Run installation test for xcframework
       needs: [package-release, prepare]
       env:

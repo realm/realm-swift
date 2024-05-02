@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.50.0 Release notes (2024-05-02)
 =============================================================
 
 Drop support for Xcode 14, as it can no longer be used to submit app to the app
