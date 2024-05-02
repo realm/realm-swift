@@ -20,7 +20,7 @@
 
 import Realm
 import Realm.Private
-import RealmSwift
+@_spi(RealmSwiftExperimental) import RealmSwift
 import XCTest
 
 #if canImport(RealmTestSupport)
@@ -76,6 +76,21 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
         } catch {
             XCTFail("Expected error of type \(E.self) but got \(error)")
         }
+    }
+
+    func testUpdateBaseUrl() async throws {
+        let app = App(id: appId)
+        XCTAssertNotNil(app.baseURL)
+        XCTAssertEqual(app.baseURL, "http://localhost:9090")
+
+        try await app.updateBaseUrl(to: "http://localhost:8080")
+        XCTAssertEqual(app.baseURL, "http://localhost:8080")
+
+        try await app.updateBaseUrl(to: "http://localhost:7070/")
+        XCTAssertEqual(app.baseURL, "http://localhost:7070")
+
+        try await app.updateBaseUrl(to: nil)
+        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
     }
 
     @MainActor func testAsyncOpenStandalone() async throws {
