@@ -16,10 +16,10 @@ Pod::Spec.new do |s|
   s.social_media_url          = 'https://twitter.com/realm'
   s.documentation_url         = "https://docs.mongodb.com/realm/sdk/swift"
   s.license                   = { :type => 'Apache 2.0', :file => 'LICENSE' }
-  s.ios.deployment_target     = '11.0'
+  s.ios.deployment_target     = '12.0'
   s.osx.deployment_target     = '10.13'
   s.watchos.deployment_target = '4.0'
-  s.tvos.deployment_target    = '11.0'
+  s.tvos.deployment_target    = '12.0'
   s.preserve_paths            = %w(build.sh)
   s.swift_version             = '5'
 
@@ -37,18 +37,13 @@ Pod::Spec.new do |s|
     'IPHONEOS_DEPLOYMENT_TARGET_1500' => '12.0',
     'IPHONEOS_DEPLOYMENT_TARGET' => '$(IPHONEOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
     'MACOSX_DEPLOYMENT_TARGET_1400' => '10.13',
-    'MACOSX_DEPLOYMENT_TARGET_1500' => '10.14',
+    'MACOSX_DEPLOYMENT_TARGET_1500' => '10.13',
     'MACOSX_DEPLOYMENT_TARGET' => '$(MACOSX_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
     'WATCHOS_DEPLOYMENT_TARGET_1400' => '4.0',
-    'WATCHOS_DEPLOYMENT_TARGET_1500' => '5.0',
+    'WATCHOS_DEPLOYMENT_TARGET_1500' => '4.0',
     'WATCHOS_DEPLOYMENT_TARGET' => '$(WATCHOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
     'TVOS_DEPLOYMENT_TARGET_1400' => '11.0',
     'TVOS_DEPLOYMENT_TARGET_1500' => '12.0',
     'TVOS_DEPLOYMENT_TARGET' => '$(TVOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
-
-    'REALM_LD_CLASSIC_1400' => '',
-    'REALM_LD_CLASSIC_1500' => '-Wl,-ld_classic',
-    'REALM_LD_CLASSIC' => '$(REALM_LD_CLASSIC_$(XCODE_VERSION_MAJOR))',
-    'OTHER_LDFLAGS' => '$(REALM_LD_CLASSIC)',
   }
 end

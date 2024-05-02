@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst]
-        xcode: ["14.3.1"]
+        xcode: ["15.1"]
         include:
           - target: xros
             xcode: "15.2.0"

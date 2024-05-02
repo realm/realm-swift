@@ -655,7 +655,6 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
         token2.invalidate()
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     private actor TestActor {
         private var gotInitial = false
@@ -798,8 +797,6 @@ class RealmCollectionTests<Collection: RealmCollection, AggregateCollection: Rea
         await fulfillment(of: [actor.expectation])
         token.invalidate()
     }
-
-#endif
 
     func testObserveKeyPath() {
         var ex = expectation(description: "initial notification")
@@ -1747,7 +1744,6 @@ class ListUnmanagedRealmCollectionTests: ListRealmCollectionTests {
         assertThrows(collection.observe { _ in })
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     override func testCancelTaskForObservationInit() async throws {}
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -1758,7 +1754,6 @@ class ListUnmanagedRealmCollectionTests: ListRealmCollectionTests {
     override func testObserveOnActorWithStringKeyPath() async throws {}
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     override func testObserveOnActorWithKeyPath() async throws {}
-#endif
 
     override func testObserveKeyPath() {
         assertThrows(collection.observe { _ in })
@@ -2001,7 +1996,6 @@ class MutableSetUnmanagedRealmCollectionTests: MutableSetRealmCollectionTests {
         assertThrows(collection.observe { _ in })
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     override func testCancelTaskForObservationInit() async throws {}
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
@@ -2012,7 +2006,6 @@ class MutableSetUnmanagedRealmCollectionTests: MutableSetRealmCollectionTests {
     override func testObserveOnActorWithStringKeyPath() async throws {}
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     override func testObserveOnActorWithKeyPath() async throws {}
-#endif
 
     override func testObserveOnQueue() {
         assertThrows(collection.observe(on: DispatchQueue(label: "bg")) { _ in })

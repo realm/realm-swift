@@ -1,5 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Drop support for Xcode 14, as it can no longer be used to submit app to the app
+store. Xcode 15.1 is now the minimum supported version.
+
 ### Enhancements
 * Added `SyncConfiguration.initialSubscriptions` which describes the initial
   subscription configuration that was passed when constructing the
@@ -9,6 +13,15 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #7552](https://github.com/realm/realm-core/pull/7552)).
 * Improve perfomance of IN queries and chained OR equality queries for
   UUID/ObjectId types. ([.Net #3566](https://github.com/realm/realm-dotnet/issues/3566))
+* Added support for updating Atlas Device Sync's base url, in case the need to roam between 
+  servers (cloud and/or edge server). This API is private and can only be imported using 
+  `@_spi(Private)` 
+   ```swift
+   @_spi(RealmSwiftExperimental) import RealmSwift
+  
+   try await app.updateBaseUrl(to: "https://services.cloud.mongodb.com")
+  ```
+  ([#8486](https://github.com/realm/realm-swift/issues/8486)).
 * Enable building RealmSwift as a dynamic framework when installing via SPM, which
   lets us supply a privacy manifest. When RealmSwift is built as a static
   library you must supply your own manifest, as Xcode does not build static

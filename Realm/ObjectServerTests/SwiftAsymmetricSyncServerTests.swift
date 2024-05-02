@@ -183,7 +183,6 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
     }
 }
 
-#if swift(>=5.8)
 @available(macOS 13.0, *)
 extension SwiftAsymmetricSyncTests {
     @MainActor
@@ -297,5 +296,4 @@ extension SwiftAsymmetricSyncTests {
         XCTAssertEqual(document!["custom_stringCol"], AnyBSON("$%&/("))
     }
 }
-#endif // canImport(_Concurrency)
 #endif // os(macOS)

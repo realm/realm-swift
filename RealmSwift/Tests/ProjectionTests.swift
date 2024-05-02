@@ -1590,7 +1590,6 @@ class ProjectionTests: TestCase {
         observeSetChange(obs, "mapOptUuid") { obj.mapOptUuid.removeObject(for: "key") }
     }
 
-#if swift(>=5.8)
     func testObserveOnActor() async throws {
         let projection = simpleProjection()
         let ex = expectation(description: "got change")
@@ -1623,7 +1622,6 @@ class ProjectionTests: TestCase {
         await fulfillment(of: [ex])
         tokens.forEach { $0.invalidate() }
     }
-#endif
 
     // MARK: Frozen Objects
 

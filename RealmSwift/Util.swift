@@ -164,11 +164,9 @@ internal func logRuntimeIssue(_ message: StaticString) {
 internal func assumeOnMainActorExecutor<T>(_ operation: @MainActor () throws -> T,
                                            file: StaticString = #fileID, line: UInt = #line
 ) rethrows -> T {
-#if swift(>=5.9)
     if #available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *) {
         return try MainActor.assumeIsolated(operation)
     }
-#endif
 
     precondition(Thread.isMainThread, file: file, line: line)
     return try withoutActuallyEscaping(operation) { fn in
@@ -181,11 +179,9 @@ internal func assumeOnMainActorExecutor<T>(_ operation: @MainActor () throws -> 
 internal func assumeOnActorExecutor<A: Actor, T>(_ actor: A,
                                                  _ operation: (isolated A) throws -> T
 ) rethrows -> T {
-#if swift(>=5.9)
     if #available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *) {
         return try actor.assumeIsolated(operation)
     }
-#endif
 
     return try withoutActuallyEscaping(operation) { fn in
         try unsafeBitCast(fn, to: ((A) throws -> T).self)(actor)

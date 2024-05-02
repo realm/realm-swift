@@ -49,7 +49,6 @@ extension URLSession {
     }
 
     // Synchronously perform a data task, returning the data from it
-    @available(macOS 10.12, *)
     fileprivate func resultDataTask(with request: URLRequest) -> Result<Data, Error> {
         let result = Locked(Result<Data, Error>?.none)
         let group = DispatchGroup()
@@ -125,10 +124,6 @@ private extension Property {
     }
 }
 
-// Swift 5.8 complains if collections are inferred as having type Any and adding
-// explicit types everywhere makes things awful, but this doesn't quite work on
-// older versions of Swift
-#if swift(>=5.8)
 internal protocol Json {}
 extension Bool: Json {}
 extension Int: Json {}
@@ -138,9 +133,6 @@ extension Double: Json {}
 extension Dictionary: Json where Key == String, Value == Json {}
 extension Array: Json where Element == Json {}
 extension Optional: Json where Wrapped: Json {}
-#else
-typealias Json = Any
-#endif
 
 private extension ObjectSchema {
     func stitchRule(_ partitionKeyType: String?, id: String? = nil, appId: String) -> [String: Json] {
@@ -220,7 +212,6 @@ private extension DispatchGroup {
 
 // MARK: AdminSession
 /// An authenticated session for using the Admin API
-@available(macOS 10.12, *)
 class AdminSession {
     /// The access token of the authenticated user
     var accessToken: String
@@ -427,7 +418,6 @@ class AdminSession {
 }
 
 // MARK: - Admin
-@available(macOS 10.12, *)
 class Admin {
     private func userProfile(accessToken: String) -> Result<AdminProfile, Error> {
         var request = URLRequest(url: URL(string: "http://localhost:9090/api/admin/v3.0/auth/profile")!)
@@ -486,7 +476,6 @@ public enum SyncMode {
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
  */
-@available(OSX 10.13, *)
 @objc(RealmServer)
 public class RealmServer: NSObject {
     public enum LogLevel: Sendable {

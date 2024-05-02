@@ -1530,7 +1530,6 @@ class ObjectTests: TestCase {
         queue.sync { }
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func expectChange<T: Object>(_ obj: T, _ ex: XCTestExpectation, newValue: Int)
     -> @Sendable (isolated CustomGlobalActor, ObjectChange<T>) -> Void {
@@ -1712,7 +1711,6 @@ class ObjectTests: TestCase {
             XCTAssertEqual(active.value, completed.value)
         }
     }
-#endif
 
     // MARK: Equality Tests
 

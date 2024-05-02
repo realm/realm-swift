@@ -86,7 +86,6 @@ extension ObjectBase {
         }
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
     internal func _observe<A: Actor, T: ObjectBase>(
         keyPaths: [String]? = nil, on actor: isolated A,
@@ -104,5 +103,4 @@ extension ObjectBase {
                                           onCancel: { token.invalidate() })
         return token
     }
-#endif // swift(>=5.8)
 }

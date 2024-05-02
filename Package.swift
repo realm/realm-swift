@@ -140,8 +140,8 @@ let package = Package(
     name: "Realm",
     platforms: [
         .macOS(.v10_13),
-        .iOS(.v11),
-        .tvOS(.v11),
+        .iOS(.v12),
+        .tvOS(.v12),
         .watchOS(.v4)
     ],
     products: [
