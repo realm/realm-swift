@@ -235,7 +235,6 @@ class FakeSyncUser : public realm::SyncUser {
     }
 
     void request_log_out() override {}
-    void request_refresh_user(CompletionHandler&&) override {}
     void request_refresh_location(CompletionHandler&&) override {}
     void request_access_token(CompletionHandler&&) override {}
 
