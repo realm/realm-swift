@@ -82,6 +82,7 @@ store. Xcode 15.1 is now the minimum supported version.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.3.0.
 * CocoaPods: 1.10 or later.
+* Xcode: 15.1.0-15.3.0.
 
 ### Internal
 * Upgraded realm-core from v14.5.2 to 14.6.2
