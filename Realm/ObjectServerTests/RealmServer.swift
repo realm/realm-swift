@@ -188,9 +188,11 @@ struct AdminProfile: Codable {
     struct Role: Codable {
         enum CodingKeys: String, CodingKey {
             case groupId = "group_id"
+            case roleName = "role_name"
         }
 
-        let groupId: String
+        let roleName: String
+        let groupId: String?
     }
 
     let roles: [Role]
@@ -453,7 +455,9 @@ class Admin {
             }
             .flatMap { (accessToken: String) -> Result<AdminSession, Error> in
                 self.userProfile(accessToken: accessToken).map {
-                    AdminSession(accessToken: accessToken, groupId: $0.roles[0].groupId)
+                    AdminSession(accessToken: accessToken, groupId: $0.roles.first(where: { role in
+                        role.roleName == "GROUP_OWNER"
+                    })!.groupId!)
                 }
             }
             .get()
@@ -883,6 +887,21 @@ public class RealmServer: NSObject {
                     ]
                 ]
             ]
+
+            // We only need to create the userData rule for .pbs since for .flx we
+            // have a default rule that covers all collections
+            let userDataRule: [String: Json] = [
+                "database": "test_data",
+                "collection": "UserData",
+                "roles": [[
+                    "name": "default",
+                    "apply_when": [:],
+                    "insert": true,
+                    "delete": true,
+                    "additional_fields": [:]
+                ]]
+            ]
+            _ = app.services[serviceId].rules.post(userDataRule)
         case .flx(let fields):
             serviceConfig = [
                 "flexible_sync": [
@@ -939,19 +958,6 @@ public class RealmServer: NSObject {
             """
         ], failOnError)
 
-        let rules = app.services[serviceId].rules
-        let userDataRule: [String: Json] = [
-            "database": "test_data",
-            "collection": "UserData",
-            "roles": [[
-                "name": "default",
-                "apply_when": [:],
-                "insert": true,
-                "delete": true,
-                "additional_fields": [:]
-            ]]
-        ]
-        _ = rules.post(userDataRule)
         app.customUserData.patch(on: group, [
             "mongo_service_id": serviceId,
             "enabled": true,
@@ -978,9 +984,10 @@ public class RealmServer: NSObject {
         ], failOnError)
 
         // Disable exponential backoff when the server isn't ready for us to connect
-        session.privateApps[appId].settings.patch(on: group, [
-            "sync": ["disable_client_error_backoff": true]
-        ], failOnError)
+        // TODO: this is returning 403 with current server. Reenable once it's fixed - see https://mongodb.slack.com/archives/C0121N9LJ14/p1713885482349059
+        // session.privateApps[appId].settings.patch(on: group, [
+        //    "sync": ["disable_client_error_backoff": true]
+        // ], failOnError)
 
         try group.throwingWait(timeout: .now() + 5.0)
 

@@ -306,11 +306,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Progress notifiers
     @MainActor
+    @available(*, deprecated)
     func testStreamingDownloadNotifier() throws {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
-        var ex = expectation(description: "first download")
-        var minimumDownloadSize = 1000000
         var callCount = 0
         var progress: SyncSession.Progress?
         let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
@@ -318,82 +317,73 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 // Verify that progress doesn't decrease, but sometimes it won't
                 // have increased since the last call
                 if let progress = progress {
-                    XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
-                    XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
-                    if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
-                        return
-                    }
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
                 progress = p
                 callCount += 1
-                if p.transferredBytes > minimumDownloadSize && p.isTransferComplete {
-                    ex.fulfill()
-                }
             }
         }
         XCTAssertNotNil(token)
 
         try populateRealm()
-        waitForExpectations(timeout: 60.0, handler: nil)
+        waitForDownloads(for: realm)
 
         XCTAssertGreaterThanOrEqual(callCount, 1)
         let p1 = try XCTUnwrap(progress)
         XCTAssertEqual(p1.transferredBytes, p1.transferrableBytes)
+        XCTAssertEqual(p1.progressEstimate, 1.0)
+        XCTAssertTrue(p1.isTransferComplete)
         let initialCallCount = callCount
-        minimumDownloadSize = p1.transferredBytes + 1000000
 
         // Run a second time to upload more data and verify that the callback continues to be called
-        ex = expectation(description: "second download")
         try populateRealm()
-        waitForExpectations(timeout: 60.0, handler: nil)
-        XCTAssertGreaterThanOrEqual(callCount, initialCallCount)
+        waitForDownloads(for: realm)
+
+        XCTAssertGreaterThan(callCount, initialCallCount)
         let p2 = try XCTUnwrap(progress)
         XCTAssertEqual(p2.transferredBytes, p2.transferrableBytes)
+        XCTAssertEqual(p2.progressEstimate, 1.0)
+        XCTAssertTrue(p2.isTransferComplete)
 
         token!.invalidate()
     }
 
     @MainActor
+    @available(*, deprecated)
     func testStreamingUploadNotifier() throws {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
 
-        var ex = expectation(description: "initial upload")
         var progress: SyncSession.Progress?
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
             DispatchQueue.main.async { @MainActor in
                 if let progress = progress {
-                    XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
-                    XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
-                    // The sync client sometimes sends spurious notifications
-                    // where nothing has changed, and we should just ignore those
-                    if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
-                        return
-                    }
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
                 progress = p
-                if p.transferredBytes > 100 && p.isTransferComplete {
-                    ex.fulfill()
-                }
             }
         }
         XCTAssertNotNil(token)
-        waitForExpectations(timeout: 10.0, handler: nil)
 
-        for i in 0..<5 {
-            ex = expectation(description: "write transaction upload \(i)")
+        waitForUploads(for: realm)
+
+        for _ in 0..<5 {
+            progress = nil
             try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
                 }
             }
-            waitForExpectations(timeout: 10.0, handler: nil)
+
+            waitForUploads(for: realm)
         }
         token!.invalidate()
 
         let p = try XCTUnwrap(progress)
         XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
+        XCTAssertEqual(p.progressEstimate, 1.0)
+        XCTAssertTrue(p.isTransferComplete)
     }
 
     func testStreamingNotifierInvalidate() throws {

@@ -859,11 +859,15 @@ public extension SyncSession {
     typealias ProgressNotificationToken = RLMProgressNotificationToken
 
     /**
-     A struct encapsulating progress information, as well as useful helper methods.
+     A struct encapsulating progress information.
      */
     struct Progress: Sendable {
+        private let _transferredBytes: Int // NEXT-MAJOR remove storage fields and deprecated props
+        private let _transferrableBytes: Int // NEXT-MAJOR remove storage fields and deprecated props
+
         /// The number of bytes that have been transferred.
-        public let transferredBytes: Int
+        @available(*, deprecated, message: "Use progressEstimate")
+        public var transferredBytes: Int { return _transferredBytes }
 
         /**
          The total number of transferrable bytes (bytes that have been transferred,
@@ -874,27 +878,36 @@ public extension SyncSession {
          If the notification block is tracking uploads, this number represents the size of the
          changesets representing the local changes on this client.
          */
-        public let transferrableBytes: Int
+        @available(*, deprecated, message: "Use progressEstimate")
+        public var transferrableBytes: Int { return _transferrableBytes }
+
+        /**
+         A value between 0.0 and 1.0 representing the estimated transfer progress. This value is precise for
+         uploads, but will be based on historical data and certain heuristics applied by the server for downloads.
+         
+         Whenever the progress reporting mode is `forCurrentlyOutstandingWork`, that value
+         will monotonically increase until it reaches 1.0. If the progress mode is `reportIndefinitely`, the
+         value may either increase or decrease as new data needs to be transferred.
+         */
+        public let progressEstimate: Double
 
         /// The fraction of bytes transferred out of all transferrable bytes. If this value is 1,
         /// no bytes are waiting to be transferred (either all bytes have already been transferred,
         /// or there are no bytes to be transferred in the first place).
+        @available(*, deprecated, message: "Use progressEstimate", renamed: "progressEstimate")
         public var fractionTransferred: Double {
-            if transferrableBytes == 0 {
-                return 1
-            }
-            let percentage = Double(transferredBytes) / Double(transferrableBytes)
-            return percentage > 1 ? 1 : percentage
+            return progressEstimate
         }
 
-        /// Whether all pending bytes have already been transferred.
+        /// Whether all pending data has already been transferred.
         public var isTransferComplete: Bool {
-            return transferredBytes >= transferrableBytes
+            return progressEstimate == 1.0
         }
 
-        internal init(transferred: UInt, transferrable: UInt) {
-            transferredBytes = Int(transferred)
-            transferrableBytes = Int(transferrable)
+        internal init(transferred: UInt, transferrable: UInt, estimate: Double) {
+            _transferredBytes = Int(transferred)
+            _transferrableBytes = Int(transferrable)
+            progressEstimate = estimate
         }
     }
 
@@ -931,11 +944,11 @@ public extension SyncSession {
     func addProgressNotification(for direction: ProgressDirection,
                                  mode: ProgressMode,
                                  block: @Sendable @escaping (Progress) -> Void) -> ProgressNotificationToken? {
-        return __addProgressNotification(for: (direction == .upload ? .upload : .download),
-                                         mode: (mode == .reportIndefinitely
-                                            ? .reportIndefinitely
-                                            : .forCurrentlyOutstandingWork)) { transferred, transferrable in
-                                                block(Progress(transferred: transferred, transferrable: transferrable))
+        return __addSyncProgressNotification(for: (direction == .upload ? .upload : .download),
+                                             mode: (mode == .reportIndefinitely
+                                                    ? .reportIndefinitely
+                                                    : .forCurrentlyOutstandingWork)) { progress in
+            block(Progress(transferred: progress.transferredBytes, transferrable: progress.transferrableBytes, estimate: progress.progressEstimate))
         }
     }
 
