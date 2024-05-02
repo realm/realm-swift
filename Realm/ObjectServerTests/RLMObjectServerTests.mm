@@ -81,6 +81,32 @@ static NSString *generateRandomString(int num) {
 
 #pragma mark - Authentication and Tokens
 
+- (void)testUpdateBaseUrl {
+    RLMApp *app = self.app;
+    XCTAssertEqual(app.baseURL, @"http://localhost:9090");
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should update base url"];
+    [app updateBaseURL:@"http://localhost:8080" completion:^(NSError *error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    XCTAssertEqual(app.baseURL, @"http://localhost:8080");
+
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"should update base url"];
+    [app updateBaseURL:@"http://localhost:7070/" completion:^(NSError *error) {
+        XCTAssertNil(error);
+        [expectation1 fulfill];
+    }];
+    XCTAssertEqual(app.baseURL, @"http://localhost:7070");
+
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"should update base url to default value"];
+    [app updateBaseURL:nil completion:^(NSError *error) {
+        XCTAssertNil(error);
+        [expectation2 fulfill];
+    }];
+    XCTAssertEqual(app.baseURL, @"https://services.cloud.mongodb.com");
+}
+
 - (void)testAnonymousAuthentication {
     RLMUser *syncUser = self.anonymousUser;
     RLMUser *currentUser = [self.app currentUser];
