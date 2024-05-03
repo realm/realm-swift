@@ -185,7 +185,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func populateRealm() throws {
         try write { realm in
             for _ in 0..<SwiftSyncTestCase.bigObjectCount {
-                realm.add(SwiftHugeSyncObject.create())
+                realm.add(SwiftHugeSyncObject.create(key: name))
             }
         }
     }
