@@ -22,8 +22,10 @@ import RealmSwift
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 class SwiftUITests: XCTestCase {
     var realm: Realm!
+    @MainActor
     let app = XCUIApplication()
 
+    @MainActor
     override func setUpWithError() throws {
         continueAfterFailure = false
 
@@ -39,6 +41,7 @@ class SwiftUITests: XCTestCase {
         ]
     }
 
+    @MainActor
     override func tearDownWithError() throws {
         app.terminate()
         self.realm.invalidate()
@@ -51,6 +54,7 @@ class SwiftUITests: XCTestCase {
         String(repeating: XCUIKeyboardKey.delete.rawValue, count: string.count)
     }
 
+    @MainActor
     private var tables: XCUIElementQuery {
         if #available(iOS 16.0, *) {
             return app.collectionViews
@@ -59,6 +63,7 @@ class SwiftUITests: XCTestCase {
         }
     }
 
+    @MainActor
     func testSampleApp() throws {
         app.launch()
         // assert realm is empty
@@ -151,17 +156,20 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
     }
 
+    @MainActor
     func testNSPredicateObservedResults() throws {
         app.launch()
         try observedResultsQueryTest()
     }
 
+    @MainActor
     func testSwiftQueryObservedResults() throws {
         app.launchEnvironment["query_type"] = "type_safe_query"
         app.launch()
         try observedResultsQueryTest()
     }
 
+    @MainActor
     private func observedResultsQueryTest() throws {
         let addButton = app.buttons["addList"]
         (1...5).forEach { _ in
@@ -185,6 +193,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(table.cells.count, 3)
     }
 
+    @MainActor
     func testMultipleEnvironmentRealms() {
         app.launchEnvironment["test_type"] = "multi_realm_test"
         app.launch()
@@ -201,6 +210,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["test_text_view"].label, "realm_c")
     }
 
+    @MainActor
     func testUnmanagedObjectState() {
         app.launchEnvironment["test_type"] = "unmanaged_object_test"
         app.launch()
@@ -218,6 +228,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(app.textFields["name"].value as? String, "test name")
     }
 
+    @MainActor
     func testKeyPathResults() {
         app.launchEnvironment["test_type"] = "observed_results_key_path"
         app.launch()
@@ -266,6 +277,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(tables.firstMatch.cells.count, 2)
     }
 
+    @MainActor
     func testUpdateResultsWithSearchable() {
         app.launchEnvironment["test_type"] = "observed_results_searchable"
         app.launch()
@@ -323,6 +335,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(table.cells.count, 0)
     }
 
+    @MainActor
     func testObservedResultsConfiguration() {
         app.launchEnvironment["test_type"] = "observed_results_configuration"
         app.launch()
@@ -347,6 +360,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(tableB.cells.count, 5)
     }
 
+    @MainActor
     func testKeyPathObservedSectionedResults() {
         app.launchEnvironment["test_type"] = "observed_sectioned_results_key_path"
         app.launch()
@@ -428,6 +442,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
     }
 
+    @MainActor
     func testKeyPathObservedSectionedResults2() {
         // Tests ObservedSectionedResults ctor that uses the `sectionBlock` param.
         app.launchEnvironment["test_type"] = "observed_sectioned_results_sort_descriptors"
@@ -512,6 +527,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
     }
 
+    @MainActor
     func testUpdateObservedSectionedResultsWithSearchable() {
         app.launchEnvironment["test_type"] = "observed_sectioned_results_searchable"
         app.launch()
@@ -580,6 +596,7 @@ class SwiftUITests: XCTestCase {
         }
     }
 
+    @MainActor
     func testObservedSectionedResultsConfiguration() {
         app.launchEnvironment["test_type"] = "observed_sectioned_results_configuration"
         app.launch()
