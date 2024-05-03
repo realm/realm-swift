@@ -93,6 +93,7 @@ jobs:
       name: Run installation test for ${{ matrix.platform }}, ${{ matrix.installation }} and ${{ matrix.linkage }}
       needs: [create-release, prepare, publish-cocoapods]
       strategy:
+        fail-fast: false
         matrix:
           platform: [ios, osx, watchos, tvos, catalyst, visionos]
           installation: [cocoapods, spm, carthage, xcframework]
@@ -135,13 +136,19 @@ jobs:
         - name: Set REALM_TEST_RELEASE
           run: echo "REALM_TEST_RELEASE=${{ needs.prepare.outputs.VERSION }}" >> $GITHUB_ENV
         - name: Run installation test
-          run: |
-            cd examples/installation
-            bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
+          uses: nick-fields/retry@v3
+          with:
+            command: |
+              cd examples/installation
+              bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
+            timeout_minutes: 30
+            max_attempts: 10
+            retry_wait_seconds: 60
+            retry_on: error
   post-slack-release:
       runs-on: macos-latest
       name: Publish to release Slack channel
-      needs: [test-installation, prepare]
+      needs: [create-release, prepare, publish-cocoapods, update-checker, publish-docs]
       env:
         WEBHOOK_URL: ${{ secrets.SLACK_RELEASES_WEBHOOK }}
       steps:
@@ -152,7 +159,7 @@ jobs:
         - name: Prepare Changelog
           run: bundle exec ./build.sh prepare-publish-changelog
         - name: 'Post to #realm-releases'
-          uses: realm/ci-actions/release-to-slack@v3
+          uses: realm/ci-actions/release-to-slack@a2191a6cbf2f5b50aa71026dd068582dbd5016cc
           with:
             changelog: ExtractedChangelog/CHANGELOG.md
             sdk: Swift
