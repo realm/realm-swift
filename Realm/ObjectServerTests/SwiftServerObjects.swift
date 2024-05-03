@@ -180,10 +180,12 @@ public class SwiftIntPrimaryKeyObject: Object {
 public class SwiftHugeSyncObject: Object {
     @Persisted(primaryKey: true) public var _id: ObjectId
     @Persisted public var data: Data?
+    @Persisted public var partition: String
 
-    public class func create() -> SwiftHugeSyncObject {
+    public class func create(key: String = "") -> SwiftHugeSyncObject {
         let fakeDataSize = 1000000
-        return SwiftHugeSyncObject(value: ["data": Data(repeating: 16, count: fakeDataSize)])
+        return SwiftHugeSyncObject(value: ["data": Data(repeating: 16, count: fakeDataSize),
+                                           "partition": key])
     }
 }
 

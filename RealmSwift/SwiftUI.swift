@@ -1531,10 +1531,16 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     }
 
     private func asyncOpenForUser(_ user: User) {
+        let initialSubscriptions = configuration?.syncConfiguration?.initialSubscriptions
+
         // Set the `syncConfiguration` depending if there is partition value (pbs) or not (flx).
         var config: Realm.Configuration
         if let partitionValue = partitionValue {
             config = user.configuration(partitionValue: partitionValue, cancelAsyncOpenOnNonFatalErrors: true)
+        } else if let initialSubscriptions {
+            config = user.flexibleSyncConfiguration(cancelAsyncOpenOnNonFatalErrors: true,
+                                                    initialSubscriptions: ObjectiveCSupport.convert(block: initialSubscriptions.callback),
+                                                    rerunOnOpen: initialSubscriptions.rerunOnOpen)
         } else {
             config = user.flexibleSyncConfiguration(cancelAsyncOpenOnNonFatalErrors: true)
         }

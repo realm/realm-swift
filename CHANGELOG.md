@@ -5,7 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* `@AutoOpen` and `@AsyncOpen` failed to use the `initialSubscriptions` set in
+  the configuration passed to them ([PR #8572](https://github.com/realm/realm-swift/pull/8572), since v10.50.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
