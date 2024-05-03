@@ -83,28 +83,39 @@ static NSString *generateRandomString(int num) {
 
 - (void)testUpdateBaseUrl {
     RLMApp *app = self.app;
-    XCTAssertEqual(app.baseURL, @"http://localhost:9090");
+    XCTAssertEqualObjects(app.baseURL, @"http://localhost:9090");
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"should update base url"];
-    [app updateBaseURL:@"http://localhost:8080" completion:^(NSError *error) {
+    [app updateBaseURL:@"http://127.0.0.1:9090" completion:^(NSError *error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    XCTAssertEqual(app.baseURL, @"http://localhost:8080");
+    [self waitForExpectations:@[expectation]];
+    XCTAssertEqualObjects(app.baseURL, @"http://127.0.0.1:9090");
 
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"should update base url"];
+    TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:7070 targetPort:9090];
+    proxy.delay = 0;
+    [proxy startAndReturnError:nil];
+
+    expectation = [self expectationWithDescription:@"should update base url"];
     [app updateBaseURL:@"http://localhost:7070/" completion:^(NSError *error) {
         XCTAssertNil(error);
-        [expectation1 fulfill];
+        [expectation fulfill];
     }];
-    XCTAssertEqual(app.baseURL, @"http://localhost:7070");
+    [self waitForExpectations:@[expectation]];
+    XCTAssertEqualObjects(app.baseURL, @"http://localhost:7070");
+    [proxy stop];
 
-    XCTestExpectation *expectation2 = [self expectationWithDescription:@"should update base url to default value"];
+    expectation = [self expectationWithDescription:@"should fail to update base url to default value"];
     [app updateBaseURL:nil completion:^(NSError *error) {
-        XCTAssertNil(error);
-        [expectation2 fulfill];
+        // This fails because our local app doesn't exist in the prod env
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, RLMAppErrorUnknown);
+        [expectation fulfill];
     }];
-    XCTAssertEqual(app.baseURL, @"https://services.cloud.mongodb.com");
+    [self waitForExpectations:@[expectation]];
+    // baseURL update failed, so it's left unchanged
+    XCTAssertEqualObjects(app.baseURL, @"http://localhost:7070");
 }
 
 - (void)testAnonymousAuthentication {

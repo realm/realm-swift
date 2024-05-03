@@ -64,41 +64,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testUpdateBaseUrl() {
         let app = App(id: appId)
-        XCTAssertNotNil(app.baseURL)
+        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
+
+        app.updateBaseUrl(to: "http://localhost:9090").await(self)
         XCTAssertEqual(app.baseURL, "http://localhost:9090")
 
-        let ex = expectation(description: "update base url")
-        app.updateBaseUrl(to: "http://localhost:8080", { result in
-            switch result {
-            case .success:
-                ex.fulfill()
-            case .failure:
-                XCTFail("Should not return an error")
-            }
-        })
-        XCTAssertEqual(app.baseURL, "http://localhost:8080")
+        app.updateBaseUrl(to: "http://127.0.0.1:9090").await(self)
+        XCTAssertEqual(app.baseURL, "http://127.0.0.1:9090")
 
-        let ex1 = expectation(description: "update base url")
-        app.updateBaseUrl(to: "http://localhost:7070/", { result in
-            switch result {
-            case .success:
-                ex1.fulfill()
-            case .failure:
-                XCTFail("Should not return an error")
-            }
-        })
-        XCTAssertEqual(app.baseURL, "http://localhost:7070")
-
-        let ex2 = expectation(description: "update base url")
-        app.updateBaseUrl(to: nil, { result in
-            switch result {
-            case .success:
-                ex2.fulfill()
-            case .failure:
-                XCTFail("Should not return an error")
-            }
-        })
-        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
+        app.updateBaseUrl(to: nil).awaitFailure(self)
+        XCTAssertEqual(app.baseURL, "http://127.0.0.1:9090")
     }
 
     func testBasicSwiftSync() throws {

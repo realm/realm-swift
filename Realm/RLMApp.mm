@@ -414,7 +414,7 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     return [[RLMEmailPasswordAuth alloc] initWithApp:_app];
 }
 
-- (NSString *)baseUrl {
+- (NSString *)baseURL {
     return getOptionalString(_app->get_base_url()) ?: RLMStringViewToNSString(_app->default_base_url());
 }
 
