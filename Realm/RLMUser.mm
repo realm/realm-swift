@@ -180,7 +180,7 @@ using namespace realm;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     syncConfig.clientResetMode = clientResetMode;
     syncConfig.manualClientResetHandler = manualClientResetHandler;
-    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions                                                                                              rerunOnOpen:rerunOnOpen];
+    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions rerunOnOpen:rerunOnOpen];
     config.syncConfiguration = syncConfig;
     return config;
 }
