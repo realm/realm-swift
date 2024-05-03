@@ -28,6 +28,15 @@ SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/stitch-artifacts/stitch-support/
 STITCH_SUPPORT_URL="https://static.realm.io/downloads/swift/stitch-support.tar.xz"
 MONGO_DIR="#{BUILD_DIR}/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 
+# exit immediately if any subcommand fails
+class Object
+  def `(command)
+    ret = super
+    exit 1 unless $?.success?
+    ret
+  end
+end
+
 def setup_mongod
     if !File.exist?("#{BIN_DIR}/mongo")
         `cd '#{BUILD_DIR}' && curl --silent '#{MONGODB_URL}' | tar xz`
@@ -38,7 +47,7 @@ end
 
 def run_mongod
     puts "starting mongod..."
-    puts `mkdir '#{BUILD_DIR}'/db_files`
+    puts `mkdir -p '#{BUILD_DIR}'/db_files`
     puts `#{MONGOD_EXE} --quiet \
         --dbpath '#{BUILD_DIR}'/db_files \
         --port 26000 \
@@ -132,13 +141,13 @@ def setup_stitch
         puts `chmod +x '#{assisted_agg_filepath}'`
     end
 
-    if `which node`.empty? && !Dir.exist?("#{BUILD_DIR}/node-v#{NODE_VERSION}-darwin-x64")
+    if `which node || true`.empty? && !Dir.exist?("#{BUILD_DIR}/node-v#{NODE_VERSION}-darwin-x64")
         puts "downloading node 🚀"
         puts `cd '#{BUILD_DIR}' && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" && tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
         exports << "export PATH=\"#{BUILD_DIR}/node-v#{NODE_VERSION}-darwin-x64/bin/:$PATH\""
     end
 
-    if `which yarn`.empty?
+    if `which yarn || true`.empty?
         `rm -rf "$HOME/.yarn"`
         `export PATH=\"#{BUILD_DIR}/node-v#{NODE_VERSION}-darwin-x64/bin/:$PATH\" && curl -o- -L https://yarnpkg.com/install.sh | bash`
         exports << "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\""
