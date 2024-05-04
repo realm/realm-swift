@@ -1220,7 +1220,7 @@ public class RealmServer: NSObject {
         let appServerId = try retrieveAppServerId(appId)
         let ident = RLMGetClientFileIdent(ObjectiveCSupport.convert(object: realm))
         XCTAssertNotEqual(ident, 0)
-        _ = try session.privateApps[appServerId].sync.forceReset.put(["file_ident": ident]).get()
+        _ = try session.apps[appServerId].sync.forceReset.put(["file_ident": ident]).get()
     }
 
     public func waitForSync(appId: String) throws {
