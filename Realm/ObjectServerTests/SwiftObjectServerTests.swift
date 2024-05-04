@@ -329,22 +329,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
 
-        var progress: SyncSession.Progress?
+        let progress = Locked<SyncSession.Progress?>(nil)
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-            DispatchQueue.main.async { @MainActor in
-                if let progress = progress {
+            progress.withLock { progress in
+                if let progress {
                     XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
                 progress = p
             }
         }
         XCTAssertNotNil(token)
-
         waitForUploads(for: realm)
 
         for _ in 0..<5 {
-            progress = nil
+            progress.value = nil
             try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
@@ -355,7 +354,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         token!.invalidate()
 
-        let p = try XCTUnwrap(progress)
+        let p = try XCTUnwrap(progress.value)
         XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
         XCTAssertEqual(p.progressEstimate, 1.0)
         XCTAssertTrue(p.isTransferComplete)
