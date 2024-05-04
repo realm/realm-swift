@@ -47,6 +47,14 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         super.tearDown()
     }
 
+    override class var defaultTestSuite: XCTestSuite {
+        // Don't run tests for the base class
+        if self === SwiftUIServerTests.self {
+            return XCTestSuite(name: "SwiftUIServerTests")
+        }
+        return super.defaultTestSuite
+    }
+
     var cancellables: Set<AnyCancellable> = []
 
     func awaitOpen(_ wrapper: some AsyncOpenStateWrapper,
