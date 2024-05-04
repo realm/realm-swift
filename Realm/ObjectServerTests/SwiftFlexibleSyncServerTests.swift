@@ -950,7 +950,9 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         let user = createUser()
         var config = user.flexibleSyncConfiguration(initialSubscriptions: { subscriptions in
-            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>())
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject> {
+                $0.partition == self.name
+            })
         })
         config.objectTypes = objectTypes
         var downloadRealm: Realm?
@@ -982,13 +984,12 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertTrue(p1.isTransferComplete)
     }
 
-    func testNonStreamingDownloadNotifier() throws {
+    func testNonStreamingDownloadNotifier() async throws {
         try populateRealm()
 
         let realm = try openRealm(wait: false)
 
         let session = try XCTUnwrap(realm.syncSession)
-        let ex = expectation(description: "first download")
         let callCount = Locked(0)
         let progress = Locked<SyncSession.Progress?>(nil)
 
@@ -1005,14 +1006,11 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertNotNil(token)
 
         let subscriptions = realm.subscriptions
-        subscriptions.update({
-            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
-        }, onComplete: { err in
-            XCTAssertNil(err)
-            ex.fulfill()
-        })
-
-        waitForExpectations(timeout: 60.0)
+        try await subscriptions.update {
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject> {
+                $0.partition == self.name
+            })
+        }
 
         XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, SwiftSyncTestCase.bigObjectCount)
 
@@ -1062,12 +1060,12 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
 
         let subscriptions = realm.subscriptions
         subscriptions.update({
-            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject> {
+                $0.partition == self.name
+            })
         }, onComplete: { err in
-            DispatchQueue.main.async {
-                XCTAssertNil(err)
-                ex.fulfill()
-            }
+            XCTAssertNil(err)
+            ex.fulfill()
         })
 
         waitForExpectations(timeout: 60.0)
@@ -1099,7 +1097,9 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let realm = try openRealm(wait: false)
         let subscriptions = realm.subscriptions
         subscriptions.update {
-            subscriptions.append(QuerySubscription<SwiftHugeSyncObject>(name: "huge_objects"))
+            subscriptions.append(QuerySubscription<SwiftHugeSyncObject> {
+                $0.partition == self.name
+            })
         }
         let session = try XCTUnwrap(realm.syncSession)
 
@@ -1107,13 +1107,11 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         let callCount = Locked(0)
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-            if let progress = progress.value {
-                if progress.progressEstimate < 1 {
-                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
-                }
+            if let progress = progress.value, progress.progressEstimate < 1 {
+                XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
             }
             progress.value = p
-            callCount.withLock({ $0 += 1 })
+            callCount.withLock { $0 += 1 }
         }
         XCTAssertNotNil(token)
         waitForUploads(for: realm)
@@ -1123,7 +1121,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
             let currentCount = callCount.value
             try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
-                    realm.add(SwiftHugeSyncObject.create())
+                    realm.add(SwiftHugeSyncObject.create(key: self.name))
                 }
             }
 
