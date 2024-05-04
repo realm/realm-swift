@@ -16,7 +16,8 @@ install_dependencies() {
         brew install swiftlint
     elif [[ "$CI_WORKFLOW" == "cocoapods"* ]]; then
         install_ruby
-    elif [[ "$CI_WORKFLOW" == "sync"* ]] || [[ "$CI_WORKFLOW" == "swiftpm"* ]]; then
+    elif [[ "$CI_WORKFLOW" == "sync"* ]]; then
+    # elif [[ "$CI_WORKFLOW" == "sync"* ]] || [[ "$CI_WORKFLOW" == "swiftpm"* ]]; then
         sh build.sh setup-baas
         sh build.sh download-core
     elif [[ "$CI_WORKFLOW" = *"spm"* ]] || [[ "$CI_WORKFLOW" = "xcframework"* ]]; then
