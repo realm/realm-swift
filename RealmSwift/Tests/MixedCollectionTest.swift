@@ -503,15 +503,20 @@ class MixedCollectionTest: TestCase {
         XCTAssertEqual(AnyRealmValue.fromDictionary([:]), AnyRealmValue.fromDictionary([:])) // Empty mixed lists should be equal
         XCTAssertEqual(AnyRealmValue.fromDictionary(dictionary), AnyRealmValue.fromDictionary(dictionary)) // Unamanged mixed list should be equal
 
-        var dictionary3 = dictionary
-        dictionary3["newKey"] = .bool(false)
-        XCTAssertNotEqual(AnyRealmValue.fromDictionary(dictionary), AnyRealmValue.fromDictionary(dictionary3))
+        var dictionary2 = dictionary
+        dictionary2["newKey"] = .bool(false)
+        XCTAssertNotEqual(AnyRealmValue.fromDictionary(dictionary), AnyRealmValue.fromDictionary(dictionary2))
+
+        let anyValue = AnyRealmValue.fromDictionary(dictionary)
+        let anyValue2 = AnyRealmValue.fromDictionary(dictionary)
+        anyValue2.dictionaryValue?["newKey"] = .bool(false)
+        XCTAssertNotEqual(anyValue, anyValue2)
 
         let mixedObject = AnyRealmTypeObject()
-        mixedObject.anyValue.value = AnyRealmValue.fromDictionary(dictionary)
-//        XCTAssertEqual(mixedObject.anyValue.value, AnyRealmValue.fromDictionary(dictionary))
+        mixedObject.anyValue.value = anyValue
         let mixedObject2 = mixedObject
-//        XCTAssertEqual(mixedObject2.anyValue.value, AnyRealmValue.fromDictionary(dictionary))
+
+        XCTAssertEqual(mixedObject.anyValue, mixedObject2.anyValue)
         XCTAssertEqual(mixedObject.anyValue.value, mixedObject2.anyValue.value)
         XCTAssertEqual(mixedObject.anyValue, mixedObject2.anyValue, "instances should be equal by `==` operator")
         XCTAssertTrue(mixedObject.isEqual(mixedObject2), "instances should be equal by `isEqual` method")
@@ -540,6 +545,70 @@ class MixedCollectionTest: TestCase {
         XCTAssertNotEqual(mixedObject.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0], mixedObject3.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0])
     }
 
+    func testMixedCollectionModernObjectEquality() throws {
+        let so = SwiftStringObject()
+        so.stringCol = "hello"
+        let subArray2: AnyRealmValue = AnyRealmValue.fromArray([ .object(so) ])
+        let subDict2: AnyRealmValue = AnyRealmValue.fromDictionary([ "key1": subArray2 ])
+        let subArray3: AnyRealmValue = AnyRealmValue.fromArray([ subArray2, subDict2])
+        let subDict3: AnyRealmValue = AnyRealmValue.fromDictionary([ "key2": subArray3 ])
+        let subArray4: AnyRealmValue = AnyRealmValue.fromArray([ subDict3 ])
+        let subDict4: AnyRealmValue = AnyRealmValue.fromDictionary([ "key3": subArray4 ])
+        let subArray5: AnyRealmValue = AnyRealmValue.fromArray([ subDict4 ])
+        let subDict5: AnyRealmValue = AnyRealmValue.fromDictionary([ "key4": subArray5 ])
+        let subArray6: AnyRealmValue = AnyRealmValue.fromArray([ subDict5 ])
+        let subDict6: AnyRealmValue = AnyRealmValue.fromDictionary([ "key5": subArray6 ])
+        let dictionary: Dictionary<String, AnyRealmValue> = [
+            "key0": subDict6,
+        ]
+
+        XCTAssertEqual(AnyRealmValue.fromDictionary([:]), AnyRealmValue.fromDictionary([:])) // Empty mixed lists should be equal
+        XCTAssertEqual(AnyRealmValue.fromDictionary(dictionary), AnyRealmValue.fromDictionary(dictionary)) // Unamanged mixed list should be equal
+
+        var dictionary2 = dictionary
+        dictionary2["newKey"] = .bool(false)
+        XCTAssertNotEqual(AnyRealmValue.fromDictionary(dictionary), AnyRealmValue.fromDictionary(dictionary2))
+
+        let anyValue = AnyRealmValue.fromDictionary(dictionary)
+        let anyValue2 = AnyRealmValue.fromDictionary(dictionary)
+        anyValue2.dictionaryValue?["newKey"] = .bool(false)
+        XCTAssertNotEqual(anyValue, anyValue2)
+
+        // Unmanaged equality
+        let mixedObject = ModernAllTypesObject()
+        mixedObject.anyCol = anyValue
+        XCTAssertEqual(mixedObject.anyCol, anyValue)
+        XCTAssertEqual(mixedObject.anyCol, AnyRealmValue.fromDictionary(dictionary))
+        let mixedObject2 = mixedObject
+        XCTAssertEqual(mixedObject2.anyCol, anyValue)
+        XCTAssertEqual(mixedObject2.anyCol, AnyRealmValue.fromDictionary(dictionary))
+
+        XCTAssertEqual(mixedObject.anyCol, mixedObject2.anyCol)
+        XCTAssertTrue(mixedObject.anyCol == mixedObject2.anyCol, "instances should be equal by `==` operator")
+        XCTAssertTrue(mixedObject.isEqual(mixedObject2), "instances should be equal by `isEqual` method")
+        XCTAssertEqual(mixedObject.anyCol.dictionaryValue, mixedObject.anyCol.dictionaryValue)
+
+        let realm = realmWithTestPath()
+        try realm.write {
+            realm.add(mixedObject)
+            realm.add(mixedObject2)
+        }
+
+        XCTAssertEqual(mixedObject.anyCol, mixedObject2.anyCol)
+        XCTAssertTrue(mixedObject.anyCol == mixedObject2.anyCol, "instances should be equal by `==` operator")
+        XCTAssertTrue(mixedObject.isEqual(mixedObject2), "instances should be equal by `isEqual` method")
+
+        let mixedObject3 = ModernAllTypesObject()
+        mixedObject3.anyCol = AnyRealmValue.fromDictionary(dictionary)
+
+        try realm.write {
+            realm.add(mixedObject3)
+        }
+
+        XCTAssertNotEqual(mixedObject.anyCol, mixedObject3.anyCol)
+        XCTAssertNotEqual(mixedObject.anyCol.dictionaryValue?["key0"], mixedObject3.anyCol.dictionaryValue?["key0"])
+        XCTAssertNotEqual(mixedObject.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0], mixedObject3.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0])
+    }
 
     func testMixedCollectionObjectNotifications() throws {
         let subArray3: AnyRealmValue = AnyRealmValue.fromArray([ .int(3) ])

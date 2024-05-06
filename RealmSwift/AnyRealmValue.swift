@@ -201,14 +201,16 @@ public enum AnyRealmValue: Hashable {
         return AnyRealmValue.list(list)
     }
 
-//    public func hash(into hasher: inout Hasher) {
-//        switch self {
-//        case .dictionary(let d):
-//            if
-//        case .list(let l):
-//            break
-//        default:
-//            break
-//        }
-//    }
+    // MARK: - Hashable
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .dictionary:
+            hasher.combine(1)
+        case .list:
+            hasher.combine(2)
+        default:
+            break
+        }
+    }
 }

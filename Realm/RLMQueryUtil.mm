@@ -1854,26 +1854,23 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
     }
 }
 
-// For nested subscripts in NSPredicate like `anyCol[0]['key'] we need to iterate through the nested NSExpression to get the paths of the query.
+// This function returns the nested subscripts from a NSPredicate with the following format `anyCol[0]['key']['all']`
+// This will iterate each argument of the NSExpression and its nested NSExpression's and take the constant value
+// and create a PathElement for the query.
 void QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExpression *expression) {
     for (int i = 0; i < expression.arguments.count; i++) {
-        if ((expression.arguments.count > 1) && (expression.arguments[i].expressionType == NSFunctionExpressionType)) {
-            get_path_elements(paths, expression.arguments[0]);
+        if (expression.arguments[i].expressionType == NSFunctionExpressionType) {
+            get_path_elements(paths, expression.arguments[i]);
         } else {
             if (expression.arguments[i].expressionType == NSConstantValueExpressionType) {
                 id value = [expression.arguments[i] constantValue];
                 if ([value isKindOfClass:[NSNumber class]]) {
-                    NSNumber *index = (NSNumber *)value;
-                    if (index) {
-                        paths.push_back(PathElement{[index intValue]});
-                    }
+                    paths.push_back(PathElement{[(NSNumber *)value intValue]});
                 } else if ([value isKindOfClass:[NSString class]]) {
                     NSString *key = (NSString *)value;
                     if ([key isEqual:@"all"]) {
                         paths.push_back(PathElement{});
-                        break;
-                    }
-                    if (key) {
+                    } else {
                         paths.push_back(PathElement{key.UTF8String});
                     }
                 }
