@@ -23,7 +23,7 @@ class MixedCollectionTest: TestCase {
     func testAnyMixedDictionary() throws {
         let so = SwiftStringObject()
         so.stringCol = "hello"
-        let d = Date.now
+        let d = Date()
         let oid = ObjectId.generate()
         let uuid = UUID()
 
@@ -222,7 +222,7 @@ class MixedCollectionTest: TestCase {
     func testAnyMixedList() throws {
         let so = SwiftStringObject()
         so.stringCol = "hello"
-        let d = Date.now
+        let d = Date()
         let oid = ObjectId.generate()
         let uuid = UUID()
 

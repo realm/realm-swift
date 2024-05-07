@@ -1688,7 +1688,9 @@ void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpress
 
     NSString *keyPath;
     NSExpression *keyPathExpression = functionExpression;
-    for (int i = 0; i < pathElements.size(); i++) {
+
+    // We consider only `NSKeyPathExpressionType` values to build the keypath.
+    for (unsigned long i = 0; i < pathElements.size(); i++) {
         if (keyPathExpression.arguments[0].expressionType == NSKeyPathExpressionType) {
             keyPath = [NSString stringWithFormat:@"%@", keyPathExpression.arguments[0]];
         } else {
@@ -1858,7 +1860,7 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
 // This will iterate each argument of the NSExpression and its nested NSExpression's and take the constant value
 // and create a PathElement for the query.
 void QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExpression *expression) {
-    for (int i = 0; i < expression.arguments.count; i++) {
+    for (NSUInteger i = 0; i < expression.arguments.count; i++) {
         if (expression.arguments[i].expressionType == NSFunctionExpressionType) {
             get_path_elements(paths, expression.arguments[i]);
         } else {

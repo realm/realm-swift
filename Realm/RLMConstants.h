@@ -58,7 +58,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 /**
  `RLMPropertyType` is an enumeration describing all property types supported in Realm models.
 
- For more information, see [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/).
+ For more information, see [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/object-models/).
  */
 typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
@@ -89,12 +89,17 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
 #pragma mark - Linked object types
 
-    /** Realm model objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/) for more information. */
+    /** Realm model objects. See [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/object-models/) for more information. */
     RLMPropertyTypeObject = 7,
-    /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#inverse-relationship) for more information. */
+    /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/#define-an-inverse-relationship-property) for more information. */
     RLMPropertyTypeLinkingObjects = 8,
 };
 
+/**
+ `RLMAnyValueType` is an enumeration describing all property types supported by RLMValue (AnyRealmValue).
+
+ For more information, see [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/supported-types/#std-label-ios-anyrealmvalue-data-type).
+ */
 typedef RLM_CLOSED_ENUM(int32_t, RLMAnyValueType) {
 #pragma mark - Primitive types
     /** Integers: `NSInteger`, `int`, `long`, `Int` (Swift) */

@@ -202,13 +202,13 @@ static void changeArray(__unsafe_unretained RLMManagedArray *const ar, NSKeyValu
         realm::Mixed value = _backingList.get_any(index);
         RLMAccessorContext context(*_ownerInfo, *_objectInfo, _property);
         if (value.is_type(realm::type_Dictionary)) {
-            return context.box(_backingList.get_dictionary(index));
+            return context.box(_backingList.get_dictionary(realm::PathElement{(int)index}));
         }
         else if (value.is_type(realm::type_List)) {
-            return context.box(_backingList.get_list(index));
+            return context.box(_backingList.get_list(realm::PathElement{(int)index}));
         }
         else {
-            return context.box(value);
+            return _backingList.get(context, index);
         }
     });
 }

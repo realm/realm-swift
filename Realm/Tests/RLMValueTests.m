@@ -19,12 +19,6 @@
 #import "RLMTestCase.h"
 #import <Realm/RLMValue.h>
 
-@interface NotRealmObject : NSObject
-@end
-
-@implementation NotRealmObject
-@end
-
 @interface RLMValueTests : RLMTestCase
 @end
 
@@ -871,11 +865,6 @@
 }
 
 - (void)testDeleteAndUpdateValuesInArray {
-    RLMRealm *r = [self realmWithTestPath];
-    StringObject *so = [[StringObject alloc] init];
-    so.stringCol = @"hello";
-    RLMObjectId *oid = [RLMObjectId objectId];
-    NSDate *d = [NSDate date];
     NSArray *d1 = @[ @"hello2",
                      @YES];
     NSArray *d2 = @[@"hello"];
@@ -883,6 +872,7 @@
     mo.anyCol = d1;
     [mo.anyArray addObjects:@[d1, d2]];
     
+    RLMRealm *r = [self realmWithTestPath];
     [r beginWriteTransaction];
     [r addObject:mo];
     [r commitWriteTransaction];
