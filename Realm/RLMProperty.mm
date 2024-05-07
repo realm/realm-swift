@@ -312,7 +312,7 @@ static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
         }
         @throw RLMException(@"Property '%@' is of type '%@<%@>' which is not a supported %@ object type. "
                             @"%@ can only contain instances of RLMObject subclasses. "
-                            @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                            @"See https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/#define-a-to-many-relationship-property "
                             @"for more information.", _name, collectionName, _objectClassName, collectionName, collectionName);
     }
     else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
@@ -323,7 +323,7 @@ static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
         }
         @throw RLMException(@"Property '%@' is of type %s which is not a supported NSNumber object type. "
                             @"NSNumbers can only be RLMInt, RLMFloat, RLMDouble, and RLMBool at the moment. "
-                            @"See https://www.mongodb.com/docs/realm/sdk/swift/data-types/supported-property-types/ "
+                            @"See https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/supported-types/#std-label-ios-supported-property-types"
                             @"for more information.", _name, code + 1);
     }
     else if (strncmp(code, linkingObjectsPrefix, linkingObjectsPrefixLen) == 0 &&
@@ -517,7 +517,7 @@ static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMArray<%@>' which is not a supported RLMArray object type. "
                                 @"RLMArrays can only contain instances of RLMObject subclasses. "
-                                @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                                @"See https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/#define-a-to-many-relationship-property "
                                 @"for more information.", _name, _objectClassName);
         }
     }
@@ -530,7 +530,7 @@ static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMSet<%@>' which is not a supported RLMSet object type. "
                                 @"RLMSets can only contain instances of RLMObject subclasses. "
-                                @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                                @"See https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/#define-a-to-many-relationship-property "
                                 @"for more information.", _name, _objectClassName);
         }
     }
@@ -544,7 +544,7 @@ static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
         if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMDictionary<KeyType, %@>' which is not a supported RLMDictionary object type. "
                                 @"RLMDictionarys can only contain instances of RLMObject subclasses. "
-                                @"See https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#to-many-relationship "
+                                @"See https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/#define-a-to-many-relationship-property "
                                 @"for more information.", _name, _objectClassName);
         }
     }
