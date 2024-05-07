@@ -2,13 +2,13 @@
 
 ## Realm Swift
 
-The documentation can be found at [www.mongodb.com/docs/realm/sdk/swift/](https://www.mongodb.com/docs/realm/sdk/swift/).  
+The documentation can be found at [https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/).  
 The API reference is located at [www.mongodb.com/docs/realm-sdks/swift/latest/](https://www.mongodb.com/docs/realm-sdks/swift/latest/).
 
 ## Realm Objective-C
 
-The documentation can be found at [www.mongodb.com/docs/realm/sdk/swift/](https://www.mongodb.com/docs/realm/sdk/swift/).  
-The API reference is located at [www.mongodb.com/docs/realm-sdks/objc/latest](https://www.mongodb.com/docs/realm-sdks/objc/latest).
+The documentation can be found at [https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/).  
+The API reference is located at [www.mongodb.com/docs/realm-sdks/objc/latest](https://www.mongodb.com/docs/realm-sdks/objc/latest/).
 
 ## Generating Docs
 

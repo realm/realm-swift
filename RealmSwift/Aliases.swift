@@ -27,7 +27,7 @@ import Realm.Swift
 /**
  `PropertyType` is an enum describing all property types supported in Realm models.
 
- For more information, see [Object Models and Schemas](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/).
+ For more information, see [Object Models and Schemas](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/object-models/).
 
  ### Primitive types
 
