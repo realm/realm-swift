@@ -111,3 +111,11 @@
 /// :nodoc:
 @interface NSArray (RLMValue)<RLMValue>
 @end
+
+/// :nodoc:
+@interface RLMArray (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMDictionary (RLMValue)<RLMValue>
+@end

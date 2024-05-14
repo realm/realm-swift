@@ -156,19 +156,11 @@ static const int RLMEnumerationBufferSize = 16;
     NSUInteger batchCount = 0, count = state->extra[1];
 
     @autoreleasepool {
-        if (!_parentInfo) {
-            RLMAccessorContext ctx = RLMAccessorContext(*_info);
-            for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-                _strongBuffer[batchCount] = _results->get(ctx, index);
-                batchCount++;
-            }
-        } else {
-            // This is used by Dicitonary and List for nested collections.
-            RLMAccessorContext ctx = RLMAccessorContext(*_parentInfo, *_info, _property);
-            for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
-                _strongBuffer[batchCount] = _results->get(ctx, index);
-                batchCount++;
-            }
+        auto ctx = _parentInfo ? RLMAccessorContext(*_parentInfo, *_info, _property) :
+        RLMAccessorContext(*_info);
+        for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
+            _strongBuffer[batchCount] = _results->get(ctx, index);
+            batchCount++;
         }
     }
 

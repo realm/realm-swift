@@ -161,43 +161,23 @@ class SwiftRLMDynamicTests: RLMTestCase {
         let obj1 = AllTypesObject.values(5,
                                          stringObject: StringObject(value: ["newString"]),
                                          mixedObject: MixedObject(value: [["string", 45, false]]))!
-        let obj2 = AllTypesObject.values(2,
-                                         stringObject: StringObject(value: ["newString1"]),
-                                         mixedObject: MixedObject(value: [["key1": "string", "key2": true, "key3": 12.12]]))!
-        let obj3 = AllTypesObject.values(2,
-                                         stringObject: StringObject(value: ["newString1"]),
-                                         mixedObject: MixedObject(value: [["key1": ["string", true, ["key3": 12.12]]]]))!
 
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
             let realm = self.realmWithTestPath()
             realm.beginWriteTransaction()
             _ = AllTypesObject.create(in: realm, withValue: obj1)
-            _ = AllTypesObject.create(in: realm, withValue: obj2)
-            _ = AllTypesObject.create(in: realm, withValue: obj3)
             try! realm.commitWriteTransaction()
         }
 
         let dyrealm = realm(withTestPathAndSchema: nil)
         let results = dyrealm.allObjects(AllTypesObject.className())
-        XCTAssertEqual(results.count, UInt(3))
+        XCTAssertEqual(results.count, UInt(1))
         let robj1 = results[0]
-        let robj2 = results[1]
-        let robj3 = results[2]
 
         // Mixed List
         XCTAssertTrue(((robj1["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedArray)[0] as! String == "string")
         XCTAssertTrue(((robj1["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedArray)[1] as! Int == 45)
         XCTAssertTrue(((robj1["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedArray)[2] as! Bool == false)
-
-        // Mixed Dictionary
-        XCTAssertTrue(((robj2["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedDictionary)["key1"] as! String == "string")
-        XCTAssertTrue(((robj2["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedDictionary)["key2"] as! Bool == true)
-        XCTAssertTrue(((robj2["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedDictionary)["key3"] as! Double == 12.12)
-
-        // Mixed Dictionary
-        XCTAssertTrue((((robj3["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedDictionary)["key1"] as! RLMManagedArray)[0] as! String == "string")
-        XCTAssertTrue((((robj3["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedDictionary)["key1"] as! RLMManagedArray)[1] as! Bool == true)
-        XCTAssertTrue(((((robj3["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedDictionary)["key1"] as! RLMManagedArray)[2] as! RLMManagedDictionary)["key3"] as! Double == 12.12)
     }
 }

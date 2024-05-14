@@ -26,7 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
   realm.objects(MixedObject.self).where { $0.anyValue[0][0][1] == .double(76.54) }
   ```
   
-  The `.all` operator allows looking up in all keys or indexes.
+  The `.all` operator allows looking up in all keys or indexes, which is the same that using a wildcard as a subscript `["*"]`.
   ```swift
   realm.objects(MixedObject.self).where { $0.anyValue["key"].all == .bool(false) }
   ```

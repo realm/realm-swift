@@ -19,7 +19,6 @@
 #import "RLMDictionary_Private.hpp"
 
 #import "RLMAccessor.hpp"
-#import "RLMArray_Private.hpp"
 #import "RLMCollection_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -302,17 +301,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
     BOOL stop = false;
     @autoreleasepool {
         for (auto&& [key, value] : _backingCollection) {
-            id nestedValue;
-            if (value.is_type(realm::type_Dictionary)) {
-                nestedValue = context.box(_backingCollection.get_dictionary(key.get_string()));
-            }
-            else if (value.is_type(realm::type_List)) {
-                nestedValue = context.box(_backingCollection.get_list(key.get_string()));
-            }
-            else {
-                nestedValue = context.box(value);
-            }
-            block(context.box(key), nestedValue, &stop);
+            block(context.box(key), _backingCollection.get(context, key.get_string()), &stop);
             if (stop) {
                 break;
             }
@@ -483,7 +472,7 @@ static NSMutableArray *resultsToArray(RLMClassInfo& info, realm::Results r) {
 - (instancetype)resolveInRealm:(RLMRealm *)realm {
     auto& parentInfo = _ownerInfo->resolve(realm);
     return translateErrors([&] {
-        return [[RLMManagedDictionary alloc] initWithBackingCollection:_backingCollection.freeze(realm->_realm)
+        return [[self.class alloc] initWithBackingCollection:_backingCollection.freeze(realm->_realm)
                                                   parentInfo:&parentInfo
                                                     property:parentInfo.rlmObjectSchema[_property.name]];
     });

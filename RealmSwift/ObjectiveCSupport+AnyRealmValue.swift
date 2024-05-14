@@ -20,21 +20,6 @@
 import Foundation
 import Realm
 
-/// :nodoc:
-extension RLMDictionary: RLMValue {
-    /// :nodoc:
-    public var rlm_anyValueType: RLMAnyValueType { .dictionary }
-    /// :nodoc:
-    public var rlm_valueType: RLMAnyValueType { fatalError("Unreachable, this should use `rlm_anyValueType`") }
-}
-/// :nodoc:
-extension RLMArray: RLMValue {
-    /// :nodoc:
-    public var rlm_anyValueType: RLMAnyValueType { .list }
-    /// :nodoc:
-    public var rlm_valueType: RLMAnyValueType { fatalError("Unreachable, this should use `rlm_anyValueType`") }
-}
-
 public extension ObjectiveCSupport {
 
     /// Convert an object boxed in `AnyRealmValue` to its
@@ -49,8 +34,8 @@ public extension ObjectiveCSupport {
             return b as NSNumber
         case let .float(f):
             return f as NSNumber
-        case let .double(f):
-            return f as NSNumber
+        case let .double(d):
+            return d as NSNumber
         case let .string(s):
             return s as NSString
         case let .data(d):

@@ -163,27 +163,6 @@ extension AnyRealmValue: BuiltInObjcBridgeable {
     }
 }
 
-
-extension RLMManagedDictionary: BuiltInObjcBridgeable {
-    @objc public class func _rlmFromObjc(_ value: Any) -> Self? {
-        fatalError()
-    }
-    public var _rlmObjcValue: Any {
-        let map = Map<String, AnyRealmValue>(objc: self)
-        return AnyRealmValue.dictionary(map)
-    }
-}
-
-extension RLMManagedArray: BuiltInObjcBridgeable {
-    @objc public class func _rlmFromObjc(_ value: Any) -> Self? {
-        fatalError()
-    }
-    public var _rlmObjcValue: Any {
-        let list = List<AnyRealmValue>(collection: self)
-        return AnyRealmValue.list(list)
-    }
-}
-
 // MARK: - Collections
 
 extension Map: BuiltInObjcBridgeable {

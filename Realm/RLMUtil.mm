@@ -290,10 +290,6 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
     if (prop.type == RLMPropertyTypeObject && !validateObjects) {
         return;
     }
-
-    if (prop.type == RLMPropertyTypeAny) {
-        return;
-    }
     
     if (RLMIsObjectValidForProperty(obj, prop)) {
         return;

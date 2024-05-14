@@ -205,12 +205,34 @@ public enum AnyRealmValue: Hashable {
 
     public func hash(into hasher: inout Hasher) {
         switch self {
-        case .dictionary:
-            hasher.combine(1)
-        case .list:
-            hasher.combine(2)
-        default:
-            break
+        case let .int(i):
+            hasher.combine(i.hashValue)
+        case let .bool(b):
+            hasher.combine(b.hashValue)
+        case let .float(f):
+            hasher.combine(f.hashValue)
+        case let .double(d):
+            hasher.combine(d.hashValue)
+        case let .string(s):
+            hasher.combine(s.hashValue)
+        case let .data(d):
+            hasher.combine(d.hashValue)
+        case let .date(d):
+            hasher.combine(d.hashValue)
+        case let .objectId(o):
+            hasher.combine(o.hashValue)
+        case let .decimal128(d):
+            hasher.combine(d.hashValue)
+        case let .uuid(u):
+            hasher.combine(u.hashValue)
+        case let .object(o):
+            hasher.combine(o.hashValue)
+        case let .dictionary(d):
+            hasher.combine(12)
+        case let .list(l):
+            hasher.combine(13)
+        case .none:
+            hasher.combine(14)
         }
     }
 }

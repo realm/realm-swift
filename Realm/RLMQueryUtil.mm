@@ -568,7 +568,7 @@ public:
 
     CollectionOperation collection_operation_from_key_path(KeyPath&& kp);
     ColumnReference column_reference_from_key_path(KeyPath&& kp, bool isAggregate);
-    void get_path_elements(std::vector<PathElement> &paths, NSExpression *expression);
+    NSString* get_path_elements(std::vector<PathElement> &paths, NSExpression *expression);
 
 private:
     Query& m_query;
@@ -1684,19 +1684,8 @@ void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpress
                                         NSComparisonPredicateOptions options, NSPredicateOperatorType operatorType,
                                         NSExpression *right) {
     std::vector<PathElement> pathElements;
-    get_path_elements(pathElements, functionExpression);
+    NSString *keyPath = get_path_elements(pathElements, functionExpression);
 
-    NSString *keyPath;
-    NSExpression *keyPathExpression = functionExpression;
-
-    // We consider only `NSKeyPathExpressionType` values to build the keypath.
-    for (unsigned long i = 0; i < pathElements.size(); i++) {
-        if (keyPathExpression.arguments[0].expressionType == NSKeyPathExpressionType) {
-            keyPath = [NSString stringWithFormat:@"%@", keyPathExpression.arguments[0]];
-        } else {
-            keyPathExpression = keyPathExpression.arguments[0];
-        }
-    }
     ColumnReference collectionColumn = column_reference_from_key_path(key_path_from_string(m_schema, objectSchema, keyPath), true);
 
     if (collectionColumn.property().type == RLMPropertyTypeAny && !collectionColumn.property().dictionary) {
@@ -1704,6 +1693,10 @@ void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpress
     } else {
         RLMPrecondition(collectionColumn.property().dictionary, @"Invalid predicate",
                         @"Invalid keypath '%@': only dictionaries and mixed support subscript predicates.", functionExpression);
+        RLMPrecondition(pathElements.size() == 1, @"Invalid subscript size",
+                        @"Invalid subscript size '%@': nested dictionaries queries are only allowed in mixed properties.", functionExpression);
+        RLMPrecondition(pathElements[0].is_key(), @"Invalid subscript type",
+                        @"Invalid subscript type '%@'; only string keys are allowed as subscripts in dictionary queries.", functionExpression);
         add_mixed_constraint(operatorType, options, std::move(collectionColumn.resolve<Dictionary>().key(pathElements[0].get_key())), right.constantValue);
     }
 }
@@ -1857,28 +1850,42 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
 }
 
 // This function returns the nested subscripts from a NSPredicate with the following format `anyCol[0]['key']['all']`
-// This will iterate each argument of the NSExpression and its nested NSExpression's and take the constant value
-// and create a PathElement for the query.
-void QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExpression *expression) {
+// and its respective keypath (including any linked keypath)
+// This will iterate each argument of the NSExpression and its nested NSExpressions, takes the constant subscript
+// and creates a PathElement to be used in the query.
+NSString* QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExpression *expression) {
+    NSString *keyPath = @"";
     for (NSUInteger i = 0; i < expression.arguments.count; i++) {
+        NSString *nestedKeyPath = @"";
         if (expression.arguments[i].expressionType == NSFunctionExpressionType) {
-            get_path_elements(paths, expression.arguments[i]);
-        } else {
-            if (expression.arguments[i].expressionType == NSConstantValueExpressionType) {
-                id value = [expression.arguments[i] constantValue];
-                if ([value isKindOfClass:[NSNumber class]]) {
-                    paths.push_back(PathElement{[(NSNumber *)value intValue]});
-                } else if ([value isKindOfClass:[NSString class]]) {
-                    NSString *key = (NSString *)value;
-                    if ([key isEqual:@"all"]) {
-                        paths.push_back(PathElement{});
-                    } else {
-                        paths.push_back(PathElement{key.UTF8String});
-                    }
+            nestedKeyPath = get_path_elements(paths, expression.arguments[i]);
+        } else if (expression.arguments[i].expressionType == NSConstantValueExpressionType) {
+            id value = [expression.arguments[i] constantValue];
+            if ([value isKindOfClass:[NSNumber class]]) {
+                paths.push_back(PathElement{[(NSNumber *)value intValue]});
+            } else if ([value isKindOfClass:[NSString class]]) {
+                NSString *key = (NSString *)value;
+                if ([key isEqual:@"*"]) {
+                    paths.push_back(PathElement{});
+                } else {
+                    paths.push_back(PathElement{key.UTF8String});
                 }
+            } else {
+                throwException(@"Invalid subscript type",
+                               @"Only `Strings` or index are allowed subscripts");
             }
+        } else if (expression.arguments[i].expressionType == NSKeyPathExpressionType) {
+            nestedKeyPath = expression.arguments[i].keyPath;
+        } else {
+            throwException(@"Invalid expression type",
+                           @"Subscripts queries don't allow any other expression types");
+        }
+        if ([nestedKeyPath length] > 0) {
+            keyPath = ([keyPath length] > 0) ? [NSString stringWithFormat:@"%@.%@", keyPath, nestedKeyPath] : [NSString stringWithFormat:@"%@", nestedKeyPath];
         }
     }
+
+    return keyPath;
 }
 } // namespace
 

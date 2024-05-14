@@ -785,8 +785,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
         }
 
         if ([keyToInvalidate isEqualToString:@"anyCol"]) {
-            // Mixed properties now can accept dictionary or list, so we are skipping testing invalid values for this.
-            continue;
+            obj = self;
         }
 
         invalidInput[keyToInvalidate] = obj;

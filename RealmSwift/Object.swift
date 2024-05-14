@@ -789,8 +789,6 @@ public final class DynamicObject: Object {
             return set.isOptional ? MutableSet<ObjectId?>(collection: set) : MutableSet<ObjectId>(collection: set)
         case .object:
             return MutableSet<DynamicObject>(collection: set)
-        default:
-            fatalError()
         }
     }
 
