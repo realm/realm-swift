@@ -18,175 +18,183 @@
 
 import Foundation
 
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+import RealmSyncTestSupport
+#endif
+
 public class BaasClient {
     private let appId: String = "baas-container-service-autzb"
-    private var session: BaasSession = BaasSession()
-
     private let apiKey: String
+    private var session: BaasSession?
+
     public init(apiKey: String) {
         self.apiKey = apiKey
-
-    public func getOrDeployContainer(apiKey: String) {
-        let session = try XCTUnwrap(session)
-        let existing = session.app[appId].listuContainers
+        session = BaasSession(apiKey: apiKey)
     }
 
-//    var result = (await helper.callEndpoint('listContainers', isPost: false) as List<dynamic>)
-//            .map((e) => _ContainerInfo.fromJson(e as Map<String, dynamic>))
-//            .whereNotNull();
-//        if (differentiator != null) {
-//          final userId = await helper.getUserId();
-//          result = result.where((c) => c.creatorId == userId && c.tags['DIFFERENTIATOR'] == differentiator);
-//        }
-//
-//        return result.toList();
-    private func getContainer() {
+    public func getOrDeployContainer(differentiator: String? = nil) -> Result<(String, String), Error>  {
+        if let existingContainer = try? getContainers().get()?.first {
+            print("Using existing BaaS container at \(existingContainer["httpUrl"] as! String)")
+            return .success((existingContainer["id"] as! String, existingContainer["httpUrl"] as! String))
+        }
 
+        print("Deploying new BaaS container ...")
+        let data = [[
+            "key": "DIFFERENTIATOR",
+            "value": "local"
+        ]]
+        let newContainer = try? session?.base.app[dynamicMember: appId].endpoint.startContainer.post(data).get() as? [String: String]
+        let id = newContainer!["id"]!
+        var httpUrl: String? = nil
+        while httpUrl == nil {
+            sleep(1)
+            httpUrl = try? waitForContainer(id: id).get()
+        }
+
+        print("Deployed BaaS instance at \(httpUrl!)")
+        return .success((id, httpUrl!))
+    }
+
+    public func deleteContainer(id: String, differentiator: String? = nil) -> Result<Void, Error>  {
+        print("Stopping all containers with differentiator \(differentiator ?? "")")
+        let containers = try? getContainers(differentiator: differentiator).get()
+        if let containers = containers {
+            for container in containers {
+                print("Stopping container \(container["id"] as! String)")
+                _ = try? session?.base.app[dynamicMember: appId].endpoint.stopContainer.post(nil).get()
+                print("Stopped container \(container["id"] as! String)")
+            }
+        }
+        return .success(())
+    }
+
+    private func getUserId() -> Result<String, Error>  {
+        let userInfo = try? session?.base.app[dynamicMember: appId].endpoint.userinfo.get().get() as? [String: String]
+        return .success(userInfo!["id"]!)
+    }
+
+    private func getContainers(differentiator: String? = nil) -> Result< [[String : Any]]?, Error> {
+        let containers = try? session?.base.app[dynamicMember: appId].endpoint.listContainers.get().get() as? [[String : Any]]
+        guard let containers = containers,
+              containers.count > 0 else {
+            return .success(nil)
+        }
+
+        if let differentiator = differentiator {
+            let userId = try? getUserId().get()
+            let filteredContainers = containers.filter { $0["creatorId"] as? String == userId && ($0["tags"] as! [String: Any])["DIFFERENTIATOR"] as! String == differentiator }
+            return .success(filteredContainers)
+        }
+
+        return .success(containers)
+    }
+
+    private func waitForContainer(id: String) -> Result<String?, Error>  {
+        let containers = try? getContainers().get()
+        let fileteredContainer = containers?.filter { $0["id"] as! String == id }.first
+        guard let fileteredContainer = fileteredContainer else {
+            print("Container \(id) is not created")
+            return .success(nil)
+        }
+
+        guard fileteredContainer["isRunning"] as! Bool else {
+            print("Container \(id) is not running")
+            return .success(nil)
+        }
+
+        let httpUrl = fileteredContainer["httpUrl"] as! String
+        var newSession = BaasSession(baseUrl: "\(httpUrl)/api/private/v1.0/version", apiKey: apiKey)
+        do {
+            _ = try newSession.base.get().get()
+            return .success(httpUrl)
+        } catch {
+            print("Calling the container with \(id) is failing. Retrying...")
+            return .success(nil)
+        }
     }
 }
 
-public class BaasSession {
-    private let location = "https://us-east-1.aws.data.mongodb-api.com"
-
+public struct BaasSession {
+    private let baseUrl: String
     private let apiKey: String
 
-    internal init(apiKey: String) {
-        self.appKey = apiKey
+    internal init(baseUrl: String = "https://us-east-1.aws.data.mongodb-api.com", apiKey: String) {
+        self.baseUrl = baseUrl
+        self.apiKey = apiKey
     }
 
-    subscript(dynamicMember member: String) -> AdminEndpoint {
-        let pattern = "([a-z0-9])([A-Z])"
+    /// The initial endpoint to access the baasas API
+    lazy var base = BaasEndpoint(url: URL(string: baseUrl)!, apiKey: apiKey)
 
-        let regex = try? NSRegularExpression(pattern: pattern, options: [])
-        let range = NSRange(location: 0, length: member.count)
-        let snakeCaseMember = regex?.stringByReplacingMatches(in: member,
-                                                              options: [],
-                                                              range: range,
-                                                              withTemplate: "$1_$2").lowercased()
-        return AdminEndpoint(accessToken: accessToken,
-                             groupId: groupId,
-                             url: location.appendingPathComponent(snakeCaseMember!))
-    }
+    @dynamicMemberLookup
+    struct BaasEndpoint {
+        var url: URL
+        var apiKey: String
 
-    private func request(httpMethod: String, data: Any? = nil,
-                         completionHandler: @escaping Completion) {
-        var components = URLComponents(url: self.url, resolvingAgainstBaseURL: false)!
-        components.query = "bypass_service_change=DestructiveSyncProtocolVersionIncrease"
-        var request = URLRequest(url: components.url!)
-        request.httpMethod = httpMethod
-        request.allHTTPHeaderFields = [
-            "Authorization": "Bearer \(accessToken)",
-            "Content-Type": "application/json;charset=utf-8",
-            "Accept": "application/json"
-        ]
-        if let data = data {
-            do {
-                request.httpBody = try JSONSerialization.data(withJSONObject: data)
-            } catch {
-                completionHandler(.failure(error))
+        subscript(dynamicMember member: String) -> BaasEndpoint {
+            return BaasEndpoint(url: url.appendingPathComponent(member),
+                                apiKey: apiKey)
+        }
+
+        typealias Completion = @Sendable (Result<Any?, Error>) -> Void
+
+        private func request(httpMethod: String, 
+                             data: Any? = nil,
+                             query: [String: Any]? = nil,
+                             completionHandler: @escaping Completion) {
+            var components = URLComponents(url: self.url, resolvingAgainstBaseURL: false)!
+            if let query = query {
+                components.query = query.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
+            }
+
+            var request = URLRequest(url: components.url!)
+            request.httpMethod = httpMethod
+            request.allHTTPHeaderFields = [
+                "apiKey": "\(apiKey)",
+            ]
+
+            if let data = data {
+                do {
+                    request.httpBody = try JSONSerialization.data(withJSONObject: data, options: .fragmentsAllowed)
+                } catch {
+                    completionHandler(.failure(error))
+                }
+            }
+
+            URLSession(configuration: URLSessionConfiguration.default,
+                       delegate: nil, delegateQueue: OperationQueue())
+            .resultDataTask(with: request) { result in
+                completionHandler(result.flatMap { data in
+                    Result {
+                        data.count > 0 ? try JSONSerialization.jsonObject(with: data) : nil
+                    }
+                })
             }
         }
 
-        URLSession(configuration: URLSessionConfiguration.default,
-                   delegate: nil, delegateQueue: OperationQueue())
-        .resultDataTask(with: request) { result in
-            completionHandler(result.flatMap { data in
-                Result {
-                    data.count > 0 ? try JSONSerialization.jsonObject(with: data) : nil
-                }
-            })
+        private func request(httpMethod: String, data: Any? = nil, query: [String: Any]? = nil) -> Result<Any?, Error> {
+            let group = DispatchGroup()
+            let result = Locked(Result<Any?, Error>?.none)
+            group.enter()
+            request(httpMethod: httpMethod, data: data, query: query) {
+                result.value = $0
+                group.leave()
+            }
+            guard case .success = group.wait(timeout: .now() + 60) else {
+                print("HTTP request timed out: \(httpMethod) \(self.url)")
+                return .failure(URLError(.timedOut))
+            }
+            return result.value!
         }
-    }
 
-    private func request(on group: DispatchGroup, httpMethod: String, data: Any? = nil,
-                         _ completionHandler: @escaping Completion) {
-        group.enter()
-        request(httpMethod: httpMethod, data: data) { result in
-            completionHandler(result)
-            group.leave()
+        func get() -> Result<Any?, Error> {
+            let result = request(httpMethod: "GET")
+            return result
         }
-    }
 
-    private func request(httpMethod: String, data: Any? = nil) -> Result<Any?, Error> {
-        let group = DispatchGroup()
-        let result = Locked(Result<Any?, Error>?.none)
-        group.enter()
-        request(httpMethod: httpMethod, data: data) {
-            result.value = $0
-            group.leave()
+        func post(_ data: Any?, _ query: [String: String]? = nil) -> Result<Any?, Error> {
+            request(httpMethod: "POST", data: data, query: query)
         }
-        guard case .success = group.wait(timeout: .now() + 60) else {
-            print("HTTP request timed out: \(httpMethod) \(self.url)")
-            return .failure(URLError(.timedOut))
-        }
-        return result.value!
-    }
-
-    func get(_ completionHandler: @escaping Completion) {
-        request(httpMethod: "GET", completionHandler: completionHandler)
-    }
-
-    func get(on group: DispatchGroup,
-             _ completionHandler: @escaping Completion) {
-        request(on: group, httpMethod: "GET", completionHandler)
-    }
-
-    func get() -> Result<Any?, Error> {
-        request(httpMethod: "GET")
-    }
-
-    func post(_ data: [String: Json], _ completionHandler: @escaping Completion) {
-        request(httpMethod: "POST", data: data, completionHandler: completionHandler)
-    }
-
-    func post(on group: DispatchGroup, _ data: [String: Json],
-              _ completionHandler: @escaping Completion) {
-        request(on: group, httpMethod: "POST", data: data, completionHandler)
-    }
-
-    func post(_ data: [String: Json]) -> Result<Any?, Error> {
-        request(httpMethod: "POST", data: data)
-    }
-
-    func put(_ completionHandler: @escaping Completion) {
-        request(httpMethod: "PUT", completionHandler: completionHandler)
-    }
-
-    func put(on group: DispatchGroup, data: Json? = nil,
-             _ completionHandler: @escaping Completion) {
-        request(on: group, httpMethod: "PUT", data: data, completionHandler)
-    }
-
-    func put(data: [String: Json]? = nil, _ completionHandler: @escaping Completion) {
-        request(httpMethod: "PUT", data: data, completionHandler: completionHandler)
-    }
-
-    func put(_ data: [String: Json]) -> Result<Any?, Error> {
-        request(httpMethod: "PUT", data: data)
-    }
-
-    func delete(_ completionHandler: @escaping Completion) {
-        request(httpMethod: "DELETE", completionHandler: completionHandler)
-    }
-
-    func delete(on group: DispatchGroup, _ completionHandler: @escaping Completion) {
-        request(on: group, httpMethod: "DELETE", completionHandler)
-    }
-
-    func delete() -> Result<Any?, Error> {
-        request(httpMethod: "DELETE")
-    }
-
-    func patch(on group: DispatchGroup, _ data: [String: Json],
-               _ completionHandler: @escaping Completion) {
-        request(on: group, httpMethod: "PATCH", data: data, completionHandler)
-    }
-
-    func patch(_ data: Any) -> Result<Any?, Error> {
-        request(httpMethod: "PATCH", data: data)
-    }
-
-    func patch(_ data: [String: Json], _ completionHandler: @escaping Completion) {
-        request(httpMethod: "PATCH", data: data, completionHandler: completionHandler)
     }
 }

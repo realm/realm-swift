@@ -1324,12 +1324,6 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
     }
 }
 
-class AsyncBaasasSync: SwiftSyncTestCase {
-    func test() async throws {
-        let baasClient = BaasClient()
-    }
-}
-
 @available(macOS 13, *)
 @globalActor actor CustomGlobalActor: GlobalActor {
     static let shared = CustomGlobalActor()

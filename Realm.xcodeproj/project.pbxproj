@@ -367,6 +367,8 @@
 		AC88478626888CEE00DF4A65 /* SwiftUISyncTestHostUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8846902686573D00DF4A65 /* SwiftUISyncTestHostUITests.swift */; };
 		AC8847A9268926B500DF4A65 /* RealmServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537130C724A9E417001FDBBC /* RealmServer.swift */; };
 		AC8AE64B26BAD4B00037D4E5 /* SwiftMongoClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */; };
+		ACA743CD2BF7AA6400D54512 /* BaasClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA743CB2BF7AA5C00D54512 /* BaasClient.swift */; };
+		ACA743CE2BF7AA9A00D54512 /* BaasClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA743CB2BF7AA5C00D54512 /* BaasClient.swift */; };
 		ACB6FD35273C60CC0009712F /* SyncSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD34273C60CC0009712F /* SyncSubscription.swift */; };
 		ACB6FD36273C60FD0009712F /* SwiftFlexibleSyncServerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */; };
 		ACB6FD37273C61040009712F /* RLMFlexibleSyncServerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */; };
@@ -926,6 +928,7 @@
 		AC8847492687E0BD00DF4A65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AC88478126888C6300DF4A65 /* SwiftUISyncTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUISyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC8AE64A26BAD4B00037D4E5 /* SwiftMongoClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftMongoClientTests.swift; path = Realm/ObjectServerTests/SwiftMongoClientTests.swift; sourceTree = "<group>"; };
+		ACA743CB2BF7AA5C00D54512 /* BaasClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BaasClient.swift; path = Realm/ObjectServerTests/BaasClient.swift; sourceTree = "<group>"; };
 		ACB6FD30273C60920009712F /* RLMFlexibleSyncServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMFlexibleSyncServerTests.mm; path = Realm/ObjectServerTests/RLMFlexibleSyncServerTests.mm; sourceTree = "<group>"; };
 		ACB6FD31273C60920009712F /* SwiftFlexibleSyncServerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftFlexibleSyncServerTests.swift; path = Realm/ObjectServerTests/SwiftFlexibleSyncServerTests.swift; sourceTree = "<group>"; };
 		ACB6FD34273C60CC0009712F /* SyncSubscription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncSubscription.swift; sourceTree = "<group>"; };
@@ -1179,6 +1182,7 @@
 		1AA5AEA21D98CA5300ED8C27 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				ACA743CB2BF7AA5C00D54512 /* BaasClient.swift */,
 				1AA5AE9A1D98A1B000ED8C27 /* Object-Server-Tests-Bridging-Header.h */,
 				3F73BC871E3A876600FE80B6 /* ObjectServerTests-Info.plist */,
 				537130C724A9E417001FDBBC /* RealmServer.swift */,
@@ -2684,6 +2688,7 @@
 				AC8847A9268926B500DF4A65 /* RealmServer.swift in Sources */,
 				ACBD595528364DFF009A664E /* RLMChildProcessEnvironment.m in Sources */,
 				ACBD595A283653CF009A664E /* RLMMultiProcessTestCase.m in Sources */,
+				ACA743CE2BF7AA9A00D54512 /* BaasClient.swift in Sources */,
 				ACBD59592836539B009A664E /* RLMServerTestObjects.m in Sources */,
 				ACBD595428364DCB009A664E /* RLMSyncTestCase.mm in Sources */,
 				ACBD5957283652D7009A664E /* RLMTestCase.m in Sources */,
@@ -2720,6 +2725,7 @@
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
 				3F558C9022C29A03002F0F30 /* RLMTestCase.m in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMUser+ObjectServerTests.mm in Sources */,
+				ACA743CD2BF7AA6400D54512 /* BaasClient.swift in Sources */,
 				CF330BBE24E57D5F00F07EE2 /* RLMWatchTestUtility.m in Sources */,
 				AC05380C2885B25A00CE27C4 /* SwiftAsymmetricSyncServerTests.swift in Sources */,
 				3F9ADA9426E7E87B007349A5 /* SwiftCollectionSyncTests.swift in Sources */,

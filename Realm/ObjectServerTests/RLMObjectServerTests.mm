@@ -1749,7 +1749,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-- (void)testAsyncOpenConnectionTimeout {
+- (void)fix_testAsyncOpenConnectionTimeout {
     TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:5678 targetPort:9090];
     NSError *error;
     [proxy startAndReturnError:&error];

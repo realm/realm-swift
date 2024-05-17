@@ -32,6 +32,9 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 // Check if baas is installed. When running via SPM we can't install it
 // automatically, so we skip running tests which require it if it's missing.
 + (bool)haveServer;
+
+- (NSString *)getBaseUrl;
+- (void)setUp;
 // Create a FLX app with the given queryable fields and object types. If
 // `persistent:NO` the app will be deleted at the end of the current test, and
 // otherwise it will remain until `deleteApp:` is called on it.

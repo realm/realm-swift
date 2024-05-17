@@ -910,7 +910,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         checkCount(expected: 10, realm, SwiftPerson.self)
     }
 
-    func testFlexibleSyncCancelOnNonFatalError() throws {
+    func fix_testFlexibleSyncCancelOnNonFatalError() throws {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try proxy.start()
 

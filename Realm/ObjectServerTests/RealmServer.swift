@@ -28,8 +28,8 @@ import RealmSyncTestSupport
 
 #if os(macOS)
 
-extension URLSession {
-    fileprivate func resultDataTask(with request: URLRequest,
+internal extension URLSession {
+    func resultDataTask(with request: URLRequest,
                                     _ completionHandler: @Sendable @escaping (Result<Data, Error>) -> Void) {
         URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue()).dataTask(with: request) { (data, response, error) in
             if let httpResponse = response as? HTTPURLResponse,
@@ -50,7 +50,7 @@ extension URLSession {
     }
 
     // Synchronously perform a data task, returning the data from it
-    fileprivate func resultDataTask(with request: URLRequest) -> Result<Data, Error> {
+    func resultDataTask(with request: URLRequest) -> Result<Data, Error> {
         let result = Locked(Result<Data, Error>?.none)
         let group = DispatchGroup()
         group.enter()
@@ -218,10 +218,12 @@ class AdminSession {
     var accessToken: String
     /// The group id associated with the authenticated user
     var groupId: String
+    var baseUrl: String
 
-    init(accessToken: String, groupId: String) {
+    init(accessToken: String, groupId: String, baseUrl: String = "http://localhost:9090") {
         self.accessToken = accessToken
         self.groupId = groupId
+        self.baseUrl = baseUrl
     }
 
     // MARK: AdminEndpoint
@@ -410,18 +412,22 @@ class AdminSession {
     /// The initial endpoint to access the admin server
     lazy var apps = AdminEndpoint(accessToken: accessToken,
                                   groupId: groupId,
-                                  url: URL(string: "http://localhost:9090/api/admin/v3.0/groups/\(groupId)/apps")!)
+                                  url: URL(string: "\(baseUrl)/api/admin/v3.0/groups/\(groupId)/apps")!)
 
     /// The initial endpoint to access the private API
     lazy var privateApps = AdminEndpoint(accessToken: accessToken,
                                   groupId: groupId,
-                                  url: URL(string: "http://localhost:9090/api/private/v1.0/groups/\(groupId)/apps")!)
+                                  url: URL(string: "\(baseUrl)/api/private/v1.0/groups/\(groupId)/apps")!)
 }
 
 // MARK: - Admin
 class Admin {
+    private var baseUrl: String
+    init(baseUrl: String = "http://localhost:9090") {
+        self.baseUrl = baseUrl
+    }
     private func userProfile(accessToken: String) -> Result<AdminProfile, Error> {
-        var request = URLRequest(url: URL(string: "http://localhost:9090/api/admin/v3.0/auth/profile")!)
+        var request = URLRequest(url: URL(string: "\(baseUrl)/api/admin/v3.0/auth/profile")!)
         request.allHTTPHeaderFields = [
             "Authorization": "Bearer \(String(describing: accessToken))"
         ]
@@ -435,7 +441,7 @@ class Admin {
 
     /// Synchronously authenticate an admin session
     func login() throws -> AdminSession {
-        let authUrl = URL(string: "http://localhost:9090/api/admin/v3.0/auth/providers/local-userpass/login")!
+        let authUrl = URL(string: "\(baseUrl)/api/admin/v3.0/auth/providers/local-userpass/login")!
         var loginRequest = URLRequest(url: authUrl)
         loginRequest.httpMethod = "POST"
         loginRequest.allHTTPHeaderFields = ["Content-Type": "application/json;charset=utf-8",
@@ -458,7 +464,8 @@ class Admin {
                 self.userProfile(accessToken: accessToken).map {
                     AdminSession(accessToken: accessToken, groupId: $0.roles.first(where: { role in
                         role.roleName == "GROUP_OWNER"
-                    })!.groupId!)
+                    })!.groupId!,
+                    baseUrl: baseUrl)
                 }
             }
             .get()
@@ -519,25 +526,66 @@ public class RealmServer: NSObject {
 
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
-        let goDir = RealmServer.buildDir.appendingPathComponent("stitch")
-        return FileManager.default.fileExists(atPath: goDir.path)
+        if isBaasas {
+            return true
+        } else {
+            let goDir = RealmServer.buildDir.appendingPathComponent("stitch")
+            return FileManager.default.fileExists(atPath: goDir.path)
+        }
     }
+
+    private static let isBaasas = (ProcessInfo.processInfo.environment["BAASAAS"] != nil)
+    private var baseUrl: String = "http://localhost:9090"
+    private var containerId: String?
 
     private override init() {
         super.init()
+    }
 
-        if isParentProcess {
-            atexit {
-                _ = RealmServer.shared.tearDown
-            }
-
+    deinit {
+        if RealmServer.isBaasas,
+           let id = self.containerId {
             do {
-                try launchMongoProcess()
-                try launchServerProcess()
-                self.session = try Admin().login()
-                try makeUserAdmin()
+                let apiKey = ProcessInfo.processInfo.environment["BAASAAS_API_KEY"]!
+                let baasClient = BaasClient(apiKey: apiKey)
+                try baasClient.deleteContainer(id: id).get()
             } catch {
-                fatalError("Could not initiate admin session: \(error.localizedDescription)")
+                print(error)
+            }
+        }
+    }
+
+    @objc func setUp() {
+        if isParentProcess {
+            if RealmServer.isBaasas {
+                do {
+                    let apiKey = ProcessInfo.processInfo.environment["BAASAAS_API_KEY"]!
+                    let baasClient = BaasClient(apiKey: apiKey)
+                    let group = DispatchGroup()
+                    group.enter()
+                    let container = try baasClient.getOrDeployContainer().get()
+                    group.leave()
+                    guard case .success = group.wait(timeout: .now() + 20) else {
+                        return XCTFail("Server did not start")
+                    }
+                    self.containerId = container.0
+                    self.baseUrl = container.1
+                    self.session = try Admin(baseUrl: baseUrl).login()
+                } catch {
+                    fatalError("Could not initiate baasas container \(error)")
+                }
+            } else {
+                atexit {
+                    _ = RealmServer.shared.tearDown
+                }
+                do {
+                    try launchMongoProcess()
+                    try launchServerProcess()
+                    self.session = try Admin().login()
+                    try makeUserAdmin()
+                } catch {
+                    fatalError("Could not initiate admin session: \(error.localizedDescription)")
+                }
             }
         }
     }
@@ -1035,6 +1083,10 @@ public class RealmServer: NSObject {
         let serverAppId = try retrieveAppServerId(appId)
         let app = try XCTUnwrap(session).apps[serverAppId]
         _ = try app.delete().get()
+    }
+
+    @objc func getBaseUrl() -> String {
+        return baseUrl
     }
 
     // Retrieve Atlas App Services AppId with ClientAppId using the Admin API
