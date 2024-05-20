@@ -1,7 +1,7 @@
 name: Publish release
 on: workflow_dispatch
 env:
-  XCODE_VERSION: "['15.1', '15.2', '15.3']"
+  XCODE_VERSION: "['15.1', '15.2', '15.3', '15.4']"
   TEST_XCODE_VERSION: '15.3'
 jobs:
   prepare:

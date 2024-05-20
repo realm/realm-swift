@@ -128,7 +128,7 @@ class SwiftRLMPropertyTypeTest: RLMTestCase {
         let realm = realmWithTestPath()
         var object: SwiftRLMObjectiveCTypesObject!
         let now = NSDate()
-        let data = "fizzbuzz".data(using: .utf8)! as Data as NSData
+        let data = Data("fizzbuzz".utf8) as NSData
         try! realm.transaction {
             object = SwiftRLMObjectiveCTypesObject()
             realm.add(object)

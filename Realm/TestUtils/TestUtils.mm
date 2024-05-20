@@ -166,30 +166,6 @@ bool RLMHasCachedRealmForPath(NSString *path) {
     return RLMGetAnyCachedRealmForPath(path.UTF8String);
 }
 
-static std::string serialize(id obj) {
-    auto data = [NSJSONSerialization dataWithJSONObject:obj
-                                                options:0
-                                                  error:nil];
-    return std::string(static_cast<const char *>(data.bytes), data.length);
-}
-
-static std::string fakeJWT() {
-    std::string unencoded_prefix = serialize(@{@"alg": @"HS256"});
-    std::string unencoded_body = serialize(@{
-        @"user_data": @{@"token": @"dummy token"},
-        @"exp": @123,
-        @"iat": @456,
-        @"access": @[@"download", @"upload"]
-    });
-    std::string encoded_prefix, encoded_body;
-    encoded_prefix.resize(realm::util::base64_encoded_size(unencoded_prefix.size()));
-    encoded_body.resize(realm::util::base64_encoded_size(unencoded_body.size()));
-    realm::util::base64_encode(unencoded_prefix, encoded_prefix);
-    realm::util::base64_encode(unencoded_body, encoded_body);
-    std::string suffix = "Et9HFtf9R3GEMA0IICOfFMVXY7kkTX1wr4qCyhIf58U";
-    return encoded_prefix + "." + encoded_body + "." + suffix;
-}
-
 // A network transport which doesn't actually do anything
 @interface NoOpTransport : NSObject <RLMNetworkTransport>
 @end
@@ -260,18 +236,6 @@ class FakeSyncUser : public realm::SyncUser {
     return config;
 }
 @end
-
-// Xcode 13 adds -[NSUUID compare:] so this warns about the category
-// implementing a method which already exists, but we can't use just the
-// built-in one yet.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wobjc-protocol-method-implementation"
-@implementation NSUUID (RLMUUIDCompareTests)
-- (NSComparisonResult)compare:(NSUUID *)other {
-    return [[self UUIDString] compare:other.UUIDString];
-}
-@end
-#pragma clang diagnostic pop
 
 bool RLMThreadSanitizerEnabled() {
 #if __has_feature(thread_sanitizer)

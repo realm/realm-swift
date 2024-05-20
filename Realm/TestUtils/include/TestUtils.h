@@ -21,21 +21,19 @@
 
 #import <Realm/RLMUser.h>
 
+RLM_HEADER_AUDIT_BEGIN(nullability)
+
 FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                                               __attribute__((noescape)) dispatch_block_t block,
                                                               NSString *regexString,
-                                                              NSString *message,
+                                                              NSString *_Nullable message,
                                                               NSString *fileName,
                                                               NSUInteger lineNumber);
 
 
 @interface RLMRealmConfiguration (TestUser)
-+ (RLMRealmConfiguration *_Nonnull)fakeSyncConfiguration;
-+ (RLMRealmConfiguration *_Nonnull)fakeFlexibleSyncConfiguration;
-@end
-
-@interface NSUUID (RLMUUIDCompareTests)
-- (NSComparisonResult)compare:(NSUUID *)other;
++ (RLMRealmConfiguration *)fakeSyncConfiguration;
++ (RLMRealmConfiguration *)fakeFlexibleSyncConfiguration;
 @end
 
 // It appears to be impossible to check this from Swift so we need a helper function
@@ -44,3 +42,4 @@ FOUNDATION_EXTERN bool RLMThreadSanitizerEnabled(void);
 FOUNDATION_EXTERN bool RLMCanFork(void);
 FOUNDATION_EXTERN pid_t RLMFork(void);
 
+RLM_HEADER_AUDIT_END(nullability)
