@@ -32,8 +32,13 @@ x.y.z Release notes (yyyy-MM-dd)
   ```
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Accessing `App.currentUser` from within a notification produced by `App.switchToUser()` 
+  (which includes notifications for a newly logged in user) would deadlock. 
+  ([Core #7670](https://github.com/realm/realm-core/issues/7670), since v10.50.0).
+* Inserting the same link to the same key in a dictionary more than once would incorrectly
+  create multiple backlinks to the object. This did not appear to cause any crashes later, but would 
+  have affecting explicit backlink count queries and possibly notifications. 
+  ([Core #7676](https://github.com/realm/realm-core/issues/7676), since v10.49.2).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -45,7 +50,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.1.0-15.4.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v14.6.2 to 14.7.0
 
 10.50.1 Release notes (2024-05-21)
 =============================================================
