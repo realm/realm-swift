@@ -278,6 +278,7 @@ public func assertPreconditionFailure<T>(_ message: String, _ expression: () asy
     guard let data = try pipe.fileHandleForReading.readToEnd() else {
         return XCTFail("Expected child process to crash with message \"\(message)\", but it exited without printing anything", file: file, line: line)
     }
+    // swiftlint:disable:next non_optional_string_data_conversion
     guard let str = String(data: data, encoding: .utf8) else {
         return XCTFail("Expected child process to crash with message \"\(message)\", but it did not print valid utf-8", file: file, line: line)
     }

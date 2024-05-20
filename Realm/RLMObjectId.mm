@@ -89,7 +89,7 @@
 }
 
 + (instancetype)objectId {
-    return [[RLMObjectId alloc] initWithValue:realm::ObjectId::gen()];
+    return [[self alloc] initWithValue:realm::ObjectId::gen()];
 }
 
 - (BOOL)isEqual:(id)object {

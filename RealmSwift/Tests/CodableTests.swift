@@ -305,10 +305,10 @@ class CodableTests: TestCase {
     func encode<T: RealmOptionalType & Codable & _RealmSchemaDiscoverable>(_ value: T?) -> String {
         let opt = RealmOptional<T>()
         opt.value = value
-        return try! String(data: encoder.encode([opt]), encoding: .utf8)!
+        return try! String(decoding: encoder.encode([opt]), as: UTF8.self)
     }
     func encode<T: Codable>(_ value: T?) -> String {
-        return try! String(data: encoder.encode([value]), encoding: .utf8)!
+        return try! String(decoding: encoder.encode([value]), as: UTF8.self)
     }
 
     func legacyObjectString(_ nullRealmProperty: Bool = false) -> String {
@@ -1217,6 +1217,7 @@ class CodableTests: TestCase {
         // Verify that it encodes to exactly the original string (which requires
         // that the original string be formatted how JSONEncoder formats things)
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        // swiftlint:disable:next non_optional_string_data_conversion
         let actual = try String(data: encoder.encode(obj), encoding: .utf8)
         XCTAssertEqual(str, actual)
 
@@ -1598,6 +1599,7 @@ class CodableTests: TestCase {
         // Verify that it encodes to exactly the original string (which requires
         // that the original string be formatted how JSONEncoder formats things)
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        // swiftlint:disable:next non_optional_string_data_conversion
         let actual = try String(data: encoder.encode(obj), encoding: .utf8)
         XCTAssertEqual(str, actual)
     }
@@ -1811,6 +1813,7 @@ class CodableTests: TestCase {
         obj.objectId = ObjectId("1234567890abcdef12345678")
         obj.uuid = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         obj.date = Date(timeIntervalSince1970: 0)
+        // swiftlint:disable:next non_optional_string_data_conversion
         let actual = try String(data: encoder.encode(obj), encoding: .utf8)
         let expected = #"{"bool":false,"bool_list":[],"bool_map":{},"bool_opt":null,"bool_opt_list":[],"bool_opt_map":{},"bool_opt_set":[],"bool_set":[],"data":"","data_list":[],"data_map":{},"data_opt":null,"data_opt_list":[],"data_opt_map":{},"data_opt_set":[],"data_set":[],"date":-978307200,"date_list":[],"date_map":{},"date_opt":null,"date_opt_list":[],"date_opt_map":{},"date_opt_set":[],"date_set":[],"decimal":"0","decimal_list":[],"decimal_map":{},"decimal_opt":null,"decimal_opt_list":[],"decimal_opt_map":{},"decimal_opt_set":[],"decimal_set":[],"double":0,"double_list":[],"double_map":{},"double_opt":null,"double_opt_list":[],"double_opt_map":{},"double_opt_set":[],"double_set":[],"embedded_object_list":[],"embedded_object_opt":null,"embedded_object_opt_map":{},"float":0,"float_list":[],"float_map":{},"float_opt":null,"float_opt_list":[],"float_opt_map":{},"float_opt_set":[],"float_set":[],"int":0,"int_list":[],"int_map":{},"int_opt":null,"int_opt_list":[],"int_opt_map":{},"int_opt_set":[],"int_set":[],"int8":0,"int8_list":[],"int8_map":{},"int8_opt":null,"int8_opt_list":[],"int8_opt_map":{},"int8_opt_set":[],"int8_set":[],"int16":0,"int16_list":[],"int16_map":{},"int16_opt":null,"int16_opt_list":[],"int16_opt_map":{},"int16_opt_set":[],"int16_set":[],"int32":0,"int32_list":[],"int32_map":{},"int32_opt":null,"int32_opt_list":[],"int32_opt_map":{},"int32_opt_set":[],"int32_set":[],"int64":0,"int64_list":[],"int64_map":{},"int64_opt":null,"int64_opt_list":[],"int64_opt_map":{},"int64_opt_set":[],"int64_set":[],"object_id":"1234567890abcdef12345678","object_id_list":[],"object_id_map":{},"object_id_opt":null,"object_id_opt_list":[],"object_id_opt_map":{},"object_id_opt_set":[],"object_id_set":[],"object_list":[],"object_opt":null,"object_opt_map":{},"object_set":[],"string":"","string_list":[],"string_map":{},"string_opt":null,"string_opt_list":[],"string_opt_map":{},"string_opt_set":[],"string_set":[],"uuid":"00000000-0000-0000-0000-000000000000","uuid_list":[],"uuid_map":{},"uuid_opt":null,"uuid_opt_list":[],"uuid_opt_map":{},"uuid_opt_set":[],"uuid_set":[]}"#
         XCTAssertEqual(expected, actual)

@@ -190,7 +190,7 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
         try await write { realm in
             let object = SwiftCustomColumnObject()
             object.id = objectId
-            object.binaryCol = "string".data(using: String.Encoding.utf8)!
+            object.binaryCol = Data("string".utf8)
             let linkedObject = SwiftCustomColumnObject()
             linkedObject.id = linkedObjectId
             object.objectCol = linkedObject
@@ -207,7 +207,7 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(object.intCol, 1)
         XCTAssertEqual(object.doubleCol, 1.1)
         XCTAssertEqual(object.stringCol, "string")
-        XCTAssertEqual(object.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(object.binaryCol, Data("string".utf8))
         XCTAssertEqual(object.dateCol, Date(timeIntervalSince1970: -1))
         XCTAssertEqual(object.longCol, 1)
         XCTAssertEqual(object.decimalCol, Decimal128(1))
@@ -462,7 +462,7 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(obj.intCol, 1)
         XCTAssertEqual(obj.doubleCol, 1.1)
         XCTAssertEqual(obj.stringCol, "string")
-        XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(obj.binaryCol, Data("string".utf8))
         XCTAssertEqual(obj.decimalCol, Decimal128(1))
         XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
         XCTAssertEqual(obj.longCol, Int64(1))
@@ -1168,7 +1168,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
                                                    "intCol": 365,
                                                    "doubleCol": 365.365,
                                                    "stringCol": "@#¢∞¬÷÷",
-                                                   "binaryCol": "string".data(using: String.Encoding.utf8)!,
+                                                   "binaryCol": Data("string".utf8),
                                                    "dateCol": Date(timeIntervalSince1970: -365),
                                                    "longCol": 365,
                                                    "decimalCol": Decimal128(365),
@@ -1193,7 +1193,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(foundObject!.intCol, 365)
         XCTAssertEqual(foundObject!.doubleCol, 365.365)
         XCTAssertEqual(foundObject!.stringCol, "@#¢∞¬÷÷")
-        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.binaryCol, Data("string".utf8))
         XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -365))
         XCTAssertEqual(foundObject!.longCol, 365)
         XCTAssertEqual(foundObject!.decimalCol, Decimal128(365))
@@ -1209,7 +1209,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         try await write { realm in
             let object = SwiftCustomColumnObject()
             object.id = objectId
-            object.binaryCol = "string".data(using: String.Encoding.utf8)!
+            object.binaryCol = Data("string".utf8)
             let linkedObject = SwiftCustomColumnObject()
             linkedObject.id = linkedObjectId
             object.objectCol = linkedObject
@@ -1232,7 +1232,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(foundObject!.intCol, 1)
         XCTAssertEqual(foundObject!.doubleCol, 1.1)
         XCTAssertEqual(foundObject!.stringCol, "string")
-        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.binaryCol, Data("string".utf8))
         XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -1))
         XCTAssertEqual(foundObject!.longCol, 1)
         XCTAssertEqual(foundObject!.decimalCol, Decimal128(1))
@@ -1248,7 +1248,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         try await write { realm in
             let object = SwiftCustomColumnObject()
             object.id = objectId
-            object.binaryCol = "string".data(using: String.Encoding.utf8)!
+            object.binaryCol = Data("string".utf8)
             let linkedObject = SwiftCustomColumnObject()
             linkedObject.id = linkedObjectId
             object.objectCol = linkedObject
@@ -1271,7 +1271,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(foundObject!.intCol, 1)
         XCTAssertEqual(foundObject!.doubleCol, 1.1)
         XCTAssertEqual(foundObject!.stringCol, "string")
-        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.binaryCol, Data("string".utf8))
         XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -1))
         XCTAssertEqual(foundObject!.longCol, 1)
         XCTAssertEqual(foundObject!.decimalCol, Decimal128(1))
@@ -1287,7 +1287,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         try await write { realm in
             let object = SwiftCustomColumnObject()
             object.id = objectId
-            object.binaryCol = "string".data(using: String.Encoding.utf8)!
+            object.binaryCol = Data("string".utf8)
             let linkedObject = SwiftCustomColumnObject()
             linkedObject.id = linkedObjectId
             object.objectCol = linkedObject
@@ -1313,7 +1313,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(foundObject!.intCol, 1)
         XCTAssertEqual(foundObject!.doubleCol, 1.1)
         XCTAssertEqual(foundObject!.stringCol, "string")
-        XCTAssertEqual(foundObject!.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(foundObject!.binaryCol, Data("string".utf8))
         XCTAssertEqual(foundObject!.dateCol, Date(timeIntervalSince1970: -1))
         XCTAssertEqual(foundObject!.longCol, 1)
         XCTAssertEqual(foundObject!.decimalCol, Decimal128(1))

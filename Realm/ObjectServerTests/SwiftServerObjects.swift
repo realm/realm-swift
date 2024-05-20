@@ -63,7 +63,7 @@ public class SwiftTypesSyncObject: Object {
     @Persisted public var intCol: Int = 1
     @Persisted public var doubleCol: Double = 1.1
     @Persisted public var stringCol: String = "string"
-    @Persisted public var binaryCol: Data = "string".data(using: String.Encoding.utf8)!
+    @Persisted public var binaryCol: Data = Data("string".utf8)
     @Persisted public var dateCol: Date = Date(timeIntervalSince1970: -1)
     @Persisted public var longCol: Int64 = 1
     @Persisted public var decimalCol: Decimal128 = Decimal128(1)
@@ -208,7 +208,7 @@ public class SwiftCustomColumnObject: Object {
     @Persisted public var intCol: Int = 1
     @Persisted public var doubleCol: Double = 1.1
     @Persisted public var stringCol: String = "string"
-    @Persisted public var binaryCol = "string".data(using: String.Encoding.utf8)!
+    @Persisted public var binaryCol = Data("string".utf8)
     @Persisted public var dateCol: Date = Date(timeIntervalSince1970: -1)
     @Persisted public var longCol: Int64 = 1
     @Persisted public var decimalCol: Decimal128 = Decimal128(1)

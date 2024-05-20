@@ -250,10 +250,10 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
     func testPrimitiveArray() {
         let obj = SwiftRLMPrimitiveArrayObject()
         let str = "str" as NSString
-        let data = "str".data(using: .utf8)! as Data as NSData
+        let data = Data("str".utf8) as NSData
         let date = NSDate()
         let str2 = "str2" as NSString
-        let data2 = "str2".data(using: .utf8)! as Data as NSData
+        let data2 = Data("str2".utf8) as NSData
         let date2 = NSDate(timeIntervalSince1970: 0)
 
         obj.stringCol.add(str)
@@ -291,7 +291,7 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
     func testPrimitiveSet() {
         let obj = SwiftRLMPrimitiveSetObject()
         let str = "str" as NSString
-        let data = "str".data(using: .utf8)! as Data as NSData
+        let data = Data("str".utf8) as NSData
         let date = NSDate()
         obj.stringCol.add(str)
         XCTAssertTrue(obj.stringCol.contains(str))

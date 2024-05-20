@@ -3722,7 +3722,6 @@ class QueryTests: TestCase {
             XCTAssertEqual(obj.map.where(q2).count, 1)
         }
 
-        // swiftlint:disable opening_brace
         test(LinkToModernAllTypesObject.self, "(boolCol == %@)",
              false,
              { $0.boolCol == false },
@@ -3963,7 +3962,6 @@ class QueryTests: TestCase {
              UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!),
              { $0.optUuid == UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!) },
              { $0.optUuid == UUIDWrapper(persistedValue: UUID(uuidString: "33041937-05b2-464a-98ad-3910cbe0d09f")!) })
-        // swiftlint:enable opening_brace
     }
 
     func testSetContainsObject() {

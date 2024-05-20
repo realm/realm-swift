@@ -38,6 +38,7 @@ extension URLSession {
                 completionHandler(.success(data))
             } else if let error = error {
                 completionHandler(.failure(error))
+            // swiftlint:disable:next non_optional_string_data_conversion
             } else if let data = data, let string = String(data: data, encoding: .utf8) {
                 completionHandler(.failure(NSError(domain: URLError.errorDomain,
                                                    code: URLError.badServerResponse.rawValue,
@@ -654,6 +655,7 @@ public class RealmServer: NSObject {
         let logLevel = self.logLevel
         pipe.fileHandleForReading.readabilityHandler = { file in
             guard file.availableData.count > 0,
+                  // swiftlint:disable:next non_optional_string_data_conversion
                   let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t") else {
                 return
             }
@@ -674,9 +676,9 @@ public class RealmServer: NSObject {
                 } else if part.contains("ERROR") {
                     parts.append("🔴")
                 } else if let json = try? JSONSerialization.jsonObject(with: part.data(using: .utf8)!) {
-                    parts.append(String(data: try! JSONSerialization.data(withJSONObject: json,
-                                                                          options: .prettyPrinted),
-                                  encoding: .utf8)!)
+                    parts.append(String(decoding: try! JSONSerialization.data(withJSONObject: json,
+                                                                              options: .prettyPrinted),
+                                        as: UTF8.self))
                 } else if !part.isEmpty {
                     parts.append(String(part))
                 }

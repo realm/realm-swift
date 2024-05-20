@@ -126,7 +126,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(obj.intCol, 1)
         XCTAssertEqual(obj.doubleCol, 1.1)
         XCTAssertEqual(obj.stringCol, "string")
-        XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(obj.binaryCol, Data("string".utf8))
         XCTAssertEqual(obj.decimalCol, Decimal128(1))
         XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
         XCTAssertEqual(obj.longCol, Int64(1))
@@ -506,7 +506,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "async open")
         ex.expectedFulfillmentCount = 2
         let config = try configuration()
-        let completion = { (result: Result<Realm, Error>) -> Void in
+        let completion = { (result: Result<Realm, Error>) in
             guard case .failure = result else {
                 XCTFail("No error on cancelled async open")
                 return ex.fulfill()
