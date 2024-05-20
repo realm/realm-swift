@@ -6,8 +6,8 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['15.1', '15.2', '15.3']"
-  XCODE_TEST_VERSIONS: "['15.1', '15.2', '15.3']"
+  XCODE_VERSION: "['15.1', '15.2', '15.3', '15.4']"
+  XCODE_TEST_VERSIONS: "['15.1', '15.2', '15.3', '15.4']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
   DOC_VERSION: '15.3'
