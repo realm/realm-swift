@@ -64,41 +64,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testUpdateBaseUrl() {
         let app = App(id: appId)
-        XCTAssertNotNil(app.baseURL)
+        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
+
+        app.updateBaseUrl(to: "http://localhost:9090").await(self)
         XCTAssertEqual(app.baseURL, "http://localhost:9090")
 
-        let ex = expectation(description: "update base url")
-        app.updateBaseUrl(to: "http://localhost:8080", { result in
-            switch result {
-            case .success:
-                ex.fulfill()
-            case .failure:
-                XCTFail("Should not return an error")
-            }
-        })
-        XCTAssertEqual(app.baseURL, "http://localhost:8080")
+        app.updateBaseUrl(to: "http://127.0.0.1:9090").await(self)
+        XCTAssertEqual(app.baseURL, "http://127.0.0.1:9090")
 
-        let ex1 = expectation(description: "update base url")
-        app.updateBaseUrl(to: "http://localhost:7070/", { result in
-            switch result {
-            case .success:
-                ex1.fulfill()
-            case .failure:
-                XCTFail("Should not return an error")
-            }
-        })
-        XCTAssertEqual(app.baseURL, "http://localhost:7070")
-
-        let ex2 = expectation(description: "update base url")
-        app.updateBaseUrl(to: nil, { result in
-            switch result {
-            case .success:
-                ex2.fulfill()
-            case .failure:
-                XCTFail("Should not return an error")
-            }
-        })
-        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
+        app.updateBaseUrl(to: nil).awaitFailure(self)
+        XCTAssertEqual(app.baseURL, "http://127.0.0.1:9090")
     }
 
     func testBasicSwiftSync() throws {
@@ -354,22 +329,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
 
-        var progress: SyncSession.Progress?
+        let progress = Locked<SyncSession.Progress?>(nil)
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-            DispatchQueue.main.async { @MainActor in
-                if let progress = progress {
+            progress.withLock { progress in
+                if let progress {
                     XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
                 progress = p
             }
         }
         XCTAssertNotNil(token)
-
         waitForUploads(for: realm)
 
         for _ in 0..<5 {
-            progress = nil
+            progress.value = nil
             try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
@@ -380,7 +354,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         token!.invalidate()
 
-        let p = try XCTUnwrap(progress)
+        let p = try XCTUnwrap(progress.value)
         XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
         XCTAssertEqual(p.progressEstimate, 1.0)
         XCTAssertTrue(p.isTransferComplete)

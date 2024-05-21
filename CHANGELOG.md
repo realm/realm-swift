@@ -7,6 +7,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
 * `@AutoOpen` and `@AsyncOpen` failed to use the `initialSubscriptions` set in
   the configuration passed to them ([PR #8572](https://github.com/realm/realm-swift/pull/8572), since v10.50.0).
+* `App.baseURL` was always `nil` ([PR #8573](https://github.com/realm/realm-swift/pull/8573), since it was introduced in v10.50.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
