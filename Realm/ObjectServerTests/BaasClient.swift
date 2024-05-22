@@ -99,7 +99,7 @@ public class BaasClient {
         }
 
         guard fileteredContainer["isRunning"] as! Bool else {
-            print("Container \(id) is not running")
+            print("\(id) status is \(fileteredContainer["lastStatus"] ?? ""). Retrying...'")
             return .success(nil)
         }
 
