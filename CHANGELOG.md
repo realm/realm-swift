@@ -1,13 +1,11 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Update release packaging for Xcode 15.4.
+* None.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* `@AutoOpen` and `@AsyncOpen` failed to use the `initialSubscriptions` set in
-  the configuration passed to them ([PR #8572](https://github.com/realm/realm-swift/pull/8572), since v10.50.0).
-* `App.baseURL` was always `nil` ([PR #8573](https://github.com/realm/realm-swift/pull/8573), since it was introduced in v10.50.0).
+* None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -20,6 +18,27 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from ? to ?
+
+10.50.1 Release notes (2024-05-21)
+=============================================================
+
+### Enhancements
+
+* Update release packaging for Xcode 15.4.
+
+### Fixed
+
+* `@AutoOpen` and `@AsyncOpen` failed to use the `initialSubscriptions` set in
+  the configuration passed to them ([PR #8572](https://github.com/realm/realm-swift/pull/8572), since v10.50.0).
+* `App.baseURL` was always `nil` ([PR #8573](https://github.com/realm/realm-swift/pull/8573), since it was introduced in v10.50.0).
+
+### Compatibility
+
+* Realm Studio: 15.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.4.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 15.1.0-15.4.0.
 
 10.50.0 Release notes (2024-05-02)
 =============================================================
