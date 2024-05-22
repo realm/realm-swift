@@ -51,11 +51,9 @@ public extension ObjectiveCSupport {
         case let .object(o):
             return o
         case let .dictionary(d):
-            let rlmDictionary = Map<String, AnyRealmValue>._rlmFromObjc(d)?.rlmDictionary
-            return rlmDictionary
+            return d.rlmDictionary
         case let .list(l):
-            let rlmArray = List<AnyRealmValue>._rlmFromObjc(l)?.rlmArray
-            return rlmArray
+            return l.rlmArray
         default:
             return nil
         }

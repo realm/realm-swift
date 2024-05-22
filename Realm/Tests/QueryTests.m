@@ -3810,8 +3810,8 @@ static NSData *data(const char *str) {
                               @"Invalid keypath 'set[\"invalid\"]': only dictionaries and mixed support subscript predicates.");
     RLMAssertThrowsWithReason(([realm objects:@"OwnerObject" where:@"dog['dogName'] = NULL"]),
                               @"Aggregate operations can only be used on key paths that include an collection property");
-    RLMAssertThrowsWithReason(([realm objects:@"DictionaryPropertyObject" where:@"stringDictionary[%@] = NULL", [RLMObjectId objectId]]),
-                              @"Only `Strings` or index are allowed subscripts");
+    RLMAssertThrows(([realm objects:@"DictionaryPropertyObject" where:@"stringDictionary[%@] = NULL", [RLMObjectId objectId]]),
+                    @"Invalid subscript type 'anyCol[[a-z0-9]+]': Only `Strings` or index are allowed subscripts");
     RLMAssertThrowsWithReason(([realm objects:@"DictionaryPropertyObject" where:@"stringDictionary['aKey']['bKey'] = NULL"]),
                               @"Invalid subscript size 'stringDictionary[\"aKey\"][\"bKey\"]': nested dictionaries queries are only allowed in mixed properties.");
     RLMAssertThrowsWithReason(([realm objects:@"DictionaryPropertyObject" where:@"stringDictionary[0] = NULL"]),
@@ -3820,8 +3820,8 @@ static NSData *data(const char *str) {
 
 - (void)testMixedSubscriptsThrowsException {
     RLMRealm *realm = [self realm];
-    RLMAssertThrowsWithReason(([realm objects:@"AllTypesObject" where:@"anyCol[%@] = NULL", [NSDate date]]),
-                              @"Only `Strings` or index are allowed subscripts");
+    RLMAssertThrows(([realm objects:@"AllTypesObject" where:@"anyCol[%@] = NULL", [RLMObjectId objectId]]),
+                    @"Invalid subscript type 'anyCol[[a-z0-9]+]': Only `Strings` or index are allowed subscripts");
 }
 
 - (void)testCollectionsQueryAllValuesAllKeys {

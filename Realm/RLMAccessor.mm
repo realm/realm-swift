@@ -777,13 +777,13 @@ RLMDecimal128 *RLMGetSwiftPropertyDecimal128(__unsafe_unretained RLMObjectBase *
 }
 
 RLMArray *RLMGetSwiftPropertyArray(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
-    return getCollection(obj, key);
+    return (RLMArray *)getCollection(obj, key);
 }
 RLMSet *RLMGetSwiftPropertySet(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
     return getCollection(obj, key);
 }
 RLMDictionary *RLMGetSwiftPropertyMap(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
-    return getCollection(obj, key);
+    return (RLMDictionary *)getCollection(obj, key);
 }
 
 void RLMSetSwiftPropertyNil(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {

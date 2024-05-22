@@ -113,8 +113,6 @@ store. Xcode 15.1 is now the minimum supported version.
 * The `transferredBytes` and `transferrableBytes` fields on `Progress` have been deprecated
   in favor of `progressEstimate` which is a value between 0.0 and 1.0 indicating the estimated
   progress toward the upload/download transfer. ([#8476](https://github.com/realm/realm-swift/issues/8476))
-  UUID/ObjectId types. ([.Net * #3566](https://github.com/realm/realm-dotnet/issues/3566))
-* Added `SyncConfiguration.initialSubscriptions` which describes the initial subscription configuration that was passed when constructing the `SyncConfiguration`. ([#8548](https://github.com/realm/realm-swift/issues/8548))
 
 ### Fixed
 * `-[RLMUser allSessions]` did not include sessions which were currently

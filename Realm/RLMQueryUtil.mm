@@ -1849,10 +1849,11 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
     }
 }
 
-// This function returns the nested subscripts from a NSPredicate with the following format `anyCol[0]['key']['all']`
+// This function returns the nested subscripts from a NSPredicate with the following format `anyCol[0]['key'][#any]`
 // and its respective keypath (including any linked keypath)
 // This will iterate each argument of the NSExpression and its nested NSExpressions, takes the constant subscript
-// and creates a PathElement to be used in the query.
+// and creates a PathElement to be used in the query. If we use `#any` as a wildcard this will show in the parser 
+// predicate as NSKeyPathExpressionType.
 NSString* QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExpression *expression) {
     NSString *keyPath = @"";
     for (NSUInteger i = 0; i < expression.arguments.count; i++) {
@@ -1865,23 +1866,24 @@ NSString* QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExp
                 paths.push_back(PathElement{[(NSNumber *)value intValue]});
             } else if ([value isKindOfClass:[NSString class]]) {
                 NSString *key = (NSString *)value;
-                if ([key isEqual:@"*"]) {
-                    paths.push_back(PathElement{});
-                } else {
-                    paths.push_back(PathElement{key.UTF8String});
-                }
+                paths.push_back(PathElement{key.UTF8String});
             } else {
                 throwException(@"Invalid subscript type",
-                               @"Only `Strings` or index are allowed subscripts");
+                               @"Invalid subscript type '%@': Only `Strings` or index are allowed subscripts", expression);
             }
         } else if (expression.arguments[i].expressionType == NSKeyPathExpressionType) {
-            nestedKeyPath = expression.arguments[i].keyPath;
+            id path = [(id)expression.arguments[i] predicateFormat];
+            if ([path isEqual:@"#any"]) {
+                paths.emplace_back();
+            } else {
+                nestedKeyPath = path;
+            }
         } else {
             throwException(@"Invalid expression type",
-                           @"Subscripts queries don't allow any other expression types");
+                           @"Invalid expression type '%@': Subscripts queries don't allow any other expression types", expression);
         }
         if ([nestedKeyPath length] > 0) {
-            keyPath = ([keyPath length] > 0) ? [NSString stringWithFormat:@"%@.%@", keyPath, nestedKeyPath] : [NSString stringWithFormat:@"%@", nestedKeyPath];
+            keyPath = ([keyPath length] > 0) ? [NSString stringWithFormat:@"%@.%@", keyPath, nestedKeyPath] : nestedKeyPath;
         }
     }
 

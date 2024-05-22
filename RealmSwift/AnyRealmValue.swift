@@ -227,9 +227,9 @@ public enum AnyRealmValue: Hashable {
             hasher.combine(u.hashValue)
         case let .object(o):
             hasher.combine(o.hashValue)
-        case let .dictionary(d):
+        case .dictionary:
             hasher.combine(12)
-        case let .list(l):
+        case .list:
             hasher.combine(13)
         case .none:
             hasher.combine(14)

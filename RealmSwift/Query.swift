@@ -301,8 +301,8 @@ extension Query where T == AnyRealmValue {
         .init(appendKeyPath("['\(key)']", options: [.isPath]))
     }
     /// Query all indexes or keys in a mixed nested collecttion.
-    public var all: Query<AnyRealmValue> {
-        .init(appendKeyPath("['*']", options: [.isPath]))
+    public var any: Query<AnyRealmValue> {
+        .init(appendKeyPath("[#any]", options: [.isPath]))
     }
 }
 

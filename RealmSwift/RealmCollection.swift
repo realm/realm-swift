@@ -84,16 +84,9 @@ public protocol _RealmMapValue {
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         let next = generatorBase.next()
-        if let key = next as? Key {
-            if let value = collection[key as AnyObject].map(dynamicBridgeCast) as? Value {
-                return (key: key, value: value)
-            } else if let value = collection[key as AnyObject] as? RLMDictionary<AnyObject, AnyObject> {
-                let map = Map<String, AnyRealmValue>(objc: value)
-                return (key: key, value: AnyRealmValue.dictionary(map) as! Value)
-            } else if let value = collection[key as AnyObject] as? RLMArray<AnyObject> {
-                let list = List<AnyRealmValue>(collection: value)
-                return (key: key, value: AnyRealmValue.list(list) as! Value)
-            }
+        if let key = next as? Key,
+            let value = collection[key as AnyObject].map(Value._rlmFromObjc(_:)), let value {
+            return (key: key, value: value)
         }
         return nil
     }

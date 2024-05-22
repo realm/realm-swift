@@ -33,7 +33,7 @@ class MixedCollectionTest: TestCase {
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key3"], .int(234))
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key4"], .float(789.123))
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key5"], .double(12345.678901))
-            XCTAssertEqual(o.anyValue.value.dictionaryValue?["key6"], .data("a".data(using: .utf8)!))
+            XCTAssertEqual(o.anyValue.value.dictionaryValue?["key6"], .data(Data("a".utf8)))
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key7"], .date(d))
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key9"], .objectId(oid))
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key10"], .uuid(uuid))
@@ -44,7 +44,7 @@ class MixedCollectionTest: TestCase {
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key3"]?.intValue, 234)
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key4"]?.floatValue, 789.123)
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key5"]?.doubleValue, 12345.678901)
-            XCTAssertEqual(o.anyValue.value.dictionaryValue?["key6"]?.dataValue, "a".data(using: .utf8)!)
+            XCTAssertEqual(o.anyValue.value.dictionaryValue?["key6"]?.dataValue, Data("a".utf8))
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key7"]?.dateValue, d)
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key8"]?.object(SwiftStringObject.self)?.stringCol, so.stringCol)
             XCTAssertEqual(o.anyValue.value.dictionaryValue?["key9"]?.objectIdValue, oid)
@@ -58,7 +58,7 @@ class MixedCollectionTest: TestCase {
             "key3": .int(234),
             "key4": .float(789.123),
             "key5": .double(12345.678901),
-            "key6": .data("a".data(using: .utf8)!),
+            "key6": .data(Data("a".utf8)),
             "key7": .date(d),
             "key8": .object(so),
             "key9": .objectId(oid),
@@ -120,9 +120,9 @@ class MixedCollectionTest: TestCase {
 
         // Unmanaged Update
         o.anyValue.value.dictionaryValue?["key1"] = .object(so)
-        o.anyValue.value.dictionaryValue?["key2"] = .data("a".data(using: .utf8)!)
+        o.anyValue.value.dictionaryValue?["key2"] = .data(Data("a".utf8))
         XCTAssertEqual(o.anyValue.value.dictionaryValue?["key1"]?.object(SwiftStringObject.self)?.stringCol, so.stringCol)
-        XCTAssertEqual(o.anyValue.value.dictionaryValue?["key2"], .data("a".data(using: .utf8)!))
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["key2"], .data(Data("a".utf8)))
 
         // Add mixed collection to object
         let realm = realmWithTestPath()
@@ -130,7 +130,7 @@ class MixedCollectionTest: TestCase {
             realm.add(o)
         }
         XCTAssertEqual(o.anyValue.value.dictionaryValue?["key1"]?.object(SwiftStringObject.self)?.stringCol, so.stringCol)
-        XCTAssertEqual(o.anyValue.value.dictionaryValue?["key2"], .data("a".data(using: .utf8)!))
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["key2"], .data(Data("a".utf8)))
 
         // Update managed object
         try realm.write {
@@ -232,7 +232,7 @@ class MixedCollectionTest: TestCase {
             XCTAssertEqual(o.anyValue.value.listValue?[2], .int(234))
             XCTAssertEqual(o.anyValue.value.listValue?[3], .float(789.123))
             XCTAssertEqual(o.anyValue.value.listValue?[4], .double(12345.678901))
-            XCTAssertEqual(o.anyValue.value.listValue?[5], .data("a".data(using: .utf8)!))
+            XCTAssertEqual(o.anyValue.value.listValue?[5], .data(Data("a".utf8)))
             XCTAssertEqual(o.anyValue.value.listValue?[6], .date(d))
             XCTAssertEqual(o.anyValue.value.listValue?[8], .objectId(oid))
             XCTAssertEqual(o.anyValue.value.listValue?[9], .uuid(uuid))
@@ -243,7 +243,7 @@ class MixedCollectionTest: TestCase {
             XCTAssertEqual(o.anyValue.value.listValue?[2].intValue, 234)
             XCTAssertEqual(o.anyValue.value.listValue?[3].floatValue, 789.123)
             XCTAssertEqual(o.anyValue.value.listValue?[4].doubleValue, 12345.678901)
-            XCTAssertEqual(o.anyValue.value.listValue?[5].dataValue, "a".data(using: .utf8)!)
+            XCTAssertEqual(o.anyValue.value.listValue?[5].dataValue, Data("a".utf8))
             XCTAssertEqual(o.anyValue.value.listValue?[6].dateValue, d)
             XCTAssertEqual(o.anyValue.value.listValue?[7].object(SwiftStringObject.self)?.stringCol, so.stringCol)
             XCTAssertEqual(o.anyValue.value.listValue?[8].objectIdValue, oid)
@@ -257,7 +257,7 @@ class MixedCollectionTest: TestCase {
             .int(234),
             .float(789.123),
             .double(12345.678901),
-            .data("a".data(using: .utf8)!),
+            .data(Data("a".utf8)),
             .date(d),
             .object(so),
             .objectId(oid),
@@ -319,9 +319,9 @@ class MixedCollectionTest: TestCase {
 
         // Unmanaged Update
         o.anyValue.value.listValue?[0] = .object(so)
-        o.anyValue.value.listValue?[1] = .data("a".data(using: .utf8)!)
+        o.anyValue.value.listValue?[1] = .data(Data("a".utf8))
         XCTAssertEqual(o.anyValue.value.listValue?[0].object(SwiftStringObject.self)?.stringCol, so.stringCol)
-        XCTAssertEqual(o.anyValue.value.listValue?[1], .data("a".data(using: .utf8)!))
+        XCTAssertEqual(o.anyValue.value.listValue?[1], .data(Data("a".utf8)))
 
         // Add mixed collection to object
         let realm = realmWithTestPath()
@@ -329,7 +329,7 @@ class MixedCollectionTest: TestCase {
             realm.add(o)
         }
         XCTAssertEqual(o.anyValue.value.listValue?[0].object(SwiftStringObject.self)?.stringCol, so.stringCol)
-        XCTAssertEqual(o.anyValue.value.listValue?[1], .data("a".data(using: .utf8)!))
+        XCTAssertEqual(o.anyValue.value.listValue?[1], .data(Data("a".utf8)))
 
         // Update managed object
         try realm.write {
