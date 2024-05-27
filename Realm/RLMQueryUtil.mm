@@ -1692,7 +1692,7 @@ void QueryBuilder::apply_map_expression(RLMObjectSchema *objectSchema, NSExpress
         add_mixed_constraint(operatorType, options, std::move(collectionColumn.resolve<realm::Mixed>().path(pathElements)), right.constantValue);
     } else {
         RLMPrecondition(collectionColumn.property().dictionary, @"Invalid predicate",
-                        @"Invalid keypath '%@': only dictionaries and mixed support subscript predicates.", functionExpression);
+                        @"Invalid keypath '%@': only dictionaries and realm `Any` support subscript predicates.", functionExpression);
         RLMPrecondition(pathElements.size() == 1, @"Invalid subscript size",
                         @"Invalid subscript size '%@': nested dictionaries queries are only allowed in mixed properties.", functionExpression);
         RLMPrecondition(pathElements[0].is_key(), @"Invalid subscript type",
@@ -1866,18 +1866,17 @@ NSString* QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExp
                 paths.push_back(PathElement{[(NSNumber *)value intValue]});
             } else if ([value isKindOfClass:[NSString class]]) {
                 NSString *key = (NSString *)value;
-                paths.push_back(PathElement{key.UTF8String});
+                if ([key isEqual:@"#any"]) {
+                    paths.emplace_back();
+                } else {
+                    paths.push_back(PathElement{key.UTF8String});
+                }
             } else {
                 throwException(@"Invalid subscript type",
                                @"Invalid subscript type '%@': Only `Strings` or index are allowed subscripts", expression);
             }
         } else if (expression.arguments[i].expressionType == NSKeyPathExpressionType) {
-            id path = [(id)expression.arguments[i] predicateFormat];
-            if ([path isEqual:@"#any"]) {
-                paths.emplace_back();
-            } else {
-                nestedKeyPath = path;
-            }
+            nestedKeyPath = [(id)expression.arguments[i] predicateFormat];
         } else {
             throwException(@"Invalid expression type",
                            @"Invalid expression type '%@': Subscripts queries don't allow any other expression types", expression);

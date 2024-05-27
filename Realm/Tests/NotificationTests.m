@@ -1728,47 +1728,11 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
 
 @end
 
-@interface MixedCollectionChangesetTests : RLMTestCase <ChangesetTestCase>
-@end
-
-@implementation MixedCollectionChangesetTests  {
-    MixedObject *_obj;
-}
-- (void)setUp {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm transactionWithBlock:^{
-        [realm deleteAllObjects];
-        _obj = [MixedObject createInRealm:realm withValue:@{ @"anyCol": @"initial" }];
-    }];
-}
-
-- (void)tearDown {
-    _obj = nil;
-    [super tearDown];
-}
-
-- (NSDictionary *)testDictionary {
-    return @{ @"key2" : @"hello2",
-              @"key3" : @YES,
-              @"key4" : @123,
-              @"key5" : @456.789 };
-}
-
-- (NSArray *)testArray {
-    return @[ @"hello2", @YES, @123, @456.789 ];
-}
-
-- (void)prepare {
-}
-
-- (RLMResults *)query {
-    return MixedObject.allObjects;
-}
-
-static void ExpectMixedCollectionObjectChange(id self, MixedObject *obj, void (^block)(void)) {
+static void ExpectObjectChange(RLMTestCase<ChangesetTestCase> *self, void (^block)(RLMRealm *realm)) {
+    [self prepare];
+    RLMResults *query = [self query];
     __block XCTestExpectation *expectation = nil;
-
-    RLMNotificationToken *token = [obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
+    RLMNotificationToken *token = [[query firstObject] addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         XCTAssertFalse(deleted);
         XCTAssertNil(error);
         XCTAssertEqual(changes.count, 1);
@@ -1778,19 +1742,19 @@ static void ExpectMixedCollectionObjectChange(id self, MixedObject *obj, void (^
     RLMRealm *realm = [RLMRealm defaultRealm];
     expectation = [self expectationWithDescription:@"collections_mixed_notifications"];
     [realm beginWriteTransaction];
-    block();
+    block(realm);
     [realm commitWriteTransaction];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
     [token invalidate];
 }
 
-static void ExpectMixedDictionaryChange(id self, NSArray *deletions, NSArray *insertions,
-                                        NSArray *modifications, void (^block)(void)) {
-    __block XCTestExpectation *expectation = nil;
-
-    MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
+static void ExpectMixedDictionaryChange(RLMTestCase<ChangesetTestCase> *self, NSArray *deletions, NSArray *insertions,
+                                        NSArray *modifications, void (^block)(RLMRealm *realm)) {
+    [self prepare];
+    MixedObject *mixedObject = [[self query] firstObject];
     RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+    __block XCTestExpectation *expectation = nil;
     RLMNotificationToken *token = [dictionary addNotificationBlock:^(RLMDictionary *dictionary, RLMDictionaryChange *changes, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(dictionary);
@@ -1808,137 +1772,69 @@ static void ExpectMixedDictionaryChange(id self, NSArray *deletions, NSArray *in
     RLMRealm *realm = [RLMRealm defaultRealm];
     expectation = [self expectationWithDescription:@"collections_mixed_notifications"];
     [realm beginWriteTransaction];
-    block();
+    block(realm);
     [realm commitWriteTransaction];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
     [token invalidate];
 }
 
-static void ExpectMixedArrayChange(id self, NSArray *deletions, NSArray *insertions,
-                                   NSArray *modifications, void (^block)(void)) {
-    __block XCTestExpectation *expectation = nil;
+@interface MixedDictionaryCollectionChangesetTests : RLMTestCase <ChangesetTestCase>
+@end
 
-    MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
-    RLMArray *array = (RLMArray *)mixedObject.anyCol;
-    RLMNotificationToken *token = [array addNotificationBlock:^(RLMArray *array, RLMCollectionChange *changes, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(array);
-        if (!changes) {
-            return;
-        }
+@implementation MixedDictionaryCollectionChangesetTests
 
-        XCTAssertEqualObjects(deletions, changes.deletions);
-        XCTAssertEqualObjects(insertions, changes.insertions);
-        XCTAssertEqualObjects(modifications, changes.modifications);
-        [expectation fulfill];
-    }];
-
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    expectation = [self expectationWithDescription:@"collections_mixed_notifications"];
-    [realm beginWriteTransaction];
-    block();
-    [realm commitWriteTransaction];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
-
-    [token invalidate];
+- (NSDictionary *)testDictionary {
+    return @{ @"key2" : @"hello2",
+              @"key3" : @YES,
+              @"key4" : @123,
+              @"key5" : @456.789 };
 }
 
-- (void)testAddDictionaryToMixed {
-    NSDictionary *testDictionary = [self testDictionary];
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        _obj.anyCol = testDictionary;
-    });
+- (void)prepare {
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteAllObjects];
+            MixedObject *mixedObject = [MixedObject new];
+            mixedObject.anyCol = [self testDictionary];
+            [realm addObject:mixedObject];
+        }];
+    }
 }
 
-- (void)testAddArrayToMixed {
-    NSArray *testArray = [self testArray];
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        _obj.anyCol = testArray;
-    });
-}
-
-- (void)testUpdateDictionaryToMixed {
-    NSDictionary *testDictionary = [self testDictionary];
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        _obj.anyCol = testDictionary;
-    });
-
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        RLMDictionary *dictionary = (RLMDictionary *)_obj.anyCol;
-        dictionary[@"key2"] = @NO;
-    });
-
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        RLMDictionary *dictionary = (RLMDictionary *)_obj.anyCol;
-        dictionary[@"key4"] = [NSNull null];
-    });
-
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        RLMDictionary *dictionary = (RLMDictionary *)_obj.anyCol;
-        [dictionary removeAllObjects];
-    });
-}
-
-- (void)testUpdateAndRemoveArrayToMixed {
-    NSArray *testArray = [self testArray];
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        _obj.anyCol = testArray;
-    });
-
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        RLMArray *array = (RLMArray *)_obj.anyCol;
-        [array addObject:@NO];
-    });
-
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        RLMArray *array = (RLMArray *)_obj.anyCol;
-        array[3] = @"hey";
-    });
-
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        RLMArray *array = (RLMArray *)_obj.anyCol;
-        [array removeObjectAtIndex:2];
-    });
-
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        RLMArray *array = (RLMArray *)_obj.anyCol;
-        [array removeAllObjects];
-    });
+- (RLMResults *)query {
+    return MixedObject.allObjects;
 }
 
 - (void)testAddToMixedObservationWithKeypath {
+    [self prepare];
     __block XCTestExpectation *expectation = nil;
-    RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+    RLMNotificationToken *token = [mixedObject addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
         XCTAssertFalse(deleted);
         XCTAssertNil(error);
         XCTAssertEqual(changes.count, 1);
         [expectation fulfill];
     } keyPaths:@[ @"anyCol" ]];
 
-    RLMRealm *realm = [RLMRealm defaultRealm];
+
     expectation = [self expectationWithDescription:@"collections_mixed_notifications"];
     [realm beginWriteTransaction];
-    _obj.anyCol = @{ @"key2": @987.321 };
+    mixedObject.anyCol = @{ @"key2": @987.321 };
     [realm commitWriteTransaction];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
     [token invalidate];
 }
 
-- (void)testAddToMixedObservationReplaceCollection {
-    NSDictionary *testDictionary = [self testDictionary];
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        _obj.anyCol = testDictionary;
-    });
-
-    NSArray *testArray = [self testArray];
-    ExpectMixedCollectionObjectChange(self, _obj, ^{
-        _obj.anyCol = testArray;
-    });
-}
-
 - (void)testMixedDictionaryChangesInResults {
+    ExpectChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        mixedObject.anyCol = [self testDictionary];
+    });
+
     ExpectChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
         MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         mixedObject.anyCol = @{ @"key": @987.321 };
@@ -1946,7 +1842,6 @@ static void ExpectMixedArrayChange(id self, NSArray *deletions, NSArray *inserti
 
     ExpectChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
         MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
-        NSLog(@"%@", mixedObject.anyCol);
         RLMDictionary *dict = (RLMDictionary *)mixedObject.anyCol;
         dict[@"key"] = @NO;
     });
@@ -1960,11 +1855,161 @@ static void ExpectMixedArrayChange(id self, NSArray *deletions, NSArray *inserti
     ExpectChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
         MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         RLMDictionary *dict = (RLMDictionary *)mixedObject.anyCol;
-        dict[@"key1"] = nil;
+        [dict removeAllObjects];
+    });
+
+    ExpectChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dict = (RLMDictionary *)mixedObject.anyCol;
+        [dict removeObjectForKey:@"key5"];
     });
 }
 
+- (void)testMixedDictionaryObjectNotifications {
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        mixedObject.anyCol = [self testDictionary];
+    });
+
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        dictionary[@"key2"] = @NO;
+    });
+
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        dictionary[@"key4"] = [NSNull null];
+    });
+
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        [dictionary removeAllObjects];
+    });
+}
+
+- (void)testMixedDictionaryCollectionChanges {
+    ExpectMixedDictionaryChange(self, @[@"key2", @"key3", @"key4", @"key5"], @[@"key1", @"key3"], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        mixedObject.anyCol = @{ @"key1": @YES, @"key3": @987.321 };
+    });
+
+    ExpectMixedDictionaryChange(self, @[], @[], @[@"key3"], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        dictionary[@"key3"] = @NO;
+    });
+
+    ExpectMixedDictionaryChange(self, @[@"key4"], @[], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        dictionary[@"key4"] = nil;
+    });
+
+    ExpectMixedDictionaryChange(self, @[], @[@"key1"], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        dictionary[@"key1"] = @345;
+    });
+
+    ExpectMixedDictionaryChange(self, @[@"key2"], @[], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        [dictionary removeObjectForKey:@"key2"];
+    });
+
+    ExpectMixedDictionaryChange(self, @[@"key2", @"key3", @"key4", @"key5"], @[], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
+        [dictionary removeAllObjects];
+    });
+}
+
+@end
+
+static void ExpectMixedArrayChange(RLMTestCase<ChangesetTestCase> *self, NSArray *deletions, NSArray *insertions,
+                                   NSArray *modifications, void (^block)(RLMRealm *realm)) {
+    [self prepare];
+     MixedObject *mixedObject = [[self query] firstObject];
+     RLMArray *array = (RLMArray *)mixedObject.anyCol;
+    __block XCTestExpectation *expectation = nil;
+     RLMNotificationToken *token = [array addNotificationBlock:^(RLMArray *array, RLMCollectionChange *changes, NSError *error) {
+         XCTAssertNil(error);
+         XCTAssertNotNil(array);
+         if (!changes) {
+             return;
+         }
+
+         XCTAssertEqualObjects(deletions, changes.deletions);
+         XCTAssertEqualObjects(insertions, changes.insertions);
+         XCTAssertEqualObjects(modifications, changes.modifications);
+         [expectation fulfill];
+     }];
+
+     RLMRealm *realm = [RLMRealm defaultRealm];
+     expectation = [self expectationWithDescription:@"collections_mixed_notifications"];
+     [realm beginWriteTransaction];
+     block(realm);
+     [realm commitWriteTransaction];
+     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+     [token invalidate];
+ }
+
+@interface MixedArrayCollectionChangesetTests : RLMTestCase <ChangesetTestCase>
+@end
+
+@implementation MixedArrayCollectionChangesetTests
+
+- (NSArray *)testArray {
+    return @[ @"hello2", @YES, @123, @456.789 ];
+}
+
+- (void)prepare {
+    @autoreleasepool {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [realm deleteAllObjects];
+            MixedObject *mixedObject = [MixedObject new];
+            mixedObject.anyCol = [self testArray];
+            [realm addObject:mixedObject];
+        }];
+    }
+}
+
+- (RLMResults *)query {
+    return MixedObject.allObjects;
+}
+
+- (void)testAddToMixedObservationWithKeypath {
+    [self prepare];
+    __block XCTestExpectation *expectation = nil;
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+    RLMNotificationToken *token = [mixedObject addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
+        XCTAssertFalse(deleted);
+        XCTAssertNil(error);
+        XCTAssertEqual(changes.count, 1);
+        [expectation fulfill];
+    } keyPaths:@[ @"anyCol" ]];
+
+    expectation = [self expectationWithDescription:@"collections_mixed_notifications"];
+    [realm beginWriteTransaction];
+    mixedObject.anyCol = @[ @987.321 ];
+    [realm commitWriteTransaction];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    [token invalidate];
+}
+
 - (void)testMixedArrayChangesInResults {
+    ExpectChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        mixedObject.anyCol = [self testArray];
+    });
+
     ExpectChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
         MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         mixedObject.anyCol = @[ @987.321 ];
@@ -2001,88 +2046,74 @@ static void ExpectMixedArrayChange(id self, NSArray *deletions, NSArray *inserti
     });
 }
 
-- (void)testMixedDictionaryCollectionChanges {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm beginWriteTransaction];
-    _obj.anyCol = @{ @"key2": @987.321 };
-    [realm commitWriteTransaction];
-
-    ExpectMixedDictionaryChange(self, @[@"key2"], @[@"key1", @"key3"], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
-        mixedObject.anyCol = @{ @"key1": @YES, @"key3": @987.321 };
+- (void)testMixedArrayObjectNotifications {
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        mixedObject.anyCol = [self testArray];
     });
 
-    ExpectMixedDictionaryChange(self, @[], @[@"key4"], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
-        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
-        dictionary[@"key4"] = @NO;
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMArray *array = (RLMArray *)mixedObject.anyCol;
+        [array addObject:@NO];
     });
 
-    ExpectMixedDictionaryChange(self, @[@"key4"], @[], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
-        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
-        dictionary[@"key4"] = nil;
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMArray *array = (RLMArray *)mixedObject.anyCol;
+        array[3] = @"hey";
     });
 
-    ExpectMixedDictionaryChange(self, @[], @[], @[@"key1"], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
-        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
-        dictionary[@"key1"] = @345;
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMArray *array = (RLMArray *)mixedObject.anyCol;
+        [array removeObjectAtIndex:2];
     });
 
-    ExpectMixedDictionaryChange(self, @[@"key1"], @[], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
-        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
-        [dictionary removeObjectForKey:@"key1"];
-    });
-
-    ExpectMixedDictionaryChange(self, @[@"key3"], @[], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
-        RLMDictionary *dictionary = (RLMDictionary *)mixedObject.anyCol;
-        [dictionary removeAllObjects];
+    ExpectObjectChange(self, ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
+        RLMArray *array = (RLMArray *)mixedObject.anyCol;
+        [array removeAllObjects];
     });
 }
 
-- (void)testMixedArrayCollectionChanges {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    [realm beginWriteTransaction];
-    _obj.anyCol = @[ @987.321 ];
-    [realm commitWriteTransaction];
 
-    ExpectMixedArrayChange(self, @[@0], @[@0, @1], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
+- (void)testMixedArrayCollectionChanges {
+    ExpectMixedArrayChange(self, @[@0, @1, @2, @3], @[@0, @1], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         mixedObject.anyCol = @[ @YES, @987.321 ];
     });
 
-    ExpectMixedArrayChange(self, @[], @[@2], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
+    ExpectMixedArrayChange(self, @[], @[@4], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         RLMArray *array = (RLMArray *)mixedObject.anyCol;
         [array addObject: @NO];
     });
 
-    ExpectMixedArrayChange(self, @[], @[@1], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
+    ExpectMixedArrayChange(self, @[], @[@1], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         RLMArray *array = (RLMArray *)mixedObject.anyCol;
         [array insertObject:@"hey" atIndex:1];
     });
 
-    ExpectMixedArrayChange(self, @[], @[], @[@0], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
+    ExpectMixedArrayChange(self, @[], @[], @[@0], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         RLMArray *array = (RLMArray *)mixedObject.anyCol;
         array[0] = [RLMObjectId objectId];
     });
 
-    ExpectMixedArrayChange(self, @[@3], @[], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
+    ExpectMixedArrayChange(self, @[@3], @[], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         RLMArray *array = (RLMArray *)mixedObject.anyCol;
         [array removeLastObject];
     });
 
-    ExpectMixedArrayChange(self, @[@0, @1, @2], @[], @[], ^{
-        MixedObject *mixedObject = [[MixedObject allObjects] firstObject];
+    ExpectMixedArrayChange(self, @[@0, @1, @2, @3], @[], @[], ^(RLMRealm *realm) {
+        MixedObject *mixedObject = [[MixedObject allObjectsInRealm:realm] firstObject];
         RLMArray *array = (RLMArray *)mixedObject.anyCol;
         [array removeAllObjects];
     });
 }
 
 @end
+

@@ -207,7 +207,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (RLMPropertyType)rlm_valueType {
-    REALM_UNREACHABLE();
+    return RLMPropertyTypeAny;
 }
 #pragma clang diagnostic pop
 
@@ -221,8 +221,8 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
-- (RLMPropertyType)rlm_valueType {
-    REALM_UNREACHABLE();
+- (RLMPropertyType)rlm_valueType { return RLMPropertyTypeAny;
+    return RLMPropertyTypeAny;
 }
 #pragma clang diagnostic pop
 

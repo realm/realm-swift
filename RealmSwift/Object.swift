@@ -820,8 +820,6 @@ public final class DynamicObject: Object {
             return dictionary.isOptional ? Map<String, ObjectId?>(objc: dictionary) : Map<String, ObjectId>(objc: dictionary)
         case .object:
             return Map<String, DynamicObject?>(objc: dictionary)
-        default:
-            fatalError()
         }
     }
 }

@@ -171,6 +171,17 @@ public struct Query<T> {
         throwRealmException("Cannot apply a keypath to \(buildPredicate(node))")
     }
 
+    private func anySubscript(appending key: Any) -> QueryNode {
+        if case .keyPath = node {
+            return .mapAnySubscripts(keyPathErasingAnyPrefix(), keys: [key])
+        } else if case let .mapAnySubscripts(kp, keys) = node {
+            var tmpKeys = keys
+            tmpKeys.append(key)
+            return .mapAnySubscripts(kp, keys: tmpKeys)
+        }
+        throwRealmException("Cannot add subscript to \(buildPredicate(node))")
+    }
+
     // MARK: Comparable
 
     /// :nodoc:
@@ -294,15 +305,16 @@ extension Query where T == Bool {
 extension Query where T == AnyRealmValue {
     /// :nodoc:
     public subscript(position: Int) -> Query<AnyRealmValue> {
-        .init(appendKeyPath("[\(position)]", options: [.isPath]))
+        .init(anySubscript(appending: position))
+
     }
     /// :nodoc:
     public subscript(key: String) -> Query<AnyRealmValue> {
-        .init(appendKeyPath("['\(key)']", options: [.isPath]))
+        .init(anySubscript(appending: key))
     }
     /// Query all indexes or keys in a mixed nested collecttion.
     public var any: Query<AnyRealmValue> {
-        .init(appendKeyPath("[#any]", options: [.isPath]))
+        .init(anySubscript(appending: "#any"))
     }
 }
 
@@ -911,6 +923,7 @@ private indirect enum QueryNode {
 
     case subqueryCount(_ child: QueryNode)
     case mapSubscript(_ keyPath: QueryNode, key: Any)
+    case mapAnySubscripts(_ keyPath: QueryNode, keys: [Any])
     case geoWithin(_ keyPath: QueryNode, _ value: QueryNode)
 }
 
@@ -989,11 +1002,7 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
                 formatStr.append("ANY ")
             }
 
-            if options.contains(.isPath) {
-                formatStr.append(kp.joined())
-            } else {
-                formatStr.append(kp.joined(separator: "."))
-            }
+            formatStr.append(kp.joined(separator: "."))
         case .not(let child):
             if case .keyPath = child,
                isNewNode {
@@ -1023,6 +1032,12 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
             build(keyPath)
             formatStr.append("[%@]")
             arguments.add(key)
+        case .mapAnySubscripts(let keyPath, let keys):
+            build(keyPath)
+            for key in keys {
+                formatStr.append("[%@]")
+                arguments.add(key)
+            }
         case .geoWithin(let keyPath, let value):
             buildExpression(keyPath, QueryNode.Operator.in.rawValue, value, prefix: nil)
         }
@@ -1039,7 +1054,6 @@ private struct KeyPathOptions: OptionSet {
 
     static let isCollection = KeyPathOptions(rawValue: 1)
     static let requiresAny = KeyPathOptions(rawValue: 2)
-    static let isPath = KeyPathOptions(rawValue: 4)
 }
 
 private struct SubqueryRewriter {
@@ -1068,6 +1082,8 @@ private struct SubqueryRewriter {
             return node
         case .mapSubscript:
             throwRealmException("Subqueries do not support map subscripts.")
+        case .mapAnySubscripts:
+            throwRealmException("Subqueries do not support AnyRealmValue subscripts.")
         case .geoWithin(let keyPath, let value):
             return .geoWithin(keyPath, value)
         }

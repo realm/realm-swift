@@ -185,9 +185,7 @@ public enum AnyRealmValue: Hashable {
     /// - Returns: Returns an `AnyRealmValue` storing a `Map`.
     public static func fromDictionary(_ dictionary: Dictionary<String, AnyRealmValue>) -> AnyRealmValue {
         let map = Map<String, AnyRealmValue>()
-        dictionary.forEach { (key, value) in
-            map.setValue(value, forKey: key)
-        }
+        map.merge(dictionary, uniquingKeysWith: { $1 })
         return AnyRealmValue.dictionary(map)
     }
 

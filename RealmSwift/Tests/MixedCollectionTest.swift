@@ -650,37 +650,37 @@ class MixedCollectionTest: TestCase {
             realm.add(o)
         }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value = AnyRealmValue.fromDictionary(dictionary)
-        })
+        }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.listValue?[0].listValue?[0] = .bool(true)
-        })
+        }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.listValue?.append(.float(33.33))
-        })
+        }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.listValue?.removeLast()
-        })
+        }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.listValue?.removeAll()
-        })
+        }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key2"] = .string("nowhere")
-        })
+        }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key2"] = nil
-        })
+        }
 
-        assertObjectNotification(o, block: {
+        assertObjectNotification(o) {
             o.anyValue.value.dictionaryValue?.removeAll()
-        })
+        }
     }
 
     func testMixedCollectionDictionaryNotifications() throws {
@@ -729,29 +729,29 @@ class MixedCollectionTest: TestCase {
             realm.add(o)
         }
 
-        assertDictionaryNotification(o.anyValue.value.dictionaryValue, deletions: [], insertions: ["key2"], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.dictionaryValue, deletions: [], insertions: ["key2"], modifications: []) {
             o.anyValue.value.dictionaryValue?["key2"] = AnyRealmValue.fromDictionary(dictionary)
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.dictionaryValue, deletions: [], insertions: ["key10"], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.dictionaryValue, deletions: [], insertions: ["key10"], modifications: []) {
             o.anyValue.value.dictionaryValue?["key10"] = AnyRealmValue.fromDictionary(dictionary)
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.dictionaryValue?["key10"]?.dictionaryValue, deletions: [], insertions: [], modifications: ["key0"], block: {
+        assertDictionaryNotification(o.anyValue.value.dictionaryValue?["key10"]?.dictionaryValue, deletions: [], insertions: [], modifications: ["key0"]) {
             o.anyValue.value.dictionaryValue?["key10"]?.dictionaryValue?["key0"] = .string("new")
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.dictionaryValue, deletions: ["key3"], insertions: [], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.dictionaryValue, deletions: ["key3"], insertions: [], modifications: []) {
             o.anyValue.value.dictionaryValue?["key3"] = nil
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.dictionaryValue, deletions: [], insertions: ["key6"], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.dictionaryValue, deletions: [], insertions: ["key6"], modifications: []) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.dictionaryValue?["key6"] = .date(Date())
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.dictionaryValue, deletions: ["key5", "key6"], insertions: [], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.dictionaryValue, deletions: ["key5", "key6"], insertions: [], modifications: []) {
             o.anyValue.value.dictionaryValue?["key0"]?.dictionaryValue?["key1"]?.dictionaryValue?.removeAll()
-        })
+        }
     }
 
     func testMixedCollectionArrayNotifications() throws {
@@ -799,21 +799,21 @@ class MixedCollectionTest: TestCase {
             realm.add(o)
         }
 
-        assertDictionaryNotification(o.anyValue.value.listValue, deletions: [], insertions: [2], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.listValue, deletions: [], insertions: [2], modifications: []) {
             o.anyValue.value.listValue?.append(AnyRealmValue.fromArray(array))
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.listValue?[0].listValue, deletions: [], insertions: [], modifications: [1], block: {
+        assertDictionaryNotification(o.anyValue.value.listValue?[0].listValue, deletions: [], insertions: [], modifications: [1]) {
             o.anyValue.value.listValue?[0].listValue?[1] = .objectId(ObjectId.generate())
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.listValue?[0].listValue?[0].listValue, deletions: [2], insertions: [], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.listValue?[0].listValue?[0].listValue, deletions: [2], insertions: [], modifications: []) {
             o.anyValue.value.listValue?[0].listValue?[0].listValue?.removeLast()
-        })
+        }
 
-        assertDictionaryNotification(o.anyValue.value.listValue?[0].listValue?[0].listValue, deletions: [0, 1], insertions: [], modifications: [], block: {
+        assertDictionaryNotification(o.anyValue.value.listValue?[0].listValue?[0].listValue, deletions: [0, 1], insertions: [], modifications: []) {
             o.anyValue.value.listValue?[0].listValue?[0].listValue?.removeAll()
-        })
+        }
     }
 
     func testReassignToMixedList() throws {
@@ -985,6 +985,5 @@ class MixedCollectionTest: TestCase {
         iterateNestedCollectionValue(o.anyValue.value)
         XCTAssertEqual(countValue, 12)
         XCTAssertTrue(accessNestedValueValue)
-
     }
 }
