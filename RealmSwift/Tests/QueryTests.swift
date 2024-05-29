@@ -1204,7 +1204,7 @@ class QueryTests: TestCase {
             $0.anyCol[1] == .none
         }
 
-        assertQuery("(anyCol[%@] == %@)", values: ["#any", AnyRealmValue.none], count: 1) {
+        assertQuery("(anyCol[%K] == %@)", values: ["#any", AnyRealmValue.none], count: 1) {
             $0.anyCol.any == .none
         }
 
@@ -1216,7 +1216,7 @@ class QueryTests: TestCase {
             $0.anyCol[0][0][1] == .double(76.54)
         }
 
-        assertQuery("(anyCol[%@][%@][%@] == %@)", values: [0, 0, "#any", AnyRealmValue.double(76.54)], count: 1) {
+        assertQuery("(anyCol[%@][%@][%K] == %@)", values: [0, 0, "#any", AnyRealmValue.double(76.54)], count: 1) {
             $0.anyCol[0][0].any == .double(76.54)
         }
 
@@ -1228,11 +1228,11 @@ class QueryTests: TestCase {
             $0.anyCol[0][0][0][1] == .bool(false)
         }
 
-        assertQuery("(anyCol[%@][%@][%@][%@] == %@)", values: [0, 0, 0, "#any", AnyRealmValue.string("john")], count: 1) {
+        assertQuery("(anyCol[%@][%@][%@][%K] == %@)", values: [0, 0, 0, "#any", AnyRealmValue.string("john")], count: 1) {
             $0.anyCol[0][0][0].any == .string("john")
         }
 
-        assertQuery("(anyCol[%@][%@][%@][%@] == %@)", values: [0, 0, 0, "#any", AnyRealmValue.bool(false)], count: 1) {
+        assertQuery("(anyCol[%@][%@][%@][%K] == %@)", values: [0, 0, 0, "#any", AnyRealmValue.bool(false)], count: 1) {
             $0.anyCol[0][0][0].any == .bool(false)
         }
 
@@ -1263,7 +1263,7 @@ class QueryTests: TestCase {
             $0.anyCol["key1"] == .none
         }
 
-        assertQuery("(anyCol[%@] == %@)", values: ["#any", AnyRealmValue.none], count: 1) {
+        assertQuery("(anyCol[%K] == %@)", values: ["#any", AnyRealmValue.none], count: 1) {
             $0.anyCol.any == .none
         }
 
@@ -1271,7 +1271,7 @@ class QueryTests: TestCase {
             $0.anyCol["key0"]["key3"] == .int(99)
         }
 
-        assertQuery("(anyCol[%@][%@] == %@)", values: ["key0", "#any", AnyRealmValue.int(99)], count: 1) {
+        assertQuery("(anyCol[%@][%K] == %@)", values: ["key0", "#any", AnyRealmValue.int(99)], count: 1) {
             $0.anyCol["key0"].any == .int(99)
         }
 
@@ -1279,7 +1279,7 @@ class QueryTests: TestCase {
             $0.anyCol["key0"]["key2"]["key5"] == .double(76.54)
         }
 
-        assertQuery("(anyCol[%@][%@][%@] == %@)", values: ["key0", "key2", "#any", AnyRealmValue.double(76.54)], count: 1) {
+        assertQuery("(anyCol[%@][%@][%K] == %@)", values: ["key0", "key2", "#any", AnyRealmValue.double(76.54)], count: 1) {
             $0.anyCol["key0"]["key2"].any == .double(76.54)
         }
 
@@ -1291,11 +1291,11 @@ class QueryTests: TestCase {
             $0.anyCol["key0"]["key2"]["key4"]["key7"] == .bool(false)
         }
 
-        assertQuery("(anyCol[%@][%@] >= %@)", values: ["key0", "#any", AnyRealmValue.int(99)], count: 1) {
+        assertQuery("(anyCol[%@][%K] >= %@)", values: ["key0", "#any", AnyRealmValue.int(99)], count: 1) {
             $0.anyCol["key0"].any >= .int(99)
         }
 
-        assertQuery("(anyCol[%@][%@] <= %@)", values: ["key0", "#any", AnyRealmValue.int(99)], count: 1) {
+        assertQuery("(anyCol[%@][%K] <= %@)", values: ["key0", "#any", AnyRealmValue.int(99)], count: 1) {
             $0.anyCol["key0"].any <= .int(99)
         }
 

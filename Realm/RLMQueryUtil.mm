@@ -1866,17 +1866,18 @@ NSString* QueryBuilder::get_path_elements(std::vector<PathElement> &paths, NSExp
                 paths.push_back(PathElement{[(NSNumber *)value intValue]});
             } else if ([value isKindOfClass:[NSString class]]) {
                 NSString *key = (NSString *)value;
-                if ([key isEqual:@"#any"]) {
-                    paths.emplace_back();
-                } else {
-                    paths.push_back(PathElement{key.UTF8String});
-                }
+                paths.push_back(PathElement{key.UTF8String});
             } else {
                 throwException(@"Invalid subscript type",
                                @"Invalid subscript type '%@': Only `Strings` or index are allowed subscripts", expression);
             }
         } else if (expression.arguments[i].expressionType == NSKeyPathExpressionType) {
-            nestedKeyPath = [(id)expression.arguments[i] predicateFormat];
+            auto keyPath = [(id)expression.arguments[i] predicateFormat];
+            if ([keyPath isEqual:@"#any"]) {
+                paths.emplace_back();
+            } else {
+                nestedKeyPath = keyPath;
+            }
         } else {
             throwException(@"Invalid expression type",
                            @"Invalid expression type '%@': Subscripts queries don't allow any other expression types", expression);

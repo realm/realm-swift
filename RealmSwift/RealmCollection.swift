@@ -86,7 +86,7 @@ public protocol _RealmMapValue {
     public mutating func next() -> Element? {
         let next = generatorBase.next()
         if let key = next as? Key,
-            let value = collection[key as AnyObject].map(Value._rlmFromObjc(_:)), let value {
+           let value = collection[key as AnyObject].map(Value._rlmFromObjc(_:)), let value {
             return (key: key, value: value)
         }
         return nil

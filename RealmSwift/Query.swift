@@ -1035,7 +1035,8 @@ private func buildPredicate(_ root: QueryNode, subqueryCount: Int = 0) -> (Strin
         case .mapAnySubscripts(let keyPath, let keys):
             build(keyPath)
             for key in keys {
-                formatStr.append("[%@]")
+                let arg = (key as? String == "#any") ? "[%K]" : "[%@]"
+                formatStr.append(arg)
                 arguments.add(key)
             }
         case .geoWithin(let keyPath, let value):
