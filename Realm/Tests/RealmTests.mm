@@ -2960,8 +2960,8 @@
 }
 - (void)testSetDefaultLogLevel {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
-    NSString *category = @"Realm";
-    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll category:category logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
+    RLMLogCategory category = RLMLogCategoryRealm;
+    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll category:category logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
@@ -2981,10 +2981,10 @@
 
 - (void)testDefaultLogger {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
-    NSString *category = @"Realm";
+    RLMLogCategory category = RLMLogCategoryRealm;
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelOff
                                                 category:category
-                                             logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
+                                             logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
@@ -3011,7 +3011,7 @@
     // Init Custom Logger
     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
                                                       category:category
-                                                   logFunction:^(RLMLogLevel level, NSString *category, NSString * message) {
+                                                   logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
 
@@ -3023,10 +3023,10 @@
 
 - (void)testCustomLoggerLogMessage {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
-    NSString *category = @"Realm";
+    RLMLogCategory category = RLMLogCategoryRealm;
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelInfo
                                                 category:category
-                                             logFunction:^(RLMLogLevel level, NSString *category, NSString * message) {
+                                             logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
@@ -3035,6 +3035,14 @@
     [logger logWithLevel:RLMLogLevelTrace message:@"IMPORTANT TRACE"];
     XCTAssertTrue([logs containsString:@"TEST: IMPORTANT INFO 0"]); // Detail
     XCTAssertFalse([logs containsString:@"IMPORTANT TRACE"]); // Trace
+}
+
+// Core defines the different categories in runtime, forcing the SDK to define the categories again.
+// This test validates that we have added new defined categories to the RLMLogCategory enum.
+- (void)testAllCategoriesWatchDog {
+    for (id category in [RLMLogger getAllCategories]) {
+        XCTAssertNoThrow([RLMLogger categoryFromString:category]);
+    }
 }
 @end
 
@@ -3052,10 +3060,10 @@
 
 - (void)testSyncConnectionMetrics {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
-    NSString *category = @"Realm";
+    RLMLogCategory category = RLMLogCategoryRealm;
     RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
                                                 category:category
-                                             logFunction:^(RLMLogLevel level, NSString *category, NSString * message) {
+                                             logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;

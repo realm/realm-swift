@@ -77,8 +77,8 @@ extension Logger {
      - SeeAlso: `LogCategory`
      */
     public convenience init(level: LogLevel, category: LogCategory = Category.realm, function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {
-        self.init(level: level, category: category.toString()) { level, cat, message in
-            function(level, Category.fromString(cat)!, message)
+        self.init(level: level, category: ObjectiveCSupport.convert(value: category)) { level, cat, message in
+            function(level, ObjectiveCSupport.convert(value: cat), message)
         }
     }
 
@@ -92,7 +92,7 @@ extension Logger {
      - SeeAlso: `LogCategory`
      */
     public func setLogLevel(_ level: LogLevel, for category: LogCategory = Category.realm) {
-        Logger.shared.__setLevel(level, category: category.toString())
+        Logger.shared.__setLevel(level, category: ObjectiveCSupport.convert(value: category))
     }
 
     /**
@@ -104,7 +104,7 @@ extension Logger {
      - SeeAlso: `LogCategory`
      */
     public func getLogLevel(for category: LogCategory) -> LogLevel {
-        Logger.shared.__getLevelForCategory(category.toString())
+        Logger.shared.__getLevelFor(ObjectiveCSupport.convert(value: category))
     }
 }
 
@@ -270,6 +270,89 @@ public enum Category: String, LogCategory {
             public func toString() -> String {
                 return self.rawValue
             }
+        }
+    }
+}
+
+private extension ObjectiveCSupport {
+
+    /// Converts a Swift category `LogCategory` to an Objective-C `RLMLogCategory.
+    /// - Parameter value: The `LogCategory`.
+    /// - Returns: Conversion of `value` to its Objective-C representation.
+    static func convert(value: LogCategory) -> RLMLogCategory {
+        switch value {
+        case Category.realm:
+            return RLMLogCategory.realm
+        case Category.sdk:
+            return RLMLogCategory.realmSDK
+        case Category.app:
+            return RLMLogCategory.realmApp
+        case Category.Storage.all:
+            return RLMLogCategory.realmStorage
+        case Category.Storage.transaction:
+            return RLMLogCategory.realmStorageTransaction
+        case Category.Storage.query:
+            return RLMLogCategory.realmStorageQuery
+        case Category.Storage.object:
+            return RLMLogCategory.realmStorageObject
+        case Category.Storage.notification:
+            return RLMLogCategory.realmStorageNotification
+        case Category.Sync.all:
+            return RLMLogCategory.realmSync
+        case Category.Sync.Client.all:
+            return RLMLogCategory.realmSyncClient
+        case Category.Sync.Client.session:
+            return RLMLogCategory.realmSyncClientSession
+        case Category.Sync.Client.changeset:
+            return RLMLogCategory.realmSyncClientChangeset
+        case Category.Sync.Client.network:
+            return RLMLogCategory.realmSyncClientNetwork
+        case Category.Sync.Client.reset:
+            return RLMLogCategory.realmSyncClientReset
+        case Category.Sync.server:
+            return RLMLogCategory.realmSyncServer
+        default:
+            throwRealmException("")
+        }
+    }
+
+    /// Converts an Objective-C category `RLMLogCategory` to a Swift `LogCategory.
+    /// - Parameter value: The `RLMLogCategory`.
+    /// - Returns: Conversion of `value` to its Swift representation.
+    static func convert(value: RLMLogCategory) -> LogCategory {
+        switch value {
+        case RLMLogCategory.realm:
+            return Category.realm
+        case RLMLogCategory.realmSDK:
+            return Category.sdk
+        case RLMLogCategory.realmApp:
+            return Category.app
+        case RLMLogCategory.realmStorage:
+            return Category.Storage.all
+        case RLMLogCategory.realmStorageTransaction:
+            return Category.Storage.transaction
+        case RLMLogCategory.realmStorageQuery:
+            return Category.Storage.query
+        case RLMLogCategory.realmStorageObject:
+            return Category.Storage.object
+        case RLMLogCategory.realmStorageNotification:
+            return Category.Storage.notification
+        case RLMLogCategory.realmSync:
+            return Category.Sync.all
+        case RLMLogCategory.realmSyncClient:
+            return Category.Sync.Client.all
+        case RLMLogCategory.realmSyncClientSession:
+            return Category.Sync.Client.session
+        case RLMLogCategory.realmSyncClientChangeset:
+            return Category.Sync.Client.changeset
+        case RLMLogCategory.realmSyncClientNetwork:
+            return Category.Sync.Client.network
+        case RLMLogCategory.realmSyncClientReset:
+            return Category.Sync.Client.reset
+        case RLMLogCategory.realmSyncServer:
+            return Category.Sync.server
+        default:
+            throwRealmException("")
         }
     }
 }

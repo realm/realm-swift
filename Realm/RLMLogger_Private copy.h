@@ -35,21 +35,16 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
  Log a message to the supplied level.
 
  @param logLevel The log level for the message.
- @param category The log category name for the message.
+ @param category The log category for the message.
  @param message The message to log.
  */
-- (void)logWithLevel:(RLMLogLevel)logLevel categoryName:(NSString *)categoryName message:(NSString *)message;
-
-#pragma mark Testing
+- (void)logWithLevel:(RLMLogLevel)logLevel category:(NSString *)category message:(NSString *)message;
 
 /**
 Gets all the categories from Core. This is to be used for testing purposes only.
  */
 + (NSArray<NSString *> *)getAllCategories;
 
-/**
-Returns a `RLMLogCategory` from a string.
- */
 + (RLMLogCategory)categoryFromString:(NSString *)string;
 @end
 

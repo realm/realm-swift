@@ -48,6 +48,60 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
     RLMLogLevelAll
 } NS_SWIFT_NAME(LogLevel);
 
+/**
+An enum representing different categories of sync-related logging that can be configured.
+Category hierarchy:
+```
+ Realm
+ ├─► Storage
+ │   ├─► Transaction
+ │   ├─► Query
+ │   ├─► Object
+ │   └─► Notification
+ ├─► Sync
+ │   ├─► Client
+ │   │   ├─► Session
+ │   │   ├─► Changeset
+ │   │   ├─► Network
+ │   │   └─► Reset
+ │   └─► Server
+ ├─► App
+ └─► Sdk
+```
+*/
+typedef NS_ENUM(NSUInteger, RLMLogCategory) {
+    ///  Top level log category for Realm, updating this category level would set all other subcategories too.
+    RLMLogCategoryRealm,
+    /// Log category for all sdk related logs.
+    RLMLogCategoryRealmSDK,
+    /// Log category for all app related logs.
+    RLMLogCategoryRealmApp,
+    /// Log category for all database related logs.
+    RLMLogCategoryRealmStorage,
+    /// Log category for all database transaction related logs.
+    RLMLogCategoryRealmStorageTransaction,
+    /// Log category for all database queries related logs.
+    RLMLogCategoryRealmStorageQuery,
+    /// Log category for all database object related logs.
+    RLMLogCategoryRealmStorageObject,
+    /// Log category for all database notification related logs.
+    RLMLogCategoryRealmStorageNotification,
+    /// Log category for all sync related logs.
+    RLMLogCategoryRealmSync,
+    /// Log category for all sync client related logs.
+    RLMLogCategoryRealmSyncClient,
+    /// Log category for all sync client session related logs.
+    RLMLogCategoryRealmSyncClientSession,
+    /// Log category for all sync client changeset related logs.
+    RLMLogCategoryRealmSyncClientChangeset,
+    /// Log category for all sync client network related logs.
+    RLMLogCategoryRealmSyncClientNetwork,
+    /// Log category for all sync client reset related logs.
+    RLMLogCategoryRealmSyncClientReset,
+    /// Log category for all sync server related logs.
+    RLMLogCategoryRealmSyncServer
+};
+
 /// A log callback function which can be set on RLMLogger.
 ///
 /// The log function may be called from multiple threads simultaneously, and is
@@ -60,7 +114,7 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 /// The log function may be called from multiple threads simultaneously, and is
 /// responsible for performing its own synchronization if any is required.
 RLM_SWIFT_SENDABLE // invoked on a background thread
-typedef void (^RLMLogCategoryFunction)(RLMLogLevel level, NSString *category, NSString *message) NS_REFINED_FOR_SWIFT;
+typedef void (^RLMLogCategoryFunction)(RLMLogLevel level, RLMLogCategory category, NSString *message) NS_REFINED_FOR_SWIFT;
 /**
  `RLMLogger` is used for creating your own custom logging logic.
 
@@ -69,8 +123,8 @@ typedef void (^RLMLogCategoryFunction)(RLMLogLevel level, NSString *category, NS
  Set this custom logger as you default logger using `setDefaultLogger`.
 
      RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                                category:RLMLogCategoryRealm
-                                                logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
+                                                       category:RLMLogCategoryRealm
+                                                    logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
          NSLog(@"Realm Log - %lu, %@, %@", (unsigned long)level, category, message);
      }];
 
@@ -104,7 +158,7 @@ __attribute__((deprecated("Use `initWithLevel:logFunction:` instead.")));
  @param logFunction The log function which will be invoked whenever there is a log message.
 */
 - (instancetype)initWithLevel:(RLMLogLevel)level
-                     category:(NSString *)category
+                     category:(RLMLogCategory)category
                   logFunction:(RLMLogCategoryFunction)logFunction;
 
 #pragma mark RLMLogger Default Logger API
@@ -120,7 +174,7 @@ __attribute__((deprecated("Use `initWithLevel:logFunction:` instead.")));
  @param level The log level to be set for the logger.
  @param category The log function which will be invoked whenever there is a log message.
 */
-- (void)setLevel:(RLMLogLevel)level category:(NSString *)category NS_REFINED_FOR_SWIFT;
+- (void)setLevel:(RLMLogLevel)level category:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
 
 /**
  Gets the logger's associated level for the specified category.
@@ -128,7 +182,16 @@ __attribute__((deprecated("Use `initWithLevel:logFunction:` instead.")));
  @param category The log category which we need the level.
  @returns The log level for the specified category
 */
-- (RLMLogLevel)getLevelForCategory:(NSString *)category NS_REFINED_FOR_SWIFT;
+- (RLMLogLevel)getLevelForCategory:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
+
+/**
+ Log a message to the supplied level.
+
+ @param logLevel The log level for the message.
+ @param category The log category for the message.
+ @param message The message to log.
+ */
+- (void)logWithLevel:(RLMLogLevel)logLevel category:(RLMLogCategory)category message:(NSString *)message;
 
 @end
 
