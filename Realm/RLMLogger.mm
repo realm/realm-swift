@@ -223,18 +223,16 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 }
 
 - (void)setLevel:(RLMLogLevel)level category:(RLMLogCategory)category {
-    RLMLogger *defaultLogger = [RLMLogger defaultLogger];
-    defaultLogger->_logger->set_level_threshold(categoryNameForLogCategory(category), levelForLogLevel(level));
+    _logger->set_level_threshold(categoryNameForLogCategory(category), levelForLogLevel(level));
 }
 
-- (RLMLogLevel)getLevelForCategory:(RLMLogCategory)category {
-    RLMLogger *defaultLogger = [RLMLogger defaultLogger];
-    return logLevelForLevel(defaultLogger->_logger->get_level_threshold(categoryNameForLogCategory(category)));
+- (RLMLogLevel)levelForCategory:(RLMLogCategory)category {
+    return logLevelForLevel(_logger->get_level_threshold(categoryNameForLogCategory(category)));
 }
 
 #pragma mark Testing
 
-+ (NSArray<NSString *> *)getAllCategories {
++ (NSArray<NSString *> *)allCategories {
     NSMutableArray<NSString *> *a = [NSMutableArray new];
     auto categories = LogCategory::get_category_names();
     for (const auto& category : categories) {

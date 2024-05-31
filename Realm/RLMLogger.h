@@ -182,7 +182,7 @@ __attribute__((deprecated("Use `initWithLevel:logFunction:` instead.")));
  @param category The log category which we need the level.
  @returns The log level for the specified category
 */
-- (RLMLogLevel)getLevelForCategory:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
+- (RLMLogLevel)levelForCategory:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
 
 /**
  Log a message to the supplied level.

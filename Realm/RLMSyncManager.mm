@@ -75,7 +75,7 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
 
 struct CocoaSyncLogger : public realm::util::Logger {
     void do_log(const realm::util::LogCategory& category, Level, const std::string& message) override {
-        NSLog(@"%@: %@", RLMStringDataToNSString(category.get_name()), RLMStringDataToNSString(message));
+        NSLog(@"%s: %s", category.get_name().c_str(), message.c_str());
     }
 };
 

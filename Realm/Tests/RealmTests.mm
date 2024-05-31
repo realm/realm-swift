@@ -2967,14 +2967,14 @@
     RLMLogger.defaultLogger = logger;
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertEqual([[RLMLogger defaultLogger] getLevelForCategory:category], RLMLogLevelAll);
+    XCTAssertEqual([[RLMLogger defaultLogger] levelForCategory:category], RLMLogLevelAll);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertTrue([logs containsString:@"7 DB:"]); // Trace
 
     [logs setString: @""];
     [logger setLevel:RLMLogLevelDetail category:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertEqual([[RLMLogger defaultLogger] getLevelForCategory:category], RLMLogLevelDetail);
+    XCTAssertEqual([[RLMLogger defaultLogger] levelForCategory:category], RLMLogLevelDetail);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 }
@@ -2988,7 +2988,7 @@
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
-    XCTAssertEqual([[RLMLogger defaultLogger] getLevelForCategory:category], RLMLogLevelOff);
+    XCTAssertEqual([[RLMLogger defaultLogger] levelForCategory:category], RLMLogLevelOff);
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] == 0);
@@ -3015,7 +3015,7 @@
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
 
-    XCTAssertEqual([RLMLogger.defaultLogger getLevelForCategory:category], RLMLogLevelDebug);
+    XCTAssertEqual([RLMLogger.defaultLogger levelForCategory:category], RLMLogLevelDebug);
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
@@ -3040,7 +3040,7 @@
 // Core defines the different categories in runtime, forcing the SDK to define the categories again.
 // This test validates that we have added new defined categories to the RLMLogCategory enum.
 - (void)testAllCategoriesWatchDog {
-    for (id category in [RLMLogger getAllCategories]) {
+    for (id category in [RLMLogger allCategories]) {
         XCTAssertNoThrow([RLMLogger categoryFromString:category]);
     }
 }

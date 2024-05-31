@@ -45,7 +45,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 /**
 Gets all the categories from Core. This is to be used for testing purposes only.
  */
-+ (NSArray<NSString *> *)getAllCategories;
++ (NSArray<NSString *> *)allCategories;
 
 /**
 Returns a `RLMLogCategory` from a string.

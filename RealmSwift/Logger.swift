@@ -27,7 +27,7 @@ import Realm.Private
 
  ```swift
  let logger = Logger(level: .all, category: Category.realm) { level, message in
-    print("Realm Log - \(category.toString())-\(level): \(message)")
+    print("Realm Log - \(category.rawValue)-\(level): \(message)")
  }
  ```
 
@@ -56,7 +56,7 @@ extension Logger {
      - parameter message: The message to log.
      */
     internal func log(level: LogLevel, category: LogCategory = Category.realm, message: String) {
-        self.log(with: level, category: category.toString(), message: message)
+        self.log(with: level, category: ObjectiveCSupport.convert(value: category), message: message)
     }
 
     /**
@@ -64,9 +64,8 @@ extension Logger {
 
      ```swift
      let logger = Logger(level: .info, category: Category.All, logFunction: { level, category, message in
-         print("\(category.toString()) - \(level): \(message)")
+         print("\(category.rawValue) - \(level): \(message)")
      })
-     logger.log(level: .info, category: Category.realm, message: "Info DB: Database opened succesfully")
      ```
 
      - parameter level: The log level to be set for the logger.
@@ -103,8 +102,8 @@ extension Logger {
      - returns: The `LogLevel` for the given category.
      - SeeAlso: `LogCategory`
      */
-    public func getLogLevel(for category: LogCategory) -> LogLevel {
-        Logger.shared.__getLevelFor(ObjectiveCSupport.convert(value: category))
+    public func logLevel(for category: LogCategory) -> LogLevel {
+        Logger.shared.__level(for: ObjectiveCSupport.convert(value: category))
     }
 }
 
@@ -116,7 +115,7 @@ public protocol LogCategory: Sendable {
      - returns: A string representing the log category.
      - SeeAlso: `LogCategory`
      */
-    func toString() -> String
+    var rawValue: String { get }
 }
 
 /**
@@ -146,16 +145,6 @@ public enum Category: String, LogCategory {
     case sdk = "Realm.SDK"
     /// Log category for all app related logs.
     case app = "Realm.App"
-
-    /**
-     Returns the string represtation of the Log category.
-
-     - returns: A string representing the log category.
-     - SeeAlso: `LogCategory`
-     */
-    public func toString() -> String {
-        return self.rawValue
-    }
 
     /// :nodoc:
     fileprivate static func fromString(_ string: String) -> LogCategory? {
@@ -195,16 +184,6 @@ public enum Category: String, LogCategory {
         case object = "Realm.Storage.Object"
         /// Log category for all database notification related logs.
         case notification = "Realm.Storage.Notification"
-
-        /**
-         Returns the string represtation of the Log category.
-
-         - returns: A string representing the log category.
-         - SeeAlso: `LogCategory`
-         */
-        public func toString() -> String {
-            return self.rawValue
-        }
     }
 
     /**
@@ -226,16 +205,6 @@ public enum Category: String, LogCategory {
         case all = "Realm.Sync"
         /// Log category for all sync server related logs.
         case server = "Realm.Sync.Server"
-
-        /**
-         Returns the string represtation of the Log category.
-
-         - returns: A string representing the log category.
-         - SeeAlso: `LogCategory`
-         */
-        public func toString() -> String {
-            return self.rawValue
-        }
 
         /**
          Log category for all storage related logs.
@@ -260,16 +229,6 @@ public enum Category: String, LogCategory {
             case network = "Realm.Sync.Client.Network"
             /// Log category for all sync client reset related logs.
             case reset = "Realm.Sync.Client.Reset"
-
-            /**
-             Returns the string represtation of the Log category.
-
-             - returns: A string representing the log category.
-             - SeeAlso: `LogCategory`
-             */
-            public func toString() -> String {
-                return self.rawValue
-            }
         }
     }
 }
@@ -312,7 +271,7 @@ private extension ObjectiveCSupport {
         case Category.Sync.server:
             return RLMLogCategory.realmSyncServer
         default:
-            throwRealmException("")
+            fatalError()
         }
     }
 
@@ -352,7 +311,7 @@ private extension ObjectiveCSupport {
         case RLMLogCategory.realmSyncServer:
             return Category.Sync.server
         default:
-            throwRealmException("")
+            fatalError()
         }
     }
 }
