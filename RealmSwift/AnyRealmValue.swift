@@ -204,27 +204,27 @@ public enum AnyRealmValue: Hashable {
     public func hash(into hasher: inout Hasher) {
         switch self {
         case let .int(i):
-            hasher.combine(i.hashValue)
+            hasher.combine(i)
         case let .bool(b):
-            hasher.combine(b.hashValue)
+            hasher.combine(b)
         case let .float(f):
-            hasher.combine(f.hashValue)
+            hasher.combine(f)
         case let .double(d):
-            hasher.combine(d.hashValue)
+            hasher.combine(d)
         case let .string(s):
-            hasher.combine(s.hashValue)
+            hasher.combine(s)
         case let .data(d):
-            hasher.combine(d.hashValue)
+            hasher.combine(d)
         case let .date(d):
-            hasher.combine(d.hashValue)
+            hasher.combine(d)
         case let .objectId(o):
-            hasher.combine(o.hashValue)
+            hasher.combine(o)
         case let .decimal128(d):
-            hasher.combine(d.hashValue)
+            hasher.combine(d)
         case let .uuid(u):
-            hasher.combine(u.hashValue)
+            hasher.combine(u)
         case let .object(o):
-            hasher.combine(o.hashValue)
+            hasher.combine(o)
         case .dictionary:
             hasher.combine(12)
         case .list:
