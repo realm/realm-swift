@@ -26,14 +26,29 @@ x.y.z Release notes (yyyy-MM-dd)
   realm.objects(MixedObject.self).where { $0.anyValue[0][0][1] == .double(76.54) }
   ```
   
-  The `.all` operator allows looking up in all keys or indexes, which is the same that using a wildcard as a subscript `["*"]`.
+  The `.any` operator allows looking up in all keys or indexes.
   ```swift
-  realm.objects(MixedObject.self).where { $0.anyValue["key"].all == .bool(false) }
+  realm.objects(MixedObject.self).where { $0.anyValue["key"].any == .bool(false) }
   ```
+* Report the originating error that caused a client reset to occur. 
+  ([Core #6154](https://github.com/realm/realm-core/issues/6154))
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* Accessing `App.currentUser` from within a notification produced by `App.switchToUser()` 
+  (which includes notifications for a newly logged in user) would deadlock. 
+  ([Core #7670](https://github.com/realm/realm-core/issues/7670), since v10.50.0).
+* Inserting the same link to the same key in a dictionary more than once would incorrectly create 
+  multiple backlinks to the object. This did not appear to cause any crashes later, but would 
+  have affecting explicit backlink count queries and possibly notifications. 
+  ([Core #7676](https://github.com/realm/realm-core/issues/7676), since v10.49.2).
+* A non-streaming progress notifier would not immediately call its callback after registration. 
+  Instead you would have to wait for a download message to be received to get your first 
+  update - if you were already caught up when you registered the notifier you could end up waiting a
+  long time for the server to deliver a download that would call/expire your notifier 
+  ([Core #7627](https://github.com/realm/realm-core/issues/7627), since v10.50.0).
+* After compacting, a file upgrade would be triggered. This could cause loss of data 
+  if `deleteRealmIfMigrationNeeded` is set to true.
+  ([Core #7747](https://github.com/realm/realm-core/issues/7747), since v10.49.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -45,7 +60,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.1.0-15.4.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v14.6.2 to 14.9.0
 
 10.50.1 Release notes (2024-05-21)
 =============================================================
