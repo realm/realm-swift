@@ -1,6 +1,7 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.51.0 Release notes (2024-06-06)
 =============================================================
 ### Enhancements
+
 * Added support for storing nested collections (List and Map not ManagedSet) in a `AnyRealmValue`.
   ```swift
   class MixedObject: Object {
@@ -34,6 +35,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #6154](https://github.com/realm/realm-core/issues/6154))
 
 ### Fixed
+
 * Accessing `App.currentUser` from within a notification produced by `App.switchToUser()` 
   (which includes notifications for a newly logged in user) would deadlock. 
   ([Core #7670](https://github.com/realm/realm-core/issues/7670), since v10.50.0).
@@ -50,9 +52,8 @@ x.y.z Release notes (yyyy-MM-dd)
   if `deleteRealmIfMigrationNeeded` is set to true.
   ([Core #7747](https://github.com/realm/realm-core/issues/7747), since v10.49.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
@@ -60,6 +61,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.1.0-15.4.0.
 
 ### Internal
+
 * Upgraded realm-core from v14.6.2 to 14.9.0
 
 10.50.1 Release notes (2024-05-21)
