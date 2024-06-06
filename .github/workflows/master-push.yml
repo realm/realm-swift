@@ -10,9 +10,9 @@ env:
   XCODE_TEST_VERSIONS: "['15.1', '15.2', '15.3', '15.4']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
-  DOC_VERSION: '15.3'
-  RELEASE_VERSION: '15.3'
-  TEST_VERSION: '15.3'
+  DOC_VERSION: '15.4'
+  RELEASE_VERSION: '15.4'
+  TEST_VERSION: '15.4'
 jobs:
   cleanup: # Clean-up XCode cloud workflows, before running the pipeline
       runs-on: ubuntu-latest
