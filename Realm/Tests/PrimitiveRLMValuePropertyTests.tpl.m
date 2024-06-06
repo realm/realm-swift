@@ -87,20 +87,20 @@ static RLMObjectId *objectId(NSUInteger i) {
 }
 
 - (void)testType {
-    XCTAssertEqual(unmanaged.boolVal.rlm_valueType, RLMPropertyTypeBool);
-    XCTAssertEqual(unmanaged.intVal.rlm_valueType, RLMPropertyTypeInt);
-    XCTAssertEqual(unmanaged.floatVal.rlm_valueType, RLMPropertyTypeFloat);
-    XCTAssertEqual(unmanaged.doubleVal.rlm_valueType, RLMPropertyTypeDouble);
-    XCTAssertEqual(unmanaged.stringVal.rlm_valueType, RLMPropertyTypeString);
-    XCTAssertEqual(unmanaged.dataVal.rlm_valueType, RLMPropertyTypeData);
-    XCTAssertEqual(unmanaged.dateVal.rlm_valueType, RLMPropertyTypeDate);
-    XCTAssertEqual(managed.boolVal.rlm_valueType, RLMPropertyTypeBool);
-    XCTAssertEqual(managed.intVal.rlm_valueType, RLMPropertyTypeInt);
-    XCTAssertEqual(managed.floatVal.rlm_valueType, RLMPropertyTypeFloat);
-    XCTAssertEqual(managed.doubleVal.rlm_valueType, RLMPropertyTypeDouble);
-    XCTAssertEqual(managed.stringVal.rlm_valueType, RLMPropertyTypeString);
-    XCTAssertEqual(managed.dataVal.rlm_valueType, RLMPropertyTypeData);
-    XCTAssertEqual(managed.dateVal.rlm_valueType, RLMPropertyTypeDate);
+    XCTAssertEqual(unmanaged.boolVal.rlm_anyValueType, RLMAnyValueTypeBool);
+    XCTAssertEqual(unmanaged.intVal.rlm_anyValueType, RLMAnyValueTypeInt);
+    XCTAssertEqual(unmanaged.floatVal.rlm_anyValueType, RLMAnyValueTypeFloat);
+    XCTAssertEqual(unmanaged.doubleVal.rlm_anyValueType, RLMAnyValueTypeDouble);
+    XCTAssertEqual(unmanaged.stringVal.rlm_anyValueType, RLMAnyValueTypeString);
+    XCTAssertEqual(unmanaged.dataVal.rlm_anyValueType, RLMAnyValueTypeData);
+    XCTAssertEqual(unmanaged.dateVal.rlm_anyValueType, RLMAnyValueTypeDate);
+    XCTAssertEqual(managed.boolVal.rlm_anyValueType, RLMAnyValueTypeBool);
+    XCTAssertEqual(managed.intVal.rlm_anyValueType, RLMAnyValueTypeInt);
+    XCTAssertEqual(managed.floatVal.rlm_anyValueType, RLMAnyValueTypeFloat);
+    XCTAssertEqual(managed.doubleVal.rlm_anyValueType, RLMAnyValueTypeDouble);
+    XCTAssertEqual(managed.stringVal.rlm_anyValueType, RLMAnyValueTypeString);
+    XCTAssertEqual(managed.dataVal.rlm_anyValueType, RLMAnyValueTypeData);
+    XCTAssertEqual(managed.dateVal.rlm_anyValueType, RLMAnyValueTypeDate);
 }
 
 - (void)testInitNull {
@@ -114,61 +114,61 @@ static RLMObjectId *objectId(NSUInteger i) {
 - (void)testUpdateBoolType {
     $rlmValue = @NO;
     XCTAssert([(NSNumber *)$rlmValue isEqual:@NO]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeBool);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeBool);
 }
 
 - (void)testUpdateIntType {
     $rlmValue = @2;
     XCTAssert([(NSNumber *)$rlmValue isEqual:@2]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeInt);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeInt);
 }
 
 - (void)testUpdateFloatType {
     $rlmValue = @2.2f;
     XCTAssert([(NSNumber *)$rlmValue isEqual:@2.2f]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeFloat);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeFloat);
 }
 
 - (void)testUpdateDoubleType {
     $rlmValue = @3.3;
     XCTAssert([(NSNumber *)$rlmValue isEqual:@3.3]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeDouble);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeDouble);
 }
 
 - (void)testUpdateStringType {
     $rlmValue = @"four";
     XCTAssert([(NSNumber *)$rlmValue isEqual:@"four"]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeString);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeString);
 }
 
 - (void)testUpdateDataType {
     $rlmValue = data(5);
     XCTAssert([(NSNumber *)$rlmValue isEqual:data(5)]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeData);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeData);
 }
 
 - (void)testUpdateDateType {
     $rlmValue = date(6);
     XCTAssert([(NSNumber *)$rlmValue isEqual:date(6)]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeDate);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeDate);
 }
 
 - (void)testUpdateDecimal {
     $rlmValue = decimal128(7);
     XCTAssert([(NSNumber *)$rlmValue isEqual:decimal128(7)]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeDecimal128);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeDecimal128);
 }
 
 - (void)testUpdateObjectIdType {
     $rlmValue = objectId(8);
     XCTAssert([(NSUUID *)$rlmValue isEqual:objectId(8)]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeObjectId);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeObjectId);
 }
 
 - (void)testUpdateUuidType {
     $rlmValue = uuid(@"137DECC8-B300-4954-A233-F89909F4FD89");
     XCTAssert([(NSUUID *)$rlmValue isEqual:uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")]);
-    XCTAssertEqual($rlmValue.rlm_valueType, RLMPropertyTypeUUID);
+    XCTAssertEqual($rlmValue.rlm_anyValueType, RLMAnyValueTypeUUID);
 }
 
 @end

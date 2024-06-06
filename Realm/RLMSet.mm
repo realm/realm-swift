@@ -70,7 +70,7 @@
 
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
-    _key = property.name;
+    _property = property;
     _isLegacyProperty = property.isLegacy;
 }
 
@@ -240,9 +240,9 @@ static void changeSet(__unsafe_unretained RLMSet *const set,
     }
 
     if (RLMObjectBase *parent = set->_parentObject) {
-        [parent willChangeValueForKey:set->_key];
+        [parent willChangeValueForKey:set->_property.name];
         f();
-        [parent didChangeValueForKey:set->_key];
+        [parent didChangeValueForKey:set->_property.name];
     }
     else {
         f();
@@ -484,7 +484,7 @@ void RLMSetValidateMatchingObjectType(__unsafe_unretained RLMSet *const set,
 #pragma mark - Key Path Strings
 
 - (NSString *)propertyKey {
-    return _key;
+    return _property.name;
 }
 
 #pragma mark - Methods unsupported on unmanaged RLMSet instances

@@ -1,7 +1,35 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Added support for storing nested collections (List and Map not ManagedSet) in a `AnyRealmValue`.
+  ```swift
+  class MixedObject: Object {
+    @Persisted var anyValue: AnyRealmValue
+  }
+
+  // You can build a AnyRealmValue from a Swift's Dictionary.
+  let dictionary: Dictionary<String, AnyRealmValue> = ["key1": .string("hello"), "key2": .bool(false)]
+
+  // You can build a AnyRealmValue from a Swift's Map
+  // and nest a collection within another collection.
+  let list: Array<AnyRealmValue> = [.int(12), .double(14.17), AnyRealmValue.fromDictionary(dictionary)]
+
+  let realm = realmWithTestPath()
+  try realm.write {
+    let obj = MixedObject()
+    obj.anyValue = AnyRealmValue.fromArray(list)
+    realm.add(obj)
+  }
+  ```
+* Added new operators to Swift's Query API for supporting querying nested collections.
+  ```swift
+  realm.objects(MixedObject.self).where { $0.anyValue[0][0][1] == .double(76.54) }
+  ```
+  
+  The `.all` operator allows looking up in all keys or indexes, which is the same that using a wildcard as a subscript `["*"]`.
+  ```swift
+  realm.objects(MixedObject.self).where { $0.anyValue["key"].all == .bool(false) }
+  ```
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -116,6 +144,10 @@ store. Xcode 15.1 is now the minimum supported version.
 * The reported download progress for flexible sync Realms was incorrect. It is now replaced by a
   progress estimate, which is derived by the server based on historical data and other heuristics.
   ([#8476](https://github.com/realm/realm-swift/issues/8476))
+
+### Deprecations
+
+* `rlm_valueType` is deprecated in favour of `rlm_anyValueType` which now includes collections (List and Dictionary).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

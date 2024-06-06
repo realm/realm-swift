@@ -1707,6 +1707,64 @@ public:
     [mutator addObject:obj];
     AssertChanged(r, @0, @1);
 }
+
+- (void)testMixedCollectionKVC {
+    KVOObject *obj = [self createObject];
+    NSDictionary *d = @{ @"key2" : @"hello2",
+                          @"key3" : @YES,
+                          @"key4" : @123,
+                          @"key5" : @456.789 };
+
+    NSArray *a = @[ @"hello2", @YES, @123, @456.789 ];
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj.anyCol = d;
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        [obj setValue:d forKey:@"anyCol"];
+        AssertCollectionChanged();
+        [obj setValue:nil forKey:@"anyCol"];
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj.anyCol = a;
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        [obj setValue:a forKey:@"anyCol"];
+        AssertCollectionChanged();
+        [obj setValue:nil forKey:@"anyCol"];
+        AssertCollectionChanged();
+    }
+
+    if (![obj respondsToSelector:@selector(setObject:forKeyedSubscript:)]) {
+        return;
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj[@"anyCol"] = d;
+        AssertCollectionChanged();
+        obj[@"anyCol"] = nil;
+        AssertCollectionChanged();
+    }
+
+    {
+        KVORecorder r(self, obj, @"anyCol");
+        obj[@"anyCol"] = a;
+        AssertCollectionChanged();
+        obj[@"anyCol"] = nil;
+        AssertCollectionChanged();
+    }
+}
 @end
 
 // Run tests on an unmanaged RLMObject instance

@@ -156,4 +156,28 @@ class SwiftRLMDynamicTests: RLMTestCase {
         XCTAssertTrue((robj2["objectCol"] as! RLMObject)["stringCol"] as! String == "string")
         XCTAssertTrue((robj2["mixedObjectCol"] as! RLMObject)["anyCol"] as! String == "string")
     }
+
+    func testDynamicTypesMixedCollection_objc() {
+        let obj1 = AllTypesObject.values(5,
+                                         stringObject: StringObject(value: ["newString"]),
+                                         mixedObject: MixedObject(value: [["string", 45, false]]))!
+
+        autoreleasepool {
+            // open realm in autoreleasepool to create tables and then dispose
+            let realm = self.realmWithTestPath()
+            realm.beginWriteTransaction()
+            _ = AllTypesObject.create(in: realm, withValue: obj1)
+            try! realm.commitWriteTransaction()
+        }
+
+        let dyrealm = realm(withTestPathAndSchema: nil)
+        let results = dyrealm.allObjects(AllTypesObject.className())
+        XCTAssertEqual(results.count, UInt(1))
+        let robj1 = results[0]
+
+        // Mixed List
+        XCTAssertTrue(((robj1["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedArray)[0] as! String == "string")
+        XCTAssertTrue(((robj1["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedArray)[1] as! Int == 45)
+        XCTAssertTrue(((robj1["mixedObjectCol"] as! RLMObject)["anyCol"] as! RLMManagedArray)[2] as! Bool == false)
+    }
 }

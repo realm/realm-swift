@@ -53,6 +53,7 @@ class SwiftKVOObject: Object {
     let otherFloatCol = RealmProperty<Float?>()
     let otherDoubleCol = RealmProperty<Double?>()
     let otherBoolCol = RealmProperty<Bool?>()
+    let otherAnyCol = RealmProperty<AnyRealmValue>()
     @objc dynamic var optStringCol: String?
     @objc dynamic var optBinaryCol: Data?
     @objc dynamic var optDateCol: Date?
@@ -71,6 +72,7 @@ class SwiftKVOObject: Object {
     let arrayDate = List<Date>()
     let arrayDecimal = List<Decimal128>()
     let arrayObjectId = List<ObjectId>()
+    let arrayAny = List<AnyRealmValue>()
 
     let arrayOptBool = List<Bool?>()
     let arrayOptInt8 = List<Int8?>()
@@ -97,6 +99,7 @@ class SwiftKVOObject: Object {
     let setDate = MutableSet<Date>()
     let setDecimal = MutableSet<Decimal128>()
     let setObjectId = MutableSet<ObjectId>()
+    let setAny = MutableSet<AnyRealmValue>()
 
     let setOptBool = MutableSet<Bool?>()
     let setOptInt8 = MutableSet<Int8?>()
@@ -123,6 +126,7 @@ class SwiftKVOObject: Object {
     let mapDate = Map<String, Date>()
     let mapDecimal = Map<String, Decimal128>()
     let mapObjectId = Map<String, ObjectId>()
+    let mapAny = Map<String, AnyRealmValue>()
 
     let mapOptBool = Map<String, Bool?>()
     let mapOptInt8 = Map<String, Int8?>()
@@ -454,6 +458,21 @@ class KVOTests: TestCase {
         observeChange(obs4, "mapBool.invalidated", false, true) {
             self.realm.delete(obj4)
         }
+    }
+
+    func testCollectionInMixedKVO() {
+        let (obj, obs) = getObject(SwiftKVOObject())
+
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value = AnyRealmValue.fromDictionary([
+            "key1": .int(1234)]) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.dictionaryValue?["key1"] = .string("hello") }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.dictionaryValue?["key1"] = nil }
+
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value = AnyRealmValue.fromArray([.bool(true)]) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?[0] = .float(123.456) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?.append(.bool(true)) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?.insert(.date(Date()), at: 1) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?.remove(at: 0) }
     }
 
     func testTypedObservation() {

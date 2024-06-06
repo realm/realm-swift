@@ -350,6 +350,7 @@
 		AC3B33AE29DC6CEE0042F3A0 /* RLMLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AC3B33AF29DC6CEE0042F3A0 /* RLMLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */; };
 		AC3B33B029DC6CEE0042F3A0 /* RLMLogger_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		AC5300722BD03D4A00BF5950 /* MixedCollectionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5300712BD03D4900BF5950 /* MixedCollectionTest.swift */; };
 		AC7825B92ACD90BE007ABA4B /* Geospatial.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7825B82ACD90BE007ABA4B /* Geospatial.swift */; };
 		AC7825BD2ACD90DA007ABA4B /* RLMGeospatial.mm in Sources */ = {isa = PBXBuildFile; fileRef = AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */; };
 		AC7825BF2ACD90DA007ABA4B /* RLMGeospatial.h in Headers */ = {isa = PBXBuildFile; fileRef = AC7825BC2ACD90DA007ABA4B /* RLMGeospatial.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -900,6 +901,7 @@
 		AC3B33AB29DC6CEE0042F3A0 /* RLMLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger.h; sourceTree = "<group>"; };
 		AC3B33AC29DC6CEE0042F3A0 /* RLMLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMLogger.mm; sourceTree = "<group>"; };
 		AC3B33AD29DC6CEE0042F3A0 /* RLMLogger_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMLogger_Private.h; sourceTree = "<group>"; };
+		AC5300712BD03D4900BF5950 /* MixedCollectionTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MixedCollectionTest.swift; sourceTree = "<group>"; };
 		AC7825B82ACD90BE007ABA4B /* Geospatial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geospatial.swift; sourceTree = "<group>"; };
 		AC7825BA2ACD90DA007ABA4B /* RLMGeospatial.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMGeospatial.mm; sourceTree = "<group>"; };
 		AC7825BB2ACD90DA007ABA4B /* RLMGeospatial_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMGeospatial_Private.hpp; sourceTree = "<group>"; };
@@ -1414,6 +1416,7 @@
 				5D6610001BE98D880021E04F /* ListTests.swift */,
 				3F1D8D75265B075000593ABA /* MapTests.swift */,
 				5D6610011BE98D880021E04F /* MigrationTests.swift */,
+				AC5300712BD03D4900BF5950 /* MixedCollectionTest.swift */,
 				3F4E0FF82654765C008B8C0B /* ModernKVOTests.swift */,
 				3F4E100E2655CA33008B8C0B /* ModernObjectAccessorTests.swift */,
 				3FA5E94C266064C4008F1345 /* ModernObjectCreationTests.swift */,
@@ -2612,6 +2615,7 @@
 				5D6610161BE98D880021E04F /* ListTests.swift in Sources */,
 				3F1D8D77265B075100593ABA /* MapTests.swift in Sources */,
 				3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */,
+				AC5300722BD03D4A00BF5950 /* MixedCollectionTest.swift in Sources */,
 				3F4E0FF92654765C008B8C0B /* ModernKVOTests.swift in Sources */,
 				3F4E10102655CA33008B8C0B /* ModernObjectAccessorTests.swift in Sources */,
 				3FA5E94D266064C4008F1345 /* ModernObjectCreationTests.swift in Sources */,

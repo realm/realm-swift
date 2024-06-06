@@ -21,6 +21,8 @@ import Foundation
 import Realm
 
 /// A enum for storing and retrieving values associated with an `AnyRealmValue` property.
+/// `AnyRealmValue` can also store a collection (List, Dictionary) of `AnyRealmValue`, meaning that you can have
+/// nested collections inside a `AnyRealmValue`.
 public enum AnyRealmValue: Hashable {
     /// Represents `nil`
     case none
@@ -46,6 +48,10 @@ public enum AnyRealmValue: Hashable {
     case decimal128(Decimal128)
     /// A UUID type.
     case uuid(UUID)
+    /// Dictionary type.
+    case dictionary(Map<String, AnyRealmValue>)
+    /// List type.
+    case list(List<AnyRealmValue>)
 
     /// Returns an `Int` if that is what the stored value is, otherwise `nil`.
     public var intValue: Int? {
@@ -139,6 +145,22 @@ public enum AnyRealmValue: Hashable {
         return o as? T
     }
 
+    /// Returns a `Map<String, AnyRealmValue>` if that is what the stored value is, otherwise `nil`.
+    public var dictionaryValue: Map<String, AnyRealmValue>? {
+        guard case let .dictionary(d) = self else {
+            return nil
+        }
+        return d
+    }
+
+    /// Returns a `List<AnyRealmValue>` if that is what the stored value is, otherwise `nil`.
+    public var listValue: List<AnyRealmValue>? {
+        guard case let .list(l) = self else {
+            return nil
+        }
+        return l
+    }
+
     /// Returns a `DynamicObject` if the stored value is an `Object`, otherwise `nil`.
     ///
     /// Note: This allows access to an object stored in `AnyRealmValue` where you may not have
@@ -155,5 +177,60 @@ public enum AnyRealmValue: Hashable {
     /// Required for conformance to `AddableType`
     public init() {
         self = .none
+    }
+
+    /// Returns a `AnyRealmValue` storing a `Map`.
+    ///
+    /// - Parameter dictionary: A Swift's dictionary of `AnyRealmValue` values.
+    /// - Returns: Returns an `AnyRealmValue` storing a `Map`.
+    public static func fromDictionary(_ dictionary: Dictionary<String, AnyRealmValue>) -> AnyRealmValue {
+        let map = Map<String, AnyRealmValue>()
+        map.merge(dictionary, uniquingKeysWith: { $1 })
+        return AnyRealmValue.dictionary(map)
+    }
+
+    /// Returns a `AnyRealmValue` storing a `List`.
+    ///
+    /// - Parameter array: A Swift's array of `AnyRealmValue`.
+    /// - Returns: Returns a `AnyRealmValue` storing a `List`.
+    public static func fromArray(_ array: Array<AnyRealmValue>) -> AnyRealmValue {
+        let list = List<AnyRealmValue>()
+        list.append(objectsIn: array)
+        return AnyRealmValue.list(list)
+    }
+
+    // MARK: - Hashable
+
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .int(i):
+            hasher.combine(i)
+        case let .bool(b):
+            hasher.combine(b)
+        case let .float(f):
+            hasher.combine(f)
+        case let .double(d):
+            hasher.combine(d)
+        case let .string(s):
+            hasher.combine(s)
+        case let .data(d):
+            hasher.combine(d)
+        case let .date(d):
+            hasher.combine(d)
+        case let .objectId(o):
+            hasher.combine(o)
+        case let .decimal128(d):
+            hasher.combine(d)
+        case let .uuid(u):
+            hasher.combine(u)
+        case let .object(o):
+            hasher.combine(o)
+        case .dictionary:
+            hasher.combine(12)
+        case .list:
+            hasher.combine(13)
+        case .none:
+            hasher.combine(14)
+        }
     }
 }

@@ -61,8 +61,9 @@ public protocol _RealmMapValue {
         let next = generatorBase.next()
         if let next = next as? Element.Key {
             let key: Element.Key = next
-            let val: Element.Value = dynamicBridgeCast(fromObjectiveC: collection[key as AnyObject]!)
-            return SingleMapEntry(key: key, value: val) as? Element
+            if let val = collection[key as AnyObject].map(Element.Value._rlmFromObjc(_:)), let val {
+                return SingleMapEntry(key: key, value: val) as? Element
+            }
         }
         return nil
     }
@@ -85,7 +86,7 @@ public protocol _RealmMapValue {
     public mutating func next() -> Element? {
         let next = generatorBase.next()
         if let key = next as? Key,
-           let value = collection[key as AnyObject].map(dynamicBridgeCast) as? Value {
+           let value = collection[key as AnyObject].map(Value._rlmFromObjc(_:)), let value {
             return (key: key, value: value)
         }
         return nil

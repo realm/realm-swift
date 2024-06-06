@@ -33,9 +33,11 @@
 #import "RLMSwiftProperty.h"
 #import "RLMUUID_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMValue.h"
 
-#import <realm/object-store/results.hpp>
+#import <realm/object-store/object.hpp>
 #import <realm/object-store/property.hpp>
+#import <realm/object-store/results.hpp>
 
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -127,13 +129,8 @@ void setValueOrNull(__unsafe_unretained RLMObjectBase *const obj, ColKey col,
 
     RLMTranslateError([&] {
         if (value) {
-            if constexpr (std::is_same_v<T, realm::Mixed>) {
-                obj->_row.set(col, RLMObjcToMixed(value, obj->_realm, realm::CreatePolicy::SetLink));
-            }
-            else {
-                RLMStatelessAccessorContext ctx;
-                obj->_row.set(col, ctx.unbox<T>(value));
-            }
+            RLMStatelessAccessorContext ctx;
+            obj->_row.set(col, ctx.unbox<T>(value));
         }
         else {
             obj->_row.set_null(col);
@@ -272,9 +269,10 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     setValueOrNull<realm::UUID>(obj, key, value);
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
-              __unsafe_unretained id<RLMValue> const value) {
-    setValueOrNull<realm::Mixed>(obj, key, value);
+void setValue(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const property, __unsafe_unretained id<RLMValue> const value) {
+    realm::Object o(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
+    RLMAccessorContext ctx(obj);
+    o.set_property_value(ctx, getProperty(obj, property), value ?: NSNull.null);
 }
 
 RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const obj,
@@ -402,6 +400,13 @@ void kvoSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index,
         tracker.trackDeletions();
     }
     setValue(obj, key, static_cast<StorageType>(value));
+}
+
+template<>
+void kvoSetValue<id<RLMValue>>(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index, id<RLMValue> value) {
+    RLMVerifyInWriteTransaction(obj);
+    auto& prop = getProperty(obj, index);
+    setValue(obj, obj->_info->propertyForTableColumn(prop.column_key), static_cast<id<RLMValue>>(value));
 }
 
 template<typename ArgType, typename StorageType=ArgType>
@@ -772,13 +777,13 @@ RLMDecimal128 *RLMGetSwiftPropertyDecimal128(__unsafe_unretained RLMObjectBase *
 }
 
 RLMArray *RLMGetSwiftPropertyArray(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
-    return getCollection(obj, key);
+    return (RLMArray *)getCollection(obj, key);
 }
 RLMSet *RLMGetSwiftPropertySet(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
     return getCollection(obj, key);
 }
 RLMDictionary *RLMGetSwiftPropertyMap(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
-    return getCollection(obj, key);
+    return (RLMDictionary *)getCollection(obj, key);
 }
 
 void RLMSetSwiftPropertyNil(__unsafe_unretained RLMObjectBase *const obj, uint16_t key) {
@@ -821,13 +826,8 @@ RLMAccessorContext::RLMAccessorContext(RLMAccessorContext& parent, realm::Obj co
 , _parentObject(obj)
 , _parentObjectInfo(&parent._info)
 , _colKey(property.column_key)
-{
-}
-
-RLMAccessorContext::RLMAccessorContext(RLMClassInfo& info)
-: _realm(info.realm), _info(info)
-{
-}
+ {
+ }
 
 RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const parent,
                                        const realm::Property *prop)
@@ -847,6 +847,20 @@ RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const 
 , _parentObject(parent->_row)
 , _parentObjectInfo(parent->_info)
 , _colKey(col)
+{
+}
+
+RLMAccessorContext::RLMAccessorContext(RLMClassInfo& info)
+: _realm(info.realm), _info(info)
+{
+}
+
+RLMAccessorContext::RLMAccessorContext(RLMClassInfo& parentInfo, RLMClassInfo& info,
+                                       __unsafe_unretained RLMProperty *const property)
+: _realm(info.realm)
+, _info(info)
+, _parentObjectInfo(&parentInfo)
+, currentProperty(property)
 {
 }
 
@@ -890,15 +904,18 @@ realm::Obj RLMAccessorContext::create_embedded_object() {
 }
 
 id RLMAccessorContext::box(realm::Mixed v) {
-    return RLMMixedToObjc(v, _realm, &_info);
+    auto property = currentProperty ?: _info.propertyForTableColumn(_colKey);
+    // Property and ParentObject are only passed for List and Dictionary boxing
+    return RLMMixedToObjc(v, _realm, &_info, property, _parentObject);
 }
 
 id RLMAccessorContext::box(realm::List&& l) {
     REALM_ASSERT(_parentObjectInfo);
-    REALM_ASSERT(currentProperty);
+    auto property = currentProperty ?: _info.propertyForTableColumn(_colKey);
+    REALM_ASSERT(property);
     return [[RLMManagedArray alloc] initWithBackingCollection:std::move(l)
                                                    parentInfo:_parentObjectInfo
-                                                     property:currentProperty];
+                                                     property:property];
 }
 
 id RLMAccessorContext::box(realm::object_store::Set&& s) {
@@ -911,10 +928,11 @@ id RLMAccessorContext::box(realm::object_store::Set&& s) {
 
 id RLMAccessorContext::box(realm::object_store::Dictionary&& d) {
     REALM_ASSERT(_parentObjectInfo);
-    REALM_ASSERT(currentProperty);
+    auto property = currentProperty ? currentProperty : _info.propertyForTableColumn(_colKey);
+    REALM_ASSERT(property);
     return [[RLMManagedDictionary alloc] initWithBackingCollection:std::move(d)
                                                         parentInfo:_parentObjectInfo
-                                                          property:currentProperty];
+                                                          property:property];
 }
 
 id RLMAccessorContext::box(realm::Object&& o) {

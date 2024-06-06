@@ -168,24 +168,24 @@
 }
 
 - (id<RLMValue>)sectionKeyForValue:(id<RLMValue>)value {
-    switch (value.rlm_valueType) {
-        case RLMPropertyTypeInt:
+    switch (value.rlm_anyValueType) {
+        case RLMAnyValueTypeInt:
             return [NSNumber numberWithInt:(((NSNumber *)value).intValue % 2)];
-        case RLMPropertyTypeBool:
+        case RLMAnyValueTypeBool:
             return value;
-        case RLMPropertyTypeFloat:
+        case RLMAnyValueTypeFloat:
             return [(NSNumber *)value isEqualToNumber:@(1.1f * 1)] ? @(1.1f) : @(2.2f);
-        case RLMPropertyTypeDouble:
+        case RLMAnyValueTypeDouble:
             return [(NSNumber *)value isEqualToNumber:@(1.11 * 1)] ? @(1.11) : @(2.2);
-        case RLMPropertyTypeString:
+        case RLMAnyValueTypeString:
             return [(NSString *)value substringToIndex:1];
-        case RLMPropertyTypeDate: {
+        case RLMAnyValueTypeDate: {
             NSCalendar *calendar = [NSCalendar currentCalendar];
             [calendar setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
             NSDateComponents *comp = [calendar components:NSCalendarUnitWeekday fromDate:(NSDate *)value];
             return [NSNumber numberWithInteger:(NSInteger)comp.weekday];
         }
-        case RLMPropertyTypeDecimal128:
+        case RLMAnyValueTypeDecimal128:
             switch ((int)((RLMDecimal128 *)value).doubleValue) {
                 case 1:
                     return @"one";
@@ -196,7 +196,7 @@
                 default:
                     XCTFail();
             }
-        case RLMPropertyTypeUUID:
+        case RLMAnyValueTypeUUID:
             if ([(NSUUID *)value isEqual:[[NSUUID alloc] initWithUUIDString:@"00000000-0000-0000-0000-000000000000"]]) {
                 return @"a";
             } else if ([(NSUUID *)value isEqual:[[NSUUID alloc] initWithUUIDString:@"137DECC8-B300-4954-A233-F89909F4FD89"]]) {
@@ -204,7 +204,7 @@
             } else if ([(NSUUID *)value isEqual:[[NSUUID alloc] initWithUUIDString:@"b84e8912-a7c2-41cd-8385-86d200d7b31e"]]) {
                 return @"c";
             }
-        case RLMPropertyTypeAny:
+        case RLMAnyValueTypeAny:
             return [NSNumber numberWithInt:(((NSNumber *)value).intValue % 2)];;
         default:
             XCTFail();

@@ -3805,11 +3805,23 @@ static NSData *data(const char *str) {
 - (void)testDictionarySubscriptThrowsException {
     RLMRealm *realm = [self realm];
     RLMAssertThrowsWithReason(([realm objects:@"ArrayPropertyObject" where:@"array['invalid'] = NULL"]),
-                              @"Invalid keypath 'array[\"invalid\"]': only dictionaries support subscript predicates.");
+                              @"Invalid keypath 'array[\"invalid\"]': only dictionaries and realm `Any` support subscript predicates.");
     RLMAssertThrowsWithReason(([realm objects:@"SetPropertyObject" where:@"set['invalid'] = NULL"]),
-                              @"Invalid keypath 'set[\"invalid\"]': only dictionaries support subscript predicates.");
+                              @"Invalid keypath 'set[\"invalid\"]': only dictionaries and realm `Any` support subscript predicates.");
     RLMAssertThrowsWithReason(([realm objects:@"OwnerObject" where:@"dog['dogName'] = NULL"]),
                               @"Aggregate operations can only be used on key paths that include an collection property");
+    RLMAssertThrows(([realm objects:@"DictionaryPropertyObject" where:@"stringDictionary[%@] = NULL", [RLMObjectId objectId]]),
+                    @"Invalid subscript type 'anyCol[[a-z0-9]+]': Only `Strings` or index are allowed subscripts");
+    RLMAssertThrowsWithReason(([realm objects:@"DictionaryPropertyObject" where:@"stringDictionary['aKey']['bKey'] = NULL"]),
+                              @"Invalid subscript size 'stringDictionary[\"aKey\"][\"bKey\"]': nested dictionaries queries are only allowed in mixed properties.");
+    RLMAssertThrowsWithReason(([realm objects:@"DictionaryPropertyObject" where:@"stringDictionary[0] = NULL"]),
+                              @"Invalid subscript type 'stringDictionary[0]'; only string keys are allowed as subscripts in dictionary queries.");
+}
+
+- (void)testMixedSubscriptsThrowsException {
+    RLMRealm *realm = [self realm];
+    RLMAssertThrows(([realm objects:@"AllTypesObject" where:@"anyCol[%@] = NULL", [RLMObjectId objectId]]),
+                    @"Invalid subscript type 'anyCol[[a-z0-9]+]': Only `Strings` or index are allowed subscripts");
 }
 
 - (void)testCollectionsQueryAllValuesAllKeys {
