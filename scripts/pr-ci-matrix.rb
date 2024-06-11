@@ -86,7 +86,7 @@ end
 # because they don't care about Xcode versions, while some others are latest-only
 # because they're particularly slow to run.
 module Workflows
-  XCODE_VERSIONS = %w(15.1 15.2 15.3 15.4)
+  XCODE_VERSIONS = %w(15.1 15.2 15.3 15.4 16\ beta)
 
   all = ->(v) { true }
   latest_only = ->(v) { v == XCODE_VERSIONS.last }
