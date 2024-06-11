@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class ThreadSafeReferenceTests: TestCase {
+class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
     /// Resolve a thread-safe reference confirming that you can't resolve it a second time.
     func assertResolve<T>(_ realm: Realm, _ reference: ThreadSafeReference<T>) -> T? {
         XCTAssertFalse(reference.isInvalidated)
@@ -350,7 +350,7 @@ struct TestThreadSafeWrapperStruct {
 }
 
 // MARK: ThreadSafeWrapperTests
-class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
+class ThreadSafeWrapperTests: ThreadSafeReferenceTests, @unchecked Sendable {
     func wrapperStruct() -> TestThreadSafeWrapperStruct {
         let realm = try! Realm()
         var stringObj: SwiftStringObject?, intObj: SwiftIntObject?

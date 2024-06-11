@@ -499,7 +499,7 @@ func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     AddablePrimitiveListTests<OF, Decimal128Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
-class UnmanagedPrimitiveListTests: TestCase {
+class UnmanagedPrimitiveListTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Lists")
         addTests(suite, UnmanagedObjectFactory.self)
@@ -507,7 +507,7 @@ class UnmanagedPrimitiveListTests: TestCase {
     }
 }
 
-class ManagedPrimitiveListTests: TestCase {
+class ManagedPrimitiveListTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Lists")
         addTests(suite, ManagedObjectFactory.self)

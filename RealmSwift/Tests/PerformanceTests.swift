@@ -47,7 +47,7 @@ private var largeRealm: Realm!
 private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class SwiftPerformanceTests: TestCase {
+class SwiftPerformanceTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
 #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst)
         if isRunningOnDevice {
@@ -932,7 +932,7 @@ class SwiftPerformanceTests: TestCase {
     }
 }
 
-class SwiftSyncRealmPerformanceTests: TestCase {
+class SwiftSyncRealmPerformanceTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
 #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst)
         if isRunningOnDevice {
@@ -1038,7 +1038,7 @@ class SwiftSyncRealmPerformanceTests: TestCase {
     }
 }
 
-class SwiftFlexibleSyncRealmPerformanceTests: SwiftSyncRealmPerformanceTests {
+class SwiftFlexibleSyncRealmPerformanceTests: SwiftSyncRealmPerformanceTests, @unchecked Sendable {
     override var config: Realm.Configuration {
         var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeFlexibleSync())
         config.objectTypes = []

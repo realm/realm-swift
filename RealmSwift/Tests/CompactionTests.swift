@@ -34,7 +34,7 @@ private func fileSize(path: String) -> Int {
 
 // MARK: Tests
 
-class CompactionTests: TestCase {
+class CompactionTests: TestCase, @unchecked Sendable {
     override func setUp() {
         super.setUp()
         autoreleasepool {

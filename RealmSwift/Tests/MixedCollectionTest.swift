@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class MixedCollectionTest: TestCase {
+class MixedCollectionTest: TestCase, @unchecked Sendable {
     func testAnyMixedDictionary() throws {
         let so = SwiftStringObject()
         so.stringCol = "hello"

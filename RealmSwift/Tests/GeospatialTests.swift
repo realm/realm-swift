@@ -64,7 +64,7 @@ class PersonLocation: Object {
     }
 }
 
-class GeospatialTests: TestCase {
+class GeospatialTests: TestCase, @unchecked Sendable {
     func populatePersonLocationTable() throws {
         let realm = realmWithTestPath()
         try realm.write {

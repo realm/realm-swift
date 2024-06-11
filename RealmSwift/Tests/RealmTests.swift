@@ -30,7 +30,7 @@ import RealmSwiftTestSupport
 #endif
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class RealmTests: TestCase {
+class RealmTests: TestCase, @unchecked Sendable {
     enum TestError: Error {
         case intentional
     }
@@ -1942,7 +1942,7 @@ extension LogLevel {
 }
 
 @available(macOS 12.0, watchOS 8.0, iOS 15.0, tvOS 15.0, macCatalyst 15.0, *)
-class LoggerTests: TestCase {
+class LoggerTests: TestCase, @unchecked Sendable {
     var logger: Logger!
     override func setUp() {
         logger = Logger.shared

@@ -21,7 +21,7 @@ import Realm
 import RealmSwift
 import XCTest
 
-class ObjectiveCSupportTests: TestCase {
+class ObjectiveCSupportTests: TestCase, @unchecked Sendable {
 
     func testSupport() {
 

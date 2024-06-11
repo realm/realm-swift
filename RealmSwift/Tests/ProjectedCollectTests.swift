@@ -30,7 +30,7 @@ class ProjectedCollections: Projection<PersistedCollections> {
     @Projected(\PersistedCollections.set.projectTo.firstName) var set: ProjectedCollection<String>
 }
 
-class ProjectedCollectionsTestsTemplate: TestCase {
+class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
     // To test some of methods there should be a collection of projections instead of collection of strings
     // set value in subclass
     var collection: ProjectedCollection<String>!
@@ -300,7 +300,7 @@ class ProjectedCollectionsTestsTemplate: TestCase {
     }
 }
 
-class ProjectedListTests: ProjectedCollectionsTestsTemplate {
+class ProjectedListTests: ProjectedCollectionsTestsTemplate, @unchecked Sendable {
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()
@@ -312,7 +312,7 @@ class ProjectedListTests: ProjectedCollectionsTestsTemplate {
     }
 }
 
-class ProjectedSetTests: ProjectedCollectionsTestsTemplate {
+class ProjectedSetTests: ProjectedCollectionsTestsTemplate, @unchecked Sendable {
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()

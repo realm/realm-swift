@@ -22,7 +22,7 @@ import RealmSwift
 import Foundation
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectAccessorTests: TestCase {
+class ObjectAccessorTests: TestCase, @unchecked Sendable {
     func setAndTestAllPropertiesViaNormalAccess(_ object: SwiftObject, _ optObject: SwiftOptionalObject) {
         object.boolCol = true
         XCTAssertEqual(object.boolCol, true)

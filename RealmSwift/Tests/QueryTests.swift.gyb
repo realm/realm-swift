@@ -234,7 +234,7 @@ import RealmSwift
         return [list(p) for _, p in itertools.groupby(properties, lambda x: x.className)]
 }%
 
-class QueryTests: TestCase {
+class QueryTests: TestCase, @unchecked Sendable {
     private var realm: Realm!
 
     // MARK: Test data population

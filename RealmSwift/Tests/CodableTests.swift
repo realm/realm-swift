@@ -291,7 +291,7 @@ final class CodableEmbeddedObject: EmbeddedObject, Codable {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class CodableTests: TestCase {
+class CodableTests: TestCase, @unchecked Sendable {
     let decoder = JSONDecoder()
     let encoder = JSONEncoder()
 

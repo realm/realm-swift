@@ -34,7 +34,7 @@ class ModernDynamicDefaultObject: Object {
     @Persisted var binaryCol = UUID().uuidString.data(using: .utf8)
 }
 
-class ModernObjectTests: TestCase {
+class ModernObjectTests: TestCase, @unchecked Sendable {
     // init() Tests are in ObjectCreationTests.swift
     // init(value:) tests are in ObjectCreationTests.swift
 

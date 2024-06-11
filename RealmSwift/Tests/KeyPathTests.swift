@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 import Foundation
 
-class KeyPathTests: TestCase {
+class KeyPathTests: TestCase, @unchecked Sendable {
     func testModernObjectTopLevel() {
         XCTAssertEqual(_name(for: \ModernAllTypesObject.pk), "pk")
 

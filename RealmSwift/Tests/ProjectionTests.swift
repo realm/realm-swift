@@ -251,7 +251,7 @@ public final class MultipleProjectionsFromOneProperty: Projection<SimpleObject> 
 // MARK: Tests
 
 @available(iOS 13.0, *)
-class ProjectionTests: TestCase {
+class ProjectionTests: TestCase, @unchecked Sendable {
     func assertSetEquals<T: RealmCollectionValue>(_ set: MutableSet<T>, _ expected: Array<T>) {
         XCTAssertEqual(set.count, Set(expected).count)
         XCTAssertEqual(Set(set), Set(expected))

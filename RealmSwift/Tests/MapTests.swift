@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class MapTests: TestCase {
+class MapTests: TestCase, @unchecked Sendable {
     var str1: SwiftStringObject!
     var str2: SwiftStringObject!
     var realm: Realm!
@@ -1031,7 +1031,7 @@ class MapTests: TestCase {
     }
 }
 
-class MapStandaloneTests: MapTests {
+class MapStandaloneTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         return createMapObject().map
     }
@@ -1088,7 +1088,7 @@ class MapStandaloneTests: MapTests {
     }
 }
 
-class MapNewlyAddedTests: MapTests {
+class MapNewlyAddedTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         realm.add(mapObj)
@@ -1111,7 +1111,7 @@ class MapNewlyAddedTests: MapTests {
     }
 }
 
-class MapNewlyCreatedTests: MapTests {
+class MapNewlyCreatedTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
@@ -1133,7 +1133,7 @@ class MapNewlyCreatedTests: MapTests {
     }
 }
 
-class MapRetrievedTests: MapTests {
+class MapRetrievedTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
