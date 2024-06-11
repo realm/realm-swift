@@ -445,10 +445,10 @@ struct ObservedSectionedResultsSearchableTestView: View {
             .navigationTitle("Reminders")
             .navigationBarItems(trailing:
                 Button("add") {
-                let realm = $reminders.wrappedValue.realm?.thaw()
-                try! realm?.write {
-                    realm?.add(ReminderList())
-                }
+                    let realm = $reminders.wrappedValue.realm?.thaw()
+                    try! realm?.write {
+                        realm?.add(ReminderList())
+                    }
                 }.accessibility(identifier: "addList"))
         }
     }
@@ -490,7 +490,7 @@ struct ObservedSectionedResultsConfiguration: View {
             .navigationTitle("Reminders")
             .navigationBarItems(leading:
                 Button("add A") {
-                let realm = $remindersA.wrappedValue.realm?.thaw()
+                    let realm = $remindersA.wrappedValue.realm?.thaw()
                     try! realm?.write {
                         realm?.add(ReminderList())
                     }
@@ -498,7 +498,7 @@ struct ObservedSectionedResultsConfiguration: View {
             )
             .navigationBarItems(trailing:
                 Button("add B") {
-                let realm = $remindersB.wrappedValue.realm?.thaw()
+                    let realm = $remindersB.wrappedValue.realm?.thaw()
                     try! realm?.write {
                         realm?.add(ReminderList())
                     }

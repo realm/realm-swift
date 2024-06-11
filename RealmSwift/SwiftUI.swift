@@ -665,7 +665,7 @@ extension Projection: _ObservedResultsValue { }
             value = results
 
             /*
-             Observing the sectioned results directly doesnt allow the SwiftUI diff to work
+             Observing the sectioned results directly doesn't allow the SwiftUI diff to work
              correctly as the previous state of the sectioned results will have the new values.
 
              An example of when this is an issue is when an item is deleted in a List containing sectioned results,

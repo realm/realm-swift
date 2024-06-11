@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `@ObservedSectionedResults.remove(atOffsets:, section:)` which adds the ability to 
+* Add `@ObservedSectionedResults.remove(atOffsets:section:)` which adds the ability to 
   remove a Realm Object when using `onDelete` on `ForEach` in a SwiftUI `List`.
 
 ### Fixed
