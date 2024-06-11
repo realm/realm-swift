@@ -1649,9 +1649,12 @@ extension RealmTests {
         try await assertPreconditionFailure("asyncRefresh() can only be called on main thread or actor-isolated Realms") {
             _ = await realm.asyncRefresh()
         }
+        // This is a compilation failure in Swift 6, which is event better
+        #if compiler(<6)
         try await assertPreconditionFailure("asyncWrite() can only be called on main thread or actor-isolated Realms") {
             _ = try await realm.asyncWrite { }
         }
+        #endif
     }
 
     @MainActor

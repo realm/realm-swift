@@ -1,10 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `@ObservedSectionedResults.remove(atOffsets:section:)` which adds the ability to 
+* Add `@ObservedSectionedResults.remove(atOffsets:section:)` which adds the ability to
   remove a Realm Object when using `onDelete` on `ForEach` in a SwiftUI `List`.
 * Add support for Xcode 16 beta 1 and fix some of the new warnings. Note that
   this does not yet include full support for Swift 6 language mode
+  ([#8618](https://github.com/realm/realm-swift/pull/8618)).
+* `Realm.asyncWrite()` and `Realm.asyncRefresh()` now use the new `#isolation`
+  feature to avoid sendability warnings when building with Xcode 16
   ([#8618](https://github.com/realm/realm-swift/pull/8618)).
 
 ### Fixed

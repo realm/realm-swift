@@ -1270,6 +1270,7 @@ extension Realm {
         self = Realm(rlmRealm.wrappedValue)
     }
 
+#if compiler(<6)
     /**
      Performs actions contained within the given block inside a write transaction.
 
@@ -1324,14 +1325,16 @@ extension Realm {
             fatalError("asyncWrite() can only be called on main thread or actor-isolated Realms")
         }
         return try await withoutActuallyEscaping(block) { block in
-            try await asyncWrite(actor: actor, Unchecked(block)).wrappedValue
+            try await Self.asyncWrite(actor: actor, realm: Unchecked(rlmRealm), Unchecked(block)).wrappedValue
         }
     }
 
-    private func asyncWrite<Result>(actor: isolated any Actor,
-                                    _ block: Unchecked<(() throws -> Result)>) async throws
+    private static func asyncWrite<Result>(actor: isolated any Actor,
+                                           realm: Unchecked<RLMRealm>,
+                                           _ block: Unchecked<(() throws -> Result)>) async throws
     -> Unchecked<Result> {
-        let write = rlmRealm.beginAsyncWrite()
+        let realm = realm.wrappedValue
+        let write = realm.beginAsyncWrite()
         await withTaskCancellationHandler {
             await write.wait()
         } onCancel: {
@@ -1343,15 +1346,98 @@ extension Realm {
             try Task.checkCancellation()
             ret = try block.wrappedValue()
         } catch {
-            if isInWriteTransaction { cancelWrite() }
+            if realm.inWriteTransaction { realm.cancelWriteTransaction() }
             throw error
         }
 
-        if isInWriteTransaction {
-            try await rlmRealm.commitAsyncWrite(withGrouping: false)
+        if realm.inWriteTransaction {
+            try await realm.commitAsyncWrite(withGrouping: false)
         }
         return Unchecked(ret)
     }
+
+#else // compiler(<6)
+
+    /**
+     Performs actions contained within the given block inside a write transaction.
+
+     This function differs from synchronous ``write`` in that it suspends the
+     calling task while waiting for its turn to write rather than blocking the
+     thread. In addition, the actual i/o to write data to disk is done by a
+     background worker thread. For small writes, using this function on the
+     main thread may block the main thread for less time than manually
+     dispatching the write to a background thread.
+
+     If the block throws an error, the transaction will be canceled and any
+     changes made before the error will be rolled back.
+
+     Only one write transaction can be open at a time for each Realm file. Write
+     transactions cannot be nested, and trying to begin a write transaction on a
+     Realm which is already in a write transaction will throw an exception.
+     Calls to `write` from `Realm` instances for the same Realm file in other
+     threads or other processes will block until the current write transaction
+     completes or is cancelled.
+
+     Before beginning the write transaction, `asyncWrite` updates the `Realm`
+     instance to the latest Realm version, as if `asyncRefresh()` had been called,
+     and generates notifications if applicable. This has no effect if the Realm
+     was already up to date.
+
+     You can skip notifying specific notification blocks about the changes made
+     in this write transaction by passing in their associated notification
+     tokens. This is primarily useful when the write transaction is saving
+     changes already made in the UI and you do not want to have the notification
+     block attempt to re-apply the same changes.
+
+     The tokens passed to this function must be for notifications for this Realm
+     which were added on the same actor as the write transaction is being
+     performed on. Notifications for different threads cannot be skipped using
+     this method.
+
+     - parameter tokens: An array of notification tokens which were returned
+                         from adding callbacks which you do not want to be
+                         notified for the changes made in this write transaction.
+
+     - parameter block: The block containing actions to perform.
+     - returns: The value returned from the block, if any.
+
+     - throws: An `NSError` if the transaction could not be completed successfully.
+               `CancellationError` if the task is cancelled.
+               If `block` throws, the function throws the propagated `ErrorType` instead.
+     */
+    @discardableResult
+    public func asyncWrite<Result>(_isolation actor: isolated any Actor = #isolation, _ block: (() throws -> Result)) async throws -> Result {
+        guard rlmRealm.actor as? Actor != nil else {
+            fatalError("asyncWrite() can only be called on main thread or actor-isolated Realms")
+        }
+        let realm = rlmRealm
+        let write = realm.beginAsyncWrite()
+        await withTaskCancellationHandler {
+            await write.wait()
+        } onCancel: {
+            actor.invoke { write.complete(true) }
+        }
+
+        let ret: Result
+        do {
+            try Task.checkCancellation()
+            ret = try block()
+        } catch {
+            if realm.inWriteTransaction { realm.cancelWriteTransaction() }
+            throw error
+        }
+
+        if realm.inWriteTransaction {
+            let error = await withCheckedContinuation { continuation in
+                realm.commitAsyncWrite(withGrouping: false, completion: continuation.resume)
+            }
+            if let error {
+                throw error
+            }
+        }
+        return ret
+    }
+#endif // compiler(<6)
 
     /**
      Updates the Realm and outstanding objects managed by the Realm to point to
