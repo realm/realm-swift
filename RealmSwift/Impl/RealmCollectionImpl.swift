@@ -128,9 +128,7 @@ extension RealmCollectionImpl {
     ) async -> NotificationToken {
         await with(self, on: actor) { actor, collection in
             collection.observe(keyPaths: keyPaths, on: nil) { change in
-                assumeOnActorExecutor(actor) { actor in
-                    block(actor, change)
-                }
+                actor.invokeIsolated(block, change)
             }
         } ?? NotificationToken()
     }
