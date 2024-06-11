@@ -397,7 +397,7 @@ public struct AppPublisher: Publisher, @unchecked Sendable { // DispatchQueue
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension App: ObservableObject {
+extension App {
     /// A publisher that emits Void each time the app changes.
     ///
     /// Despite the name, this actually emits *after* the app has changed.
@@ -405,6 +405,11 @@ extension App: ObservableObject {
         return AppPublisher(self, scheduler: DispatchQueue.main)
     }
 }
+#if compiler(>=6)
+extension App: @retroactive ObservableObject {}
+#else
+extension App: ObservableObject {}
+#endif
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 internal func promisify(_ fn: @escaping (@escaping @Sendable (Error?) -> Void) -> Void) -> Future<Void, Error> {

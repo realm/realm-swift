@@ -806,6 +806,7 @@ class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
     @objc dynamic var objectCol = SwiftBoolObject()
 }
 
+#if compiler(<6)
 extension Set: RealmOptionalType {
     public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Set<Element>? {
         fatalError()
@@ -815,6 +816,17 @@ extension Set: RealmOptionalType {
         fatalError()
     }
 }
+#else
+extension Set: @retroactive RealmOptionalType {
+    public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Set<Element>? {
+        fatalError()
+    }
+
+    public var _rlmObjcValue: Any {
+        fatalError()
+    }
+}
+#endif
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {

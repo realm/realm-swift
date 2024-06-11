@@ -1894,12 +1894,21 @@ extension RealmTests {
     static var shared = CustomGlobalActor()
 }
 
+#if compiler(<6)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension CancellationError: Equatable {
     public static func == (lhs: CancellationError, rhs: CancellationError) -> Bool {
         true
     }
 }
+#else
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension CancellationError: @retroactive Equatable {
+    public static func == (lhs: CancellationError, rhs: CancellationError) -> Bool {
+        true
+    }
+}
+#endif
 
 // Helper
 extension LogLevel {

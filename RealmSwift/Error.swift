@@ -48,7 +48,11 @@ extension Realm.Error {
 
 // MARK: Equatable
 
+#if compiler(>=6)
+extension Realm.Error: @retroactive Equatable {}
+#else
 extension Realm.Error: Equatable {}
+#endif
 
 // FIXME: we should not be defining this but it's a breaking change to remove
 /// Returns a Boolean indicating whether the errors are identical.
