@@ -1545,6 +1545,12 @@ extension RLMAsyncDownloadTask: TaskWithCancellation {}
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 internal extension Actor {
     func verifier() -> (@Sendable () -> Void) {
+#if compiler(>=5.10)
+        // This was made backdeployable in Xcode 15.3
+        return {
+            self.preconditionIsolated()
+        }
+#else
         // When possible use the official API for actor checking
         if #available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *) {
             return {
@@ -1558,6 +1564,7 @@ internal extension Actor {
         // from outside the actor when actor data race checking is enabled.
         let fn: () -> Void = { _ = self }
         return unsafeBitCast(fn, to: (@Sendable () -> Void).self)
+#endif
     }
 
     // Asynchronously invoke the given block on the actor. This takes a
