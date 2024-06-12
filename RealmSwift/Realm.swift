@@ -1356,6 +1356,35 @@ extension Realm {
         return Unchecked(ret)
     }
 
+    /**
+     Updates the Realm and outstanding objects managed by the Realm to point to
+     the most recent data and deliver any applicable notifications.
+
+     This function should be used instead of synchronous ``refresh`` in async
+     functions, as it suspends the calling task (if required) rather than
+     blocking.
+
+     - warning: This function is only supported for main thread and
+                actor-isolated Realms.
+     - returns: Whether there were any updates for the Realm. Note that `true`
+                may be returned even if no data actually changed.
+     */
+    @discardableResult
+    @_unsafeInheritExecutor
+    public func asyncRefresh() async -> Bool {
+        guard rlmRealm.actor as? Actor != nil else {
+            fatalError("asyncRefresh() can only be called on main thread or actor-isolated Realms")
+        }
+        guard let task = RLMRealmRefreshAsync(rlmRealm) else {
+            return false
+        }
+        return await withTaskCancellationHandler {
+            await task.wait()
+        } onCancel: {
+            task.complete(false)
+        }
+    }
+
 #else // compiler(<6)
 
     /**
@@ -1407,7 +1436,7 @@ extension Realm {
      */
     @discardableResult
     public func asyncWrite<Result>(_isolation actor: isolated any Actor = #isolation, _ block: (() throws -> Result)) async throws -> Result {
-        guard rlmRealm.actor as? Actor != nil else {
+        guard rlmRealm.actor != nil else {
             fatalError("asyncWrite() can only be called on main thread or actor-isolated Realms")
         }
         let realm = rlmRealm
@@ -1437,7 +1466,6 @@ extension Realm {
         }
         return ret
     }
-#endif // compiler(<6)
 
     /**
      Updates the Realm and outstanding objects managed by the Realm to point to
@@ -1453,9 +1481,8 @@ extension Realm {
                 may be returned even if no data actually changed.
      */
     @discardableResult
-    @_unsafeInheritExecutor
-    public func asyncRefresh() async -> Bool {
-        guard rlmRealm.actor as? Actor != nil else {
+    public func asyncRefresh(_isolation: isolated any Actor = #isolation) async -> Bool {
+        guard rlmRealm.actor != nil else {
             fatalError("asyncRefresh() can only be called on main thread or actor-isolated Realms")
         }
         guard let task = RLMRealmRefreshAsync(rlmRealm) else {
@@ -1467,6 +1494,7 @@ extension Realm {
             task.complete(false)
         }
     }
+#endif // compiler(<6)
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)

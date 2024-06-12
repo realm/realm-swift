@@ -1642,19 +1642,22 @@ extension RealmTests {
 
     @available(macOS 10.15.4, iOS 13.4, tvOS 13.4, watchOS 6.4, *)
     func testAsyncRefreshOnQueueConfinedRealm() async throws {
-        @Locked var realm: Realm!
+        let realm = Locked<Realm?>(wrappedValue: nil)
         dispatchSyncNewThread {
-            realm = try! Realm(queue: self.queue)
+            realm.wrappedValue = try! Realm(queue: self.queue)
         }
-        try await assertPreconditionFailure("asyncRefresh() can only be called on main thread or actor-isolated Realms") {
-            _ = await realm.asyncRefresh()
-        }
-        // This is a compilation failure in Swift 6, which is event better
-        #if compiler(<6)
-        try await assertPreconditionFailure("asyncWrite() can only be called on main thread or actor-isolated Realms") {
-            _ = try await realm.asyncWrite { }
-        }
-        #endif
+        // asyncRefresh() has to be called from a statically isolated context,
+        // but the test as whole can't be isolated (or the dispatch async breaks),
+        // and we have to hop to the actor before fork and not after or the child
+        // crashes before we get to the precondition
+        try await Task { @MainActor in
+            try await assertPreconditionFailure("asyncRefresh() can only be called on main thread or actor-isolated Realms") {
+                _ = await realm.wrappedValue!.asyncRefresh()
+            }
+            try await assertPreconditionFailure("asyncWrite() can only be called on main thread or actor-isolated Realms") {
+                _ = try await realm.wrappedValue!.asyncWrite { }
+            }
+        }.value
     }
 
     @MainActor
