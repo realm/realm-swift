@@ -180,7 +180,7 @@ internal func with<A: Actor, Value: ThreadConfined, Return: Sendable>(
         let unchecked = Unchecked(wrappedValue: value)
         return try await actor.invoke { actor in
             if !Task.isCancelled {
-#if swift(>=5.10)
+#if swift(>=5.10) && compiler(<6)
                 // As of Swift 5.10 the compiler incorrectly thinks that this
                 // is an async hop even though the isolation context is
                 // unchanged. This is fixed in 5.11.
@@ -205,7 +205,7 @@ internal func with<A: Actor, Value: ThreadConfined, Return: Sendable>(
         guard let value = tsr.resolve(in: realm) else {
             return nil
         }
-#if swift(>=5.10)
+#if swift(>=5.10) && compiler(<6)
         // As above; this is safe but 5.10's sendability checking can't prove it
         // nonisolated(unsafe) can't be applied to a let in guard so we need
         // a second variable
