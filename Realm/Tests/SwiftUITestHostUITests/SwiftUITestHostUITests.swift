@@ -445,12 +445,12 @@ class SwiftUITests: XCTestCase {
         collectionViewsQuery.children(matching: .other).element(boundBy: 1).tap()
         collectionViewsQuery.children(matching: .cell).element(boundBy: 1).children(matching: .other).element(boundBy: 1).children(matching: .other).element.swipeLeft()
         collectionViewsQuery.buttons["Delete"].tap()
-
         XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
 
         collectionViewsQuery.children(matching: .other).element(boundBy: 2).tap()
         collectionViewsQuery.children(matching: .cell).element(boundBy: 2).children(matching: .other).element(boundBy: 1).children(matching: .other).element.swipeLeft()
         collectionViewsQuery.buttons["Delete"].tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 1)
 
         collectionViewsQuery.children(matching: .other).element(boundBy: 1).tap()
         collectionViewsQuery.children(matching: .cell).element(boundBy: 1).children(matching: .other).element(boundBy: 1).children(matching: .other).element.swipeLeft()

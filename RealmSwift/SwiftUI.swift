@@ -752,7 +752,7 @@ extension Projection: _ObservedResultsValue { }
     public func remove(atOffsets offsets: IndexSet,
                        section: ResultsSection<Key, ResultType>) where ResultType: ObjectBase & ThreadConfined {
         write(wrappedValue) { collection in
-            collection.realm!.delete(offsets.map { section[$0].thaw()! })
+            collection.realm?.delete(offsets.compactMap { section[$0].thaw() ?? nil })
         }
     }
 
