@@ -161,7 +161,7 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 + (void)initialize {
     auto defaultLogger = std::make_shared<CocoaLogger>();
-    defaultLogger->set_level_threshold(Level::info);
+    defaultLogger->set_level_threshold(LogCategory::realm, Level::info);
     Logger::set_default_logger(defaultLogger);
 }
 
@@ -186,13 +186,13 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     return self;
 }
 
-- (instancetype)initWithLevel:(RLMLogLevel)level
-                     category:(RLMLogCategory)category
-                  logFunction:(RLMLogCategoryFunction)logFunction {
+- (instancetype)initWithLogFunction:(RLMLogCategoryFunction)logFunction {
     if (self = [super init]) {
         auto logger = std::make_shared<CustomLogger>();
-        logger->set_level_threshold(categoryNameForLogCategory(category), levelForLogLevel(level));
-        logger->function = logFunction;
+        auto block = [logFunction](RLMLogLevel level, RLMLogCategory category, NSString *message) {
+            logFunction(level, category, message);
+        };
+        logger->function = block;
         self->_logger = logger;
     }
     return self;
@@ -210,24 +210,29 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 - (void)logWithLevel:(RLMLogLevel)logLevel category:(RLMLogCategory)category message:(NSString *)message {
     auto level = levelForLogLevel(logLevel);
-    if (_logger->would_log(level)) {
-        _logger->log(LogCategory::get_category(categoryNameForLogCategory(category)), levelForLogLevel(logLevel), message.UTF8String);
+    auto cat = categoryNameForLogCategory(category);
+    LogCategory& lcat = LogCategory::get_category(cat);
+    if (_logger->would_log(lcat, level)) {
+        _logger->log(lcat, levelForLogLevel(logLevel), message.UTF8String);
     }
 }
 
 - (void)logWithLevel:(RLMLogLevel)logLevel categoryName:(NSString *)categoryName message:(NSString *)message {
     auto level = levelForLogLevel(logLevel);
-    if (_logger->would_log(level)) {
-        _logger->log(LogCategory::get_category(categoryName.UTF8String), levelForLogLevel(logLevel), message.UTF8String);
+    LogCategory& lcat = LogCategory::get_category(categoryName.UTF8String);
+    if (_logger->would_log(lcat, level)) {
+        _logger->log(lcat, levelForLogLevel(logLevel), message.UTF8String);
     }
 }
 
-- (void)setLevel:(RLMLogLevel)level category:(RLMLogCategory)category {
-    _logger->set_level_threshold(categoryNameForLogCategory(category), levelForLogLevel(level));
++ (void)setLevel:(RLMLogLevel)level forCategory:(RLMLogCategory)category {
+    auto defaultLogger = Logger::get_default_logger();
+    defaultLogger->set_level_threshold(categoryNameForLogCategory(category), levelForLogLevel(level));
 }
 
-- (RLMLogLevel)levelForCategory:(RLMLogCategory)category {
-    return logLevelForLevel(_logger->get_level_threshold(categoryNameForLogCategory(category)));
++ (RLMLogLevel)levelForCategory:(RLMLogCategory)category {
+    auto defaultLogger = Logger::get_default_logger();
+    return logLevelForLevel(defaultLogger->get_level_threshold(categoryNameForLogCategory(category)));
 }
 
 #pragma mark Testing

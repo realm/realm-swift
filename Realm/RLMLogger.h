@@ -116,15 +116,13 @@ typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 RLM_SWIFT_SENDABLE // invoked on a background thread
 typedef void (^RLMLogCategoryFunction)(RLMLogLevel level, RLMLogCategory category, NSString *message) NS_REFINED_FOR_SWIFT;
 /**
- `RLMLogger` is used for creating your own custom logging logic.
+ Global logger class used by all Realm components.
 
  You can define your own logger creating an instance of `RLMLogger` and define the log function which will be
  invoked whenever there is a log message.
  Set this custom logger as you default logger using `setDefaultLogger`.
 
-     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                                       category:RLMLogCategoryRealm
-                                                    logFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
+     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, NSString *category, NSString *message) {
          NSLog(@"Realm Log - %lu, %@, %@", (unsigned long)level, category, message);
      }];
 
@@ -146,43 +144,28 @@ __attribute__((deprecated("Use `setLevel(level:category)` or `setLevel:category`
 
  @param level The log level to be set for the logger.
  @param logFunction The log function which will be invoked whenever there is a log message.
+
+ @note This will set the log level for the log category `RLMLogCategoryRealm`.
 */
 - (instancetype)initWithLevel:(RLMLogLevel)level logFunction:(RLMLogFunction)logFunction
-__attribute__((deprecated("Use `initWithLevel:logFunction:` instead.")));
+__attribute__((deprecated("Use `initWithLogFunction:` instead.")));
 
 /**
- Creates a logger with the associated log level and the logic function to define your own logging logic.
+ Creates a logger with a callback, which will be invoked whenever there is a log message.
 
- @param level The log level to be set for the logger.
- @param category The log category to be set for the logger.
  @param logFunction The log function which will be invoked whenever there is a log message.
 */
-- (instancetype)initWithLevel:(RLMLogLevel)level
-                     category:(RLMLogCategory)category
-                  logFunction:(RLMLogCategoryFunction)logFunction;
+- (instancetype)initWithLogFunction:(RLMLogCategoryFunction)logFunction;
 
 #pragma mark RLMLogger Default Logger API
 
 /**
- The current default logger. When setting a logger as default, this logger will be used whenever information must be logged.
+ The current default logger. When setting a logger as default, this logger will replace the current default logger and will
+ be used whenever information must be logged.
+
+ @note By default the logger
  */
 @property (class) RLMLogger *defaultLogger NS_SWIFT_NAME(shared);
-
-/**
- Sets the logger's associated log and category.
-
- @param level The log level to be set for the logger.
- @param category The log function which will be invoked whenever there is a log message.
-*/
-- (void)setLevel:(RLMLogLevel)level category:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
-
-/**
- Gets the logger's associated level for the specified category.
-
- @param category The log category which we need the level.
- @returns The log level for the specified category
-*/
-- (RLMLogLevel)levelForCategory:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
 
 /**
  Log a message to the supplied level.
@@ -192,6 +175,22 @@ __attribute__((deprecated("Use `initWithLevel:logFunction:` instead.")));
  @param message The message to log.
  */
 - (void)logWithLevel:(RLMLogLevel)logLevel category:(RLMLogCategory)category message:(NSString *)message;
+
+/**
+ Sets the gobal log level for a given category.
+
+ @param level The log level to be set for the logger.
+ @param category The log function which will be invoked whenever there is a log message.
+*/
++ (void)setLevel:(RLMLogLevel)level forCategory:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
+
+/**
+ Gets the global log level for the specified category.
+
+ @param category The log category which we need the level.
+ @returns The log level for the specified category
+*/
++ (RLMLogLevel)levelForCategory:(RLMLogCategory)category NS_REFINED_FOR_SWIFT;
 
 @end
 

@@ -2961,20 +2961,21 @@
 - (void)testSetDefaultLogLevel {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
-    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelAll category:category logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
+    RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
 
+    [RLMLogger setLevel:RLMLogLevelAll forCategory:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertEqual([[RLMLogger defaultLogger] levelForCategory:category], RLMLogLevelAll);
+    XCTAssertEqual([RLMLogger levelForCategory:category], RLMLogLevelAll);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertTrue([logs containsString:@"7 DB:"]); // Trace
 
     [logs setString: @""];
-    [logger setLevel:RLMLogLevelDetail category:category];
+    [RLMLogger setLevel:RLMLogLevelDetail forCategory:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
-    XCTAssertEqual([[RLMLogger defaultLogger] levelForCategory:category], RLMLogLevelDetail);
+    XCTAssertEqual([RLMLogger levelForCategory:category], RLMLogLevelDetail);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 }
@@ -2982,26 +2983,25 @@
 - (void)testDefaultLogger {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
-    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelOff
-                                                category:category
-                                             logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
+    RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
-    XCTAssertEqual([[RLMLogger defaultLogger] levelForCategory:category], RLMLogLevelOff);
+    [RLMLogger setLevel:RLMLogLevelOff forCategory:category];
+    XCTAssertEqual([RLMLogger levelForCategory:category], RLMLogLevelOff);
 
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] == 0);
 
     // Test LogLevel Detail
-    [logger setLevel:RLMLogLevelDetail category:category];
+    [RLMLogger setLevel:RLMLogLevelDetail forCategory:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] > 0);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
 
     // Test LogLevel All
-    [logger setLevel:RLMLogLevelAll category:category];
+    [RLMLogger setLevel:RLMLogLevelAll forCategory:category];
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs length] > 0);
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
@@ -3009,13 +3009,11 @@
 
     [logs setString: @""];
     // Init Custom Logger
-    RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                                      category:category
-                                                   logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
+    RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
     }];
-
-    XCTAssertEqual([RLMLogger.defaultLogger levelForCategory:category], RLMLogLevelDebug);
+    [RLMLogger setLevel:RLMLogLevelDebug forCategory:category];
+    XCTAssertEqual([RLMLogger levelForCategory:category], RLMLogLevelDebug);
     @autoreleasepool { [RLMRealm defaultRealm]; }
     XCTAssertTrue([logs containsString:@"5 DB:"]); // Detail
     XCTAssertFalse([logs containsString:@"7 DB:"]); // Trace
@@ -3024,9 +3022,7 @@
 - (void)testCustomLoggerLogMessage {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
-    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelInfo
-                                                category:category
-                                             logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
+    RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;
@@ -3061,9 +3057,7 @@
 - (void)testSyncConnectionMetrics {
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
-    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                                category:category
-                                             logFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
+    RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
         [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
     }];
     RLMLogger.defaultLogger = logger;

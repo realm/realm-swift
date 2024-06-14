@@ -20,24 +20,36 @@ import Realm
 import Realm.Private
 
 /**
- `Logger` is used for creating your own custom logging logic.
+ Global logger class used by all Realm components.
+
+ Set the global log level for a given category.
+ ```swift
+ Logger.setLogLevel(.info, for: Category.sdk)
+ ```
+
+ Read the global log level for a given category.
+ ```swift
+ let level = Logger.logLevel(for: Category.Storage.all)
+ ```
 
  You can define your own logger creating an instance of `Logger` and define the log function which will be
  invoked whenever there is a log message.
 
  ```swift
- let logger = Logger(level: .all, category: Category.realm) { level, message in
+ let logger = Logger(function: { level, message in
     print("Realm Log - \(category.rawValue)-\(level): \(message)")
- }
+ })
  ```
 
- Set this custom logger as you default logger using `Logger.shared`.
+ Set this custom logger as you default logger using `Logger.shared`. This will replace the default logger.
 
  ```swift
-    Logger.shared = inMemoryLogger
+    Logger.shared = logger
  ```
 
- - note: By default default log threshold level is `.info`, and logging strings are output to Apple System Logger.
+ - note: By default log threshold level is `.info`, for the log category `.Category.realm`,
+         and logging strings are output to Apple System Logger.
+ - SeeAlso: `LogCategory`
 */
 public typealias Logger = RLMLogger
 extension Logger {
@@ -60,7 +72,7 @@ extension Logger {
     }
 
     /**
-     Creates a logger with the associated log level, category and the logic function to define your own logging logic.
+     Creates a logger with the associated log level, and a logic function to define your own logging logic.
 
      ```swift
      let logger = Logger(level: .info, category: Category.All, logFunction: { level, category, message in
@@ -69,20 +81,37 @@ extension Logger {
      ```
 
      - parameter level: The log level to be set for the logger.
-     - parameter category: The log category to be set for the logger, by default it will setup the top Category `Category.realm`
      - parameter function: The log function which will be invoked whenever there is a log message.
 
-     - note:By setting the log level of a category, it will set all its subcategories log level as well.
-     - SeeAlso: `LogCategory`
+     - note: This will set the log level for the log category `Category.realm`.
      */
-    public convenience init(level: LogLevel, category: LogCategory = Category.realm, function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {
-        self.init(level: level, category: ObjectiveCSupport.convert(value: category)) { level, cat, message in
-            function(level, ObjectiveCSupport.convert(value: cat), message)
-        }
+    @available(*, deprecated, message: "Use init(function:)")
+    public convenience init(level: LogLevel, function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {
+        self.init(logFunction: { level, category, message in
+            function(level, Category.realm, message)
+        })
+        Logger.setLogLevel(level, for: Category.realm)
     }
 
     /**
-     Sets the log level for a given log category.
+     Creates a logger with a callback, which will be invoked whenever there is a log message.
+
+     ```swift
+     let logger = Logger(function: { level, category, message in
+         print("\(category.rawValue) - \(level): \(message)")
+     })
+     ```
+
+     - parameter function: The log function which will be invoked whenever there is a log message.
+     */
+    public convenience init(function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {
+        self.init(logFunction: { level, category, message in
+            function(level, ObjectiveCSupport.convert(value: category), message)
+        })
+    }
+
+    /**
+     Sets the global log level for a given log category.
 
      - parameter level: The log level to be set for the logger.
      - parameter category: The log category to be set for the logger, by default it will setup the top Category `Category.realm`
@@ -90,20 +119,20 @@ extension Logger {
      - note:By setting the log level of a category, it will set all its subcategories log level as well.
      - SeeAlso: `LogCategory`
      */
-    public func setLogLevel(_ level: LogLevel, for category: LogCategory = Category.realm) {
-        Logger.shared.__setLevel(level, category: ObjectiveCSupport.convert(value: category))
+    public static func setLogLevel(_ level: LogLevel, for category: LogCategory = Category.realm) {
+        Logger.__setLevel(level, for: ObjectiveCSupport.convert(value: category))
     }
 
     /**
-     Gets the current log level of a log category.
+     Gets the current global log level of a log category.
 
      - parameter category: The target log category.
 
      - returns: The `LogLevel` for the given category.
      - SeeAlso: `LogCategory`
      */
-    public func logLevel(for category: LogCategory) -> LogLevel {
-        Logger.shared.__level(for: ObjectiveCSupport.convert(value: category))
+    public static func logLevel(for category: LogCategory) -> LogLevel {
+        Logger.__level(for: ObjectiveCSupport.convert(value: category))
     }
 }
 

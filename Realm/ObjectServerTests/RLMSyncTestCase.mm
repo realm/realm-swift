@@ -613,7 +613,7 @@ static bool s_opensApp;
     RLMApp *app = [RLMApp appWithConfiguration:config];
     RLMSyncManager *syncManager = app.syncManager;
     syncManager.userAgent = self.name;
-    [RLMLogger.defaultLogger setLevel:RLMLogLevelWarn category:RLMLogCategoryRealmSync];
+    [RLMLogger setLevel:RLMLogLevelWarn forCategory:RLMLogCategoryRealmSync];
     return app;
 }
 
