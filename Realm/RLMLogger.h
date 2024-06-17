@@ -126,7 +126,8 @@ typedef void (^RLMLogCategoryFunction)(RLMLogLevel level, RLMLogCategory categor
          NSLog(@"Realm Log - %lu, %@, %@", (unsigned long)level, category, message);
      }];
 
- @note By default default log threshold level is `RLMLogLevelInfo`, and logging strings are output to Apple System Logger.
+ @note By default default log threshold level is `RLMLogLevelInfo` for the log category `RLMLogCategoryRealm`,
+       and logging strings are output to Apple System Logger.
 */
 @interface RLMLogger : NSObject
 

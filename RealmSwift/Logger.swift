@@ -32,11 +32,11 @@ import Realm.Private
  let level = Logger.logLevel(for: Category.Storage.all)
  ```
 
- You can define your own logger creating an instance of `Logger` and define the log function which will be
+ You can define your own custom logger creating an instance of `Logger` and defining the log function which will be
  invoked whenever there is a log message.
 
  ```swift
- let logger = Logger(function: { level, message in
+ let logger = Logger(function: { level, category, message in
     print("Realm Log - \(category.rawValue)-\(level): \(message)")
  })
  ```
@@ -44,7 +44,7 @@ import Realm.Private
  Set this custom logger as you default logger using `Logger.shared`. This will replace the default logger.
 
  ```swift
-    Logger.shared = logger
+ Logger.shared = logger
  ```
 
  - note: By default log threshold level is `.info`, for the log category `.Category.realm`,
@@ -83,7 +83,7 @@ extension Logger {
      - parameter level: The log level to be set for the logger.
      - parameter function: The log function which will be invoked whenever there is a log message.
 
-     - note: This will set the log level for the log category `Category.realm`.
+     - note: This will set the specified log level for the log category `Category.realm`.
      */
     @available(*, deprecated, message: "Use init(function:)")
     public convenience init(level: LogLevel, function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {

@@ -1973,7 +1973,7 @@ class LoggerTests: TestCase, @unchecked Sendable {
         XCTAssertTrue(logs.value.contains("Trace DB:"))
     }
 
-    func testDefaultLogger() throws {
+    func testSetDefaultLogger() throws {
         let logs = Locked("")
         let logger = Logger(function: { level, category, message in
             logs.withLock({ $0 += "\(Date.now)  \(category.rawValue):\(level.logLevel) \(message)" })
@@ -2044,7 +2044,7 @@ class LoggerTests: TestCase, @unchecked Sendable {
         }
     }
 
-    func testLogMessageCategory() throws {
+    func testLogMessageForCategory() throws {
         let logs = Locked("")
         let logger = Logger(function: { level, category, message in
             logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
@@ -2064,8 +2064,11 @@ class LoggerTests: TestCase, @unchecked Sendable {
         }
     }
 
-    /// Logger shoulldn't log category, even if it's a child or same category type, this test workd because `get_category_names()` returns categories from parent to children.
-    func testNotLogParentOrRelatedCategory() throws {
+    /// This test works because `get_category_names()` returns categories from parent to children.
+    func testShouldNotLogParentOrRelatedCategory() throws {
+        Logger.setLogLevel(.off, for: Category.realm)
+        XCTAssertEqual(Logger.logLevel(for: Category.realm), .off)
+        
         let logs = Locked("")
         let logger = Logger(function: { level, category, message in
             logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
@@ -2083,11 +2086,12 @@ class LoggerTests: TestCase, @unchecked Sendable {
             XCTAssertEqual(Logger.logLevel(for: categoryEnum!), .trace)
 
             logger.log(with: .trace, categoryName: category, message: "Test")
-            XCTAssertFalse(logs.value.contains("\(LogLevel.trace.logLevel) \(category) Test"), "Log shouldn't contain \(categories[index+1])")
+            XCTAssertFalse(logs.value.contains("\(LogLevel.trace.logLevel) \(category) Test"), "Log shouldn't contain message from \(category)")
+            Logger.setLogLevel(.off, for: categoryEnum!)
         }
     }
 
-    /// Logger should log any message with from a child category
+    /// Logger should log messages from all child categories
     func testShouldLogWhenParentCategory() throws {
         let logs = Locked("")
         let logger = Logger(function: { level, category, message in
@@ -2129,12 +2133,6 @@ class LoggerTests: TestCase, @unchecked Sendable {
     }
 
     func testChangeSubCategoryLevel() throws {
-        let logs = Locked("")
-        let logger = Logger(function: { level, category, message in
-            logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
-        })
-        Logger.shared = logger
-
         Logger.setLogLevel(.off, for: Category.realm)
         XCTAssertEqual(Logger.logLevel(for: Category.Storage.all), .off)
         XCTAssertEqual(Logger.logLevel(for: Category.Storage.transaction), .off)
@@ -2155,7 +2153,7 @@ class LoggerTests: TestCase, @unchecked Sendable {
         XCTAssertEqual(Logger.logLevel(for: Category.Sync.all), .off)
     }
 
-    func testing() throws {
+    func testCallbackFilteringForCatgories() throws {
         let logs = Locked("")
         let logger = Logger(function: { level, _, message in
             logs.withLock({ $0 += "\(Date.now) \(level.logLevel) \(message)" })
@@ -2163,16 +2161,19 @@ class LoggerTests: TestCase, @unchecked Sendable {
 
         Logger.shared = logger
 
-        Logger.setLogLevel(.info, for: Category.sdk)
-        logger.log(level: .info, category: Category.sdk, message: "SDK test entry")
+        Logger.setLogLevel(.off, for: Category.realm)
+        Logger.setLogLevel(.info, for: Category.Storage.all)
+        
+        logger.log(level: .info, category: Category.Storage.all, message: "Storage test entry")
+        XCTAssertTrue(logs.value.contains("Storage test entry"))
+        logs.wrappedValue = ""
 
-        XCTAssertTrue(logs.value.contains("SDK test entry"))
+        logger.log(level: .info, category: Category.Storage.transaction, message: "Transaction test entry")
+        XCTAssertTrue(logs.value.contains("Transaction test entry"))
         logs.wrappedValue = ""
 
         logger.log(level: .info, category: Category.realm, message: "REALM test entry")
-
         XCTAssertFalse(logs.value.contains("REALM test entry"))
-        logs.wrappedValue = ""
     }
 
     func categoryfromString(_ string: String) -> LogCategory? {
