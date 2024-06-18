@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.52.0 Release notes (2024-06-18)
 =============================================================
+
 ### Enhancements
+
 * Add `@ObservedSectionedResults.remove(atOffsets:section:)` which adds the ability to
   remove a Realm Object when using `onDelete` on `ForEach` in a SwiftUI `List`.
 * Add support for Xcode 16 beta 1 and fix some of the new warnings. Note that
@@ -18,6 +20,7 @@ x.y.z Release notes (yyyy-MM-dd)
   confusing 404 errors. ([Core #7791](https://github.com/realm/realm-core/pull/7791)).
 
 ### Fixed
+
 * Deleting a Realm Object used in a `@ObservedSectionedResults` collection in `SwiftUI`
   would cause a crash during the diff on the `View`. ([#8294](https://github.com/realm/realm-swift/issues/8294), since v10.29.0)
 * Fix some client resets (such as migrating to flexible sync) potentially
@@ -49,9 +52,8 @@ x.y.z Release notes (yyyy-MM-dd)
   file originally created by a version of Realm older than v10.49.0.
   ([Core #7771](https://github.com/realm/realm-core/issues/7771), since 10.49.0)
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
@@ -59,6 +61,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.1.0-16 beta
 
 ### Internal
+
 * Upgraded realm-core from v14.9.0 to 14.10.1
 
 10.51.0 Release notes (2024-06-06)
