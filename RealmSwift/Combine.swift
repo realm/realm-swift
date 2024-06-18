@@ -939,7 +939,7 @@ public enum RealmPublishers {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))
     }
     static private func realm<S: Scheduler>(_ sourceRealm: Realm, _ scheduler: S) -> Realm? {
-        return realm(sourceRealm.rlmRealm.configuration, scheduler)
+        return realm(sourceRealm.rlmRealm.configurationSharingSchema(), scheduler)
     }
 
     /// A publisher which emits an asynchronously opened Realm.
@@ -1300,7 +1300,7 @@ public enum RealmPublishers {
         private let scheduler: S
 
         internal init(_ upstream: Upstream, _ scheduler: S, _ realm: Realm) {
-            self.config = realm.rlmRealm.configuration
+            self.config = realm.rlmRealm.configurationSharingSchema()
             self.upstream = upstream
             self.scheduler = scheduler
         }
@@ -1377,7 +1377,7 @@ public enum RealmPublishers {
             self.upstream
                 .map { (obj: Output) -> Handover in
                     guard let realm = obj.realm, !realm.isFrozen else { return .object(obj) }
-                    return .tsr(ThreadSafeReference(to: obj), config: realm.rlmRealm.configuration)
+                    return .tsr(ThreadSafeReference(to: obj), config: realm.rlmRealm.configurationSharingSchema())
             }
             .receive(on: scheduler)
             .compactMap { (handover: Handover) -> Output? in
