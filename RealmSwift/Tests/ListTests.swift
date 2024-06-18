@@ -23,7 +23,7 @@ import RealmSwift
 import RealmSwiftTestSupport
 #endif
 
-class ListTests: TestCase {
+class ListTests: TestCase, @unchecked Sendable {
     var str1: SwiftStringObject?
     var str2: SwiftStringObject?
     var arrayObject: SwiftArrayPropertyObject!
@@ -661,7 +661,7 @@ class ListTests: TestCase {
     }
 }
 
-class ListStandaloneTests: ListTests {
+class ListStandaloneTests: ListTests, @unchecked Sendable {
     override func createArray() -> SwiftArrayPropertyObject {
         let array = SwiftArrayPropertyObject()
         XCTAssertNil(array.realm)
@@ -679,7 +679,7 @@ class ListStandaloneTests: ListTests {
     }
 }
 
-class ListNewlyAddedTests: ListTests {
+class ListNewlyAddedTests: ListTests, @unchecked Sendable {
     override func createArray() -> SwiftArrayPropertyObject {
         let array = SwiftArrayPropertyObject()
         array.name = "name"
@@ -708,7 +708,7 @@ class ListNewlyAddedTests: ListTests {
     }
 }
 
-class ListNewlyCreatedTests: ListTests {
+class ListNewlyCreatedTests: ListTests, @unchecked Sendable {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
@@ -737,7 +737,7 @@ class ListNewlyCreatedTests: ListTests {
     }
 }
 
-class ListRetrievedTests: ListTests {
+class ListRetrievedTests: ListTests, @unchecked Sendable {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
@@ -770,7 +770,7 @@ class ListRetrievedTests: ListTests {
 }
 
 /// Ensure the range replaceable collection methods behave correctly when emulated for Swift 4 and later.
-class ListRRCMethodsTests: TestCase {
+class ListRRCMethodsTests: TestCase, @unchecked Sendable {
     private func compare(array: [Int], with list: List<SwiftIntObject>) {
         guard array.count == list.count else {
             XCTFail("Array and list have different sizes (\(array.count) and \(list.count), respectively).")

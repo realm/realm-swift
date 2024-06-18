@@ -32,7 +32,7 @@ class ObjectWithPrivateOptionals: Object {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectCreationTests: TestCase {
+class ObjectCreationTests: TestCase, @unchecked Sendable {
     // MARK: - Init tests
 
     func testInitWithDefaults() {

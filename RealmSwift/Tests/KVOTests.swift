@@ -148,7 +148,7 @@ class SwiftKVOObject: Object {
 // Most of the testing of KVO functionality is done in the obj-c tests
 // These tests just verify that it also works on Swift types
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class KVOTests: TestCase {
+class KVOTests: TestCase, @unchecked Sendable {
     var realm: Realm! = nil
 
     override func setUp() {
@@ -556,7 +556,7 @@ class KVOTests: TestCase {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class KVOPersistedTests: KVOTests {
+class KVOPersistedTests: KVOTests, @unchecked Sendable {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
         return (obj, obj)
@@ -564,7 +564,7 @@ class KVOPersistedTests: KVOTests {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class KVOMultipleAccessorsTests: KVOTests {
+class KVOMultipleAccessorsTests: KVOTests, @unchecked Sendable {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
         return (obj, realm.object(ofType: SwiftKVOObject.self, forPrimaryKey: obj.pk)!)

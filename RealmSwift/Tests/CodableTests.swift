@@ -291,7 +291,7 @@ final class CodableEmbeddedObject: EmbeddedObject, Codable {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class CodableTests: TestCase {
+class CodableTests: TestCase, @unchecked Sendable {
     let decoder = JSONDecoder()
     let encoder = JSONEncoder()
 
@@ -775,321 +775,639 @@ class CodableTests: TestCase {
         // Note: "ZGVm" is Data("def".utf8).base64EncodedString()
         // This string needs to exactly match what JSONEncoder produces so that
         // we can validate round-tripping
-        let str = """
-        {
-          "bool" : true,
-          "boolList" : [
-            true
-          ],
-          "boolMap" : {
-            "foo" : true
-          },
-          "boolOpt" : true,
-          "boolOptList" : [
-            true
-          ],
-          "boolOptMap" : {
-            "foo" : true
-          },
-          "boolOptSet" : [
-            true
-          ],
-          "boolSet" : [
-            true
-          ],
-          "data" : "ZGVm",
-          "dataList" : [
-            "ZGVm"
-          ],
-          "dataMap" : {
-            "foo" : "ZGVm"
-          },
-          "dataOpt" : "ZGVm",
-          "dataOptList" : [
-            "ZGVm"
-          ],
-          "dataOptMap" : {
-            "foo" : "ZGVm"
-          },
-          "dataOptSet" : [
-            "ZGVm"
-          ],
-          "dataSet" : [
-            "ZGVm"
-          ],
-          "date" : 2.5,
-          "dateList" : [
-            2.5
-          ],
-          "dateMap" : {
-            "foo" : 2.5
-          },
-          "dateOpt" : 2.5,
-          "dateOptList" : [
-            2.5
-          ],
-          "dateOptMap" : {
-            "foo" : 2.5
-          },
-          "dateOptSet" : [
-            2.5
-          ],
-          "dateSet" : [
-            2.5
-          ],
-          "decimal" : "1.5E2",
-          "decimalList" : [
-            "1.5E2"
-          ],
-          "decimalMap" : {
-            "foo" : "1.5E2"
-          },
-          "decimalOpt" : "1.5E2",
-          "decimalOptList" : [
-            "1.5E2"
-          ],
-          "decimalOptMap" : {
-            "foo" : "1.5E2"
-          },
-          "decimalOptSet" : [
-            "1.5E2"
-          ],
-          "decimalSet" : [
-            "1.5E2"
-          ],
-          "double" : 2.5,
-          "doubleList" : [
-            2.5
-          ],
-          "doubleMap" : {
-            "foo" : 2.5
-          },
-          "doubleOpt" : 2.5,
-          "doubleOptList" : [
-            2.5
-          ],
-          "doubleOptMap" : {
-            "foo" : 2.5
-          },
-          "doubleOptSet" : [
-            2.5
-          ],
-          "doubleSet" : [
-            2.5
-          ],
-          "embeddedObjectList" : [
+        let str = if #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
+            """
             {
-              "value" : 8
+              "bool" : true,
+              "boolList" : [
+                true
+              ],
+              "boolMap" : {
+                "foo" : true
+              },
+              "boolOpt" : true,
+              "boolOptList" : [
+                true
+              ],
+              "boolOptMap" : {
+                "foo" : true
+              },
+              "boolOptSet" : [
+                true
+              ],
+              "boolSet" : [
+                true
+              ],
+              "data" : "ZGVm",
+              "dataList" : [
+                "ZGVm"
+              ],
+              "dataMap" : {
+                "foo" : "ZGVm"
+              },
+              "dataOpt" : "ZGVm",
+              "dataOptList" : [
+                "ZGVm"
+              ],
+              "dataOptMap" : {
+                "foo" : "ZGVm"
+              },
+              "dataOptSet" : [
+                "ZGVm"
+              ],
+              "dataSet" : [
+                "ZGVm"
+              ],
+              "date" : 2.5,
+              "dateList" : [
+                2.5
+              ],
+              "dateMap" : {
+                "foo" : 2.5
+              },
+              "dateOpt" : 2.5,
+              "dateOptList" : [
+                2.5
+              ],
+              "dateOptMap" : {
+                "foo" : 2.5
+              },
+              "dateOptSet" : [
+                2.5
+              ],
+              "dateSet" : [
+                2.5
+              ],
+              "decimal" : "1.5E2",
+              "decimalList" : [
+                "1.5E2"
+              ],
+              "decimalMap" : {
+                "foo" : "1.5E2"
+              },
+              "decimalOpt" : "1.5E2",
+              "decimalOptList" : [
+                "1.5E2"
+              ],
+              "decimalOptMap" : {
+                "foo" : "1.5E2"
+              },
+              "decimalOptSet" : [
+                "1.5E2"
+              ],
+              "decimalSet" : [
+                "1.5E2"
+              ],
+              "double" : 2.5,
+              "doubleList" : [
+                2.5
+              ],
+              "doubleMap" : {
+                "foo" : 2.5
+              },
+              "doubleOpt" : 2.5,
+              "doubleOptList" : [
+                2.5
+              ],
+              "doubleOptMap" : {
+                "foo" : 2.5
+              },
+              "doubleOptSet" : [
+                2.5
+              ],
+              "doubleSet" : [
+                2.5
+              ],
+              "embeddedObjectList" : [
+                {
+                  "value" : 8
+                }
+              ],
+              "embeddedObjectOpt" : {
+                "value" : 6
+              },
+              "embeddedObjectOptMap" : {
+                "b" : {
+                  "value" : 10
+                }
+              },
+              "float" : 2.5,
+              "floatList" : [
+                2.5
+              ],
+              "floatMap" : {
+                "foo" : 2.5
+              },
+              "floatOpt" : 2.5,
+              "floatOptList" : [
+                2.5
+              ],
+              "floatOptMap" : {
+                "foo" : 2.5
+              },
+              "floatOptSet" : [
+                2.5
+              ],
+              "floatSet" : [
+                2.5
+              ],
+              "int" : 123,
+              "int16" : 123,
+              "int16List" : [
+                123
+              ],
+              "int16Map" : {
+                "foo" : 123
+              },
+              "int16Opt" : 123,
+              "int16OptList" : [
+                123
+              ],
+              "int16OptMap" : {
+                "foo" : 123
+              },
+              "int16OptSet" : [
+                123
+              ],
+              "int16Set" : [
+                123
+              ],
+              "int32" : 123,
+              "int32List" : [
+                123
+              ],
+              "int32Map" : {
+                "foo" : 123
+              },
+              "int32Opt" : 123,
+              "int32OptList" : [
+                123
+              ],
+              "int32OptMap" : {
+                "foo" : 123
+              },
+              "int32OptSet" : [
+                123
+              ],
+              "int32Set" : [
+                123
+              ],
+              "int64" : 123,
+              "int64List" : [
+                123
+              ],
+              "int64Map" : {
+                "foo" : 123
+              },
+              "int64Opt" : 123,
+              "int64OptList" : [
+                123
+              ],
+              "int64OptMap" : {
+                "foo" : 123
+              },
+              "int64OptSet" : [
+                123
+              ],
+              "int64Set" : [
+                123
+              ],
+              "int8" : 123,
+              "int8List" : [
+                123
+              ],
+              "int8Map" : {
+                "foo" : 123
+              },
+              "int8Opt" : 123,
+              "int8OptList" : [
+                123
+              ],
+              "int8OptMap" : {
+                "foo" : 123
+              },
+              "int8OptSet" : [
+                123
+              ],
+              "int8Set" : [
+                123
+              ],
+              "intList" : [
+                123
+              ],
+              "intMap" : {
+                "foo" : 123
+              },
+              "intOpt" : 123,
+              "intOptList" : [
+                123
+              ],
+              "intOptMap" : {
+                "foo" : 123
+              },
+              "intOptSet" : [
+                123
+              ],
+              "intSet" : [
+                123
+              ],
+              "objectId" : "1234567890abcdef12345678",
+              "objectIdList" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdMap" : {
+                "foo" : "1234567890abcdef12345678"
+              },
+              "objectIdOpt" : "1234567890abcdef12345678",
+              "objectIdOptList" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdOptMap" : {
+                "foo" : "1234567890abcdef12345678"
+              },
+              "objectIdOptSet" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdSet" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectList" : [
+                {
+                  "value" : 7
+                }
+              ],
+              "objectOpt" : {
+                "value" : 5
+              },
+              "objectOptMap" : {
+                "a" : {
+                  "value" : 9
+                }
+              },
+              "objectSet" : [
+                {
+                  "value" : 9
+                }
+              ],
+              "string" : "abc",
+              "stringList" : [
+                "abc"
+              ],
+              "stringMap" : {
+                "foo" : "abc"
+              },
+              "stringOpt" : "abc",
+              "stringOptList" : [
+                "abc"
+              ],
+              "stringOptMap" : {
+                "foo" : "abc"
+              },
+              "stringOptSet" : [
+                "abc"
+              ],
+              "stringSet" : [
+                "abc"
+              ],
+              "uuid" : "00000000-0000-0000-0000-000000000000",
+              "uuidList" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidMap" : {
+                "foo" : "00000000-0000-0000-0000-000000000000"
+              },
+              "uuidOpt" : "00000000-0000-0000-0000-000000000000",
+              "uuidOptList" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidOptMap" : {
+                "foo" : "00000000-0000-0000-0000-000000000000"
+              },
+              "uuidOptSet" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidSet" : [
+                "00000000-0000-0000-0000-000000000000"
+              ]
             }
-          ],
-          "embeddedObjectOpt" : {
-            "value" : 6
-          },
-          "embeddedObjectOptMap" : {
-            "b" : {
-              "value" : 10
-            }
-          },
-          "float" : 2.5,
-          "floatList" : [
-            2.5
-          ],
-          "floatMap" : {
-            "foo" : 2.5
-          },
-          "floatOpt" : 2.5,
-          "floatOptList" : [
-            2.5
-          ],
-          "floatOptMap" : {
-            "foo" : 2.5
-          },
-          "floatOptSet" : [
-            2.5
-          ],
-          "floatSet" : [
-            2.5
-          ],
-          "int" : 123,
-          "int8" : 123,
-          "int8List" : [
-            123
-          ],
-          "int8Map" : {
-            "foo" : 123
-          },
-          "int8Opt" : 123,
-          "int8OptList" : [
-            123
-          ],
-          "int8OptMap" : {
-            "foo" : 123
-          },
-          "int8OptSet" : [
-            123
-          ],
-          "int8Set" : [
-            123
-          ],
-          "int16" : 123,
-          "int16List" : [
-            123
-          ],
-          "int16Map" : {
-            "foo" : 123
-          },
-          "int16Opt" : 123,
-          "int16OptList" : [
-            123
-          ],
-          "int16OptMap" : {
-            "foo" : 123
-          },
-          "int16OptSet" : [
-            123
-          ],
-          "int16Set" : [
-            123
-          ],
-          "int32" : 123,
-          "int32List" : [
-            123
-          ],
-          "int32Map" : {
-            "foo" : 123
-          },
-          "int32Opt" : 123,
-          "int32OptList" : [
-            123
-          ],
-          "int32OptMap" : {
-            "foo" : 123
-          },
-          "int32OptSet" : [
-            123
-          ],
-          "int32Set" : [
-            123
-          ],
-          "int64" : 123,
-          "int64List" : [
-            123
-          ],
-          "int64Map" : {
-            "foo" : 123
-          },
-          "int64Opt" : 123,
-          "int64OptList" : [
-            123
-          ],
-          "int64OptMap" : {
-            "foo" : 123
-          },
-          "int64OptSet" : [
-            123
-          ],
-          "int64Set" : [
-            123
-          ],
-          "intList" : [
-            123
-          ],
-          "intMap" : {
-            "foo" : 123
-          },
-          "intOpt" : 123,
-          "intOptList" : [
-            123
-          ],
-          "intOptMap" : {
-            "foo" : 123
-          },
-          "intOptSet" : [
-            123
-          ],
-          "intSet" : [
-            123
-          ],
-          "objectId" : "1234567890abcdef12345678",
-          "objectIdList" : [
-            "1234567890abcdef12345678"
-          ],
-          "objectIdMap" : {
-            "foo" : "1234567890abcdef12345678"
-          },
-          "objectIdOpt" : "1234567890abcdef12345678",
-          "objectIdOptList" : [
-            "1234567890abcdef12345678"
-          ],
-          "objectIdOptMap" : {
-            "foo" : "1234567890abcdef12345678"
-          },
-          "objectIdOptSet" : [
-            "1234567890abcdef12345678"
-          ],
-          "objectIdSet" : [
-            "1234567890abcdef12345678"
-          ],
-          "objectList" : [
+            """
+        } else {
+            """
             {
-              "value" : 7
+              "bool" : true,
+              "boolList" : [
+                true
+              ],
+              "boolMap" : {
+                "foo" : true
+              },
+              "boolOpt" : true,
+              "boolOptList" : [
+                true
+              ],
+              "boolOptMap" : {
+                "foo" : true
+              },
+              "boolOptSet" : [
+                true
+              ],
+              "boolSet" : [
+                true
+              ],
+              "data" : "ZGVm",
+              "dataList" : [
+                "ZGVm"
+              ],
+              "dataMap" : {
+                "foo" : "ZGVm"
+              },
+              "dataOpt" : "ZGVm",
+              "dataOptList" : [
+                "ZGVm"
+              ],
+              "dataOptMap" : {
+                "foo" : "ZGVm"
+              },
+              "dataOptSet" : [
+                "ZGVm"
+              ],
+              "dataSet" : [
+                "ZGVm"
+              ],
+              "date" : 2.5,
+              "dateList" : [
+                2.5
+              ],
+              "dateMap" : {
+                "foo" : 2.5
+              },
+              "dateOpt" : 2.5,
+              "dateOptList" : [
+                2.5
+              ],
+              "dateOptMap" : {
+                "foo" : 2.5
+              },
+              "dateOptSet" : [
+                2.5
+              ],
+              "dateSet" : [
+                2.5
+              ],
+              "decimal" : "1.5E2",
+              "decimalList" : [
+                "1.5E2"
+              ],
+              "decimalMap" : {
+                "foo" : "1.5E2"
+              },
+              "decimalOpt" : "1.5E2",
+              "decimalOptList" : [
+                "1.5E2"
+              ],
+              "decimalOptMap" : {
+                "foo" : "1.5E2"
+              },
+              "decimalOptSet" : [
+                "1.5E2"
+              ],
+              "decimalSet" : [
+                "1.5E2"
+              ],
+              "double" : 2.5,
+              "doubleList" : [
+                2.5
+              ],
+              "doubleMap" : {
+                "foo" : 2.5
+              },
+              "doubleOpt" : 2.5,
+              "doubleOptList" : [
+                2.5
+              ],
+              "doubleOptMap" : {
+                "foo" : 2.5
+              },
+              "doubleOptSet" : [
+                2.5
+              ],
+              "doubleSet" : [
+                2.5
+              ],
+              "embeddedObjectList" : [
+                {
+                  "value" : 8
+                }
+              ],
+              "embeddedObjectOpt" : {
+                "value" : 6
+              },
+              "embeddedObjectOptMap" : {
+                "b" : {
+                  "value" : 10
+                }
+              },
+              "float" : 2.5,
+              "floatList" : [
+                2.5
+              ],
+              "floatMap" : {
+                "foo" : 2.5
+              },
+              "floatOpt" : 2.5,
+              "floatOptList" : [
+                2.5
+              ],
+              "floatOptMap" : {
+                "foo" : 2.5
+              },
+              "floatOptSet" : [
+                2.5
+              ],
+              "floatSet" : [
+                2.5
+              ],
+              "int" : 123,
+              "int8" : 123,
+              "int8List" : [
+                123
+              ],
+              "int8Map" : {
+                "foo" : 123
+              },
+              "int8Opt" : 123,
+              "int8OptList" : [
+                123
+              ],
+              "int8OptMap" : {
+                "foo" : 123
+              },
+              "int8OptSet" : [
+                123
+              ],
+              "int8Set" : [
+                123
+              ],
+              "int16" : 123,
+              "int16List" : [
+                123
+              ],
+              "int16Map" : {
+                "foo" : 123
+              },
+              "int16Opt" : 123,
+              "int16OptList" : [
+                123
+              ],
+              "int16OptMap" : {
+                "foo" : 123
+              },
+              "int16OptSet" : [
+                123
+              ],
+              "int16Set" : [
+                123
+              ],
+              "int32" : 123,
+              "int32List" : [
+                123
+              ],
+              "int32Map" : {
+                "foo" : 123
+              },
+              "int32Opt" : 123,
+              "int32OptList" : [
+                123
+              ],
+              "int32OptMap" : {
+                "foo" : 123
+              },
+              "int32OptSet" : [
+                123
+              ],
+              "int32Set" : [
+                123
+              ],
+              "int64" : 123,
+              "int64List" : [
+                123
+              ],
+              "int64Map" : {
+                "foo" : 123
+              },
+              "int64Opt" : 123,
+              "int64OptList" : [
+                123
+              ],
+              "int64OptMap" : {
+                "foo" : 123
+              },
+              "int64OptSet" : [
+                123
+              ],
+              "int64Set" : [
+                123
+              ],
+              "intList" : [
+                123
+              ],
+              "intMap" : {
+                "foo" : 123
+              },
+              "intOpt" : 123,
+              "intOptList" : [
+                123
+              ],
+              "intOptMap" : {
+                "foo" : 123
+              },
+              "intOptSet" : [
+                123
+              ],
+              "intSet" : [
+                123
+              ],
+              "objectId" : "1234567890abcdef12345678",
+              "objectIdList" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdMap" : {
+                "foo" : "1234567890abcdef12345678"
+              },
+              "objectIdOpt" : "1234567890abcdef12345678",
+              "objectIdOptList" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdOptMap" : {
+                "foo" : "1234567890abcdef12345678"
+              },
+              "objectIdOptSet" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdSet" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectList" : [
+                {
+                  "value" : 7
+                }
+              ],
+              "objectOpt" : {
+                "value" : 5
+              },
+              "objectOptMap" : {
+                "a" : {
+                  "value" : 9
+                }
+              },
+              "objectSet" : [
+                {
+                  "value" : 9
+                }
+              ],
+              "string" : "abc",
+              "stringList" : [
+                "abc"
+              ],
+              "stringMap" : {
+                "foo" : "abc"
+              },
+              "stringOpt" : "abc",
+              "stringOptList" : [
+                "abc"
+              ],
+              "stringOptMap" : {
+                "foo" : "abc"
+              },
+              "stringOptSet" : [
+                "abc"
+              ],
+              "stringSet" : [
+                "abc"
+              ],
+              "uuid" : "00000000-0000-0000-0000-000000000000",
+              "uuidList" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidMap" : {
+                "foo" : "00000000-0000-0000-0000-000000000000"
+              },
+              "uuidOpt" : "00000000-0000-0000-0000-000000000000",
+              "uuidOptList" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidOptMap" : {
+                "foo" : "00000000-0000-0000-0000-000000000000"
+              },
+              "uuidOptSet" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidSet" : [
+                "00000000-0000-0000-0000-000000000000"
+              ]
             }
-          ],
-          "objectOpt" : {
-            "value" : 5
-          },
-          "objectOptMap" : {
-            "a" : {
-              "value" : 9
-            }
-          },
-          "objectSet" : [
-            {
-              "value" : 9
-            }
-          ],
-          "string" : "abc",
-          "stringList" : [
-            "abc"
-          ],
-          "stringMap" : {
-            "foo" : "abc"
-          },
-          "stringOpt" : "abc",
-          "stringOptList" : [
-            "abc"
-          ],
-          "stringOptMap" : {
-            "foo" : "abc"
-          },
-          "stringOptSet" : [
-            "abc"
-          ],
-          "stringSet" : [
-            "abc"
-          ],
-          "uuid" : "00000000-0000-0000-0000-000000000000",
-          "uuidList" : [
-            "00000000-0000-0000-0000-000000000000"
-          ],
-          "uuidMap" : {
-            "foo" : "00000000-0000-0000-0000-000000000000"
-          },
-          "uuidOpt" : "00000000-0000-0000-0000-000000000000",
-          "uuidOptList" : [
-            "00000000-0000-0000-0000-000000000000"
-          ],
-          "uuidOptMap" : {
-            "foo" : "00000000-0000-0000-0000-000000000000"
-          },
-          "uuidOptSet" : [
-            "00000000-0000-0000-0000-000000000000"
-          ],
-          "uuidSet" : [
-            "00000000-0000-0000-0000-000000000000"
-          ]
+            """
         }
-        """
 
         let decoder = JSONDecoder()
         let obj = try decoder.decode(ModernCodableObject.self, from: Data(str.utf8))
@@ -1218,7 +1536,7 @@ class CodableTests: TestCase {
         // that the original string be formatted how JSONEncoder formats things)
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         // swiftlint:disable:next non_optional_string_data_conversion
-        let actual = try String(data: encoder.encode(obj), encoding: .utf8)
+        let actual = try XCTUnwrap(String(data: encoder.encode(obj), encoding: .utf8))
         XCTAssertEqual(str, actual)
 
         let realm = try! Realm()
@@ -1233,307 +1551,611 @@ class CodableTests: TestCase {
         // Note: "ZGVm" is Data("def".utf8).base64EncodedString()
         // This string needs to exactly match what JSONEncoder produces so that
         // we can validate round-tripping
-        let str = """
-        {
-          "bool" : true,
-          "boolList" : [
-            true
-          ],
-          "boolMap" : {
-            "foo" : true
-          },
-          "boolOpt" : null,
-          "boolOptList" : [
-            null
-          ],
-          "boolOptMap" : {
-            "foo" : null
-          },
-          "boolOptSet" : [
-            null
-          ],
-          "boolSet" : [
-            true
-          ],
-          "data" : "ZGVm",
-          "dataList" : [
-            "ZGVm"
-          ],
-          "dataMap" : {
-            "foo" : "ZGVm"
-          },
-          "dataOpt" : null,
-          "dataOptList" : [
-            null
-          ],
-          "dataOptMap" : {
-            "foo" : null
-          },
-          "dataOptSet" : [
-            null
-          ],
-          "dataSet" : [
-            "ZGVm"
-          ],
-          "date" : 2.5,
-          "dateList" : [
-            2.5
-          ],
-          "dateMap" : {
-            "foo" : 2.5
-          },
-          "dateOpt" : null,
-          "dateOptList" : [
-            null
-          ],
-          "dateOptMap" : {
-            "foo" : null
-          },
-          "dateOptSet" : [
-            null
-          ],
-          "dateSet" : [
-            2.5
-          ],
-          "decimal" : "1.5E2",
-          "decimalList" : [
-            "1.5E2"
-          ],
-          "decimalMap" : {
-            "foo" : "1.5E2"
-          },
-          "decimalOpt" : null,
-          "decimalOptList" : [
-            null
-          ],
-          "decimalOptMap" : {
-            "foo" : null
-          },
-          "decimalOptSet" : [
-            null
-          ],
-          "decimalSet" : [
-            "1.5E2"
-          ],
-          "double" : 2.5,
-          "doubleList" : [
-            2.5
-          ],
-          "doubleMap" : {
-            "foo" : 2.5
-          },
-          "doubleOpt" : null,
-          "doubleOptList" : [
-            null
-          ],
-          "doubleOptMap" : {
-            "foo" : null
-          },
-          "doubleOptSet" : [
-            null
-          ],
-          "doubleSet" : [
-            2.5
-          ],
-          "embeddedObjectList" : [
+        let str = if #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
+            """
+            {
+              "bool" : true,
+              "boolList" : [
+                true
+              ],
+              "boolMap" : {
+                "foo" : true
+              },
+              "boolOpt" : null,
+              "boolOptList" : [
+                null
+              ],
+              "boolOptMap" : {
+                "foo" : null
+              },
+              "boolOptSet" : [
+                null
+              ],
+              "boolSet" : [
+                true
+              ],
+              "data" : "ZGVm",
+              "dataList" : [
+                "ZGVm"
+              ],
+              "dataMap" : {
+                "foo" : "ZGVm"
+              },
+              "dataOpt" : null,
+              "dataOptList" : [
+                null
+              ],
+              "dataOptMap" : {
+                "foo" : null
+              },
+              "dataOptSet" : [
+                null
+              ],
+              "dataSet" : [
+                "ZGVm"
+              ],
+              "date" : 2.5,
+              "dateList" : [
+                2.5
+              ],
+              "dateMap" : {
+                "foo" : 2.5
+              },
+              "dateOpt" : null,
+              "dateOptList" : [
+                null
+              ],
+              "dateOptMap" : {
+                "foo" : null
+              },
+              "dateOptSet" : [
+                null
+              ],
+              "dateSet" : [
+                2.5
+              ],
+              "decimal" : "1.5E2",
+              "decimalList" : [
+                "1.5E2"
+              ],
+              "decimalMap" : {
+                "foo" : "1.5E2"
+              },
+              "decimalOpt" : null,
+              "decimalOptList" : [
+                null
+              ],
+              "decimalOptMap" : {
+                "foo" : null
+              },
+              "decimalOptSet" : [
+                null
+              ],
+              "decimalSet" : [
+                "1.5E2"
+              ],
+              "double" : 2.5,
+              "doubleList" : [
+                2.5
+              ],
+              "doubleMap" : {
+                "foo" : 2.5
+              },
+              "doubleOpt" : null,
+              "doubleOptList" : [
+                null
+              ],
+              "doubleOptMap" : {
+                "foo" : null
+              },
+              "doubleOptSet" : [
+                null
+              ],
+              "doubleSet" : [
+                2.5
+              ],
+              "embeddedObjectList" : [
 
-          ],
-          "embeddedObjectOpt" : null,
-          "embeddedObjectOptMap" : {
-            "foo" : null
-          },
-          "float" : 2.5,
-          "floatList" : [
-            2.5
-          ],
-          "floatMap" : {
-            "foo" : 2.5
-          },
-          "floatOpt" : null,
-          "floatOptList" : [
-            null
-          ],
-          "floatOptMap" : {
-            "foo" : null
-          },
-          "floatOptSet" : [
-            null
-          ],
-          "floatSet" : [
-            2.5
-          ],
-          "int" : 123,
-          "int8" : 123,
-          "int8List" : [
-            123
-          ],
-          "int8Map" : {
-            "foo" : 123
-          },
-          "int8Opt" : null,
-          "int8OptList" : [
-            null
-          ],
-          "int8OptMap" : {
-            "foo" : null
-          },
-          "int8OptSet" : [
-            null
-          ],
-          "int8Set" : [
-            123
-          ],
-          "int16" : 123,
-          "int16List" : [
-            123
-          ],
-          "int16Map" : {
-            "foo" : 123
-          },
-          "int16Opt" : null,
-          "int16OptList" : [
-            null
-          ],
-          "int16OptMap" : {
-            "foo" : null
-          },
-          "int16OptSet" : [
-            null
-          ],
-          "int16Set" : [
-            123
-          ],
-          "int32" : 123,
-          "int32List" : [
-            123
-          ],
-          "int32Map" : {
-            "foo" : 123
-          },
-          "int32Opt" : null,
-          "int32OptList" : [
-            null
-          ],
-          "int32OptMap" : {
-            "foo" : null
-          },
-          "int32OptSet" : [
-            null
-          ],
-          "int32Set" : [
-            123
-          ],
-          "int64" : 123,
-          "int64List" : [
-            123
-          ],
-          "int64Map" : {
-            "foo" : 123
-          },
-          "int64Opt" : null,
-          "int64OptList" : [
-            null
-          ],
-          "int64OptMap" : {
-            "foo" : null
-          },
-          "int64OptSet" : [
-            null
-          ],
-          "int64Set" : [
-            123
-          ],
-          "intList" : [
-            123
-          ],
-          "intMap" : {
-            "foo" : 123
-          },
-          "intOpt" : null,
-          "intOptList" : [
-            null
-          ],
-          "intOptMap" : {
-            "foo" : null
-          },
-          "intOptSet" : [
-            null
-          ],
-          "intSet" : [
-            123
-          ],
-          "objectId" : "1234567890abcdef12345678",
-          "objectIdList" : [
-            "1234567890abcdef12345678"
-          ],
-          "objectIdMap" : {
-            "foo" : "1234567890abcdef12345678"
-          },
-          "objectIdOpt" : null,
-          "objectIdOptList" : [
-            null
-          ],
-          "objectIdOptMap" : {
-            "foo" : null
-          },
-          "objectIdOptSet" : [
-            null
-          ],
-          "objectIdSet" : [
-            "1234567890abcdef12345678"
-          ],
-          "objectList" : [
+              ],
+              "embeddedObjectOpt" : null,
+              "embeddedObjectOptMap" : {
+                "foo" : null
+              },
+              "float" : 2.5,
+              "floatList" : [
+                2.5
+              ],
+              "floatMap" : {
+                "foo" : 2.5
+              },
+              "floatOpt" : null,
+              "floatOptList" : [
+                null
+              ],
+              "floatOptMap" : {
+                "foo" : null
+              },
+              "floatOptSet" : [
+                null
+              ],
+              "floatSet" : [
+                2.5
+              ],
+              "int" : 123,
+              "int16" : 123,
+              "int16List" : [
+                123
+              ],
+              "int16Map" : {
+                "foo" : 123
+              },
+              "int16Opt" : null,
+              "int16OptList" : [
+                null
+              ],
+              "int16OptMap" : {
+                "foo" : null
+              },
+              "int16OptSet" : [
+                null
+              ],
+              "int16Set" : [
+                123
+              ],
+              "int32" : 123,
+              "int32List" : [
+                123
+              ],
+              "int32Map" : {
+                "foo" : 123
+              },
+              "int32Opt" : null,
+              "int32OptList" : [
+                null
+              ],
+              "int32OptMap" : {
+                "foo" : null
+              },
+              "int32OptSet" : [
+                null
+              ],
+              "int32Set" : [
+                123
+              ],
+              "int64" : 123,
+              "int64List" : [
+                123
+              ],
+              "int64Map" : {
+                "foo" : 123
+              },
+              "int64Opt" : null,
+              "int64OptList" : [
+                null
+              ],
+              "int64OptMap" : {
+                "foo" : null
+              },
+              "int64OptSet" : [
+                null
+              ],
+              "int64Set" : [
+                123
+              ],
+              "int8" : 123,
+              "int8List" : [
+                123
+              ],
+              "int8Map" : {
+                "foo" : 123
+              },
+              "int8Opt" : null,
+              "int8OptList" : [
+                null
+              ],
+              "int8OptMap" : {
+                "foo" : null
+              },
+              "int8OptSet" : [
+                null
+              ],
+              "int8Set" : [
+                123
+              ],
+              "intList" : [
+                123
+              ],
+              "intMap" : {
+                "foo" : 123
+              },
+              "intOpt" : null,
+              "intOptList" : [
+                null
+              ],
+              "intOptMap" : {
+                "foo" : null
+              },
+              "intOptSet" : [
+                null
+              ],
+              "intSet" : [
+                123
+              ],
+              "objectId" : "1234567890abcdef12345678",
+              "objectIdList" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdMap" : {
+                "foo" : "1234567890abcdef12345678"
+              },
+              "objectIdOpt" : null,
+              "objectIdOptList" : [
+                null
+              ],
+              "objectIdOptMap" : {
+                "foo" : null
+              },
+              "objectIdOptSet" : [
+                null
+              ],
+              "objectIdSet" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectList" : [
 
-          ],
-          "objectOpt" : null,
-          "objectOptMap" : {
-            "foo" : null
-          },
-          "objectSet" : [
+              ],
+              "objectOpt" : null,
+              "objectOptMap" : {
+                "foo" : null
+              },
+              "objectSet" : [
 
-          ],
-          "string" : "abc",
-          "stringList" : [
-            "abc"
-          ],
-          "stringMap" : {
-            "foo" : "abc"
-          },
-          "stringOpt" : null,
-          "stringOptList" : [
-            null
-          ],
-          "stringOptMap" : {
-            "foo" : null
-          },
-          "stringOptSet" : [
-            null
-          ],
-          "stringSet" : [
-            "abc"
-          ],
-          "uuid" : "00000000-0000-0000-0000-000000000000",
-          "uuidList" : [
-            "00000000-0000-0000-0000-000000000000"
-          ],
-          "uuidMap" : {
-            "foo" : "00000000-0000-0000-0000-000000000000"
-          },
-          "uuidOpt" : null,
-          "uuidOptList" : [
-            null
-          ],
-          "uuidOptMap" : {
-            "foo" : null
-          },
-          "uuidOptSet" : [
-            null
-          ],
-          "uuidSet" : [
-            "00000000-0000-0000-0000-000000000000"
-          ]
+              ],
+              "string" : "abc",
+              "stringList" : [
+                "abc"
+              ],
+              "stringMap" : {
+                "foo" : "abc"
+              },
+              "stringOpt" : null,
+              "stringOptList" : [
+                null
+              ],
+              "stringOptMap" : {
+                "foo" : null
+              },
+              "stringOptSet" : [
+                null
+              ],
+              "stringSet" : [
+                "abc"
+              ],
+              "uuid" : "00000000-0000-0000-0000-000000000000",
+              "uuidList" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidMap" : {
+                "foo" : "00000000-0000-0000-0000-000000000000"
+              },
+              "uuidOpt" : null,
+              "uuidOptList" : [
+                null
+              ],
+              "uuidOptMap" : {
+                "foo" : null
+              },
+              "uuidOptSet" : [
+                null
+              ],
+              "uuidSet" : [
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+            """
+        } else {
+            """
+            {
+              "bool" : true,
+              "boolList" : [
+                true
+              ],
+              "boolMap" : {
+                "foo" : true
+              },
+              "boolOpt" : null,
+              "boolOptList" : [
+                null
+              ],
+              "boolOptMap" : {
+                "foo" : null
+              },
+              "boolOptSet" : [
+                null
+              ],
+              "boolSet" : [
+                true
+              ],
+              "data" : "ZGVm",
+              "dataList" : [
+                "ZGVm"
+              ],
+              "dataMap" : {
+                "foo" : "ZGVm"
+              },
+              "dataOpt" : null,
+              "dataOptList" : [
+                null
+              ],
+              "dataOptMap" : {
+                "foo" : null
+              },
+              "dataOptSet" : [
+                null
+              ],
+              "dataSet" : [
+                "ZGVm"
+              ],
+              "date" : 2.5,
+              "dateList" : [
+                2.5
+              ],
+              "dateMap" : {
+                "foo" : 2.5
+              },
+              "dateOpt" : null,
+              "dateOptList" : [
+                null
+              ],
+              "dateOptMap" : {
+                "foo" : null
+              },
+              "dateOptSet" : [
+                null
+              ],
+              "dateSet" : [
+                2.5
+              ],
+              "decimal" : "1.5E2",
+              "decimalList" : [
+                "1.5E2"
+              ],
+              "decimalMap" : {
+                "foo" : "1.5E2"
+              },
+              "decimalOpt" : null,
+              "decimalOptList" : [
+                null
+              ],
+              "decimalOptMap" : {
+                "foo" : null
+              },
+              "decimalOptSet" : [
+                null
+              ],
+              "decimalSet" : [
+                "1.5E2"
+              ],
+              "double" : 2.5,
+              "doubleList" : [
+                2.5
+              ],
+              "doubleMap" : {
+                "foo" : 2.5
+              },
+              "doubleOpt" : null,
+              "doubleOptList" : [
+                null
+              ],
+              "doubleOptMap" : {
+                "foo" : null
+              },
+              "doubleOptSet" : [
+                null
+              ],
+              "doubleSet" : [
+                2.5
+              ],
+              "embeddedObjectList" : [
+
+              ],
+              "embeddedObjectOpt" : null,
+              "embeddedObjectOptMap" : {
+                "foo" : null
+              },
+              "float" : 2.5,
+              "floatList" : [
+                2.5
+              ],
+              "floatMap" : {
+                "foo" : 2.5
+              },
+              "floatOpt" : null,
+              "floatOptList" : [
+                null
+              ],
+              "floatOptMap" : {
+                "foo" : null
+              },
+              "floatOptSet" : [
+                null
+              ],
+              "floatSet" : [
+                2.5
+              ],
+              "int" : 123,
+              "int8" : 123,
+              "int8List" : [
+                123
+              ],
+              "int8Map" : {
+                "foo" : 123
+              },
+              "int8Opt" : null,
+              "int8OptList" : [
+                null
+              ],
+              "int8OptMap" : {
+                "foo" : null
+              },
+              "int8OptSet" : [
+                null
+              ],
+              "int8Set" : [
+                123
+              ],
+              "int16" : 123,
+              "int16List" : [
+                123
+              ],
+              "int16Map" : {
+                "foo" : 123
+              },
+              "int16Opt" : null,
+              "int16OptList" : [
+                null
+              ],
+              "int16OptMap" : {
+                "foo" : null
+              },
+              "int16OptSet" : [
+                null
+              ],
+              "int16Set" : [
+                123
+              ],
+              "int32" : 123,
+              "int32List" : [
+                123
+              ],
+              "int32Map" : {
+                "foo" : 123
+              },
+              "int32Opt" : null,
+              "int32OptList" : [
+                null
+              ],
+              "int32OptMap" : {
+                "foo" : null
+              },
+              "int32OptSet" : [
+                null
+              ],
+              "int32Set" : [
+                123
+              ],
+              "int64" : 123,
+              "int64List" : [
+                123
+              ],
+              "int64Map" : {
+                "foo" : 123
+              },
+              "int64Opt" : null,
+              "int64OptList" : [
+                null
+              ],
+              "int64OptMap" : {
+                "foo" : null
+              },
+              "int64OptSet" : [
+                null
+              ],
+              "int64Set" : [
+                123
+              ],
+              "intList" : [
+                123
+              ],
+              "intMap" : {
+                "foo" : 123
+              },
+              "intOpt" : null,
+              "intOptList" : [
+                null
+              ],
+              "intOptMap" : {
+                "foo" : null
+              },
+              "intOptSet" : [
+                null
+              ],
+              "intSet" : [
+                123
+              ],
+              "objectId" : "1234567890abcdef12345678",
+              "objectIdList" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectIdMap" : {
+                "foo" : "1234567890abcdef12345678"
+              },
+              "objectIdOpt" : null,
+              "objectIdOptList" : [
+                null
+              ],
+              "objectIdOptMap" : {
+                "foo" : null
+              },
+              "objectIdOptSet" : [
+                null
+              ],
+              "objectIdSet" : [
+                "1234567890abcdef12345678"
+              ],
+              "objectList" : [
+
+              ],
+              "objectOpt" : null,
+              "objectOptMap" : {
+                "foo" : null
+              },
+              "objectSet" : [
+
+              ],
+              "string" : "abc",
+              "stringList" : [
+                "abc"
+              ],
+              "stringMap" : {
+                "foo" : "abc"
+              },
+              "stringOpt" : null,
+              "stringOptList" : [
+                null
+              ],
+              "stringOptMap" : {
+                "foo" : null
+              },
+              "stringOptSet" : [
+                null
+              ],
+              "stringSet" : [
+                "abc"
+              ],
+              "uuid" : "00000000-0000-0000-0000-000000000000",
+              "uuidList" : [
+                "00000000-0000-0000-0000-000000000000"
+              ],
+              "uuidMap" : {
+                "foo" : "00000000-0000-0000-0000-000000000000"
+              },
+              "uuidOpt" : null,
+              "uuidOptList" : [
+                null
+              ],
+              "uuidOptMap" : {
+                "foo" : null
+              },
+              "uuidOptSet" : [
+                null
+              ],
+              "uuidSet" : [
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+            """
         }
-        """
         let decoder = JSONDecoder()
         let obj = try decoder.decode(ModernCodableObject.self, from: Data(str.utf8))
 
@@ -1780,10 +2402,6 @@ class CodableTests: TestCase {
             try "length: \(data.count)".encode(to: encoder)
         }
 
-        func data(_ length: Int) -> Data {
-            Data(repeating: 0, count: length)
-        }
-
         let obj = ModernCodableObject()
         obj.data = Data(repeating: 0, count: 1)
         obj.dataOpt = Data(repeating: 0, count: 2)
@@ -1814,8 +2432,13 @@ class CodableTests: TestCase {
         obj.uuid = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         obj.date = Date(timeIntervalSince1970: 0)
         // swiftlint:disable:next non_optional_string_data_conversion
-        let actual = try String(data: encoder.encode(obj), encoding: .utf8)
-        let expected = #"{"bool":false,"bool_list":[],"bool_map":{},"bool_opt":null,"bool_opt_list":[],"bool_opt_map":{},"bool_opt_set":[],"bool_set":[],"data":"","data_list":[],"data_map":{},"data_opt":null,"data_opt_list":[],"data_opt_map":{},"data_opt_set":[],"data_set":[],"date":-978307200,"date_list":[],"date_map":{},"date_opt":null,"date_opt_list":[],"date_opt_map":{},"date_opt_set":[],"date_set":[],"decimal":"0","decimal_list":[],"decimal_map":{},"decimal_opt":null,"decimal_opt_list":[],"decimal_opt_map":{},"decimal_opt_set":[],"decimal_set":[],"double":0,"double_list":[],"double_map":{},"double_opt":null,"double_opt_list":[],"double_opt_map":{},"double_opt_set":[],"double_set":[],"embedded_object_list":[],"embedded_object_opt":null,"embedded_object_opt_map":{},"float":0,"float_list":[],"float_map":{},"float_opt":null,"float_opt_list":[],"float_opt_map":{},"float_opt_set":[],"float_set":[],"int":0,"int_list":[],"int_map":{},"int_opt":null,"int_opt_list":[],"int_opt_map":{},"int_opt_set":[],"int_set":[],"int8":0,"int8_list":[],"int8_map":{},"int8_opt":null,"int8_opt_list":[],"int8_opt_map":{},"int8_opt_set":[],"int8_set":[],"int16":0,"int16_list":[],"int16_map":{},"int16_opt":null,"int16_opt_list":[],"int16_opt_map":{},"int16_opt_set":[],"int16_set":[],"int32":0,"int32_list":[],"int32_map":{},"int32_opt":null,"int32_opt_list":[],"int32_opt_map":{},"int32_opt_set":[],"int32_set":[],"int64":0,"int64_list":[],"int64_map":{},"int64_opt":null,"int64_opt_list":[],"int64_opt_map":{},"int64_opt_set":[],"int64_set":[],"object_id":"1234567890abcdef12345678","object_id_list":[],"object_id_map":{},"object_id_opt":null,"object_id_opt_list":[],"object_id_opt_map":{},"object_id_opt_set":[],"object_id_set":[],"object_list":[],"object_opt":null,"object_opt_map":{},"object_set":[],"string":"","string_list":[],"string_map":{},"string_opt":null,"string_opt_list":[],"string_opt_map":{},"string_opt_set":[],"string_set":[],"uuid":"00000000-0000-0000-0000-000000000000","uuid_list":[],"uuid_map":{},"uuid_opt":null,"uuid_opt_list":[],"uuid_opt_map":{},"uuid_opt_set":[],"uuid_set":[]}"#
+        let actual = try XCTUnwrap(String(data: encoder.encode(obj), encoding: .utf8))
+        // Before the 2024 OS versions, int8 was sorted before int16
+        let expected = if #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {
+            #"{"bool":false,"bool_list":[],"bool_map":{},"bool_opt":null,"bool_opt_list":[],"bool_opt_map":{},"bool_opt_set":[],"bool_set":[],"data":"","data_list":[],"data_map":{},"data_opt":null,"data_opt_list":[],"data_opt_map":{},"data_opt_set":[],"data_set":[],"date":-978307200,"date_list":[],"date_map":{},"date_opt":null,"date_opt_list":[],"date_opt_map":{},"date_opt_set":[],"date_set":[],"decimal":"0","decimal_list":[],"decimal_map":{},"decimal_opt":null,"decimal_opt_list":[],"decimal_opt_map":{},"decimal_opt_set":[],"decimal_set":[],"double":0,"double_list":[],"double_map":{},"double_opt":null,"double_opt_list":[],"double_opt_map":{},"double_opt_set":[],"double_set":[],"embedded_object_list":[],"embedded_object_opt":null,"embedded_object_opt_map":{},"float":0,"float_list":[],"float_map":{},"float_opt":null,"float_opt_list":[],"float_opt_map":{},"float_opt_set":[],"float_set":[],"int":0,"int16":0,"int16_list":[],"int16_map":{},"int16_opt":null,"int16_opt_list":[],"int16_opt_map":{},"int16_opt_set":[],"int16_set":[],"int32":0,"int32_list":[],"int32_map":{},"int32_opt":null,"int32_opt_list":[],"int32_opt_map":{},"int32_opt_set":[],"int32_set":[],"int64":0,"int64_list":[],"int64_map":{},"int64_opt":null,"int64_opt_list":[],"int64_opt_map":{},"int64_opt_set":[],"int64_set":[],"int8":0,"int8_list":[],"int8_map":{},"int8_opt":null,"int8_opt_list":[],"int8_opt_map":{},"int8_opt_set":[],"int8_set":[],"int_list":[],"int_map":{},"int_opt":null,"int_opt_list":[],"int_opt_map":{},"int_opt_set":[],"int_set":[],"object_id":"1234567890abcdef12345678","object_id_list":[],"object_id_map":{},"object_id_opt":null,"object_id_opt_list":[],"object_id_opt_map":{},"object_id_opt_set":[],"object_id_set":[],"object_list":[],"object_opt":null,"object_opt_map":{},"object_set":[],"string":"","string_list":[],"string_map":{},"string_opt":null,"string_opt_list":[],"string_opt_map":{},"string_opt_set":[],"string_set":[],"uuid":"00000000-0000-0000-0000-000000000000","uuid_list":[],"uuid_map":{},"uuid_opt":null,"uuid_opt_list":[],"uuid_opt_map":{},"uuid_opt_set":[],"uuid_set":[]}"#
+        } else {
+            #"{"bool":false,"bool_list":[],"bool_map":{},"bool_opt":null,"bool_opt_list":[],"bool_opt_map":{},"bool_opt_set":[],"bool_set":[],"data":"","data_list":[],"data_map":{},"data_opt":null,"data_opt_list":[],"data_opt_map":{},"data_opt_set":[],"data_set":[],"date":-978307200,"date_list":[],"date_map":{},"date_opt":null,"date_opt_list":[],"date_opt_map":{},"date_opt_set":[],"date_set":[],"decimal":"0","decimal_list":[],"decimal_map":{},"decimal_opt":null,"decimal_opt_list":[],"decimal_opt_map":{},"decimal_opt_set":[],"decimal_set":[],"double":0,"double_list":[],"double_map":{},"double_opt":null,"double_opt_list":[],"double_opt_map":{},"double_opt_set":[],"double_set":[],"embedded_object_list":[],"embedded_object_opt":null,"embedded_object_opt_map":{},"float":0,"float_list":[],"float_map":{},"float_opt":null,"float_opt_list":[],"float_opt_map":{},"float_opt_set":[],"float_set":[],"int":0,"int_list":[],"int_map":{},"int_opt":null,"int_opt_list":[],"int_opt_map":{},"int_opt_set":[],"int_set":[],"int8":0,"int8_list":[],"int8_map":{},"int8_opt":null,"int8_opt_list":[],"int8_opt_map":{},"int8_opt_set":[],"int8_set":[],"int16":0,"int16_list":[],"int16_map":{},"int16_opt":null,"int16_opt_list":[],"int16_opt_map":{},"int16_opt_set":[],"int16_set":[],"int32":0,"int32_list":[],"int32_map":{},"int32_opt":null,"int32_opt_list":[],"int32_opt_map":{},"int32_opt_set":[],"int32_set":[],"int64":0,"int64_list":[],"int64_map":{},"int64_opt":null,"int64_opt_list":[],"int64_opt_map":{},"int64_opt_set":[],"int64_set":[],"object_id":"1234567890abcdef12345678","object_id_list":[],"object_id_map":{},"object_id_opt":null,"object_id_opt_list":[],"object_id_opt_map":{},"object_id_opt_set":[],"object_id_set":[],"object_list":[],"object_opt":null,"object_opt_map":{},"object_set":[],"string":"","string_list":[],"string_map":{},"string_opt":null,"string_opt_list":[],"string_opt_map":{},"string_opt_set":[],"string_set":[],"uuid":"00000000-0000-0000-0000-000000000000","uuid_list":[],"uuid_map":{},"uuid_opt":null,"uuid_opt_list":[],"uuid_opt_map":{},"uuid_opt_set":[],"uuid_set":[]}"#
+        }
         XCTAssertEqual(expected, actual)
     }
 }

@@ -65,6 +65,11 @@ FOUNDATION_EXTERN void RLMRealmSubscribeToAll(RLMRealm *);
 @property (nonatomic, readonly, nullable) id actor;
 @property (nonatomic, readonly) bool isFlexibleSync;
 
+// `-configuration` does a deep copy of the schema as if the user mutates the
+// RLMSchema in use by a RLMRealm things will break horribly. When we know that
+// the configuration won't be exposed we can skip the copy.
+- (RLMRealmConfiguration *)configurationSharingSchema NS_RETURNS_RETAINED;
+
 + (void)resetRealmState;
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator;

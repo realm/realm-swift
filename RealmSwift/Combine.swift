@@ -612,7 +612,7 @@ extension Realm {
 // MARK: - Object
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension Object: ObservableObject {
+extension Object {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the object has changed.
@@ -621,7 +621,7 @@ extension Object: ObservableObject {
     }
 }
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EmbeddedObject: ObservableObject {
+extension EmbeddedObject {
     /// A publisher that emits Void each time the object changes.
     ///
     /// Despite the name, this actually emits *after* the embedded object has changed.
@@ -646,6 +646,18 @@ extension ObjectBase: RealmSubscribable {
         return _observe(keyPaths: keyPaths, { _ = subscriber.receive() })
     }
 }
+
+#if compiler(>=6)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Object: @retroactive ObservableObject {}
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EmbeddedObject: @retroactive ObservableObject {}
+#else
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension Object: ObservableObject {}
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EmbeddedObject: ObservableObject {}
+#endif
 
 // MARK: - List
 
@@ -927,7 +939,7 @@ public enum RealmPublishers {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))
     }
     static private func realm<S: Scheduler>(_ sourceRealm: Realm, _ scheduler: S) -> Realm? {
-        return realm(sourceRealm.rlmRealm.configuration, scheduler)
+        return realm(sourceRealm.rlmRealm.configurationSharingSchema(), scheduler)
     }
 
     /// A publisher which emits an asynchronously opened Realm.
@@ -1288,7 +1300,7 @@ public enum RealmPublishers {
         private let scheduler: S
 
         internal init(_ upstream: Upstream, _ scheduler: S, _ realm: Realm) {
-            self.config = realm.rlmRealm.configuration
+            self.config = realm.rlmRealm.configurationSharingSchema()
             self.upstream = upstream
             self.scheduler = scheduler
         }
@@ -1365,7 +1377,7 @@ public enum RealmPublishers {
             self.upstream
                 .map { (obj: Output) -> Handover in
                     guard let realm = obj.realm, !realm.isFrozen else { return .object(obj) }
-                    return .tsr(ThreadSafeReference(to: obj), config: realm.rlmRealm.configuration)
+                    return .tsr(ThreadSafeReference(to: obj), config: realm.rlmRealm.configurationSharingSchema())
             }
             .receive(on: scheduler)
             .compactMap { (handover: Handover) -> Output? in

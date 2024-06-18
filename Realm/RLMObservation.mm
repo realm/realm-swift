@@ -341,7 +341,7 @@ void RLMObservationTracker::trackDeletions() {
         return;
     }
 
-    _group.set_cascade_notification_handler([=](realm::Group::CascadeNotification const& cs) {
+    _group.set_cascade_notification_handler([this](realm::Group::CascadeNotification const& cs) {
         cascadeNotification(cs);
     });
 }

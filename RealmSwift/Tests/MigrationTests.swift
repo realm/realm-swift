@@ -44,7 +44,7 @@ private func dynamicRealm(_ fileURL: URL) -> RLMRealm {
     return try! RLMRealm(configuration: config)
 }
 
-class MigrationTests: TestCase {
+class MigrationTests: TestCase, @unchecked Sendable {
     private func createDefaultRealm() throws {
         let config = Realm.Configuration(fileURL: defaultRealmURL())
         try autoreleasepool {

@@ -234,7 +234,7 @@ void RLMAddBeforeNotifyBlock(RLMRealm *realm, dispatch_block_t block) {
 - (instancetype)initWithRealm:(RLMRealm *)realm {
     if (self = [super init]) {
         _pin = realm->_realm->duplicate();
-        _configuration = realm.configuration;
+        _configuration = realm.configurationSharingSchema;
     }
     return self;
 }

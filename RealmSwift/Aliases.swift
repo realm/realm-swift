@@ -94,10 +94,8 @@ extension ObjectBase {
         let token = RLMObjectNotificationToken()
         token.observe(self, keyPaths: keyPaths) { object, names, oldValues, newValues, error in
             assert(error == nil)
-            assumeOnActorExecutor(actor) { actor in
-                block(actor, .init(object: object as? T, names: names,
+            actor.invokeIsolated(block, .init(object: object as? T, names: names,
                         oldValues: oldValues, newValues: newValues))
-            }
         }
         await withTaskCancellationHandler(operation: token.registrationComplete,
                                           onCancel: { token.invalidate() })

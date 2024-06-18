@@ -571,7 +571,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         proxy.stop()
     }
 
-    class LocationOverrideTransport: RLMNetworkTransport {
+    class LocationOverrideTransport: RLMNetworkTransport, Sendable {
         let hostname: String
         let wsHostname: String
         init(hostname: String = "http://localhost:9090", wsHostname: String = "ws://invalid.com:9090") {

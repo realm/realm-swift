@@ -36,7 +36,7 @@ private func objectWrapperValues() -> [EmbeddedObjectWrapper] {
     return objectValues().map(EmbeddedObjectWrapper.init)
 }
 
-class CustomObjectCreationTests: TestCase {
+class CustomObjectCreationTests: TestCase, @unchecked Sendable {
     var rawValues: [String: Any]!
     var wrappedValues: [String: Any]!
     var nilOptionalValues: [String: Any]!

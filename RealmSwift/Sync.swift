@@ -1098,7 +1098,7 @@ public class UserPublisher: Publisher {
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension User: ObservableObject {
+extension User {
     /// A publisher that emits Void each time the user changes.
     ///
     /// Despite the name, this actually emits *after* the user has changed.
@@ -1106,6 +1106,14 @@ extension User: ObservableObject {
         return UserPublisher(self).receive(on: DispatchQueue.main).eraseToAnyPublisher()
     }
 }
+
+#if compiler(>=6)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension User: @retroactive ObservableObject {}
+#else
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension User: ObservableObject {}
+#endif
 
 public extension User {
     // NEXT-MAJOR: This function returns the incorrect type. It should be Document

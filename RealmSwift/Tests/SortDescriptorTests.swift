@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SortDescriptorTests: TestCase {
+class SortDescriptorTests: TestCase, @unchecked Sendable {
 
     let sortDescriptor = SortDescriptor(keyPath: "property")
 

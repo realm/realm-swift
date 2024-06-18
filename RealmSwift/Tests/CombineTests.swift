@@ -48,7 +48,7 @@ func hasCombine() -> Bool {
 }
 
 @available(macOS 10.15, iOS 13, tvOS 13, watchOS 6, *)
-class ObjectIdentifiableTests: TestCase {
+class ObjectIdentifiableTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         if hasCombine() {
             return super.defaultTestSuite
@@ -94,7 +94,7 @@ class ObjectIdentifiableTests: TestCase {
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class CombinePublisherTestCase: TestCase {
+class CombinePublisherTestCase: TestCase, @unchecked Sendable {
     var realm: Realm!
     var cancellable: AnyCancellable?
     var notificationToken: NotificationToken?
@@ -144,7 +144,7 @@ class CombinePublisherTestCase: TestCase {
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class CombineRealmTests: CombinePublisherTestCase {
+class CombineRealmTests: CombinePublisherTestCase, @unchecked Sendable {
     func testWillChangeLocalWrite() {
         var called = false
         cancellable = realm
@@ -212,7 +212,7 @@ class CombineRealmTests: CombinePublisherTestCase {
 // MARK: - Object
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class CombineObjectPublisherTests: CombinePublisherTestCase {
+class CombineObjectPublisherTests: CombinePublisherTestCase, @unchecked Sendable {
     var obj: SwiftIntObject!
 
     override func setUp() {
@@ -786,7 +786,7 @@ private protocol CombineTestCollection {
 // MARK: - List, MutableSet
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-private class CombineCollectionPublisherTests<Collection: RealmCollection>: CombinePublisherTestCase
+private class CombineCollectionPublisherTests<Collection: RealmCollection>: CombinePublisherTestCase, @unchecked Sendable
         where Collection: CombineTestCollection, Collection: RealmSubscribable {
     var collection: Collection!
 
@@ -1414,7 +1414,7 @@ extension Results: CombineTestCollection where Element == ModernAllTypesObject {
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class ResultsPublisherTests: TestCase {
+class ResultsPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<Results<ModernAllTypesObject>>.testSuite("Results")
     }
@@ -1444,7 +1444,7 @@ extension List: CombineTestCollection where Element == ModernAllTypesObject {
 
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class ManagedListPublisherTests: TestCase {
+class ManagedListPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<List<ModernAllTypesObject>>.testSuite("List")
     }
@@ -1473,7 +1473,7 @@ extension MutableSet: CombineTestCollection where Element == ModernAllTypesObjec
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class ManagedMutableSetPublisherTests: TestCase {
+class ManagedMutableSetPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<MutableSet<ModernAllTypesObject>>.testSuite("MutableSet")
     }
@@ -1505,7 +1505,7 @@ extension LinkingObjects: CombineTestCollection where Element == ModernAllTypesO
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class LinkingObjectsPublisherTests: TestCase {
+class LinkingObjectsPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<LinkingObjects<ModernAllTypesObject>>.testSuite("LinkingObjects")
     }
@@ -1534,7 +1534,7 @@ extension AnyRealmCollection: CombineTestCollection where Element == ModernAllTy
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class AnyRealmCollectionPublisherTests: TestCase {
+class AnyRealmCollectionPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<AnyRealmCollection<ModernAllTypesObject>>.testSuite("AnyRealmCollection")
     }
@@ -1543,7 +1543,7 @@ class AnyRealmCollectionPublisherTests: TestCase {
 // MARK: - Map
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: CombinePublisherTestCase
+private class CombineMapPublisherTests<Collection: RealmKeyedCollection>: CombinePublisherTestCase, @unchecked Sendable
         where Collection: CombineTestCollection, Collection: RealmSubscribable {
     var collection: Collection!
 
@@ -2171,7 +2171,7 @@ extension Map: CombineTestCollection where Key == String, Value == SwiftObject? 
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class ManagedMapPublisherTests: TestCase {
+class ManagedMapPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineMapPublisherTests<Map<String, SwiftObject?>>.testSuite("Map")
     }
@@ -2189,7 +2189,7 @@ extension ModernAllTypesObject: RealmSectionedObject {
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>: CombinePublisherTestCase
+private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>: CombinePublisherTestCase, @unchecked Sendable
     where Collection: CombineTestCollection, Collection: RealmSubscribable, Collection.Element: RealmSectionedObject {
     var collection: Collection!
 
@@ -3392,7 +3392,7 @@ private class CombineSectionedResultsPublisherTests<Collection: RealmCollection>
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 // swiftlint:disable:next type_name
-class ResultsWithSectionedResultsPublisherTests: TestCase {
+class ResultsWithSectionedResultsPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<Results<ModernAllTypesObject>>.testSuite("Results")
     }
@@ -3400,7 +3400,7 @@ class ResultsWithSectionedResultsPublisherTests: TestCase {
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 // swiftlint:disable:next type_name
-class ManagedListSectionedResultsPublisherTests: TestCase {
+class ManagedListSectionedResultsPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<List<ModernAllTypesObject>>.testSuite("List")
     }
@@ -3408,7 +3408,7 @@ class ManagedListSectionedResultsPublisherTests: TestCase {
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 // swiftlint:disable:next type_name
-class ManagedMutableSetSectionedResultsPublisherTests: TestCase {
+class ManagedMutableSetSectionedResultsPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<MutableSet<ModernAllTypesObject>>.testSuite("MutableSet")
     }
@@ -3416,7 +3416,7 @@ class ManagedMutableSetSectionedResultsPublisherTests: TestCase {
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 // swiftlint:disable:next type_name
-class LinkingObjectsSectionedResultsPublisherTests: TestCase {
+class LinkingObjectsSectionedResultsPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<LinkingObjects<ModernAllTypesObject>>.testSuite("LinkingObjects")
     }
@@ -3424,7 +3424,7 @@ class LinkingObjectsSectionedResultsPublisherTests: TestCase {
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 // swiftlint:disable:next type_name
-class AnyRealmCollectionSectionedResultsPublisherTests: TestCase {
+class AnyRealmCollectionSectionedResultsPublisherTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         return CombineSectionedResultsPublisherTests<AnyRealmCollection<ModernAllTypesObject>>.testSuite("AnyRealmCollection")
     }
@@ -3446,7 +3446,7 @@ public final class AltSimpleProjection: Projection<SimpleObject>, ObjectKeyIdent
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class CombineProjectionPublisherTests: CombinePublisherTestCase {
+class CombineProjectionPublisherTests: CombinePublisherTestCase, @unchecked Sendable {
 
     var object: SimpleObject!
     var projection: SimpleProjection!
@@ -4080,7 +4080,7 @@ class CombineProjectionPublisherTests: CombinePublisherTestCase {
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-class CombineAsyncRealmTests: CombinePublisherTestCase {
+class CombineAsyncRealmTests: CombinePublisherTestCase, @unchecked Sendable {
     func testWillChangeLocalWrite() {
         let asyncWriteExpectation = expectation(description: "Should complete async write")
         cancellable = realm.objectWillChange.sink {

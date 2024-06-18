@@ -596,6 +596,14 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     return configuration;
 }
 
+- (RLMRealmConfiguration *)configurationSharingSchema {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.configRef = _realm->config();
+    configuration.dynamic = _dynamic;
+    [configuration setCustomSchemaWithoutCopying:_schema];
+    return configuration;
+}
+
 - (void)beginWriteTransaction {
     [self beginWriteTransactionWithError:nil];
 }
@@ -1076,7 +1084,7 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
 
 - (RLMRealm *)thaw {
     [self verifyThread];
-    return self.isFrozen ? [RLMRealm realmWithConfiguration:self.configuration error:nil] : self;
+    return self.isFrozen ? [RLMRealm realmWithConfiguration:self.configurationSharingSchema error:nil] : self;
 }
 
 - (RLMRealm *)frozenCopy {

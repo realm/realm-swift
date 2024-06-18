@@ -536,9 +536,7 @@ extension ProjectionObservable {
     ) async -> NotificationToken {
         await with(self, on: actor) { actor, obj in
             obj.observe(keyPaths: keyPaths, on: nil) { (change: ObjectChange<Self>) in
-                assumeOnActorExecutor(actor) { actor in
-                    block(actor, change)
-                }
+                actor.invokeIsolated(block, change)
             }
         } ?? NotificationToken()
     }

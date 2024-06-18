@@ -574,7 +574,7 @@ keyPaths:(std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm
                                confinedTo:(RLMScheduler *)confinement
                                completion:(RLMResultsCompletionBlock)completion
                                     error:(NSError *_Nullable)error {
-    RLMRealmConfiguration *configuration = _realm.configuration;
+    RLMRealmConfiguration *configuration = _realm.configurationSharingSchema;
     [confinement invoke:^{
         if (error) {
             return completion(nil, error);

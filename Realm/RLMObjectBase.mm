@@ -790,7 +790,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
     RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:(id)obj];
     auto token = [[RLMObjectNotificationToken alloc] init];
     token->_realm = obj->_realm;
-    RLMRealmConfiguration *config = obj->_realm.configuration;
+    RLMRealmConfiguration *config = obj->_realm.configurationSharingSchema;
     dispatch_async(queue, ^{
         @autoreleasepool {
             [token addNotificationBlock:block threadSafeReference:tsr config:config keyPaths:keyPaths queue:queue];

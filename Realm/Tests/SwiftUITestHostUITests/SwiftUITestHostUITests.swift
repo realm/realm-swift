@@ -93,6 +93,12 @@ class SwiftUITests: XCTestCase {
         app.buttons["New List"].tap()
         XCTAssertTrue(app.navigationBars.staticTexts["New List"].waitForExistence(timeout: 1.0))
         app.buttons["addReminder"].tap()
+        if #available(iOS 18, *) {
+            // Work around what appears to be a bug in SwiftUI in iOS 18 beta 1
+            // where tapping the list entry doesn't navigate to ReminderView
+            // if there's only one list entry
+            app.buttons["addReminder"].tap()
+        }
         // type in a name
         if #available(iOS 16, *) {
             app.cells.element(boundBy: 0).tap()
@@ -142,6 +148,10 @@ class SwiftUITests: XCTestCase {
                 app.buttons.matching(identifier: "Delete ").firstMatch.tap()
                 app.buttons.matching(identifier: "Delete").firstMatch.tap()
             }
+        }
+        if #available(iOS 18, *) {
+            XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 3)
+            delete()
         }
         XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 2)
         delete()
@@ -419,7 +429,7 @@ class SwiftUITests: XCTestCase {
         // been inserted into the Realm.
         if #available(iOS 16, *) {
             let sectionHeader1 = app.collectionViews.children(matching: .cell).element(boundBy: 0)
-            XCTAssert(sectionHeader1.staticTexts["A"].exists)
+            XCTAssert(sectionHeader1.staticTexts["A"].waitForExistence(timeout: 1.0))
             let cell0 = app.collectionViews.children(matching: .cell).element(boundBy: 1)
             XCTAssert(cell0.staticTexts["Another List"].exists)
             let sectionHeader2 = app.collectionViews.children(matching: .cell).element(boundBy: 2)
@@ -520,7 +530,7 @@ class SwiftUITests: XCTestCase {
         // been inserted into the Realm.
         if #available(iOS 16, *) {
             let sectionHeader1 = app.collectionViews.children(matching: .cell).element(boundBy: 0)
-            XCTAssert(sectionHeader1.staticTexts["A"].exists)
+            XCTAssert(sectionHeader1.staticTexts["A"].waitForExistence(timeout: 1.0))
             let cell0 = app.collectionViews.children(matching: .cell).element(boundBy: 1)
             XCTAssert(cell0.staticTexts["Another List"].exists)
             let sectionHeader2 = app.collectionViews.children(matching: .cell).element(boundBy: 2)

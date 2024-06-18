@@ -21,7 +21,7 @@ import Realm.Private
 import RealmSwift
 import Foundation
 
-class ModernObjectAccessorTests: TestCase {
+class ModernObjectAccessorTests: TestCase, @unchecked Sendable {
     let data = "b".data(using: .utf8, allowLossyConversion: false)!
     let date = Date(timeIntervalSinceReferenceDate: 2)
     let oid1 = ObjectId("1234567890ab1234567890ab")

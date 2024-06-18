@@ -527,7 +527,7 @@ RLMNotificationToken *RLMAddNotificationBlock(id c, id block,
     }
 
     RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:collection];
-    RLMRealmConfiguration *config = realm.configuration;
+    RLMRealmConfiguration *config = realm.configurationSharingSchema;
     dispatch_async(queue, ^{
         std::lock_guard lock(token->_mutex);
         if (!token->_realm) {

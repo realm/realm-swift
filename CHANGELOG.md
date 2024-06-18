@@ -1,12 +1,53 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Add `@ObservedSectionedResults.remove(atOffsets:section:)` which adds the ability to 
+* Add `@ObservedSectionedResults.remove(atOffsets:section:)` which adds the ability to
   remove a Realm Object when using `onDelete` on `ForEach` in a SwiftUI `List`.
+* Add support for Xcode 16 beta 1 and fix some of the new warnings. Note that
+  this does not yet include full support for Swift 6 language mode
+  ([#8618](https://github.com/realm/realm-swift/pull/8618)).
+* `Realm.asyncWrite()` and `Realm.asyncRefresh()` now use the new `#isolation`
+  feature to avoid sendability warnings when building with Xcode 16
+  ([#8618](https://github.com/realm/realm-swift/pull/8618)).
+* Include the originating client reset error message in errors reporting that
+  automatic client reset handling failed. ([Core #7761](https://github.com/realm/realm-core/pull/7761))
+* Improve the performance of insertion-heavy write transactions, particularly
+  when setting a large number of properties on each object created
+  ([Core #7734](https://github.com/realm/realm-core/pull/7734)).
+* App now trims trailing slashes from the base url rather than producing
+  confusing 404 errors. ([Core #7791](https://github.com/realm/realm-core/pull/7791)).
 
 ### Fixed
 * Deleting a Realm Object used in a `@ObservedSectionedResults` collection in `SwiftUI`
   would cause a crash during the diff on the `View`. ([#8294](https://github.com/realm/realm-swift/issues/8294), since v10.29.0)
+* Fix some client resets (such as migrating to flexible sync) potentially
+  failing if a new client reset condition (such as rolling back a flexible sync
+  migration) occurred before the first one completed.
+ ([Core #7542](https://github.com/realm/realm-core/pull/7542), since v10.40.0)
+* The encryption code no longer behaves differently depending on the system
+  page size, which should entirely eliminate a recurring source of bugs related
+  to copying encrypted Realm files between platforms with different page sizes.
+  One known outstanding bug was ([RNET-1141](https://github.com/realm/realm-dotnet/issues/3592)),
+  where opening files on a system with a larger page size than the writing
+  system would attempt to read sections of the file which had never been
+  written to ([Core #7698](https://github.com/realm/realm-core/pull/7698)).
+* There were several complicated scenarios which could result in stale reads
+  from encrypted files in multiprocess scenarios. These were very difficult to
+  hit and would typically lead to a crash, either due to an assertion failure
+  or DecryptionFailure being thrown ([Core #7698](https://github.com/realm/realm-core/pull/7698), since v10.38.0).
+* Encrypted files have some benign data races where we can memcpy a block of
+  memory while another thread is writing to a limited range of it. It is
+  logically impossible to ever read from that range when this happens, but
+  Thread Sanitizer quite reasonably complains about this. We now perform a
+  slower operations when running with TSan which avoids this benign race
+  ([Core #7698](https://github.com/realm/realm-core/pull/7698)).
+* `Realm.asyncOpen()` on a flexible sync Realm would sometimes fail to wait for
+  pending subscriptions to complete, resulting in it not actually waiting for
+  all data to be downloaded. ([Core #7720](https://github.com/realm/realm-core/issues/7720),
+  since flexible sync was introduced).
+* `List<AnyRealmValue>.clear()` would hit an assertion failure when used on a
+  file originally created by a version of Realm older than v10.49.0.
+  ([Core #7771](https://github.com/realm/realm-core/issues/7771), since 10.49.0)
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -15,10 +56,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 15.1.0-15.4.0.
+* Xcode: 15.1.0-16 beta
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v14.9.0 to 14.10.1
 
 10.51.0 Release notes (2024-06-06)
 =============================================================
@@ -48,29 +89,29 @@ x.y.z Release notes (yyyy-MM-dd)
   ```swift
   realm.objects(MixedObject.self).where { $0.anyValue[0][0][1] == .double(76.54) }
   ```
-  
+
   The `.any` operator allows looking up in all keys or indexes.
   ```swift
   realm.objects(MixedObject.self).where { $0.anyValue["key"].any == .bool(false) }
   ```
-* Report the originating error that caused a client reset to occur. 
+* Report the originating error that caused a client reset to occur.
   ([Core #6154](https://github.com/realm/realm-core/issues/6154))
 
 ### Fixed
 
-* Accessing `App.currentUser` from within a notification produced by `App.switchToUser()` 
-  (which includes notifications for a newly logged in user) would deadlock. 
+* Accessing `App.currentUser` from within a notification produced by `App.switchToUser()`
+  (which includes notifications for a newly logged in user) would deadlock.
   ([Core #7670](https://github.com/realm/realm-core/issues/7670), since v10.50.0).
-* Inserting the same link to the same key in a dictionary more than once would incorrectly create 
-  multiple backlinks to the object. This did not appear to cause any crashes later, but would 
-  have affecting explicit backlink count queries and possibly notifications. 
+* Inserting the same link to the same key in a dictionary more than once would incorrectly create
+  multiple backlinks to the object. This did not appear to cause any crashes later, but would
+  have affecting explicit backlink count queries and possibly notifications.
   ([Core #7676](https://github.com/realm/realm-core/issues/7676), since v10.49.2).
-* A non-streaming progress notifier would not immediately call its callback after registration. 
-  Instead you would have to wait for a download message to be received to get your first 
+* A non-streaming progress notifier would not immediately call its callback after registration.
+  Instead you would have to wait for a download message to be received to get your first
   update - if you were already caught up when you registered the notifier you could end up waiting a
-  long time for the server to deliver a download that would call/expire your notifier 
+  long time for the server to deliver a download that would call/expire your notifier
   ([Core #7627](https://github.com/realm/realm-core/issues/7627), since v10.50.0).
-* After compacting, a file upgrade would be triggered. This could cause loss of data 
+* After compacting, a file upgrade would be triggered. This could cause loss of data
   if `deleteRealmIfMigrationNeeded` is set to true.
   ([Core #7747](https://github.com/realm/realm-core/issues/7747), since v10.49.0).
 

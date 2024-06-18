@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class ObjectIdTests: TestCase {
+class ObjectIdTests: TestCase, @unchecked Sendable {
 
     func testObjectIdInitialization() {
         let strValue = "000123450000ffbeef91906c"
