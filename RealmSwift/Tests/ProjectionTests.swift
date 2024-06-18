@@ -1590,6 +1590,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         observeSetChange(obs, "mapOptUuid") { obj.mapOptUuid.removeObject(for: "key") }
     }
 
+    @MainActor
     func testObserveOnActor() async throws {
         let projection = simpleProjection()
         let ex = expectation(description: "got change")
