@@ -147,11 +147,9 @@ let package = Package(
     products: [
         .library(
             name: "Realm",
-            type: .dynamic,
             targets: ["Realm"]),
         .library(
             name: "RealmSwift",
-            type: .dynamic,
             targets: ["RealmSwift"]),
     ],
     dependencies: [
