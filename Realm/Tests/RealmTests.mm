@@ -2962,7 +2962,7 @@
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
     RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
-        [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
+        [logs appendFormat:@" %@ %lu %lu %@", [NSDate date], (unsigned long)category, level, message];
     }];
     RLMLogger.defaultLogger = logger;
 
@@ -2984,7 +2984,7 @@
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
     RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString *message) {
-        [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
+        [logs appendFormat:@" %@ %lu %lu %@", [NSDate date], (unsigned long)category, level, message];
     }];
     RLMLogger.defaultLogger = logger;
     [RLMLogger setLevel:RLMLogLevelOff forCategory:category];
@@ -3010,7 +3010,7 @@
     [logs setString: @""];
     // Init Custom Logger
     RLMLogger.defaultLogger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
-        [logs appendFormat:@" %@ %lu %@", [NSDate date], level, message];
+        [logs appendFormat:@" %@ %lu %lu %@", [NSDate date], (unsigned long)category, level, message];
     }];
     [RLMLogger setLevel:RLMLogLevelDebug forCategory:category];
     XCTAssertEqual([RLMLogger levelForCategory:category], RLMLogLevelDebug);
@@ -3023,9 +3023,10 @@
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
     RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
-        [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
+        [logs appendFormat:@" %@ %lu %lu %@", [NSDate date], (unsigned long)category, level, message];
     }];
     RLMLogger.defaultLogger = logger;
+    [RLMLogger setLevel:RLMLogLevelDebug forCategory:category];
 
     [logger logWithLevel:RLMLogLevelInfo message:@"%@ IMPORTANT INFO %i", @"TEST:", 0];
     [logger logWithLevel:RLMLogLevelTrace message:@"IMPORTANT TRACE"];
@@ -3058,9 +3059,10 @@
     __block NSMutableString *logs = [[NSMutableString alloc] init];
     RLMLogCategory category = RLMLogCategoryRealm;
     RLMLogger *logger = [[RLMLogger alloc] initWithLogFunction:^(RLMLogLevel level, RLMLogCategory category, NSString * message) {
-        [logs appendFormat:@" %@ %lu %@.", [NSDate date], level, message];
+        [logs appendFormat:@" %@ %lu %lu %@", [NSDate date], (unsigned long)category, level, message];
     }];
     RLMLogger.defaultLogger = logger;
+    [RLMLogger setLevel:RLMLogLevelAll forCategory:category];
     RLMApp *app = [RLMApp appWithId:@"test-id"];
     // We don't even need the login to succeed, we only want for the logger
     // to log the values on device info after trying to login.

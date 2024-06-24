@@ -35,7 +35,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
  Log a message to the supplied level.
 
  @param logLevel The log level for the message.
- @param category The log category name for the message.
+ @param categoryName The log category name for the message.
  @param message The message to log.
  */
 - (void)logWithLevel:(RLMLogLevel)logLevel categoryName:(NSString *)categoryName message:(NSString *)message;

@@ -1,8 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
-* Update release packaging for Xcode 15.4.
 * Added support for filtering logs by category. Users wil have more fine grained control over 
   the log level for each category as well.
   ```swift

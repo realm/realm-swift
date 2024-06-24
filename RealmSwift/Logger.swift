@@ -88,7 +88,7 @@ extension Logger {
     @available(*, deprecated, message: "Use init(function:)")
     public convenience init(level: LogLevel, function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {
         self.init(logFunction: { level, category, message in
-            function(level, Category.realm, message)
+            function(level, ObjectiveCSupport.convert(value: category), message)
         })
         Logger.setLogLevel(level, for: Category.realm)
     }

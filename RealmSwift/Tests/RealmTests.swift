@@ -2068,7 +2068,7 @@ class LoggerTests: TestCase, @unchecked Sendable {
     func testShouldNotLogParentOrRelatedCategory() throws {
         Logger.setLogLevel(.off, for: Category.realm)
         XCTAssertEqual(Logger.logLevel(for: Category.realm), .off)
-        
+
         let logs = Locked("")
         let logger = Logger(function: { level, category, message in
             logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
@@ -2163,16 +2163,16 @@ class LoggerTests: TestCase, @unchecked Sendable {
 
         Logger.setLogLevel(.off, for: Category.realm)
         Logger.setLogLevel(.info, for: Category.Storage.all)
-        
-        logger.log(level: .info, category: Category.Storage.all, message: "Storage test entry")
+
+        logger.log(with: .info, categoryName: Category.Storage.all.rawValue, message: "Storage test entry")
         XCTAssertTrue(logs.value.contains("Storage test entry"))
         logs.wrappedValue = ""
 
-        logger.log(level: .info, category: Category.Storage.transaction, message: "Transaction test entry")
+        logger.log(with: .info, categoryName: Category.Storage.transaction.rawValue, message: "Transaction test entry")
         XCTAssertTrue(logs.value.contains("Transaction test entry"))
         logs.wrappedValue = ""
 
-        logger.log(level: .info, category: Category.realm, message: "REALM test entry")
+        logger.log(with: .info, categoryName: Category.realm.rawValue, message: "REALM test entry")
         XCTAssertFalse(logs.value.contains("REALM test entry"))
     }
 
