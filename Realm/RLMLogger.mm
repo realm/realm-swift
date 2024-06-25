@@ -75,53 +75,47 @@ static NSString* levelPrefix(Level logLevel) {
     REALM_UNREACHABLE();    // Unrecognized log level.
 }
 
-static NSArray<NSString *> *categories = [NSArray arrayWithObjects:
-                                          @"Realm",
-                                          @"Realm.SDK",
-                                          @"Realm.App",
-                                          @"Realm.Storage",
-                                          @"Realm.Storage.Transaction",
-                                          @"Realm.Storage.Query",
-                                          @"Realm.Storage.Object",
-                                          @"Realm.Storage.Notification",
-                                          @"Realm.Sync",
-                                          @"Realm.Sync.Client",
-                                          @"Realm.Sync.Client.Session",
-                                          @"Realm.Sync.Client.Changeset",
-                                          @"Realm.Sync.Client.Network",
-                                          @"Realm.Sync.Client.Reset",
-                                          @"Realm.Sync.Server",
-                                          nil];
-
-static std::string categoryNameForLogCategory(RLMLogCategory logCategory) {
-    if (logCategory < [categories count]) {
-        if (auto categoryName = [categories objectAtIndex:logCategory]) {
-            return categoryName.UTF8String;
-        }
-    }
+static LogCategory& categoryForLogCategory(RLMLogCategory logCategory) {
+    switch (logCategory) {
+        case RLMLogCategoryRealm: return LogCategory::realm;
+        case RLMLogCategoryRealmSDK: return LogCategory::sdk;
+        case RLMLogCategoryRealmApp: return LogCategory::app;
+        case RLMLogCategoryRealmStorage: return LogCategory::storage;
+        case RLMLogCategoryRealmStorageTransaction: return LogCategory::transaction;
+        case RLMLogCategoryRealmStorageQuery: return LogCategory::query;
+        case RLMLogCategoryRealmStorageObject: return LogCategory::object;
+        case RLMLogCategoryRealmStorageNotification: return LogCategory::notification;
+        case RLMLogCategoryRealmSync:  return LogCategory::sync;
+        case RLMLogCategoryRealmSyncClient: return LogCategory::client;
+        case RLMLogCategoryRealmSyncClientSession: return LogCategory::session;
+        case RLMLogCategoryRealmSyncClientChangeset: return LogCategory::changeset;
+        case RLMLogCategoryRealmSyncClientNetwork: return LogCategory::network;
+        case RLMLogCategoryRealmSyncClientReset: return LogCategory::reset;
+        case RLMLogCategoryRealmSyncServer: return LogCategory::server;
+    };
     REALM_UNREACHABLE();
 }
 
 static RLMLogCategory logCategoryForCategoryName(std::string category) {
-    auto index = [categories indexOfObject:RLMStringDataToNSString(category)];
-    if (index != NSNotFound) {
-        switch (index) {
-            case 0: return RLMLogCategoryRealm;
-            case 1: return RLMLogCategoryRealmSDK;
-            case 2: return RLMLogCategoryRealmApp;
-            case 3: return RLMLogCategoryRealmStorage;
-            case 4: return RLMLogCategoryRealmStorageTransaction;
-            case 5: return RLMLogCategoryRealmStorageQuery;
-            case 6: return RLMLogCategoryRealmStorageObject;
-            case 7: return RLMLogCategoryRealmStorageNotification;
-            case 8: return RLMLogCategoryRealmSync;
-            case 9: return RLMLogCategoryRealmSyncClient;
-            case 10: return RLMLogCategoryRealmSyncClientSession;
-            case 11: return RLMLogCategoryRealmSyncClientChangeset;
-            case 12: return RLMLogCategoryRealmSyncClientNetwork;
-            case 13: return RLMLogCategoryRealmSyncClientReset;
-            case 14: return RLMLogCategoryRealmSyncServer;
-        }
+    NSDictionary *categories = @{
+        @"Realm": @(RLMLogCategoryRealm),
+        @"Realm.SDK": @(RLMLogCategoryRealmSDK),
+        @"Realm.App": @(RLMLogCategoryRealmApp),
+        @"Realm.Storage": @(RLMLogCategoryRealmStorage),
+        @"Realm.Storage.Transaction": @(RLMLogCategoryRealmStorageTransaction),
+        @"Realm.Storage.Query": @(RLMLogCategoryRealmStorageQuery),
+        @"Realm.Storage.Object": @(RLMLogCategoryRealmStorageObject),
+        @"Realm.Storage.Notification": @(RLMLogCategoryRealmStorageNotification),
+        @"Realm.Sync": @(RLMLogCategoryRealmSync),
+        @"Realm.Sync.Client": @(RLMLogCategoryRealmSyncClient),
+        @"Realm.Sync.Client.Session": @(RLMLogCategoryRealmSyncClientSession),
+        @"Realm.Sync.Client.Changeset": @(RLMLogCategoryRealmSyncClientChangeset),
+        @"Realm.Sync.Client.Network": @(RLMLogCategoryRealmSyncClientNetwork),
+        @"Realm.Sync.Client.Reset": @(RLMLogCategoryRealmSyncClientReset),
+        @"Realm.Sync.Server": @(RLMLogCategoryRealmSyncServer)
+    };
+    if (NSNumber *logCategory = [categories objectForKey:RLMStringDataToNSString(category)]) {
+        return RLMLogCategory([logCategory intValue]);
     }
     REALM_UNREACHABLE();
 }
@@ -210,10 +204,9 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 - (void)logWithLevel:(RLMLogLevel)logLevel category:(RLMLogCategory)category message:(NSString *)message {
     auto level = levelForLogLevel(logLevel);
-    auto cat = categoryNameForLogCategory(category);
-    LogCategory& lcat = LogCategory::get_category(cat);
-    if (_logger->would_log(lcat, level)) {
-        _logger->log(lcat, levelForLogLevel(logLevel), message.UTF8String);
+    LogCategory& cat = categoryForLogCategory(category);
+    if (_logger->would_log(cat, level)) {
+        _logger->log(cat, levelForLogLevel(logLevel), message.UTF8String);
     }
 }
 
@@ -227,12 +220,12 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 + (void)setLevel:(RLMLogLevel)level forCategory:(RLMLogCategory)category {
     auto defaultLogger = Logger::get_default_logger();
-    defaultLogger->set_level_threshold(categoryNameForLogCategory(category), levelForLogLevel(level));
+    defaultLogger->set_level_threshold(categoryForLogCategory(category).get_name(), levelForLogLevel(level));
 }
 
 + (RLMLogLevel)levelForCategory:(RLMLogCategory)category {
     auto defaultLogger = Logger::get_default_logger();
-    return logLevelForLevel(defaultLogger->get_level_threshold(categoryNameForLogCategory(category)));
+    return logLevelForLevel(defaultLogger->get_level_threshold(categoryForLogCategory(category).get_name()));
 }
 
 #pragma mark Testing

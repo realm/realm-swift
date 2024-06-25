@@ -13,7 +13,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Deprecations
 * `RLMLogger.level`/`Logger.level` has been deprecated in favor of using `RLMLogger.setLevel:forCategory:`/`Logger.setLevel(:category:)` and `RLMLogger.getLevelForCategory:`/`Logger.getLevel(for:)`.
-* Is not recommended to initialise a `RLMLogger/Logger` with a level anymore.
+* It is not recommended to initialize a `RLMLogger/Logger` with a level anymore.
 
 ### Compatibility
 * Realm Studio: 15.0.0 or later.

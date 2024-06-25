@@ -47,7 +47,7 @@ import Realm.Private
  Logger.shared = logger
  ```
 
- - note: By default log threshold level is `.info`, for the log category `.Category.realm`,
+ - note: The default log threshold level is `.info`, for the log category `.Category.realm`,
          and logging strings are output to Apple System Logger.
  - SeeAlso: `LogCategory`
 */
@@ -67,7 +67,7 @@ extension Logger {
      - parameter category: The log category for the message.
      - parameter message: The message to log.
      */
-    internal func log(level: LogLevel, category: LogCategory = Category.realm, message: String) {
+    internal func log(level: LogLevel, category: LogCategory = Category.sdk, message: String) {
         self.log(with: level, category: ObjectiveCSupport.convert(value: category), message: message)
     }
 
@@ -175,21 +175,6 @@ public enum Category: String, LogCategory {
     /// Log category for all app related logs.
     case app = "Realm.App"
 
-    /// :nodoc:
-    fileprivate static func fromString(_ string: String) -> LogCategory? {
-        if let category = Category(rawValue: string) {
-            return category
-        } else if let storage = Storage(rawValue: string) {
-            return storage
-        } else if let sync = Sync(rawValue: string) {
-            return sync
-        } else if let client = Sync.Client(rawValue: string) {
-            return client
-        } else {
-            return nil
-        }
-    }
-
     /**
      Log category for all storage related logs.
 
@@ -240,11 +225,11 @@ public enum Category: String, LogCategory {
 
          Category hierarchy:
          ```
-          Storage
-          ├─► Transaction
-          ├─► Query
-          ├─► Object
-          └─► Notification
+         Client
+          ├─► Session
+          ├─► Changeset
+          ├─► Network
+          └─► Reset
          ```
          */
         public enum Client: String, LogCategory {

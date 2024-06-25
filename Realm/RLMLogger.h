@@ -49,8 +49,9 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
 } NS_SWIFT_NAME(LogLevel);
 
 /**
-An enum representing different categories of sync-related logging that can be configured.
-Category hierarchy:
+ An enum representing different categories of sync-related logging that can be configured.
+ Setting the log level for a parent category automatically sets the same level for all child categories.
+ Category hierarchy:
 ```
  Realm
  ├─► Storage
@@ -126,7 +127,7 @@ typedef void (^RLMLogCategoryFunction)(RLMLogLevel level, RLMLogCategory categor
          NSLog(@"Realm Log - %lu, %@, %@", (unsigned long)level, category, message);
      }];
 
- @note By default default log threshold level is `RLMLogLevelInfo` for the log category `RLMLogCategoryRealm`,
+ @note The default log threshold level is `RLMLogLevelInfo` for the log category `RLMLogCategoryRealm`,
        and logging strings are output to Apple System Logger.
 */
 @interface RLMLogger : NSObject
@@ -163,8 +164,6 @@ __attribute__((deprecated("Use `initWithLogFunction:` instead.")));
 /**
  The current default logger. When setting a logger as default, this logger will replace the current default logger and will
  be used whenever information must be logged.
-
- @note By default the logger
  */
 @property (class) RLMLogger *defaultLogger NS_SWIFT_NAME(shared);
 
