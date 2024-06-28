@@ -78,20 +78,20 @@ static NSString* levelPrefix(Level logLevel) {
 static LogCategory& categoryForLogCategory(RLMLogCategory logCategory) {
     switch (logCategory) {
         case RLMLogCategoryRealm: return LogCategory::realm;
-        case RLMLogCategoryRealmSDK: return LogCategory::sdk;
-        case RLMLogCategoryRealmApp: return LogCategory::app;
-        case RLMLogCategoryRealmStorage: return LogCategory::storage;
-        case RLMLogCategoryRealmStorageTransaction: return LogCategory::transaction;
-        case RLMLogCategoryRealmStorageQuery: return LogCategory::query;
-        case RLMLogCategoryRealmStorageObject: return LogCategory::object;
-        case RLMLogCategoryRealmStorageNotification: return LogCategory::notification;
-        case RLMLogCategoryRealmSync:  return LogCategory::sync;
-        case RLMLogCategoryRealmSyncClient: return LogCategory::client;
-        case RLMLogCategoryRealmSyncClientSession: return LogCategory::session;
-        case RLMLogCategoryRealmSyncClientChangeset: return LogCategory::changeset;
-        case RLMLogCategoryRealmSyncClientNetwork: return LogCategory::network;
-        case RLMLogCategoryRealmSyncClientReset: return LogCategory::reset;
-        case RLMLogCategoryRealmSyncServer: return LogCategory::server;
+        case RLMLogCategorySDK: return LogCategory::sdk;
+        case RLMLogCategoryApp: return LogCategory::app;
+        case RLMLogCategoryStorage: return LogCategory::storage;
+        case RLMLogCategoryStorageTransaction: return LogCategory::transaction;
+        case RLMLogCategoryStorageQuery: return LogCategory::query;
+        case RLMLogCategoryStorageObject: return LogCategory::object;
+        case RLMLogCategoryStorageNotification: return LogCategory::notification;
+        case RLMLogCategorySync:  return LogCategory::sync;
+        case RLMLogCategorySyncClient: return LogCategory::client;
+        case RLMLogCategorySyncClientSession: return LogCategory::session;
+        case RLMLogCategorySyncClientChangeset: return LogCategory::changeset;
+        case RLMLogCategorySyncClientNetwork: return LogCategory::network;
+        case RLMLogCategorySyncClientReset: return LogCategory::reset;
+        case RLMLogCategorySyncServer: return LogCategory::server;
     };
     REALM_UNREACHABLE();
 }
@@ -99,20 +99,20 @@ static LogCategory& categoryForLogCategory(RLMLogCategory logCategory) {
 static RLMLogCategory logCategoryForCategoryName(std::string category) {
     NSDictionary *categories = @{
         @"Realm": @(RLMLogCategoryRealm),
-        @"Realm.SDK": @(RLMLogCategoryRealmSDK),
-        @"Realm.App": @(RLMLogCategoryRealmApp),
-        @"Realm.Storage": @(RLMLogCategoryRealmStorage),
-        @"Realm.Storage.Transaction": @(RLMLogCategoryRealmStorageTransaction),
-        @"Realm.Storage.Query": @(RLMLogCategoryRealmStorageQuery),
-        @"Realm.Storage.Object": @(RLMLogCategoryRealmStorageObject),
-        @"Realm.Storage.Notification": @(RLMLogCategoryRealmStorageNotification),
-        @"Realm.Sync": @(RLMLogCategoryRealmSync),
-        @"Realm.Sync.Client": @(RLMLogCategoryRealmSyncClient),
-        @"Realm.Sync.Client.Session": @(RLMLogCategoryRealmSyncClientSession),
-        @"Realm.Sync.Client.Changeset": @(RLMLogCategoryRealmSyncClientChangeset),
-        @"Realm.Sync.Client.Network": @(RLMLogCategoryRealmSyncClientNetwork),
-        @"Realm.Sync.Client.Reset": @(RLMLogCategoryRealmSyncClientReset),
-        @"Realm.Sync.Server": @(RLMLogCategoryRealmSyncServer)
+        @"Realm.SDK": @(RLMLogCategorySDK),
+        @"Realm.App": @(RLMLogCategoryApp),
+        @"Realm.Storage": @(RLMLogCategoryStorage),
+        @"Realm.Storage.Transaction": @(RLMLogCategoryStorageTransaction),
+        @"Realm.Storage.Query": @(RLMLogCategoryStorageQuery),
+        @"Realm.Storage.Object": @(RLMLogCategoryStorageObject),
+        @"Realm.Storage.Notification": @(RLMLogCategoryStorageNotification),
+        @"Realm.Sync": @(RLMLogCategorySync),
+        @"Realm.Sync.Client": @(RLMLogCategorySyncClient),
+        @"Realm.Sync.Client.Session": @(RLMLogCategorySyncClientSession),
+        @"Realm.Sync.Client.Changeset": @(RLMLogCategorySyncClientChangeset),
+        @"Realm.Sync.Client.Network": @(RLMLogCategorySyncClientNetwork),
+        @"Realm.Sync.Client.Reset": @(RLMLogCategorySyncClientReset),
+        @"Realm.Sync.Server": @(RLMLogCategorySyncServer)
     };
     if (NSNumber *logCategory = [categories objectForKey:RLMStringDataToNSString(category)]) {
         return RLMLogCategory([logCategory intValue]);

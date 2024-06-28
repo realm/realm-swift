@@ -257,33 +257,33 @@ private extension ObjectiveCSupport {
         case Category.realm:
             return RLMLogCategory.realm
         case Category.sdk:
-            return RLMLogCategory.realmSDK
+            return RLMLogCategory.SDK
         case Category.app:
-            return RLMLogCategory.realmApp
+            return RLMLogCategory.app
         case Category.Storage.all:
-            return RLMLogCategory.realmStorage
+            return RLMLogCategory.storage
         case Category.Storage.transaction:
-            return RLMLogCategory.realmStorageTransaction
+            return RLMLogCategory.storageTransaction
         case Category.Storage.query:
-            return RLMLogCategory.realmStorageQuery
+            return RLMLogCategory.storageQuery
         case Category.Storage.object:
-            return RLMLogCategory.realmStorageObject
+            return RLMLogCategory.storageObject
         case Category.Storage.notification:
-            return RLMLogCategory.realmStorageNotification
+            return RLMLogCategory.storageNotification
         case Category.Sync.all:
-            return RLMLogCategory.realmSync
+            return RLMLogCategory.sync
         case Category.Sync.Client.all:
-            return RLMLogCategory.realmSyncClient
+            return RLMLogCategory.syncClient
         case Category.Sync.Client.session:
-            return RLMLogCategory.realmSyncClientSession
+            return RLMLogCategory.syncClientSession
         case Category.Sync.Client.changeset:
-            return RLMLogCategory.realmSyncClientChangeset
+            return RLMLogCategory.syncClientChangeset
         case Category.Sync.Client.network:
-            return RLMLogCategory.realmSyncClientNetwork
+            return RLMLogCategory.syncClientNetwork
         case Category.Sync.Client.reset:
-            return RLMLogCategory.realmSyncClientReset
+            return RLMLogCategory.syncClientReset
         case Category.Sync.server:
-            return RLMLogCategory.realmSyncServer
+            return RLMLogCategory.syncServer
         default:
             fatalError()
         }
@@ -296,33 +296,33 @@ private extension ObjectiveCSupport {
         switch value {
         case RLMLogCategory.realm:
             return Category.realm
-        case RLMLogCategory.realmSDK:
+        case RLMLogCategory.SDK:
             return Category.sdk
-        case RLMLogCategory.realmApp:
+        case RLMLogCategory.app:
             return Category.app
-        case RLMLogCategory.realmStorage:
+        case RLMLogCategory.storage:
             return Category.Storage.all
-        case RLMLogCategory.realmStorageTransaction:
+        case RLMLogCategory.storageTransaction:
             return Category.Storage.transaction
-        case RLMLogCategory.realmStorageQuery:
+        case RLMLogCategory.storageQuery:
             return Category.Storage.query
-        case RLMLogCategory.realmStorageObject:
+        case RLMLogCategory.storageObject:
             return Category.Storage.object
-        case RLMLogCategory.realmStorageNotification:
+        case RLMLogCategory.storageNotification:
             return Category.Storage.notification
-        case RLMLogCategory.realmSync:
+        case RLMLogCategory.sync:
             return Category.Sync.all
-        case RLMLogCategory.realmSyncClient:
+        case RLMLogCategory.syncClient:
             return Category.Sync.Client.all
-        case RLMLogCategory.realmSyncClientSession:
+        case RLMLogCategory.syncClientSession:
             return Category.Sync.Client.session
-        case RLMLogCategory.realmSyncClientChangeset:
+        case RLMLogCategory.syncClientChangeset:
             return Category.Sync.Client.changeset
-        case RLMLogCategory.realmSyncClientNetwork:
+        case RLMLogCategory.syncClientNetwork:
             return Category.Sync.Client.network
-        case RLMLogCategory.realmSyncClientReset:
+        case RLMLogCategory.syncClientReset:
             return Category.Sync.Client.reset
-        case RLMLogCategory.realmSyncServer:
+        case RLMLogCategory.syncServer:
             return Category.Sync.server
         default:
             fatalError()

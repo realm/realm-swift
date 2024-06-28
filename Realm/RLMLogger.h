@@ -74,33 +74,33 @@ typedef NS_ENUM(NSUInteger, RLMLogCategory) {
     ///  Top level log category for Realm, updating this category level would set all other subcategories too.
     RLMLogCategoryRealm,
     /// Log category for all sdk related logs.
-    RLMLogCategoryRealmSDK,
+    RLMLogCategorySDK,
     /// Log category for all app related logs.
-    RLMLogCategoryRealmApp,
+    RLMLogCategoryApp,
     /// Log category for all database related logs.
-    RLMLogCategoryRealmStorage,
+    RLMLogCategoryStorage,
     /// Log category for all database transaction related logs.
-    RLMLogCategoryRealmStorageTransaction,
+    RLMLogCategoryStorageTransaction,
     /// Log category for all database queries related logs.
-    RLMLogCategoryRealmStorageQuery,
+    RLMLogCategoryStorageQuery,
     /// Log category for all database object related logs.
-    RLMLogCategoryRealmStorageObject,
+    RLMLogCategoryStorageObject,
     /// Log category for all database notification related logs.
-    RLMLogCategoryRealmStorageNotification,
+    RLMLogCategoryStorageNotification,
     /// Log category for all sync related logs.
-    RLMLogCategoryRealmSync,
+    RLMLogCategorySync,
     /// Log category for all sync client related logs.
-    RLMLogCategoryRealmSyncClient,
+    RLMLogCategorySyncClient,
     /// Log category for all sync client session related logs.
-    RLMLogCategoryRealmSyncClientSession,
+    RLMLogCategorySyncClientSession,
     /// Log category for all sync client changeset related logs.
-    RLMLogCategoryRealmSyncClientChangeset,
+    RLMLogCategorySyncClientChangeset,
     /// Log category for all sync client network related logs.
-    RLMLogCategoryRealmSyncClientNetwork,
+    RLMLogCategorySyncClientNetwork,
     /// Log category for all sync client reset related logs.
-    RLMLogCategoryRealmSyncClientReset,
+    RLMLogCategorySyncClientReset,
     /// Log category for all sync server related logs.
-    RLMLogCategoryRealmSyncServer
+    RLMLogCategorySyncServer
 };
 
 /// A log callback function which can be set on RLMLogger.
