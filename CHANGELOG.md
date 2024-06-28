@@ -1,15 +1,24 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.52.1 Release notes (2024-06-28)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Realm compaction (triggered by setting `shouldCompactOnLaunch`) on an
+  encrypted Realm file could produce an invalid file unless the encryption key
+  happened to be a valid nul-terminated string.
+  ([Core #7842](https://github.com/realm/realm-core/issues/7842), since v10.52.0.
+* Assigning a List or Dictionary to an AnyRealmValue property which already
+  stored that type of collection would only emit a clear instruction if the
+  collection was not already empty. This meant that assigning to the property
+  on two different clients would merge the collections if the property
+  initially stored an empty collection, but would pick one of the two
+  assignments to win if it was initially non-empty. If merging is the desired
+  behavior, appending to the List rather than assigning a new List will still
+  achieve that ([Core #7809](https://github.com/realm/realm-core/issues/7809), since v10.51.0).
+
 
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
@@ -17,7 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.1.0-15.4.0.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v14.10.1 to 14.10.2
 
 10.52.0 Release notes (2024-06-18)
 =============================================================
@@ -87,6 +96,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 10.51.0 Release notes (2024-06-06)
 =============================================================
+
 ### Enhancements
 
 * Added support for storing nested collections (List and Map not ManagedSet) in a `AnyRealmValue`.
