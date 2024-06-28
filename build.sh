@@ -289,6 +289,7 @@ create_xcframework() {
     find "$ROOT_WORKSPACE" -path "*/$config*/$product.framework" \
         | sed 's/.*/-framework &/' \
         | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "$out_path"
+    codesign --timestamp -s "$SIGNING_IDENTITY" "$out_path"
 }
 
 # Artifacts are zipped by the artifacts store so they're endup nested zipped, so we need to unzip this zip.
