@@ -787,6 +787,39 @@ extension Query where T: _HasPersistedType, T.PersistedType: _QueryBinary {
     public func notEquals<U>(_ column: Query<U>, options: StringOptions = []) -> Query<Bool> {
         .init(.comparison(operator: .notEqual, node, column.node, options: options))
     }
+
+    /// :nodoc:
+    public static func > (_ lhs: Query, _ rhs: T) -> Query<Bool> {
+        .init(.comparison(operator: .greaterThan, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func > (_ lhs: Query, _ rhs: Query) -> Query<Bool> {
+        .init(.comparison(operator: .greaterThan, lhs.node, rhs.node, options: []))
+    }
+    /// :nodoc:
+    public static func >= (_ lhs: Query, _ rhs: T) -> Query<Bool> {
+        .init(.comparison(operator: .greaterThanEqual, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func >= (_ lhs: Query, _ rhs: Query) -> Query<Bool> {
+        .init(.comparison(operator: .greaterThanEqual, lhs.node, rhs.node, options: []))
+    }
+    /// :nodoc:
+    public static func < (_ lhs: Query, _ rhs: T) -> Query<Bool> {
+        .init(.comparison(operator: .lessThan, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func < (_ lhs: Query, _ rhs: Query) -> Query<Bool> {
+        .init(.comparison(operator: .lessThan, lhs.node, rhs.node, options: []))
+    }
+    /// :nodoc:
+    public static func <= (_ lhs: Query, _ rhs: T) -> Query<Bool> {
+        .init(.comparison(operator: .lessThanEqual, lhs.node, .constant(rhs), options: []))
+    }
+    /// :nodoc:
+    public static func <= (_ lhs: Query, _ rhs: Query) -> Query<Bool> {
+        .init(.comparison(operator: .lessThanEqual, lhs.node, rhs.node, options: []))
+    }
 }
 
 extension Query where T: OptionalProtocol, T.Wrapped: Comparable {
