@@ -18,6 +18,7 @@ install_dependencies() {
         install_ruby
     elif [[ "$CI_WORKFLOW" == "sync"* ]]; then
     # elif [[ "$CI_WORKFLOW" == "sync"* ]] || [[ "$CI_WORKFLOW" == "swiftpm"* ]]; then
+        brew install node
         sh build.sh setup-baas
         sh build.sh download-core
     elif [[ "$CI_WORKFLOW" = *"spm"* ]] || [[ "$CI_WORKFLOW" = "xcframework"* ]]; then

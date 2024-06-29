@@ -76,6 +76,11 @@ public class SwiftTypesSyncObject: Object {
         self.init()
         self.objectCol = person
     }
+
+    public convenience init(id: ObjectId) {
+        self.init()
+        self._id = id
+    }
 }
 
 public class SwiftCollectionSyncObject: Object {
