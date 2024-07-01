@@ -107,8 +107,11 @@ Data can be encrypted in-flight and at-rest, keeping even the most sensitive dat
 ```swift
 // Generate a random encryption key
 var key = Data(count: 64)
-_ = key.withUnsafeMutableBytes { bytes in
-    SecRandomCopyBytes(kSecRandomDefault, 64, bytes)
+_ = key.withUnsafeMutableBytes { (pointer: UnsafeMutableRawBufferPointer) in
+    guard let baseAddress = pointer.baseAddress else {
+        fatalError("Failed to obtain base address")
+    }
+    SecRandomCopyBytes(kSecRandomDefault, 64, baseAddress)
 }
 
 // Add the encryption key to the config and open the realm
