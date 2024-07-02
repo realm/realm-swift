@@ -1028,10 +1028,7 @@ public class RealmServer: NSObject {
 
     // Retrieve Atlas App Services AppId with ClientAppId using the Admin API
     public func retrieveAppServerId(_ clientAppId: String) throws -> String {
-        guard let session = session else {
-            fatalError()
-        }
-
+        let session = try XCTUnwrap(session)
         let appsListInfo = try session.apps.get().get()
         guard let appsList = appsListInfo as? [[String: Any]] else {
             throw URLError(.badServerResponse)
@@ -1052,9 +1049,7 @@ public class RealmServer: NSObject {
     }
 
     public func retrieveSyncServiceId(appServerId: String) throws -> String {
-        guard let session = session else {
-            fatalError()
-        }
+        let session = try XCTUnwrap(session)
         let app = session.apps[appServerId]
         // Get all services
         guard let syncServices = try app.services.get().get() as? [[String: Any]] else {
@@ -1083,14 +1078,11 @@ public class RealmServer: NSObject {
         }
     }
 
-    public func isSyncEnabled(flexibleSync: Bool = false, appServerId: String, syncServiceId: String) throws -> Bool {
-        let configOption = flexibleSync ? "flexible_sync" : "sync"
-        guard let session = session else {
-            fatalError()
-        }
+    public func isSyncEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
+        let session = try XCTUnwrap(session)
         let app = session.apps[appServerId]
         let response = try app.services[syncServiceId].config.get().get() as? [String: Any]
-        guard let syncInfo = response?[configOption] as? [String: Any] else {
+        guard let syncInfo = response?["flexible_sync"] as? [String: Any] else {
             return false
         }
         return syncInfo["state"] as? String == "enabled"
@@ -1113,28 +1105,23 @@ public class RealmServer: NSObject {
         return app.sync.config.put(["development_mode_enabled": true])
     }
 
-    public func disableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String)
-            -> Result<Any?, Error> {
-        let configOption = flexibleSync ? "flexible_sync" : "sync"
-        guard let session = session else {
-            return .failure(URLError(.unknown))
-        }
+    public func disableSync(appServerId: String, syncServiceId: String) throws -> Any? {
+        let session = try XCTUnwrap(session)
         let app = session.apps[appServerId]
-        return app.services[syncServiceId].config.patch([configOption: ["state": ""]])
+        return app.services[syncServiceId].config.patch(["flexible_sync": ["state": ""]])
     }
 
-    public func enableSync(flexibleSync: Bool = false, appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
-        let configOption = flexibleSync ? "flexible_sync" : "sync"
+    public func enableSync(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
         var syncConfig = syncServiceConfiguration
         guard let session = session else {
             return .failure(URLError(.unknown))
         }
         let app = session.apps[appServerId]
-        guard var syncInfo = syncConfig[configOption] as? [String: Any] else {
+        guard var syncInfo = syncConfig["flexible_sync"] as? [String: Any] else {
             return .failure(URLError(.unknown))
         }
         syncInfo["state"] = "enabled"
-        syncConfig[configOption] = syncInfo
+        syncConfig["flexible_sync"] = syncInfo
         return app.services[syncServiceId].config.patch(syncConfig)
     }
 

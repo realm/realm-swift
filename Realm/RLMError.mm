@@ -292,7 +292,7 @@ NSError *makeError(realm::SyncError&& error, const std::shared_ptr<realm::app::A
                 errorCode = RLMSyncErrorClientResetError;
             else if (isSyncError)
                 errorCode = RLMSyncErrorClientSessionError;
-            else if (!error.is_fatal)
+            else if (!error.is_fatal && error.server_requests_action != realm::sync::ProtocolErrorInfo::Action::Warning)
                 return nil;
             break;
     }
