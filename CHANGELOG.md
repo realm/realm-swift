@@ -1,11 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Added support for filtering logs by category. Users wil have more fine grained control over 
-  the log level for each category as well.
+* Added support for setting the log level for a category in `Logger`. User will have more fine grained control over 
+  the log level for each category.
   ```swift
   Logger.setLogLevel(.info, category: Category.Storage.transactions)
   ```
+* Throw any sync errors tagged with warning action from the server via the sync error handler. 
+  ([#8020](https://github.com/realm/realm-swift/issues/8020)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
