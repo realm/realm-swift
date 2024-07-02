@@ -40,6 +40,7 @@ let testCxxSettings: [CXXSetting] = cxxSettings + [
 // gets very awkward when we have four targets building from a single directory
 let objectServerTestSources = [
     "AsyncSyncTests.swift",
+    "BaasClient.swift",
     "ClientResetTests.swift",
     "CombineSyncTests.swift",
     "EventTests.swift",
@@ -355,6 +356,7 @@ let package = Package(
             name: "RealmSwiftSyncTestSupport",
             dependencies: ["RealmSwift", "RealmTestSupport", "RealmSyncTestSupport", "RealmSwiftTestSupport"],
             sources: [
+                 "BaasClient.swift",
                  "RealmServer.swift",
                  "SwiftServerObjects.swift",
                  "SwiftSyncTestCase.swift",

@@ -126,7 +126,8 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMAppConfiguration*)defaultAppConfiguration {
-    auto config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
+    NSString *baseUrl = [RealmServer.shared getBaseUrl];
+    auto config = [[RLMAppConfiguration alloc] initWithBaseURL:baseUrl
                                                      transport:[TestNetworkTransport new]
                                        defaultRequestTimeoutMS:60000];
     config.rootDirectory = self.clientDataRoot;
@@ -474,7 +475,7 @@ static NSURL *syncDirectoryForChildProcess() {
     [super setUp];
     // Wait for the server to launch
     if ([RealmServer haveServer]) {
-        (void)[RealmServer shared];
+        (void)[[RealmServer shared] setUp];
     }
 }
 
