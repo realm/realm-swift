@@ -327,6 +327,8 @@ extension Realm {
                                                                       errorHandler: eventConfiguration.errorHandler)
             }
 
+            configuration.seedFilePath = rlmConfiguration.seedFilePath
+
             return configuration
         }
     }
