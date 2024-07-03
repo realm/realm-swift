@@ -387,68 +387,50 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         ]
     }
 
-    private func assertListEqual(_ object: SwiftTypesSyncObject, _ index: Int, _ value: AnyRealmValue) {
-        if case .object = value {
-            XCTAssertEqual(object.anyCol.listValue?[index].object(SwiftPerson.self)?.firstName, value.object(SwiftPerson.self)?.firstName)
-        } else if case .float = value {
-            if object.anyCol.listValue?[index].floatValue != nil {
-                XCTAssertEqual(object.anyCol.listValue?[index], value)
+    private func assertValue(_ value: AnyRealmValue, _ expectedValue: AnyRealmValue) {
+        switch value {
+        case .object:
+            XCTAssertEqual(value.object(SwiftPerson.self)?.firstName, expectedValue.object(SwiftPerson.self)?.firstName)
+        case .double:
+            // All float values are converted to doubles in the server.
+            if let floatValue = expectedValue.floatValue {
+                XCTAssertEqual(value, .double(Double(floatValue)))
             } else {
-                // This happens when we download a fresh realm
-                XCTAssertEqual(object.anyCol.listValue?[index], .double(Double(value.floatValue!)))
+                XCTAssertEqual(value, expectedValue)
             }
-        } else if case .date = value {
+        case .date:
             // Date is not exact when synced
-            let date = object.anyCol.listValue?[index].dateValue
-            XCTAssertTrue(Calendar.current.isDate(date!, equalTo: value.dateValue!, toGranularity: .second))
-        } else {
-            XCTAssertEqual(object.anyCol.listValue?[index], value)
+            XCTAssertTrue(Calendar.current.isDate(value.dateValue!, equalTo: expectedValue.dateValue!, toGranularity: .second))
+        default:
+            XCTAssertEqual(value, expectedValue)
         }
     }
 
-    private func assertDictionaryEqual(_ object: SwiftTypesSyncObject, _ key: String, _ value: AnyRealmValue) {
-        if case .object = value {
-            XCTAssertEqual(object.anyCol.dictionaryValue?[key]?.object(SwiftPerson.self)?.firstName, value.object(SwiftPerson.self)?.firstName)
-        } else if case .float = value {
-            if object.anyCol.dictionaryValue?[key]?.floatValue != nil {
-                XCTAssertEqual(object.anyCol.dictionaryValue?[key], value)
-            } else {
-                // This happens when we download a fresh realm
-                XCTAssertEqual(object.anyCol.dictionaryValue?[key], .double(Double(value.floatValue!)))
-            }
-        } else if case .date = value {
-            // Date is not exact when synced
-            let date = object.anyCol.dictionaryValue?[key]?.dateValue
-            XCTAssertTrue(Calendar.current.isDate(date!, equalTo: value.dateValue!, toGranularity: .second))
-        } else {
-            XCTAssertEqual(object.anyCol.dictionaryValue?[key], value)
-        }
+    private func assertListEqual(_ object: SwiftTypesSyncObject, _ index: Int, _ expectedValue: AnyRealmValue) {
+        let value: AnyRealmValue? = object.anyCol.listValue?[index]
+        assertValue(value!, expectedValue)
+    }
+
+    private func assertDictionaryEqual(_ object: SwiftTypesSyncObject, _ key: String, _ expectedValue: AnyRealmValue) {
+        let value: AnyRealmValue? = object.anyCol.dictionaryValue?[key]
+        assertValue(value!, expectedValue)
     }
 
     @MainActor func testSyncAnyRealmValue() async throws {
         let list = sampleData
-        for (index, value) in list.enumerated() {
-            try await write { realm in
+        try await write { realm in
+            for (index, expectedValue) in list.enumerated() {
                 let object = SwiftTypesSyncObject()
-                object.anyCol = value
+                object.anyCol = expectedValue
                 object.stringCol = "\(self.name)_\(index)"
                 realm.add(object)
             }
+        }
 
-            let realm = try await openRealm()
-            let results0 =  try await realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == "\(self.name)_\(index)" }.subscribe()
-            let o = results0.first!
-            if case .object = value {
-                XCTAssertEqual(o.anyCol.object(SwiftPerson.self)?.firstName, value.object(SwiftPerson.self)?.firstName)
-            } else if case .float = value {
-                XCTAssertEqual(o.anyCol, .double(Double(value.floatValue!)))
-            } else if case .date = value {
-                // Date is not exact when synced
-                let date = o.anyCol.dateValue
-                XCTAssertTrue(Calendar.current.isDate(date!, equalTo: value.dateValue!, toGranularity: .second))
-            } else {
-                XCTAssertEqual(o.anyCol, value)
-            }
+        let realm = try await openRealm()
+        for (index, expectedValue) in list.enumerated() {
+            let results = realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == "\(self.name)_\(index)" }
+            assertValue(results.first!.anyCol, expectedValue)
         }
     }
 
@@ -462,12 +444,12 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
 
         let realm = try await openRealm()
-        let results0 =  try await realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
-        XCTAssertEqual(results0.count, 1)
+        let results = realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
+        XCTAssertEqual(results.count, 1)
 
-        let o = results0.first!
+        let obj = results.first!
         for (index, value) in list.enumerated() {
-            assertListEqual(o, index, value)
+            assertListEqual(obj, index, value)
         }
     }
 
@@ -481,13 +463,12 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
 
         let realm = try await openRealm()
-        let results0 =  try await realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
-        XCTAssertEqual(results0.count, 1)
+        let results = realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
+        XCTAssertEqual(results.count, 1)
 
-        let o = results0.first!
-
+        let obj = results.first!
         for (key, value) in dictionary {
-            assertDictionaryEqual(o, key, value)
+            assertDictionaryEqual(obj, key, value)
         }
     }
 
@@ -508,16 +489,16 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
 
         let realm = try await openRealm()
-        let results0 =  try await realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
-        XCTAssertEqual(results0.count, 1)
+        let results = try await realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        XCTAssertEqual(results.count, 1)
 
-        let o = results0.first!
-        XCTAssertEqual(o.anyCol.listValue?[1], .bool(false))
-        XCTAssertEqual(o.anyCol.listValue?[0].listValue?[0].listValue?[0].listValue?[1], .double(123.456))
+        let listValue = results.first!.anyCol.listValue
+        XCTAssertEqual(listValue?[1], .bool(false))
+        XCTAssertEqual(listValue?[0].listValue?[0].listValue?[0].listValue?[1], .double(123.456))
 
-        XCTAssertEqual(o.anyCol.listValue?[0].listValue?[0].listValue?[0].listValue?[0].object(SwiftPerson.self)?.firstName, so.firstName)
-        XCTAssertEqual(o.anyCol.listValue?[1].boolValue, false)
-        XCTAssertEqual(o.anyCol.listValue?[0].listValue?[0].listValue?[0].listValue?[1].doubleValue, 123.456)
+        XCTAssertEqual(listValue?[0].listValue?[0].listValue?[0].listValue?[0].object(SwiftPerson.self)?.firstName, so.firstName)
+        XCTAssertEqual(listValue?[1].boolValue, false)
+        XCTAssertEqual(listValue?[0].listValue?[0].listValue?[0].listValue?[1].doubleValue, 123.456)
     }
 
     @MainActor func testSyncMixedNestedDictionary() async throws {
@@ -538,16 +519,16 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
 
         let realm = try await openRealm()
-        let results0 =  try await realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
-        XCTAssertEqual(results0.count, 1)
+        let results = realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
+        XCTAssertEqual(results.count, 1)
 
-        let o = results0.first!
-        XCTAssertEqual(o.anyCol.dictionaryValue?["key1"], .bool(false))
-        XCTAssertEqual(o.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key2"]?.dictionaryValue?["key3"]?.dictionaryValue?["key5"], .int(1202))
+        let dictionaryValue = results.first!.anyCol.dictionaryValue
+        XCTAssertEqual(dictionaryValue?["key1"], .bool(false))
+        XCTAssertEqual(dictionaryValue?["key0"]?.dictionaryValue?["key2"]?.dictionaryValue?["key3"]?.dictionaryValue?["key5"], .int(1202))
 
-        XCTAssertEqual(o.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key2"]?.dictionaryValue?["key3"]?.dictionaryValue?["key4"]?.object(SwiftPerson.self)?.firstName, so.firstName)
-        XCTAssertEqual(o.anyCol.dictionaryValue?["key1"]?.boolValue, false)
-        XCTAssertEqual(o.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key2"]?.dictionaryValue?["key3"]?.dictionaryValue?["key5"]?.intValue, 1202)
+        XCTAssertEqual(dictionaryValue?["key0"]?.dictionaryValue?["key2"]?.dictionaryValue?["key3"]?.dictionaryValue?["key4"]?.object(SwiftPerson.self)?.firstName, so.firstName)
+        XCTAssertEqual(dictionaryValue?["key1"]?.boolValue, false)
+        XCTAssertEqual(dictionaryValue?["key0"]?.dictionaryValue?["key2"]?.dictionaryValue?["key3"]?.dictionaryValue?["key5"]?.intValue, 1202)
     }
 
     @MainActor func testSyncMixedNestedCollection() async throws {
@@ -575,11 +556,11 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
 
         let realm = try await openRealm()
-        let results0 =  try await realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
-        XCTAssertEqual(results0.count, 1)
+        let results = realm.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
+        XCTAssertEqual(results.count, 1)
 
-        let o = results0.first!
-        let baseNested: List<AnyRealmValue>? = o.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0].dictionaryValue?["key4"]?.listValue?[0].dictionaryValue?["key3"]?.listValue
+        let obj = results.first!
+        let baseNested: List<AnyRealmValue>? = obj.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0].dictionaryValue?["key4"]?.listValue?[0].dictionaryValue?["key3"]?.listValue
         let nested1: String? = baseNested?[0].dictionaryValue?["key2"]?.listValue?[0].listValue?[0].object(SwiftPerson.self)?.firstName
         XCTAssertEqual(nested1, so.firstName)
         let nested2: AnyRealmValue? = baseNested?[0].dictionaryValue?["key2"]?.listValue?[0].listValue?[1]
@@ -595,10 +576,10 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
 
     @MainActor func testUpdateMixedList() async throws {
         let realm1 = try await openRealm()
-        let results1 =  try await realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results1 = realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let realm2 = try await openRealm()
-        let results2 =  try await realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results2 = realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         // Add initial list
         try realm1.write {
@@ -609,7 +590,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
         try await realm1.syncSession?.wait(for: .upload)
         try await realm2.syncSession?.wait(for: .download)
-        try await realm2.syncSession?.wait(for: .upload)
+        await realm2.asyncRefresh()
         XCTAssertNotEqual(results2.first?.anyCol, .int(1))
         XCTAssertEqual(results2.first?.anyCol.listValue?.count, 0)
 
@@ -621,7 +602,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
             }
             try await realm1.syncSession?.wait(for: .upload)
             try await realm2.syncSession?.wait(for: .download)
-            try await realm2.syncSession?.wait(for: .upload)
+            await realm2.asyncRefresh()
 
             XCTAssertEqual(results1.first?.anyCol.listValue?.count, results2.first?.anyCol.listValue?.count)
             assertListEqual(results1.first!, index, value)
@@ -635,7 +616,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
             }
             try await realm1.syncSession?.wait(for: .upload)
             try await realm2.syncSession?.wait(for: .download)
-            try await realm2.syncSession?.wait(for: .upload)
+            await realm2.asyncRefresh()
 
             XCTAssertEqual(results1.first?.anyCol.listValue?.count, results2.first?.anyCol.listValue?.count)
             XCTAssertFalse(results1.first?.anyCol.listValue?.contains(value) ?? true)
@@ -649,19 +630,19 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
             }
             try await realm1.syncSession?.wait(for: .upload)
             try await realm2.syncSession?.wait(for: .download)
-            try await realm2.syncSession?.wait(for: .upload)
+            await realm2.asyncRefresh()
 
             XCTAssertEqual(results1.first?.anyCol.listValue?.count, results2.first?.anyCol.listValue?.count)
             assertListEqual(results1.first!, 0, value)
             assertListEqual(results2.first!, 0, value)
         }
 
-
         try realm1.write {
             results1.first?.anyCol.listValue?.removeAll()
         }
         try await realm1.syncSession?.wait(for: .upload)
         try await realm2.syncSession?.wait(for: .download)
+        await realm2.asyncRefresh()
         XCTAssertEqual(results1.first?.anyCol.listValue?.count, results2.first?.anyCol.listValue?.count)
         XCTAssertEqual(results1.first?.anyCol.listValue?.count, 0)
         XCTAssertEqual(results2.first?.anyCol.listValue?.count, 0)
@@ -669,10 +650,10 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
 
     @MainActor func testUpdateMixedDictionary() async throws {
         let realm1 = try await openRealm()
-        let results1 =  try await realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results1 = realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let realm2 = try await openRealm()
-        let results2 =  try await realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results2 = realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         // Add initial list
         try realm1.write {
@@ -683,7 +664,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
         try await realm1.syncSession?.wait(for: .upload)
         try await realm2.syncSession?.wait(for: .download)
-        try await realm2.syncSession?.wait(for: .upload)
+        await realm2.asyncRefresh()
         XCTAssertNotEqual(results2.first?.anyCol, .int(1))
         XCTAssertEqual(results2.first?.anyCol.dictionaryValue?.count, 0)
 
@@ -695,7 +676,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
             }
             try await realm1.syncSession?.wait(for: .upload)
             try await realm2.syncSession?.wait(for: .download)
-            try await realm2.syncSession?.wait(for: .upload)
+            await realm2.asyncRefresh()
 
             XCTAssertEqual(results1.first?.anyCol.dictionaryValue?.count, results2.first?.anyCol.dictionaryValue?.count)
             assertDictionaryEqual(results1.first!, key, value)
@@ -709,7 +690,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
             }
             try await realm1.syncSession?.wait(for: .upload)
             try await realm2.syncSession?.wait(for: .download)
-            try await realm2.syncSession?.wait(for: .upload)
+            await realm2.asyncRefresh()
 
             XCTAssertEqual(results1.first?.anyCol.dictionaryValue?.count, results2.first?.anyCol.dictionaryValue?.count)
             XCTAssertFalse(results1.first?.anyCol.dictionaryValue?.contains(where: { $0.key == key }) ?? true)
@@ -723,7 +704,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
             }
             try await realm1.syncSession?.wait(for: .upload)
             try await realm2.syncSession?.wait(for: .download)
-            try await realm2.syncSession?.wait(for: .upload)
+            await realm2.asyncRefresh()
 
             XCTAssertEqual(results1.first?.anyCol.dictionaryValue?.count, results2.first?.anyCol.dictionaryValue?.count)
             assertDictionaryEqual(results1.first!, key, value)
@@ -735,7 +716,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
         try await realm1.syncSession?.wait(for: .upload)
         try await realm2.syncSession?.wait(for: .download)
-        try await realm2.syncSession?.wait(for: .upload)
+        await realm2.asyncRefresh()
         XCTAssertEqual(results1.first?.anyCol.dictionaryValue?.count, results2.first?.anyCol.dictionaryValue?.count)
         XCTAssertEqual(results1.first?.anyCol.dictionaryValue?.count, 0)
         XCTAssertEqual(results2.first?.anyCol.dictionaryValue?.count, 0)
@@ -743,10 +724,10 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
 
     @MainActor func testUpdateListTwoUsers() async throws {
         let realm1 = try await openRealm()
-        let results1 =  try await realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results1 = realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let realm2 = try await openRealm()
-        let results2 =  try await realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results2 = realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         // Add initial list
         try realm1.write {
@@ -757,6 +738,7 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
         }
         try await realm1.syncSession?.wait(for: .upload)
         try await realm2.syncSession?.wait(for: .download)
+        await realm2.asyncRefresh()
 
         try realm1.write {
             results1.first?.anyCol.listValue?.append(.bool(false))
@@ -815,10 +797,10 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
 
     @MainActor func testUpdateDictionaryTwoUsers() async throws {
         let realm1 = try await openRealm()
-        let results1 =  try await realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results1 = realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let realm2 = try await openRealm()
-        let results2 =  try await realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results2 = realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         // Add initial list
         try realm1.write {
@@ -874,10 +856,10 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
 
     @MainActor func testAssignMixedListWithSamePrimaryKey() async throws {
         let realm1 = try await openRealm()
-        let results1 =  try await realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results1 = realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let realm2 = try await openRealm()
-        let results2 =  try await realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results2 = realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let primaryKey = ObjectId.generate()
 
@@ -907,10 +889,10 @@ class AsyncAnyRealmValueSyncTest: SwiftSyncTestCase {
 
     @MainActor func testAssignMixedDictionaryWithSamePrimaryKey() async throws {
         let realm1 = try await openRealm()
-        let results1 =  try await realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results1 = realm1.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let realm2 = try await openRealm()
-        let results2 =  try await realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }.subscribe()
+        let results2 = realm2.objects(SwiftTypesSyncObject.self).where { $0.stringCol == name }
 
         let primaryKey = ObjectId.generate()
 

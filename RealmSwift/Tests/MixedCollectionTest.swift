@@ -1012,5 +1012,6 @@ class MixedCollectionTest: TestCase, @unchecked Sendable {
             o.anyValue.value = AnyRealmValue.fromDictionary(dictionary1)
         }
         XCTAssertEqual(o.anyValue.value.dictionaryValue?["key1"], .string("adios"))
+        XCTAssertNil(o.anyValue.value.dictionaryValue?["key2"])
     }
 }
