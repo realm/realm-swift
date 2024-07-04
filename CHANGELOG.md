@@ -10,6 +10,7 @@ x.y.z Release notes (yyyy-MM-dd)
   binaries so Xcode can validate it was signed by the same developer on every new version. 
   ([Apple](https://developer.apple.com/support/third-party-SDK-requirements/)).
 * Throw any sync errors tagged with warning action from the server via the sync error handler. 
+* Report sync warnings from the server such as sync being disabled server-side to the sync error handler.
   ([#8020](https://github.com/realm/realm-swift/issues/8020)).
 
 ### Fixed

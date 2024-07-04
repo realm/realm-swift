@@ -1188,27 +1188,17 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     func testFlexibleSyncNotEnabledError() throws {
-        let appServerId = try RealmServer.shared.retrieveAppServerId(appId)
-        let syncServerId = try RealmServer.shared.retrieveSyncServiceId(appServerId: appServerId)
-        _ = try RealmServer.shared.disableSync(appServerId: appServerId, syncServiceId: syncServerId)
-        var isEnable = try RealmServer.shared.isSyncEnabled(appServerId: appServerId, syncServiceId: syncServerId)
-        XCTAssertFalse(isEnable)
-
+        let appId = try RealmServer.shared.createNotSyncApp()
+        let app = app(id: appId)
         let ex = expectation(description: "Waiting for error handler to be called...")
         ex.assertForOverFulfill = false // error handler can legally be called multiple times
         app.syncManager.errorHandler = { @Sendable (error, _) in
-            assertSyncError(error, .clientInternalError, "Sync is not enabled for this app")
+            assertSyncError(error, .serverWarning, "Sync is not enabled for this app")
             ex.fulfill()
         }
 
-        _ = try Realm(configuration: configuration()) // Sync is disabled so we cannot use async open
+        _ = try Realm(configuration: configuration(app: app)) // Sync is disabled so we cannot use async open
         wait(for: [ex], timeout: 10.0)
-
-        let configuration = try RealmServer.shared.getSyncServiceConfiguration(appServerId: appServerId, syncServiceId: syncServerId)
-        _ = try RealmServer.shared.enableSync(appServerId: appServerId, syncServiceId: syncServerId, syncServiceConfiguration: configuration!).get()
-
-        isEnable = try RealmServer.shared.isSyncEnabled(appServerId: appServerId, syncServiceId: syncServerId)
-        XCTAssertTrue(isEnable)
     }
 }
 

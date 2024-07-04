@@ -328,6 +328,11 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      Connecting to the server failed due to a TLS issue such as an invalid certificate.
      */
     RLMSyncErrorTLSHandshakeFailed = 13,
+    /**
+     An error indicating the server send down an error with a warning action, which
+     needs to be executed by the client or the end user.
+     */
+    RLMSyncErrorServerWarning = 14,
 };
 
 #pragma mark - RLMSyncAuthError

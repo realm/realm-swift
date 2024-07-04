@@ -469,6 +469,7 @@ class Admin {
 public enum SyncMode {
     case pbs(String) // partition based
     case flx([String]) // flexible sync
+    case notSync
 }
 
 // MARK: RealmServer
@@ -815,6 +816,10 @@ public class RealmServer: NSObject {
             }
         }
 
+        if case .notSync = syncMode {
+            return clientAppId
+        }
+
         app.secrets.post(on: group, [
             "name": "BackingDB_uri",
             "value": "mongodb://localhost:26000"
@@ -927,6 +932,8 @@ public class RealmServer: NSObject {
                     "delete": true
                 ]]
             ]).get()
+        default:
+            fatalError()
         }
         _ = try app.services[serviceId].config.patch(serviceConfig).get()
 
@@ -1009,6 +1016,10 @@ public class RealmServer: NSObject {
 
     @objc public func createApp(partitionKeyType: String = "string", types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
         return try createApp(syncMode: .pbs(partitionKeyType), types: types, persistent: persistent)
+    }
+
+    @objc public func createNotSyncApp() throws -> AppId {
+        return try createApp(syncMode: .notSync, types: [], persistent: false)
     }
 
     /// Delete all Apps created without `persistent: true`
