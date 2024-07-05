@@ -3034,13 +3034,6 @@
     XCTAssertFalse([logs containsString:@"IMPORTANT TRACE"]); // Trace
 }
 
-// Core defines the different categories in runtime, forcing the SDK to define the categories again.
-// This test validates that we have added new defined categories to the RLMLogCategory enum.
-- (void)testAllCategoriesWatchDog {
-    for (id category in [RLMLogger allCategories]) {
-        XCTAssertNoThrow([RLMLogger categoryFromString:category]);
-    }
-}
 @end
 
 @interface RLMMetricsTests : RLMTestCase

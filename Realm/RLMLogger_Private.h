@@ -47,10 +47,6 @@ Gets all the categories from Core. This is to be used for testing purposes only.
  */
 + (NSArray<NSString *> *)allCategories;
 
-/**
-Returns a `RLMLogCategory` from a string.
- */
-+ (RLMLogCategory)categoryFromString:(NSString *)string;
 @end
 
 RLM_HEADER_AUDIT_END(nullability)

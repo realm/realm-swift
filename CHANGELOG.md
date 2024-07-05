@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Added support for filtering logs by category. Users wil have more fine grained control over 
+* Added support for filtering logs by category. Users wil have more fine grained control over
   the log level for each category as well.
   ```swift
   Logger.setLogLevel(.info, category: Category.Storage.transactions)
@@ -17,7 +17,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Deprecations
-* `RLMLogger.level`/`Logger.level` has been deprecated in favor of using `RLMLogger.setLevel:forCategory:`/`Logger.setLevel(:category:)` and `RLMLogger.getLevelForCategory:`/`Logger.getLevel(for:)`.
+* `RLMLogger.level`/`Logger.level` has been deprecated in favor of using
+  `RLMLogger.setLevel:forCategory:`/`Logger.setLevel(:category:)` and
+  `RLMLogger.getLevelForCategory:`/`Logger.getLevel(for:)`.
 * It is not recommended to initialize a `RLMLogger/Logger` with a level anymore.
 
 ### Compatibility
