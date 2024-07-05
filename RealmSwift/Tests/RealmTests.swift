@@ -2020,6 +2020,72 @@ class LoggerTests: TestCase, @unchecked Sendable {
         XCTAssertTrue(logs.value.contains("Trace DB:"))
     }
 
+    @available(*, deprecated)
+    func testOldSetDefaultLogLevel() throws {
+        var logs: String = ""
+        let logger = Logger(level: .off) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        Logger.shared = logger
+
+        try autoreleasepool { _ = try Realm() }
+        XCTAssertTrue(logs.isEmpty)
+
+        logger.level = .all
+        try autoreleasepool { _ = try Realm() } // We should be getting logs after changing the log level
+        XCTAssertEqual(Logger.shared.level, .all)
+        XCTAssertTrue(logs.contains("Details DB:"))
+        XCTAssertTrue(logs.contains("Trace DB:"))
+    }
+
+    @available(*, deprecated)
+    func testOldDefaultLogger() throws {
+        var logs: String = ""
+        let logger = Logger(level: .off) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+        Logger.shared = logger
+
+        XCTAssertEqual(Logger.shared.level, .off)
+        try autoreleasepool { _ = try Realm() }
+        XCTAssertTrue(logs.isEmpty)
+
+        // Info
+        logger.level = .detail
+        try autoreleasepool { _ = try Realm() }
+
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Details DB:"))
+
+        // Trace
+        logs = ""
+        logger.level = .trace
+        try autoreleasepool { _ = try Realm() }
+
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Trace DB:"))
+
+        // Detail
+        logs = ""
+        logger.level = .detail
+        try autoreleasepool { _ = try Realm() }
+
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Details DB:"))
+        XCTAssertFalse(logs.contains("Trace DB:"))
+
+        logs = ""
+        Logger.shared = Logger(level: .trace) { level, message in
+            logs += "\(Date.now) \(level.logLevel) \(message)"
+        }
+
+        XCTAssertEqual(Logger.shared.level, .trace)
+        try autoreleasepool { _ = try Realm() }
+        XCTAssertTrue(!logs.isEmpty)
+        XCTAssertTrue(logs.contains("Details DB:"))
+        XCTAssertTrue(logs.contains("Trace DB:"))
+    }
+
     // Core defines the different categories in runtime, forcing the SDK to define the categories again.
     // This test validates that we have added new defined categories to the Categories enum and/or
     // child categories
