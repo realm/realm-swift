@@ -1,3 +1,61 @@
+10.52.2 Release notes (2024-07-19)
+=============================================================
+
+### Enhancements
+
+* Server-side role and permissions changes no longer require a client reset to
+  update the local Realm. ([Core #7440](https://github.com/realm/realm-core/pull/7440))
+
+### Fixed
+
+* Deleting an object with a `List<AnyRealmValue` proeprty which linked to an
+  object which had been deleted by another sync client would switch to the
+  incorrect cascade mode and perform a cascading delete. This meant that if any
+  subsequent properties in the object linked to another top-level object and
+  that was the *only* link to that object, the target object would also be
+  recursively deleted as if it was an embedded object.
+  ([Core #7828](https://github.com/realm/realm-core/issues/7828), since v10.51.0).
+* Fix the assertion failure `array_backlink.cpp:112: Assertion failed:
+  int64_t(value >> 1) == key.value` when removing links to an object (either by
+  reassigning the link or by deleting the object). This could happen if the link
+  came from a collection inside a `AnyRealmValue`, any `Map`, or a
+  `List<AnyRealmValue>`, and there were more than 256 objects of the type which
+  contained the link.
+ ([Core #7594](https://github.com/realm/realm-core/issues/7594), since v10.8.0)
+* Fix the assertion failure `array.cpp:319: Array::move() Assertion failed:
+  begin <= end [2, 1]` when deleting objects containing collections nested
+  inside a `AnyRealmValue` when this caused bptree leaves to be merged.
+  ()[Core #7839](https://github.com/realm/realm-core/issues/7839), since v10.51.0).
+* `SyncSession.wait(for .upload)` was inconsistent in how it handled commits
+  which do no produce any changesets to upload (such as modifying flexible sync
+  subscriptions). Previously if all unuploaded commits had empty changesets and
+  the session had never completed a download it would wait for download
+  completion, and otherwise it would complete immediate. It now always
+  completes immediately. ([Core #7796](https://github.com/realm/realm-core/pull/7796)).
+* The sync client could hit an assertion failure if a session is resumed while
+  the session is being suspended. ([Core #7860](https://github.com/realm/realm-core/issues/7860), since v10.27.0)
+* If a sync session was interrupted by a disconnect or restart while downloading
+  a bootstrap (a set of downloads caused by adding or changing a query
+  subscription), stale data from the previous bootstrap could be included when
+  the session reconnected and completed downloading the bootstrap. This could
+  lead to objects stored in the database that do not match the actual state of
+  the server and potentially leading to compensating writes.
+  ([Core #7827](https://github.com/realm/realm-core/issues/7827), since v10.27.0)
+* Fixed unnecessary server roundtrips when there was no download to acknowledge
+  ([Core #2129](https://jira.mongodb.org/browse/RCORE-2129), since v10.51.0).
+
+### Compatibility
+
+* Realm Studio: 15.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.4.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 15.1.0-16 beta 3.
+
+### Internal
+
+* Upgraded realm-core from v14.10.2 to 14.11.0
+
 10.52.1 Release notes (2024-06-28)
 =============================================================
 
