@@ -534,7 +534,7 @@ static NSString *randomEmail() {
     [self.app loginWithCredential:credentials completion:^(RLMUser *user, NSError *error) {
         XCTAssertNil(user);
         RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorInvalidPassword,
-                         @"invalid username/password");
+                         @"unauthorized");
         [expectation fulfill];
     }];
 
@@ -551,7 +551,7 @@ static NSString *randomEmail() {
     [self.app loginWithCredential:credentials completion:^(RLMUser *user, NSError *error) {
         XCTAssertNil(user);
         RLMValidateError(error, RLMAppErrorDomain, RLMAppErrorInvalidPassword,
-                         @"invalid username/password");
+                         @"unauthorized");
         [expectation fulfill];
     }];
 
@@ -936,7 +936,7 @@ static NSString *randomEmail() {
     c.encryptionKey = RLMGenerateKey();
     RLMAssertRealmExceptionContains([RLMRealm realmWithConfiguration:c error:nil],
                                     RLMErrorInvalidDatabase,
-                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: unable to decrypt after 0 seconds",
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: page 0 in file of size ",
                                     c.fileURL.path);
 }
 
