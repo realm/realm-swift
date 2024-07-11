@@ -35,13 +35,6 @@ RLM_SWIFT_SENDABLE
 typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger bytesUsed);
 
 /**
- A block which receives a subscription set instance, that can be used to add an initial set of subscriptions which will be executed
- when the Realm is first opened.
- */
-RLM_SWIFT_SENDABLE
-typedef void(^RLMFlexibleSyncInitialSubscriptionsBlock)(RLMSyncSubscriptionSet * _Nonnull subscriptions);
-
-/**
  An `RLMRealmConfiguration` instance describes the different options used to
  create an instance of a Realm.
 

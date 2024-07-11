@@ -80,7 +80,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
         let repository = results![indexPath.item]
         cell.titleLabel.text = repository.name
 
-        URLSession.shared.dataTask(with: URLRequest(url: URL(string: repository.avatarURL!)!)) { (data, _, error) -> Void in
+        URLSession.shared.dataTask(with: URLRequest(url: URL(string: repository.avatarURL!)!)) { (data, _, error) in
             if let error = error {
                 print(error.localizedDescription)
                 return

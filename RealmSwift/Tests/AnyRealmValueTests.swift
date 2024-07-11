@@ -91,7 +91,7 @@ func doubleValue(_ value: AnyRealmValue) -> Double {
     }
 }
 
-class AnyRealmValueTests<T: AnyValueFactory>: TestCase {
+class AnyRealmValueTests<T: AnyValueFactory>: TestCase, @unchecked Sendable {
     func testAnyRealmValue() {
         let values = T.anyValues()
         let o = AnyRealmTypeObject()
@@ -110,7 +110,7 @@ class AnyRealmValueTests<T: AnyValueFactory>: TestCase {
         XCTAssertEqual(o.anyValue.value, values[2])
     }
 }
-class AnyRealmValuePrimitiveTests: TestCase {
+class AnyRealmValuePrimitiveTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Any Realm Value Tests")
         AnyRealmValueTests<Int>.defaultTestSuite.tests.forEach(suite.addTest)
@@ -126,7 +126,7 @@ class AnyRealmValuePrimitiveTests: TestCase {
     }
 }
 
-class AnyRealmValueObjectTests: TestCase {
+class AnyRealmValueObjectTests: TestCase, @unchecked Sendable {
     func testObject() {
         let o = AnyRealmTypeObject()
         let so = SwiftStringObject()
@@ -237,7 +237,7 @@ class AnyRealmValueObjectTests: TestCase {
 
 // MARK: - List tests
 
-class AnyRealmValueListTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase {
+class AnyRealmValueListTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase, @unchecked Sendable {
     var realm: Realm?
     var obj: ModernAllTypesObject!
     var array: List<AnyRealmValue>!
@@ -257,7 +257,7 @@ class AnyRealmValueListTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase
     }
 }
 
-class AnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> {
+class AnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V>, @unchecked Sendable {
     private func assertEqual(_ obj: AnyRealmValue, _ anotherObj: AnyRealmValue) {
         if case let .object(a) = obj, case let .object(b) = anotherObj {
             XCTAssertEqual((a as! SwiftStringObject).stringCol, (b as! SwiftStringObject).stringCol)
@@ -487,7 +487,7 @@ class AnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValu
     }
 }
 
-class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> {
+class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V>, @unchecked Sendable {
     func testMin() {
         XCTAssertNil(array.min())
         array.append(objectsIn: values.reversed())
@@ -501,7 +501,7 @@ class MinMaxAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRea
     }
 }
 
-class AddableAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V> where V: NumericValueFactory {
+class AddableAnyRealmValueListTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueListTestsBase<O, V>, @unchecked Sendable where V: NumericValueFactory {
     func testSum() {
         if array.realm != nil {
             XCTAssertEqual(array.sum().intValue, nil)
@@ -547,7 +547,7 @@ func addAnyRealmValueTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.T
     AddableAnyRealmValueListTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
-class UnmanagedAnyRealmValueListTests: TestCase {
+class UnmanagedAnyRealmValueListTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged AnyRealmValue Lists")
         addAnyRealmValueTests(suite, UnmanagedObjectFactory.self)
@@ -555,7 +555,7 @@ class UnmanagedAnyRealmValueListTests: TestCase {
     }
 }
 
-class ManagedAnyRealmValueListTests: TestCase {
+class ManagedAnyRealmValueListTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Lists")
         addAnyRealmValueTests(suite, ManagedObjectFactory.self)
@@ -565,7 +565,7 @@ class ManagedAnyRealmValueListTests: TestCase {
 
 // MARK: - Set tests
 
-class AnyRealmValueSetTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase {
+class AnyRealmValueSetTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase, @unchecked Sendable {
     var realm: Realm?
     var obj: ModernAllTypesObject!
     var obj2: ModernAllTypesObject!
@@ -590,7 +590,7 @@ class AnyRealmValueSetTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase 
     }
 }
 
-class AnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> {
+class AnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V>, @unchecked Sendable {
     private func assertEqual(_ obj: AnyRealmValue, _ anotherObj: AnyRealmValue) {
         if case let .object(a) = obj,
            case let .object(b) = anotherObj {
@@ -641,6 +641,10 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRea
             XCTAssertEqual(kvc as! String, s)
         case let .uuid(u):
             XCTAssertEqual(kvc as! UUID, u)
+        case let .dictionary(d):
+            XCTAssertEqual(kvc as! Map<String, AnyRealmValue>, d)
+        case let .list(l):
+            XCTAssertEqual(kvc as! List<AnyRealmValue>, l)
         }
 
         assertThrows(mutableSet.value(forKey: "not self"), named: "NSUnknownKeyException")
@@ -795,7 +799,7 @@ class AnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRea
     }
 }
 
-class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> {
+class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V>, @unchecked Sendable {
     func testMin() {
         XCTAssertNil(mutableSet.min())
         mutableSet.insert(objectsIn: values)
@@ -809,7 +813,7 @@ class MinMaxAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: 
     }
 }
 
-class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V> where V: NumericValueFactory {
+class AddableAnyRealmValueMutableSetTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueSetTestsBase<O, V>, @unchecked Sendable where V: NumericValueFactory {
     func testSum() {
         if mutableSet.realm != nil {
             XCTAssertEqual(mutableSet.sum().intValue, nil)
@@ -854,7 +858,7 @@ func addAnyRealmValueMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ 
     AddableAnyRealmValueMutableSetTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
-class UnmanagedAnyRealmValueMutableSetTests: TestCase {
+class UnmanagedAnyRealmValueMutableSetTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Sets")
         addAnyRealmValueMutableSetTests(suite, UnmanagedObjectFactory.self)
@@ -862,7 +866,7 @@ class UnmanagedAnyRealmValueMutableSetTests: TestCase {
     }
 }
 
-class ManagedAnyRealmValueMutableSetTests: TestCase {
+class ManagedAnyRealmValueMutableSetTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Sets")
         addAnyRealmValueMutableSetTests(suite, ManagedObjectFactory.self)
@@ -872,7 +876,7 @@ class ManagedAnyRealmValueMutableSetTests: TestCase {
 
 // MARK: - Map tests
 
-class AnyRealmValueMapTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase {
+class AnyRealmValueMapTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase, @unchecked Sendable {
     var realm: Realm?
     var obj: ModernAllTypesObject!
     var map: Map<String, AnyRealmValue>!
@@ -893,7 +897,7 @@ class AnyRealmValueMapTestsBase<O: ObjectFactory, V: AnyValueFactory>: TestCase 
     }
 }
 
-class AnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> {
+class AnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V>, @unchecked Sendable {
     func testInvalidated() {
         XCTAssertFalse(map.isInvalidated)
         if let realm = obj.realm {
@@ -937,6 +941,10 @@ class AnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValue
             XCTAssertEqual(kvc as! String, s)
         case let .uuid(u):
             XCTAssertEqual(kvc as! UUID, u)
+        case let .dictionary(d):
+            XCTAssertEqual(kvc as! Map<String, AnyRealmValue>, d)
+        case let .list(l):
+            XCTAssertEqual(kvc as! List<AnyRealmValue>, l)
         }
     }
 
@@ -1034,7 +1042,7 @@ class AnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValue
     }
 }
 
-class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> {
+class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V>, @unchecked Sendable {
     func testMin() {
         XCTAssertNil(map.min())
         map.merge(values) { $1 }
@@ -1048,7 +1056,7 @@ class MinMaxAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyReal
     }
 }
 
-class AddableAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V> where V: NumericValueFactory {
+class AddableAnyRealmValueMapTests<O: ObjectFactory, V: AnyValueFactory>: AnyRealmValueMapTestsBase<O, V>, @unchecked Sendable where V: NumericValueFactory {
     func testSum() {
         XCTAssertEqual(map.sum().intValue, 0)
         map.merge(values) { $1 }
@@ -1088,7 +1096,7 @@ func addAnyRealmValueMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: O
     AddableAnyRealmValueMapTests<OF, Decimal128>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
-class UnmanagedAnyRealmValueMapTests: TestCase {
+class UnmanagedAnyRealmValueMapTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged AnyRealmValue Maps")
         addAnyRealmValueMapTests(suite, UnmanagedObjectFactory.self)
@@ -1096,7 +1104,7 @@ class UnmanagedAnyRealmValueMapTests: TestCase {
     }
 }
 
-class ManagedAnyRealmValueMapTests: TestCase {
+class ManagedAnyRealmValueMapTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed AnyRealmValue Maps")
         addAnyRealmValueMapTests(suite, ManagedObjectFactory.self)

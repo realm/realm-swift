@@ -202,11 +202,16 @@ extension ResultsSection: BuiltInObjcBridgeable {
     }
 }
 
-extension RLMSwiftCollectionBase: Equatable {
+extension RLMSwiftCollectionBase {
     public static func == (lhs: RLMSwiftCollectionBase, rhs: RLMSwiftCollectionBase) -> Bool {
         return lhs.isEqual(rhs)
     }
 }
+#if compiler(>=6)
+extension RLMSwiftCollectionBase: @retroactive Equatable {}
+#else
+extension RLMSwiftCollectionBase: Equatable {}
+#endif
 
 extension Projection: BuiltInObjcBridgeable {
     public static func _rlmFromObjc(_ value: Any) -> Self? {

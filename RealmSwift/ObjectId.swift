@@ -39,10 +39,12 @@ public final class ObjectId: RLMObjectId, Decodable, @unchecked Sendable {
         super.init()
     }
 
+    // swiftlint:disable unneeded_override
     /// Creates a new randomly-initialized ObjectId.
-    public override class func generate() -> ObjectId {
-        return unsafeDowncast(super.generate(), to: ObjectId.self)
+    public override static func generate() -> ObjectId {
+        super.generate()
     }
+    // swiftlint:enable unneeded_override
 
     /// Creates a new ObjectId from the given 24-byte hexadecimal string.
     ///

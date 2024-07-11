@@ -18,6 +18,8 @@
 
 #import "RLMSyncConfiguration_Private.hpp"
 
+#import <Realm/RLMInitialSubscriptionsConfiguration.h>
+
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMError_Private.hpp"
@@ -28,11 +30,13 @@
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
+#import "RLMSyncSubscription.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <realm/object-store/impl/realm_coordinator.hpp>
+#import <realm/object-store/sync/app_user.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
 #import <realm/object-store/thread_safe_reference.hpp>
@@ -80,6 +84,23 @@ struct AfterClientResetWrapper : CallbackSchema {
         }
     }
 };
+
+struct InitialSubscriptionsWrapper : CallbackSchema {
+    RLMFlexibleSyncInitialSubscriptionsBlock block;
+    void operator()(std::shared_ptr<Realm> local) {
+        @autoreleasepool {
+            RLMRealm *realm = [RLMRealm realmWithSharedRealm:local
+                                                      schema:customSchema
+                                                     dynamic:dynamic
+                                                      freeze:false];
+
+            RLMSyncSubscriptionSet* subscriptions = realm.subscriptions;
+            [subscriptions update:^{
+                block(subscriptions);
+            }];
+        }
+    }
+};
 } // anonymous namespace
 
 @interface RLMSyncConfiguration () {
@@ -116,8 +137,7 @@ struct AfterClientResetWrapper : CallbackSchema {
 }
 
 - (RLMUser *)user {
-    RLMApp *app = [RLMApp appWithId:@(_config->user->sync_manager()->app().lock()->config().app_id.data())];
-    return [[RLMUser alloc] initWithUser:_config->user app:app];
+    return [[RLMUser alloc] initWithUser:_config->user];
 }
 
 - (RLMSyncStopPolicy)stopPolicy {
@@ -190,6 +210,26 @@ struct AfterClientResetWrapper : CallbackSchema {
     [self assignConfigErrorHandler:self.user];
 }
 
+- (RLMInitialSubscriptionsConfiguration *)initialSubscriptions {
+    if (_config->subscription_initializer) {
+        auto wrapper = _config->subscription_initializer.target<InitialSubscriptionsWrapper>();
+
+        return [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:wrapper->block
+                                                                  rerunOnOpen:_config->rerun_init_subscription_on_open];
+    }
+
+    return nil;
+}
+
+- (void)setInitialSubscriptions:(RLMInitialSubscriptionsConfiguration *)initialSubscriptions {
+    if (initialSubscriptions) {
+        _config->subscription_initializer = InitialSubscriptionsWrapper{.block = initialSubscriptions.callback};
+        _config->rerun_init_subscription_on_open = initialSubscriptions.rerunOnOpen;
+    } else {
+        _config->subscription_initializer = nil;
+    }
+}
+
 void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMRealmConfiguration *config) {
     if (syncConfig.notify_before_client_reset) {
         auto before = syncConfig.notify_before_client_reset.target<BeforeClientResetWrapper>();
@@ -200,6 +240,11 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
         auto after = syncConfig.notify_after_client_reset.target<AfterClientResetWrapper>();
         after->dynamic = config.dynamic;
         after->customSchema = config.customSchema;
+    }
+    if (syncConfig.subscription_initializer) {
+        auto initializer = syncConfig.subscription_initializer.target<InitialSubscriptionsWrapper>();
+        initializer->dynamic = config.dynamic;
+        initializer->customSchema = config.customSchema;
     }
 }
 
@@ -219,7 +264,7 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
 }
 
 - (void)assignConfigErrorHandler:(RLMUser *)user {
-    RLMSyncManager *manager = [user.app syncManager];
+    RLMSyncManager *manager = user.app.syncManager;
     __weak RLMSyncManager *weakManager = manager;
     RLMSyncErrorReportingBlock resetHandler = self.manualClientResetHandler;
     _config->error_handler = [weakManager, resetHandler](std::shared_ptr<SyncSession> errored_session, SyncError error) {
@@ -235,7 +280,8 @@ void RLMSetConfigInfoForClientResetCallbacks(realm::SyncConfig& syncConfig, RLMR
         if (!errorHandler) {
             return;
         }
-        NSError *nsError = makeError(std::move(error));
+        NSError *nsError = makeError(std::move(error),
+                                     static_cast<app::User*>(errored_session->user().get())->app());
         if (!nsError) {
             return;
         }
@@ -260,7 +306,7 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
     if (self = [super init]) {
         std::stringstream s;
         s << RLMConvertRLMBSONToBson(partitionValue);
-        _config = std::make_unique<SyncConfig>([user _syncUser], s.str());
+        _config = std::make_unique<SyncConfig>(user.user, s.str());
         _path = [user pathForPartitionValue:_config->partition_value];
         setDefaults(*_config, user);
         [self assignConfigErrorHandler:user];
@@ -270,7 +316,7 @@ static void setDefaults(SyncConfig& config, RLMUser *user) {
 
 - (instancetype)initWithUser:(RLMUser *)user {
     if (self = [super init]) {
-        _config = std::make_unique<SyncConfig>([user _syncUser], SyncConfig::FLXSyncEnabled{});
+        _config = std::make_unique<SyncConfig>(user.user, SyncConfig::FLXSyncEnabled{});
         _path = [user pathForFlexibleSync];
         setDefaults(*_config, user);
         [self assignConfigErrorHandler:user];

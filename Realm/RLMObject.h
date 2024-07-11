@@ -68,7 +68,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
  ### Relationships
 
- See our [Realm Swift Documentation](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#relationships) for more details.
+ See our [Realm Swift Documentation](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/) for more details.
 
  ### Key-Value Observing
 

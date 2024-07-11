@@ -20,7 +20,7 @@ import XCTest
 import Realm
 @_spi(RealmSwiftPrivate) import RealmSwift
 
-final class ObjectCustomPropertiesTests: TestCase {
+final class ObjectCustomPropertiesTests: TestCase, @unchecked Sendable {
     override func tearDown() {
         super.tearDown()
         CustomPropertiesObject.injected_customRealmProperties = nil

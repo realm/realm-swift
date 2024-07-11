@@ -67,7 +67,7 @@
 
 - (void)setParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property {
     _parentObject = parentObject;
-    _key = property.name;
+    _property = property;
     _isLegacyProperty = property.isLegacy;
 }
 
@@ -133,9 +133,9 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
         dictionary->_backingCollection = [NSMutableDictionary new];
     }
     if (RLMObjectBase *parent = dictionary->_parentObject) {
-        [parent willChangeValueForKey:dictionary->_key];
+        [parent willChangeValueForKey:dictionary->_property.name];
         f();
-        [parent didChangeValueForKey:dictionary->_key];
+        [parent didChangeValueForKey:dictionary->_property.name];
     }
     else {
         f();
@@ -425,7 +425,7 @@ static void changeDictionary(__unsafe_unretained RLMDictionary *const dictionary
 #pragma mark - Key Path Strings
 
 - (NSString *)propertyKey {
-    return _key;
+    return _property.name;
 }
 
 #pragma mark - Methods unsupported on unmanaged RLMDictionary instances

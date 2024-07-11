@@ -514,7 +514,7 @@ __attribute__((warn_unused_result));
 
 /**
  `-[RLMSet init]` is not available because `RLMSet`s cannot be created directly.
- ``RLMSet` properties on `RLMObject`s are lazily created when accessed.
+ `RLMSet` properties on `RLMObject`s are lazily created when accessed.
  */
 - (instancetype)init __attribute__((unavailable("RLMSets cannot be created directly")));
 

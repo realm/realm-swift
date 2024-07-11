@@ -37,6 +37,7 @@
 #import "RLMWatchTestUtility.h"
 
 #import <realm/object-store/shared_realm.hpp>
+#import <realm/object-store/sync/app_user.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/thread_safe_reference.hpp>
 #import <realm/util/file.hpp>
@@ -79,6 +80,43 @@ static NSString *generateRandomString(int num) {
 }
 
 #pragma mark - Authentication and Tokens
+
+- (void)testUpdateBaseUrl {
+    RLMApp *app = self.app;
+    XCTAssertEqualObjects(app.baseURL, @"http://localhost:9090");
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should update base url"];
+    [app updateBaseURL:@"http://127.0.0.1:9090" completion:^(NSError *error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectations:@[expectation]];
+    XCTAssertEqualObjects(app.baseURL, @"http://127.0.0.1:9090");
+
+    TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:7070 targetPort:9090];
+    proxy.delay = 0;
+    [proxy startAndReturnError:nil];
+
+    expectation = [self expectationWithDescription:@"should update base url"];
+    [app updateBaseURL:@"http://localhost:7070/" completion:^(NSError *error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectations:@[expectation]];
+    XCTAssertEqualObjects(app.baseURL, @"http://localhost:7070");
+    [proxy stop];
+
+    expectation = [self expectationWithDescription:@"should fail to update base url to default value"];
+    [app updateBaseURL:nil completion:^(NSError *error) {
+        // This fails because our local app doesn't exist in the prod env
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, RLMAppErrorUnknown);
+        [expectation fulfill];
+    }];
+    [self waitForExpectations:@[expectation]];
+    // baseURL update failed, so it's left unchanged
+    XCTAssertEqualObjects(app.baseURL, @"http://localhost:7070");
+}
 
 - (void)testAnonymousAuthentication {
     RLMUser *syncUser = self.anonymousUser;
@@ -166,7 +204,7 @@ static NSString *generateRandomString(int num) {
 }
 
 - (void)testDeleteUser {
-    [self createUser];
+    RLMUser *firstUser = [self createUser];
     RLMUser *secondUser = [self createUser];
 
     XCTAssert([self.app.currentUser.identifier isEqualToString:secondUser.identifier]);
@@ -176,7 +214,7 @@ static NSString *generateRandomString(int num) {
     [secondUser deleteWithCompletion:^(NSError *error) {
         XCTAssert(!error);
         XCTAssert(self.app.allUsers.count == 1);
-        XCTAssertNil(self.app.currentUser);
+        XCTAssertEqualObjects(self.app.currentUser, firstUser);
         XCTAssertEqual(secondUser.state, RLMUserStateRemoved);
         [deleteUserExpectation fulfill];
     }];
@@ -560,7 +598,7 @@ static NSString *randomEmail() {
 #pragma mark - User Profile
 
 - (void)testUserProfileInitialization {
-    RLMUserProfile *profile = [[RLMUserProfile alloc] initWithUserProfile:realm::SyncUserProfile()];
+    RLMUserProfile *profile = [[RLMUserProfile alloc] initWithUserProfile:realm::app::UserProfile()];
     XCTAssertNil(profile.name);
     XCTAssertNil(profile.maxAge);
     XCTAssertNil(profile.minAge);
@@ -572,7 +610,7 @@ static NSString *randomEmail() {
 
     auto metadata = realm::bson::BsonDocument({{"some_key", "some_value"}});
 
-    profile = [[RLMUserProfile alloc] initWithUserProfile:realm::SyncUserProfile(realm::bson::BsonDocument({
+    profile = [[RLMUserProfile alloc] initWithUserProfile:realm::app::UserProfile(realm::bson::BsonDocument({
         {"name", "Jane"},
         {"max_age", "40"},
         {"min_age", "30"},
@@ -758,7 +796,10 @@ static NSString *randomEmail() {
 
     // Should result in an access token error followed by a refresh when we
     // open the Realm which is entirely transparent to the user
-    user._syncUser->update_access_token(self.badAccessToken.UTF8String);
+    realm::RealmJWT token(std::string_view(self.badAccessToken));
+    user.user->update_data_for_testing([&](auto& data) {
+        data.access_token = token;
+    });
     RLMRealm *realm = [self openRealmForPartitionValue:self.name user:user];
 
     RLMRealm *realm2 = [self openRealm];
@@ -895,7 +936,7 @@ static NSString *randomEmail() {
     c.encryptionKey = RLMGenerateKey();
     RLMAssertRealmExceptionContains([RLMRealm realmWithConfiguration:c error:nil],
                                     RLMErrorInvalidDatabase,
-                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: 'unable to decrypt after 0 seconds",
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: unable to decrypt after 0 seconds",
                                     c.fileURL.path);
 }
 
@@ -1367,8 +1408,7 @@ static NSString *randomEmail() {
     // At this point the Realm should be invalidated and client reset should be possible.
     NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
     XCTAssertFalse([NSFileManager.defaultManager fileExistsAtPath:pathValue]);
-    [RLMSyncSession immediatelyHandleError:theError.rlmSync_errorActionToken
-                               syncManager:self.app.syncManager];
+    [RLMSyncSession immediatelyHandleError:theError.rlmSync_errorActionToken];
     XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:pathValue]);
 }
 
@@ -2016,8 +2056,8 @@ static NSString *newPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
     s << RLMConvertRLMBSONToBson(partitionValue);
     // Intentionally not passing the correct partition value here as we (accidentally?)
     // don't use the filename generated from the partition value
-    realm::SyncConfig config(user._syncUser, "null");
-    return @(user._syncUser->sync_manager()->path_for_realm(config, s.str()).c_str());
+    realm::SyncConfig config(user.user, "null");
+    return @(user.user->path_for_realm(config, s.str()).c_str());
 }
 
 - (void)testSyncFilePaths {
@@ -2044,10 +2084,10 @@ static NSString *newPathForPartitionValue(RLMUser *user, id<RLMBSON> partitionVa
 }
 
 static NSString *oldPathForPartitionValue(RLMUser *user, NSString *oldName) {
-    realm::SyncConfig config(user._syncUser, "null");
+    realm::SyncConfig config(user.user, "null");
     return [NSString stringWithFormat:@"%@/%s%@.realm",
-            [@(user._syncUser->sync_manager()->path_for_realm(config).c_str()) stringByDeletingLastPathComponent],
-            user._syncUser->identity().c_str(), oldName];
+            [@(user.user->path_for_realm(config).c_str()) stringByDeletingLastPathComponent],
+            user.user->user_id().c_str(), oldName];
 }
 
 - (void)testLegacyFilePathsAreUsedIfFilesArePresent {

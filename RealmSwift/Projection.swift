@@ -458,7 +458,6 @@ extension ProjectionObservable {
         observe(keyPaths: map(keyPaths: keyPaths), on: queue, block)
     }
 
-#if swift(>=5.8)
     /**
      Registers a block to be called each time the projection's underlying object changes.
 
@@ -537,9 +536,7 @@ extension ProjectionObservable {
     ) async -> NotificationToken {
         await with(self, on: actor) { actor, obj in
             obj.observe(keyPaths: keyPaths, on: nil) { (change: ObjectChange<Self>) in
-                assumeOnActorExecutor(actor) { actor in
-                    block(actor, change)
-                }
+                actor.invokeIsolated(block, change)
             }
         } ?? NotificationToken()
     }
@@ -622,7 +619,6 @@ extension ProjectionObservable {
     ) async -> NotificationToken {
         await observe(keyPaths: map(keyPaths: keyPaths), on: actor, block)
     }
-#endif
 
     fileprivate var schema: [ProjectionProperty] {
         projectionSchemaCache.schema(for: self)

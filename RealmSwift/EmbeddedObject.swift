@@ -58,8 +58,8 @@ import Realm.Private
 public typealias EmbeddedObject = RealmSwiftEmbeddedObject
 extension EmbeddedObject: _RealmCollectionValueInsideOptional {
     /// :nodoc:
-    public class override final func isEmbedded() -> Bool {
-        return true
+    public static override func isEmbedded() -> Bool {
+        true
     }
 
     // MARK: Initializers
@@ -114,8 +114,8 @@ extension EmbeddedObject: _RealmCollectionValueInsideOptional {
      It is not considered part of the public API.
      :nodoc:
      */
-    public override final class func _getProperties() -> [RLMProperty] {
-        return ObjectUtil.getSwiftProperties(self)
+    public override static func _getProperties() -> [RLMProperty] {
+        ObjectUtil.getSwiftProperties(self)
     }
 
     // MARK: Object Customization
@@ -217,7 +217,6 @@ extension EmbeddedObject: _RealmCollectionValueInsideOptional {
         return _observe(on: queue, block)
     }
 
-#if swift(>=5.8)
     /**
     Registers a block to be called each time the object changes.
 
@@ -303,7 +302,6 @@ extension EmbeddedObject: _RealmCollectionValueInsideOptional {
     ) async -> NotificationToken {
         await observe(keyPaths: keyPaths.map(_name(for:)), on: actor, block)
     }
-#endif // swift(>=5.8)
 
     // MARK: Dynamic list
 

@@ -27,7 +27,7 @@ import Realm.Swift
 /**
  `PropertyType` is an enum describing all property types supported in Realm models.
 
- For more information, see [Object Models and Schemas](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/).
+ For more information, see [Object Models and Schemas](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/object-models/).
 
  ### Primitive types
 
@@ -86,7 +86,6 @@ extension ObjectBase {
         }
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
     internal func _observe<A: Actor, T: ObjectBase>(
         keyPaths: [String]? = nil, on actor: isolated A,
@@ -95,14 +94,11 @@ extension ObjectBase {
         let token = RLMObjectNotificationToken()
         token.observe(self, keyPaths: keyPaths) { object, names, oldValues, newValues, error in
             assert(error == nil)
-            assumeOnActorExecutor(actor) { actor in
-                block(actor, .init(object: object as? T, names: names,
+            actor.invokeIsolated(block, .init(object: object as? T, names: names,
                         oldValues: oldValues, newValues: newValues))
-            }
         }
         await withTaskCancellationHandler(operation: token.registrationComplete,
                                           onCancel: { token.invalidate() })
         return token
     }
-#endif // swift(>=5.8)
 }

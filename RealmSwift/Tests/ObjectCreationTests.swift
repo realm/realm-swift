@@ -32,7 +32,7 @@ class ObjectWithPrivateOptionals: Object {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectCreationTests: TestCase {
+class ObjectCreationTests: TestCase, @unchecked Sendable {
     // MARK: - Init tests
 
     func testInitWithDefaults() {
@@ -82,7 +82,7 @@ class ObjectCreationTests: TestCase {
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
-            "binaryCol": "b".data(using: String.Encoding.utf8)!,
+            "binaryCol": Data("b".utf8),
             "dateCol": Date(timeIntervalSince1970: 2),
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
@@ -129,7 +129,7 @@ class ObjectCreationTests: TestCase {
     func testInitWithArray() {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, Int8(1), Int16(1), Int32(1), Int64(1), IntEnum.value1.rawValue, 1.1 as Float,
-                                     11.1, "b", "b".data(using: String.Encoding.utf8)!,
+                                     11.1, "b", Data("b".utf8),
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
                                      ObjectId.generate(), ["boolCol": true],
                                      UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
@@ -198,7 +198,7 @@ class ObjectCreationTests: TestCase {
             return
         }
         verifySwiftObjectWithDictionaryLiteral(object, dictionary: SwiftObject.defaultValues(), boolObjectValue: false,
-            boolObjectListValues: [])
+                                               boolObjectListValues: [])
 
         // test realm properties are populated correctly
         XCTAssertEqual(object.realm!, realm)
@@ -221,7 +221,7 @@ class ObjectCreationTests: TestCase {
         try! realm.write {
             let object = realm.create(SwiftOptionalDefaultValuesObject.self)
             self.verifySwiftOptionalObjectWithDictionaryLiteral(object,
-                dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
+                                                                dictionary: SwiftOptionalDefaultValuesObject.defaultValues(), boolObjectValue: true)
         }
     }
 
@@ -247,7 +247,7 @@ class ObjectCreationTests: TestCase {
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
-            "binaryCol": "b".data(using: String.Encoding.utf8)!,
+            "binaryCol": Data("b".utf8),
             "dateCol": Date(timeIntervalSince1970: 2),
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
@@ -303,7 +303,7 @@ class ObjectCreationTests: TestCase {
     func testCreateWithArray() {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, Int8(1), Int16(1), Int32(1), Int64(1), IntEnum.value1.rawValue, 1.1 as Float,
-                                     11.1, "b", "b".data(using: String.Encoding.utf8)!,
+                                     11.1, "b", Data("b".utf8),
                                      Date(timeIntervalSince1970: 2), Decimal128(number: 123),
                                      ObjectId.generate(), ["boolCol": true],
                                      UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!,
@@ -429,7 +429,7 @@ class ObjectCreationTests: TestCase {
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
-            "binaryCol": "b".data(using: String.Encoding.utf8)!,
+            "binaryCol": Data("b".utf8),
             "dateCol": Date(timeIntervalSince1970: 2),
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
@@ -464,7 +464,7 @@ class ObjectCreationTests: TestCase {
             "floatCol": 1.1 as Float,
             "doubleCol": 11.1,
             "stringCol": "b",
-            "binaryCol": "b".data(using: String.Encoding.utf8)!,
+            "binaryCol": Data("b".utf8),
             "dateCol": Date(timeIntervalSince1970: 2),
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
@@ -559,7 +559,7 @@ class ObjectCreationTests: TestCase {
             "floatCol": 1.1,
             "doubleCol": 11.1,
             "stringCol": "b",
-            "binaryCol": "b".data(using: String.Encoding.utf8)!,
+            "binaryCol": Data("b".utf8),
             "dateCol": Date(timeIntervalSince1970: 2),
             "decimalCol": 3 as Decimal128,
             "objectIdCol": ObjectId.generate(),
@@ -1445,6 +1445,8 @@ class ObjectCreationTests: TestCase {
         case .any:      return ["hello"]
         case .linkingObjects: fatalError("not supported")
         case .UUID: return [UUID(uuidString: "137decc8-b300-4954-a233-f89909f4fd89")!, UUID(uuidString: "00000000-0000-0000-0000-000000000000")!]
+        default:
+            fatalError()
         }
     }
 
@@ -1472,9 +1474,11 @@ class ObjectCreationTests: TestCase {
         case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
         case .objectId: return ["invalid", 123]
         case .decimal128: return ["invalid"]
-        case .any: return [List<String>()]
+        case .any: return [MutableSet<String>()]
         case .linkingObjects: fatalError("not supported")
         case .UUID: return ["invalid"]
+        default:
+            fatalError()
         }
     }
 }

@@ -81,8 +81,8 @@ extension AsymmetricObject {
      It is not considered part of the public API.
      :nodoc:
      */
-    public override final class func _getProperties() -> [RLMProperty] {
-        return ObjectUtil.getSwiftProperties(self)
+    public override static func _getProperties() -> [RLMProperty] {
+        ObjectUtil.getSwiftProperties(self)
     }
 
     // MARK: Object Customization

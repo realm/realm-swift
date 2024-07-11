@@ -61,8 +61,9 @@ public protocol _RealmMapValue {
         let next = generatorBase.next()
         if let next = next as? Element.Key {
             let key: Element.Key = next
-            let val: Element.Value = dynamicBridgeCast(fromObjectiveC: collection[key as AnyObject]!)
-            return SingleMapEntry(key: key, value: val) as? Element
+            if let val = collection[key as AnyObject].map(Element.Value._rlmFromObjc(_:)), let val {
+                return SingleMapEntry(key: key, value: val) as? Element
+            }
         }
         return nil
     }
@@ -85,7 +86,7 @@ public protocol _RealmMapValue {
     public mutating func next() -> Element? {
         let next = generatorBase.next()
         if let key = next as? Key,
-           let value = collection[key as AnyObject].map(dynamicBridgeCast) as? Value {
+           let value = collection[key as AnyObject].map(Value._rlmFromObjc(_:)), let value {
             return (key: key, value: value)
         }
         return nil
@@ -523,7 +524,6 @@ public protocol RealmCollection: RealmCollectionBase, Equatable where Iterator =
                  on queue: DispatchQueue?,
                  _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
-#if swift(>=5.8)
     /**
     Registers a block to be called each time the collection changes.
 
@@ -621,7 +621,6 @@ public protocol RealmCollection: RealmCollectionBase, Equatable where Iterator =
     func observe<A: Actor>(keyPaths: [String]?,
                            on actor: A,
                            _ block: @Sendable @escaping (isolated A, RealmCollectionChange<Self>) -> Void) async -> NotificationToken
-#endif
 
     // MARK: Frozen Objects
 
@@ -1128,7 +1127,6 @@ public extension RealmCollection {
         return self.observe(keyPaths: keyPaths, on: queue, block)
     }
 
-#if swift(>=5.8)
     /**
     Registers a block to be called each time the collection changes.
 
@@ -1228,7 +1226,6 @@ public extension RealmCollection {
                            _ block: @Sendable @escaping (isolated A, RealmCollectionChange<Self>) -> Void) async -> NotificationToken {
         await self.observe(keyPaths: keyPaths, on: actor, block)
     }
-#endif
 }
 
 public extension RealmCollection where Element: ObjectBase {
@@ -1352,7 +1349,6 @@ public extension RealmCollection where Element: ObjectBase {
         return self.observe(keyPaths: keyPaths.map(_name(for:)), on: queue, block)
     }
 
-#if swift(>=5.8)
     /**
     Registers a block to be called each time the collection changes.
 
@@ -1451,7 +1447,6 @@ public extension RealmCollection where Element: ObjectBase {
                            _ block: @Sendable @escaping (isolated A, RealmCollectionChange<Self>) -> Void) async -> NotificationToken {
         await observe(keyPaths: keyPaths.map(_name(for:)), on: actor, block)
     }
-#endif
 }
 
 extension RealmCollection {

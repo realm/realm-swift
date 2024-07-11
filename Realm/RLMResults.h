@@ -736,7 +736,7 @@ __attribute__((swift_attr("@_unsafeInheritExecutor")));
  parent object.
 
  For more information, please see the "Inverse Relationships" section in the
- [documentation](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#relationships).
+ [documentation](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/).
  */
 @interface RLMLinkingObjects<RLMObjectType: RLMObject *> : RLMResults
 @end

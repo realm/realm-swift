@@ -22,7 +22,7 @@ import RealmSwift
 
 // swiftlint:disable cyclomatic_complexity
 
-class PrimitiveMapTestsBase<O: ObjectFactory, V: MapValueFactory>: TestCase {
+class PrimitiveMapTestsBase<O: ObjectFactory, V: MapValueFactory>: TestCase, @unchecked Sendable {
     var realm: Realm?
     var obj: V.MapRoot!
     var obj2: V.MapRoot!
@@ -49,7 +49,7 @@ class PrimitiveMapTestsBase<O: ObjectFactory, V: MapValueFactory>: TestCase {
     }
 }
 
-class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> {
+class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V>, @unchecked Sendable {
     func testInvalidated() {
         XCTAssertFalse(map.isInvalidated)
         if let realm = obj.realm {
@@ -179,7 +179,7 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
     }
 }
 
-class MinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.PersistedType: MinMaxType {
+class MinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V>, @unchecked Sendable where V.PersistedType: MinMaxType {
     func testMin() {
         XCTAssertNil(map.min())
         map.merge(values) { $1 }
@@ -194,7 +194,7 @@ class MinMaxPrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMa
     }
 }
 
-class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V: NumericValueFactory, V.PersistedType: AddableType {
+class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V>, @unchecked Sendable where V: NumericValueFactory, V.PersistedType: AddableType {
     func testSum() {
         XCTAssertEqual(map.sum(), .zero)
         map.merge(values) { $1 }
@@ -208,7 +208,7 @@ class AddablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveM
     }
 }
 
-class SortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V> where V.PersistedType: SortableType {
+class SortablePrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTestsBase<O, V>, @unchecked Sendable where V.PersistedType: SortableType {
     func testSorted() {
         map.merge(values) { $1 }
         XCTAssertEqual(map.count, 3)
@@ -324,7 +324,7 @@ func addPrimitiveMapTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Ty
     MinMaxPrimitiveMapTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
-class UnmanagedPrimitiveMapTests: TestCase {
+class UnmanagedPrimitiveMapTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Maps")
         addPrimitiveMapTests(suite, UnmanagedObjectFactory.self)
@@ -332,7 +332,7 @@ class UnmanagedPrimitiveMapTests: TestCase {
     }
 }
 
-class ManagedPrimitiveMapTests: TestCase {
+class ManagedPrimitiveMapTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Maps")
         addPrimitiveMapTests(suite, ManagedObjectFactory.self)

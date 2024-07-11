@@ -208,7 +208,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
         rlmArray.exchangeObject(at: UInt(index1), withObjectAt: UInt(index2))
     }
 
-    @objc class func _unmanagedCollection() -> RLMArray<AnyObject> {
+    @objc static func _unmanagedCollection() -> RLMArray<AnyObject> {
         if let type = Element.self as? ObjectBase.Type {
             return RLMArray(objectClassName: type.className())
         }
@@ -222,8 +222,8 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
     }
 
     /// :nodoc:
-    @objc public override class func _backingCollectionType() -> AnyClass {
-        return RLMManagedArray.self
+    @objc public override static func _backingCollectionType() -> AnyClass {
+        RLMManagedArray.self
     }
 
     // Printable requires a description property defined in Swift (and not obj-c),

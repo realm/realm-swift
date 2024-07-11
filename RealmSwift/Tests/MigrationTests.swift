@@ -44,7 +44,7 @@ private func dynamicRealm(_ fileURL: URL) -> RLMRealm {
     return try! RLMRealm(configuration: config)
 }
 
-class MigrationTests: TestCase {
+class MigrationTests: TestCase, @unchecked Sendable {
     private func createDefaultRealm() throws {
         let config = Realm.Configuration(fileURL: defaultRealmURL())
         try autoreleasepool {
@@ -851,7 +851,7 @@ class MigrationTests: TestCase {
                 XCTAssertEqual((oldObj["decimalCol"] as! Decimal128), 123e4 as Decimal128)
                 XCTAssertEqual((newObj["decimalCol"] as! Decimal128), 123e4 as Decimal128)
 
-                let binaryCol = "a".data(using: String.Encoding.utf8)!
+                let binaryCol = Data("a".utf8)
                 XCTAssertEqual((oldObj["binaryCol"] as! Data), binaryCol)
                 XCTAssertEqual((newObj["binaryCol"] as! Data), binaryCol)
 

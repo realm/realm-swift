@@ -207,7 +207,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 - (void)resetSyncManager;
 
-- (NSString *)badAccessToken;
+- (const char *)badAccessToken;
 
 - (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection;
 

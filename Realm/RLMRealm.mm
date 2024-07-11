@@ -447,7 +447,6 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
         }
     }
 
-    bool isFirstOpen = false;
     if (realm->_schema) { }
     else if (dynamic) {
         realm->_schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:realm->_realm->schema()];
@@ -482,16 +481,9 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
             };
         }
 
-        DataInitializationFunction initializationFunction;
-        if (!configuration.rerunOnOpen && configuration.initialSubscriptions) {
-            initializationFunction = [&isFirstOpen](SharedRealm) {
-                isFirstOpen = true;
-            };
-        }
-
         try {
             realm->_realm->update_schema(schema.objectStoreCopy, config.schema_version,
-                                         std::move(migrationFunction), std::move(initializationFunction));
+                                         std::move(migrationFunction));
         }
         catch (...) {
             RLMRealmTranslateException(error);
@@ -521,15 +513,6 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
         realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
         realm->_realm->m_binding_context->realm = realm->_realm;
     }
-
-#if REALM_ENABLE_SYNC
-    if (isFirstOpen || (configuration.rerunOnOpen && !realmIsCached)) {
-        RLMSyncSubscriptionSet *subscriptions = realm.subscriptions;
-        [subscriptions update:^{
-            configuration.initialSubscriptions(subscriptions);
-        }];
-    }
-#endif
 
     // Run Analytics and Update checker, this will be run only the first any realm open
     [self runFirstCheckForConfiguration:configuration schema:realm.schema];
@@ -610,6 +593,14 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     configuration.configRef = _realm->config();
     configuration.dynamic = _dynamic;
     configuration.customSchema = _schema;
+    return configuration;
+}
+
+- (RLMRealmConfiguration *)configurationSharingSchema {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.configRef = _realm->config();
+    configuration.dynamic = _dynamic;
+    [configuration setCustomSchemaWithoutCopying:_schema];
     return configuration;
 }
 
@@ -1093,7 +1084,7 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
 
 - (RLMRealm *)thaw {
     [self verifyThread];
-    return self.isFrozen ? [RLMRealm realmWithConfiguration:self.configuration error:nil] : self;
+    return self.isFrozen ? [RLMRealm realmWithConfiguration:self.configurationSharingSchema error:nil] : self;
 }
 
 - (RLMRealm *)frozenCopy {

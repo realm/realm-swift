@@ -23,29 +23,25 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMCredentials_Private.hpp"
 #import "RLMMongoClient_Private.hpp"
+#import "RLMProviderClient_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import <realm/object-store/sync/app_user.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/object-store/sync/sync_session.hpp>
-#import <realm/object-store/sync/sync_user.hpp>
 #import <realm/util/bson/bson.hpp>
 
 using namespace realm;
 
-@interface RLMUser () {
-    std::shared_ptr<SyncUser> _user;
-}
-@end
-
 @implementation RLMUserSubscriptionToken {
-    std::shared_ptr<SyncUser> _user;
-    std::optional<realm::Subscribable<SyncUser>::Token> _token;
+    std::shared_ptr<app::User> _user;
+    std::optional<realm::Subscribable<app::User>::Token> _token;
 }
 
-- (instancetype)initWithUser:(std::shared_ptr<SyncUser>)user token:(realm::Subscribable<SyncUser>::Token&&)token {
+- (instancetype)initWithUser:(std::shared_ptr<app::User>)user token:(realm::Subscribable<app::User>::Token&&)token {
     if (self = [super init]) {
         _user = std::move(user);
         _token = std::move(token);
@@ -63,21 +59,24 @@ using namespace realm;
 
 #pragma mark - API
 
-- (instancetype)initWithUser:(std::shared_ptr<SyncUser>)user
-                         app:(RLMApp *)app {
+- (instancetype)initWithUser:(std::shared_ptr<SyncUser>)user {
     if (self = [super init]) {
-        _user = user;
-        _app = app;
+        _user = std::static_pointer_cast<app::User>(user);
+        _app = [RLMApp cachedAppWithId:@(user->app_id().c_str())];
         return self;
     }
     return nil;
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:[RLMUser class]]) {
-        return NO;
+    if (auto user = RLMDynamicCast<RLMUser>(object)) {
+        return _user == user->_user;
     }
-    return _user == ((RLMUser *)object)->_user;
+    return NO;
+}
+
+- (NSUInteger)hash {
+    return NSUInteger(_user.get());
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable id<RLMBSON>)partitionValue {
@@ -151,9 +150,8 @@ using namespace realm;
 - (RLMRealmConfiguration *)flexibleSyncConfigurationWithInitialSubscriptions:(RLMFlexibleSyncInitialSubscriptionsBlock)initialSubscriptions
                                                                  rerunOnOpen:(BOOL)rerunOnOpen {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self];
+    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions                                                                                              rerunOnOpen:rerunOnOpen];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-    config.initialSubscriptions = initialSubscriptions;
-    config.rerunOnOpen = rerunOnOpen;
     config.syncConfiguration = syncConfig;
     return config;
 }
@@ -168,8 +166,8 @@ using namespace realm;
     syncConfig.clientResetMode = clientResetMode;
     syncConfig.beforeClientReset = beforeResetBlock;
     syncConfig.afterClientReset = afterResetBlock;
-    config.initialSubscriptions = initialSubscriptions;
-    config.rerunOnOpen = rerunOnOpen;
+    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions                                                                                              rerunOnOpen:rerunOnOpen];
+
     config.syncConfiguration = syncConfig;
     return config;
 }
@@ -182,16 +180,12 @@ using namespace realm;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     syncConfig.clientResetMode = clientResetMode;
     syncConfig.manualClientResetHandler = manualClientResetHandler;
-    config.initialSubscriptions = initialSubscriptions;
-    config.rerunOnOpen = rerunOnOpen;
+    syncConfig.initialSubscriptions = [[RLMInitialSubscriptionsConfiguration alloc] initWithCallback:initialSubscriptions rerunOnOpen:rerunOnOpen];
     config.syncConfiguration = syncConfig;
     return config;
 }
 
 - (void)logOut {
-    if (!_user) {
-        return;
-    }
     _user->log_out();
 }
 
@@ -199,20 +193,9 @@ using namespace realm;
     return _user->is_logged_in();
 }
 
-- (void)invalidate {
-    if (!_user) {
-        return;
-    }
-    _user = nullptr;
-}
-
 - (std::string)pathForPartitionValue:(std::string const&)value {
-    if (!_user) {
-        return "";
-    }
-
     SyncConfig config(_user, value);
-    auto path = _user->sync_manager()->path_for_realm(config, value);
+    auto path = _user->path_for_realm(config, value);
     if ([NSFileManager.defaultManager fileExistsAtPath:@(path.c_str())]) {
         return path;
     }
@@ -222,7 +205,7 @@ using namespace realm;
     NSString *encodedPartitionValue = [@(value.data())
                                        stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
     NSString *overEncodedRealmName = [[NSString alloc] initWithFormat:@"%@/%@", self.identifier, encodedPartitionValue];
-    auto legacyPath = _user->sync_manager()->path_for_realm(config, std::string(overEncodedRealmName.UTF8String));
+    auto legacyPath = _user->path_for_realm(config, std::string(overEncodedRealmName.UTF8String));
     if ([NSFileManager.defaultManager fileExistsAtPath:@(legacyPath.c_str())]) {
         return legacyPath;
     }
@@ -231,65 +214,45 @@ using namespace realm;
 }
 
 - (std::string)pathForFlexibleSync {
-    if (!_user) {
-        @throw RLMException(@"This is an exceptional state, `RLMUser` cannot be initialised without a reference to `SyncUser`");
-    }
-
     SyncConfig config(_user, SyncConfig::FLXSyncEnabled{});
-    return _user->sync_manager()->path_for_realm(config, realm::none);
+    return _user->path_for_realm(config, realm::none);
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {
-    if (!_user) {
-        return nil;
-    }
-
     std::stringstream s;
     s << RLMConvertRLMBSONToBson(partitionValue);
     auto path = [self pathForPartitionValue:s.str()];
-    if (auto session = _user->session_for_on_disk_path(path)) {
+    if (auto session = _user->sync_manager()->get_existing_session(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
     return nil;
 }
 
 - (NSArray<RLMSyncSession *> *)allSessions {
-    if (!_user) {
-        return @[];
-    }
-    NSMutableArray<RLMSyncSession *> *buffer = [NSMutableArray array];
-    auto sessions = _user->all_sessions();
-    for (auto session : sessions) {
+    auto sessions = _user->sync_manager()->get_all_sessions_for(*_user);
+    NSMutableArray<RLMSyncSession *> *buffer = [NSMutableArray arrayWithCapacity:sessions.size()];
+    for (auto& session : sessions) {
         [buffer addObject:[[RLMSyncSession alloc] initWithSyncSession:std::move(session)]];
     }
     return [buffer copy];
 }
 
 - (NSString *)identifier {
-    if (!_user) {
-        return @"";
-    }
-    return @(_user->identity().c_str());
+    return @(_user->user_id().c_str());
 }
 
 - (NSArray<RLMUserIdentity *> *)identities {
-    if (!_user) {
-        return @[];
-    }
     NSMutableArray<RLMUserIdentity *> *buffer = [NSMutableArray array];
     auto identities = _user->identities();
     for (auto& identity : identities) {
-        [buffer addObject: [[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
-                                                                          identifier:@(identity.id.c_str())]];
+        [buffer addObject:[[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
+                                                                         identifier:@(identity.id.c_str())]];
     }
 
     return [buffer copy];
 }
 
 - (RLMUserState)state {
-    if (!_user) {
-        return RLMUserStateRemoved;
-    }
     switch (_user->state()) {
         case SyncUser::State::LoggedIn:
             return RLMUserStateLoggedIn;
@@ -312,36 +275,36 @@ using namespace realm;
 
 - (void)linkUserWithCredentials:(RLMCredentials *)credentials
                      completion:(RLMOptionalUserBlock)completion {
-    _app._realmApp->link_user(_user, credentials.appCredentials,
-                   ^(std::shared_ptr<SyncUser> user, std::optional<app::AppError> error) {
+    _user->app()->link_user(_user, credentials.appCredentials,
+                            ^(std::shared_ptr<app::User> user, std::optional<app::AppError> error) {
         if (error) {
             return completion(nil, makeError(*error));
         }
 
-        completion([[RLMUser alloc] initWithUser:user app:_app], nil);
+        completion([[RLMUser alloc] initWithUser:user], nil);
     });
 }
 
 - (void)removeWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app._realmApp->remove_user(_user, ^(std::optional<app::AppError> error) {
+    _user->app()->remove_user(_user, ^(std::optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)deleteWithCompletion:(RLMUserOptionalErrorBlock)completion {
-    _app._realmApp->delete_user(_user, ^(std::optional<app::AppError> error) {
+    _user->app()->delete_user(_user, ^(std::optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app._realmApp->log_out(_user, ^(std::optional<app::AppError> error) {
+    _user->app()->log_out(_user, ^(std::optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (RLMAPIKeyAuth *)apiKeysAuth {
-    return [[RLMAPIKeyAuth alloc] initWithApp:_app];
+    return [[RLMAPIKeyAuth alloc] initWithApp:_user->app()];
 }
 
 - (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
@@ -357,9 +320,9 @@ using namespace realm;
         args.push_back(RLMConvertRLMBSONToBson(argument));
     }
 
-    _app._realmApp->call_function(_user, name.UTF8String, args,
-                                  [completionBlock](std::optional<bson::Bson>&& response,
-                                                    std::optional<app::AppError> error) {
+    _user->app()->call_function(_user, name.UTF8String, args,
+                                [completionBlock](std::optional<bson::Bson>&& response,
+                                                  std::optional<app::AppError> error) {
         if (error) {
             return completionBlock(nil, makeError(*error));
         }
@@ -379,21 +342,21 @@ using namespace realm;
 #pragma mark - Private API
 
 - (NSString *)refreshToken {
-    if (!_user || _user->refresh_token().empty()) {
+    if (_user->refresh_token().empty()) {
         return nil;
     }
     return @(_user->refresh_token().c_str());
 }
 
 - (NSString *)accessToken {
-    if (!_user || _user->access_token().empty()) {
+    if (_user->access_token().empty()) {
         return nil;
     }
     return @(_user->access_token().c_str());
 }
 
 - (NSDictionary *)customData {
-    if (!_user || !_user->custom_data()) {
+    if (!_user->custom_data()) {
         return @{};
     }
 
@@ -401,14 +364,7 @@ using namespace realm;
 }
 
 - (RLMUserProfile *)profile {
-    if (!_user) {
-        return [RLMUserProfile new];
-    }
-
     return [[RLMUserProfile alloc] initWithUserProfile:_user->user_profile()];
-}
-- (std::shared_ptr<SyncUser>)_syncUser {
-    return _user;
 }
 
 - (RLMUserSubscriptionToken *)subscribe:(RLMUserNotificationBlock)block {
@@ -436,7 +392,7 @@ using namespace realm;
 #pragma mark - RLMUserProfile
 
 @interface RLMUserProfile () {
-    SyncUserProfile _userProfile;
+    app::UserProfile _userProfile;
 }
 @end
 
@@ -449,9 +405,9 @@ static NSString* userProfileMemberToNSString(const std::optional<std::string>& m
 
 @implementation RLMUserProfile
 
-using UserProfileMember = std::optional<std::string> (SyncUserProfile::*)() const;
+using UserProfileMember = std::optional<std::string> (app::UserProfile::*)() const;
 
-- (instancetype)initWithUserProfile:(SyncUserProfile)userProfile {
+- (instancetype)initWithUserProfile:(app::UserProfile)userProfile {
     if (self = [super init]) {
         _userProfile = std::move(userProfile);
     }

@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersion = Version("14.5.0")
-let cocoaVersion = Version("10.49.1")
+let coreVersion = Version("14.10.2")
+let cocoaVersion = Version("10.52.1")
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
@@ -141,17 +141,19 @@ let package = Package(
     name: "Realm",
     platforms: [
         .macOS(.v10_13),
-        .iOS(.v11),
-        .tvOS(.v11),
+        .iOS(.v12),
+        .tvOS(.v12),
         .watchOS(.v4)
     ],
     products: [
         .library(
             name: "Realm",
+            type: .dynamic,
             targets: ["Realm"]),
         .library(
             name: "RealmSwift",
-            targets: ["Realm", "RealmSwift"]),
+            type: .dynamic,
+            targets: ["RealmSwift"]),
     ],
     dependencies: [
         .package(url: "https://github.com/realm/realm-core.git", exact: coreVersion)
@@ -245,6 +247,7 @@ let package = Package(
                 "Realm/RLMEmailPasswordAuth.mm",
                 "Realm/RLMFindOneAndModifyOptions.mm",
                 "Realm/RLMFindOptions.mm",
+                "Realm/RLMInitialSubscriptionsConfiguration.m",
                 "Realm/RLMMongoClient.mm",
                 "Realm/RLMMongoCollection.mm",
                 "Realm/RLMNetworkTransport.mm",

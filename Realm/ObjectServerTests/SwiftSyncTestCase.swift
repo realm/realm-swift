@@ -185,7 +185,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func populateRealm() throws {
         try write { realm in
             for _ in 0..<SwiftSyncTestCase.bigObjectCount {
-                realm.add(SwiftHugeSyncObject.create())
+                realm.add(SwiftHugeSyncObject.create(key: name))
             }
         }
     }
@@ -217,7 +217,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssertEqual(collection.count(filter: [:]).await(self), count)
     }
 
-#if swift(>=5.8)
     // MARK: - Async helpers
 
     // These are async versions of the synchronous functions defined above.
@@ -254,7 +253,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         let credentials = try await basicCredentials(app: app)
         return try await (app ?? self.app).login(credentials: credentials)
     }
-#endif // swift(>=5.8)
 }
 
 @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)

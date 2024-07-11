@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 import Foundation
 
-class KeyPathTests: TestCase {
+class KeyPathTests: TestCase, @unchecked Sendable {
     func testModernObjectTopLevel() {
         XCTAssertEqual(_name(for: \ModernAllTypesObject.pk), "pk")
 
@@ -564,7 +564,7 @@ class SwiftOldSyntaxAllTypesObject: Object {
     @objc dynamic var floatCol = 1.23 as Float
     @objc dynamic var doubleCol = 12.3
     @objc dynamic var stringCol = "a"
-    @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
+    @objc dynamic var binaryCol = Data("a".utf8)
     @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
     @objc dynamic var decimalCol = Decimal128("123e4")
     @objc dynamic var objectIdCol = ObjectId("1234567890ab1234567890ab")
@@ -597,7 +597,7 @@ class SwiftOldSyntaxAllTypesEmbeddedObject: EmbeddedObject {
     @objc dynamic var floatCol = 1.23 as Float
     @objc dynamic var doubleCol = 12.3
     @objc dynamic var stringCol = "a"
-    @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
+    @objc dynamic var binaryCol = Data("a".utf8)
     @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
     @objc dynamic var decimalCol = Decimal128("123e4")
     @objc dynamic var objectIdCol = ObjectId("1234567890ab1234567890ab")
@@ -634,7 +634,7 @@ class ModernAllTypesEmbeddedObject: EmbeddedObject {
     @Persisted var floatCol = 1.23 as Float
     @Persisted var doubleCol = 12.3
     @Persisted var stringCol = "a"
-    @Persisted var binaryCol = "a".data(using: String.Encoding.utf8)!
+    @Persisted var binaryCol = Data("a".utf8)
     @Persisted var dateCol = Date(timeIntervalSince1970: 1)
     @Persisted var decimalCol = Decimal128("123e4")
     @Persisted var objectIdCol = ObjectId("1234567890ab1234567890ab")

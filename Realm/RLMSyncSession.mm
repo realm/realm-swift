@@ -34,7 +34,7 @@ using namespace realm;
 @interface RLMSyncErrorActionToken () {
 @public
     std::string _originalPath;
-    BOOL _isValid;
+    std::shared_ptr<app::App> _app;
 }
 @end
 
@@ -131,10 +131,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMUser *)parentUser {
     if (auto session = _session.lock()) {
-        if (auto app = session->user()->sync_manager()->app().lock()) {
-            auto rlmApp = [RLMApp appWithId:@(app->config().app_id.data())];
-            return [[RLMUser alloc] initWithUser:session->user() app:rlmApp];
-        }
+        return [[RLMUser alloc] initWithUser:session->user()];
     }
     return nil;
 }
@@ -208,18 +205,23 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
     return NO;
 }
 
-- (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
-                                                                 mode:(RLMSyncProgressMode)mode
-                                                                block:(RLMProgressNotificationBlock)block {
+- (RLMProgressNotificationToken *)addSyncProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+                                                                     mode:(RLMSyncProgressMode)mode
+                                                                    block:(RLMSyncProgressNotificationBlock)block {
     if (auto session = _session.lock()) {
         dispatch_queue_t queue = RLMSyncSession.notificationsQueue;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
                                    ? SyncSession::ProgressDirection::upload
                                    : SyncSession::ProgressDirection::download);
         bool is_streaming = (mode == RLMSyncProgressModeReportIndefinitely);
-        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable, double) {
+        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable, double estimate) {
             dispatch_async(queue, ^{
-                block((NSUInteger)transferred, (NSUInteger)transferrable);
+                RLMSyncProgress progress = {
+                    .transferredBytes = (NSUInteger)transferred,
+                    .transferrableBytes = (NSUInteger)transferrable,
+                    .progressEstimate = estimate
+                };
+                block(progress);
             });
         }, notifier_direction, is_streaming);
         return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:session];
@@ -227,21 +229,28 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
     return nil;
 }
 
-+ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager {
-    if (!token->_isValid) {
-        return;
-    }
-    token->_isValid = NO;
+- (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+                                                                 mode:(RLMSyncProgressMode)mode
+                                                                block:(RLMProgressNotificationBlock)block {
+    return [self addSyncProgressNotificationForDirection:direction mode:mode block:([=](RLMSyncProgress progress) {
+        block(progress.transferredBytes, progress.transferrableBytes);
+    })];
+}
 
-    syncManager.syncManager->immediately_run_file_actions(token->_originalPath);
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token {
+    if (token->_app) {
+        token->_app->immediately_run_file_actions(token->_originalPath);
+        token->_app.reset();
+    }
+}
+
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token
+                   syncManager:(__unused RLMSyncManager *)syncManager {
+    [self immediatelyHandleError:token];
 }
 
 + (nullable RLMSyncSession *)sessionForRealm:(RLMRealm *)realm {
-    auto& config = realm->_realm->config().sync_config;
-    if (!config) {
-        return nil;
-    }
-    if (auto session = config->user->session_for_on_disk_path(realm->_realm->config().path)) {
+    if (auto session = realm->_realm->sync_session()) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
     return nil;
@@ -268,10 +277,10 @@ static util::UniqueFunction<void(Status)> wrapCompletion(dispatch_queue_t queue,
 
 @implementation RLMSyncErrorActionToken
 
-- (instancetype)initWithOriginalPath:(std::string)originalPath {
+- (instancetype)initWithOriginalPath:(std::string)originalPath app:(std::shared_ptr<app::App>)app {
     if (self = [super init]) {
-        _isValid = YES;
         _originalPath = std::move(originalPath);
+        _app = std::move(app);
         return self;
     }
     return nil;

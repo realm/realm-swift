@@ -251,7 +251,7 @@ public final class MultipleProjectionsFromOneProperty: Projection<SimpleObject> 
 // MARK: Tests
 
 @available(iOS 13.0, *)
-class ProjectionTests: TestCase {
+class ProjectionTests: TestCase, @unchecked Sendable {
     func assertSetEquals<T: RealmCollectionValue>(_ set: MutableSet<T>, _ expected: Array<T>) {
         XCTAssertEqual(set.count, Set(expected).count)
         XCTAssertEqual(Set(set), Set(expected))
@@ -288,7 +288,7 @@ class ProjectionTests: TestCase {
             "floatCol": 15 as Float,
             "doubleCol": 16 as Double,
             "stringCol": "a",
-            "binaryCol": "b".data(using: .utf8)!,
+            "binaryCol": Data("b".utf8),
             "dateCol": Date(timeIntervalSince1970: 17),
             "decimalCol": 18 as Decimal128,
             "objectIdCol": ObjectId("6058f12b957ba06156586a7c"),
@@ -315,7 +315,7 @@ class ProjectionTests: TestCase {
             "optFloatCol": 35 as Float,
             "optDoubleCol": 36 as Double,
             "optStringCol": "c",
-            "optBinaryCol": "d".data(using: .utf8)!,
+            "optBinaryCol": Data("d".utf8),
             "optDateCol": Date(timeIntervalSince1970: 37),
             "optDecimalCol": 38 as Decimal128,
             "optObjectIdCol": ObjectId("6058f12b957ba06156586a7c"),
@@ -331,7 +331,7 @@ class ProjectionTests: TestCase {
             "arrayFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float],
             "arrayDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double],
             "arrayString": ["a", "b", "c"] as [String],
-            "arrayBinary": ["a".data(using: .utf8)!] as [Data],
+            "arrayBinary": [Data("a".utf8)] as [Data],
             "arrayDate": [Date(timeIntervalSince1970: 0), Date(timeIntervalSince1970: 1)] as [Date],
             "arrayDecimal": [1 as Decimal128, 2 as Decimal128],
             "arrayObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d")],
@@ -346,7 +346,7 @@ class ProjectionTests: TestCase {
             "arrayOptFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float, nil],
             "arrayOptDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double, nil],
             "arrayOptString": ["a", "b", "c", nil],
-            "arrayOptBinary": ["a".data(using: .utf8)!, nil],
+            "arrayOptBinary": [Data("a".utf8), nil],
             "arrayOptDate": [Date(timeIntervalSince1970: 0), Date(timeIntervalSince1970: 1), nil],
             "arrayOptDecimal": [1 as Decimal128, 2 as Decimal128, nil],
             "arrayOptObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d"), nil],
@@ -360,7 +360,7 @@ class ProjectionTests: TestCase {
             "setFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float],
             "setDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double],
             "setString": ["a", "b", "c"] as [String],
-            "setBinary": ["a".data(using: .utf8)!] as [Data],
+            "setBinary": [Data("a".utf8)] as [Data],
             "setDate": [Date(timeIntervalSince1970: 1), Date(timeIntervalSince1970: 2)] as [Date],
             "setDecimal": [1 as Decimal128, 2 as Decimal128],
             "setObjectId": [ObjectId("6058f12b957ba06156586a7c"),
@@ -378,7 +378,7 @@ class ProjectionTests: TestCase {
             "setOptFloat": [1 as Float, 2 as Float, 3 as Float, 1 as Float, nil],
             "setOptDouble": [1 as Double, 2 as Double, 3 as Double, 1 as Double, nil],
             "setOptString": ["a", "b", "c", nil],
-            "setOptBinary": ["a".data(using: .utf8)!, nil],
+            "setOptBinary": [Data("a".utf8), nil],
             "setOptDate": [Date(timeIntervalSince1970: 1), Date(timeIntervalSince1970: 2), nil],
             "setOptDecimal": [1 as Decimal128, 2 as Decimal128, nil],
             "setOptObjectId": [ObjectId("6058f12b957ba06156586a7c"), ObjectId("6058f12682b2fbb1f334ef1d"), nil],
@@ -395,7 +395,7 @@ class ProjectionTests: TestCase {
             "mapFloat": ["1": 1 as Float, "2": 2 as Float, "3": 3 as Float, "4": 1 as Float],
             "mapDouble": ["1": 1 as Double, "2": 2 as Double, "3": 3 as Double, "4": 1 as Double],
             "mapString": ["1": "a", "2": "b", "3": "c"] as [String: String],
-            "mapBinary": ["1": "a".data(using: .utf8)!] as [String: Data],
+            "mapBinary": ["1": Data("a".utf8)] as [String: Data],
             "mapDate": ["1": Date(timeIntervalSince1970: 1), "2": Date(timeIntervalSince1970: 2)] as [String: Date],
             "mapDecimal": ["1": 1 as Decimal128, "2": 2 as Decimal128],
             "mapObjectId": ["1": ObjectId("6058f12b957ba06156586a7c"),
@@ -413,7 +413,7 @@ class ProjectionTests: TestCase {
             "mapOptFloat": ["1": 1 as Float, "2": 2 as Float, "3": 3 as Float, "4": 1 as Float, "5": nil],
             "mapOptDouble": ["1": 1 as Double, "2": 2 as Double, "3": 3 as Double, "4": 1 as Double, "5": nil],
             "mapOptString": ["1": "a", "2": "b", "3": "c", "4": nil],
-            "mapOptBinary": ["1": "a".data(using: .utf8)!, "2": nil],
+            "mapOptBinary": ["1": Data("a".utf8), "2": nil],
             "mapOptDate": ["1": Date(timeIntervalSince1970: 1), "2": Date(timeIntervalSince1970: 2), "3": nil],
             "mapOptDecimal": ["1": 1 as Decimal128, "2": 2 as Decimal128, "3": nil],
             "mapOptObjectId": ["1": ObjectId("6058f12b957ba06156586a7c"),
@@ -804,7 +804,7 @@ class ProjectionTests: TestCase {
         let obj = realm.objects(ModernAllTypesObject.self).first!
         let obs = realm.objects(AllTypesPrimitiveProjection.self).first!
 
-        let data = "c".data(using: String.Encoding.utf8)!
+        let data = Data("c".utf8)
         let date = Date(timeIntervalSince1970: 7)
         let decimal = Decimal128(number: 3)
         let objectId = ObjectId.generate()
@@ -1093,7 +1093,7 @@ class ProjectionTests: TestCase {
     func testAllPropertyTypes() {
         var (obj, obs) = newObjects(allTypeValues)
 
-        let data = "b".data(using: String.Encoding.utf8)!
+        let data = Data("b".utf8)
         let date = Date(timeIntervalSince1970: 2)
         let decimal = Decimal128(number: 3)
         let objectId = ObjectId()
@@ -1590,7 +1590,7 @@ class ProjectionTests: TestCase {
         observeSetChange(obs, "mapOptUuid") { obj.mapOptUuid.removeObject(for: "key") }
     }
 
-#if swift(>=5.8)
+    @MainActor
     func testObserveOnActor() async throws {
         let projection = simpleProjection()
         let ex = expectation(description: "got change")
@@ -1623,7 +1623,6 @@ class ProjectionTests: TestCase {
         await fulfillment(of: [ex])
         tokens.forEach { $0.invalidate() }
     }
-#endif
 
     // MARK: Frozen Objects
 

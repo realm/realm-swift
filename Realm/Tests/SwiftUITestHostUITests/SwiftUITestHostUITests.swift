@@ -22,8 +22,10 @@ import RealmSwift
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 class SwiftUITests: XCTestCase {
     var realm: Realm!
+    @MainActor
     let app = XCUIApplication()
 
+    @MainActor
     override func setUpWithError() throws {
         continueAfterFailure = false
 
@@ -39,6 +41,7 @@ class SwiftUITests: XCTestCase {
         ]
     }
 
+    @MainActor
     override func tearDownWithError() throws {
         app.terminate()
         self.realm.invalidate()
@@ -51,6 +54,7 @@ class SwiftUITests: XCTestCase {
         String(repeating: XCUIKeyboardKey.delete.rawValue, count: string.count)
     }
 
+    @MainActor
     private var tables: XCUIElementQuery {
         if #available(iOS 16.0, *) {
             return app.collectionViews
@@ -59,6 +63,7 @@ class SwiftUITests: XCTestCase {
         }
     }
 
+    @MainActor
     func testSampleApp() throws {
         app.launch()
         // assert realm is empty
@@ -88,6 +93,12 @@ class SwiftUITests: XCTestCase {
         app.buttons["New List"].tap()
         XCTAssertTrue(app.navigationBars.staticTexts["New List"].waitForExistence(timeout: 1.0))
         app.buttons["addReminder"].tap()
+        if #available(iOS 18, *) {
+            // Work around what appears to be a bug in SwiftUI in iOS 18 beta 1
+            // where tapping the list entry doesn't navigate to ReminderView
+            // if there's only one list entry
+            app.buttons["addReminder"].tap()
+        }
         // type in a name
         if #available(iOS 16, *) {
             app.cells.element(boundBy: 0).tap()
@@ -138,6 +149,10 @@ class SwiftUITests: XCTestCase {
                 app.buttons.matching(identifier: "Delete").firstMatch.tap()
             }
         }
+        if #available(iOS 18, *) {
+            XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 3)
+            delete()
+        }
         XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 2)
         delete()
         XCTAssertEqual(realm.objects(ReminderList.self).first!.reminders.count, 1)
@@ -151,17 +166,20 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
     }
 
+    @MainActor
     func testNSPredicateObservedResults() throws {
         app.launch()
         try observedResultsQueryTest()
     }
 
+    @MainActor
     func testSwiftQueryObservedResults() throws {
         app.launchEnvironment["query_type"] = "type_safe_query"
         app.launch()
         try observedResultsQueryTest()
     }
 
+    @MainActor
     private func observedResultsQueryTest() throws {
         let addButton = app.buttons["addList"]
         (1...5).forEach { _ in
@@ -185,6 +203,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(table.cells.count, 3)
     }
 
+    @MainActor
     func testMultipleEnvironmentRealms() {
         app.launchEnvironment["test_type"] = "multi_realm_test"
         app.launch()
@@ -201,6 +220,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["test_text_view"].label, "realm_c")
     }
 
+    @MainActor
     func testUnmanagedObjectState() {
         app.launchEnvironment["test_type"] = "unmanaged_object_test"
         app.launch()
@@ -218,6 +238,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(app.textFields["name"].value as? String, "test name")
     }
 
+    @MainActor
     func testKeyPathResults() {
         app.launchEnvironment["test_type"] = "observed_results_key_path"
         app.launch()
@@ -266,6 +287,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(tables.firstMatch.cells.count, 2)
     }
 
+    @MainActor
     func testUpdateResultsWithSearchable() {
         app.launchEnvironment["test_type"] = "observed_results_searchable"
         app.launch()
@@ -323,6 +345,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(table.cells.count, 0)
     }
 
+    @MainActor
     func testObservedResultsConfiguration() {
         app.launchEnvironment["test_type"] = "observed_results_configuration"
         app.launch()
@@ -347,6 +370,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(tableB.cells.count, 5)
     }
 
+    @MainActor
     func testKeyPathObservedSectionedResults() {
         app.launchEnvironment["test_type"] = "observed_sectioned_results_key_path"
         app.launch()
@@ -405,7 +429,7 @@ class SwiftUITests: XCTestCase {
         // been inserted into the Realm.
         if #available(iOS 16, *) {
             let sectionHeader1 = app.collectionViews.children(matching: .cell).element(boundBy: 0)
-            XCTAssert(sectionHeader1.staticTexts["A"].exists)
+            XCTAssert(sectionHeader1.staticTexts["A"].waitForExistence(timeout: 1.0))
             let cell0 = app.collectionViews.children(matching: .cell).element(boundBy: 1)
             XCTAssert(cell0.staticTexts["Another List"].exists)
             let sectionHeader2 = app.collectionViews.children(matching: .cell).element(boundBy: 2)
@@ -426,8 +450,25 @@ class SwiftUITests: XCTestCase {
             XCTAssertEqual(app.tables.firstMatch.cells.count, 3)
         }
         XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
+
+        let collectionViewsQuery = XCUIApplication().collectionViews
+        collectionViewsQuery.children(matching: .other).element(boundBy: 1).tap()
+        collectionViewsQuery.children(matching: .cell).element(boundBy: 1).children(matching: .other).element(boundBy: 1).children(matching: .other).element.swipeLeft()
+        collectionViewsQuery.buttons["Delete"].tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 2)
+
+        collectionViewsQuery.children(matching: .other).element(boundBy: 2).tap()
+        collectionViewsQuery.children(matching: .cell).element(boundBy: 2).children(matching: .other).element(boundBy: 1).children(matching: .other).element.swipeLeft()
+        collectionViewsQuery.buttons["Delete"].tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 1)
+
+        collectionViewsQuery.children(matching: .other).element(boundBy: 1).tap()
+        collectionViewsQuery.children(matching: .cell).element(boundBy: 1).children(matching: .other).element(boundBy: 1).children(matching: .other).element.swipeLeft()
+        collectionViewsQuery.buttons["Delete"].tap()
+        XCTAssertEqual(realm.objects(ReminderList.self).count, 0)
     }
 
+    @MainActor
     func testKeyPathObservedSectionedResults2() {
         // Tests ObservedSectionedResults ctor that uses the `sectionBlock` param.
         app.launchEnvironment["test_type"] = "observed_sectioned_results_sort_descriptors"
@@ -489,7 +530,7 @@ class SwiftUITests: XCTestCase {
         // been inserted into the Realm.
         if #available(iOS 16, *) {
             let sectionHeader1 = app.collectionViews.children(matching: .cell).element(boundBy: 0)
-            XCTAssert(sectionHeader1.staticTexts["A"].exists)
+            XCTAssert(sectionHeader1.staticTexts["A"].waitForExistence(timeout: 1.0))
             let cell0 = app.collectionViews.children(matching: .cell).element(boundBy: 1)
             XCTAssert(cell0.staticTexts["Another List"].exists)
             let sectionHeader2 = app.collectionViews.children(matching: .cell).element(boundBy: 2)
@@ -512,6 +553,7 @@ class SwiftUITests: XCTestCase {
         XCTAssertEqual(realm.objects(ReminderList.self).count, 3)
     }
 
+    @MainActor
     func testUpdateObservedSectionedResultsWithSearchable() {
         app.launchEnvironment["test_type"] = "observed_sectioned_results_searchable"
         app.launch()
@@ -580,6 +622,7 @@ class SwiftUITests: XCTestCase {
         }
     }
 
+    @MainActor
     func testObservedSectionedResultsConfiguration() {
         app.launchEnvironment["test_type"] = "observed_sectioned_results_configuration"
         app.launch()

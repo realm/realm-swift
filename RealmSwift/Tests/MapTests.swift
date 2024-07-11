@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class MapTests: TestCase {
+class MapTests: TestCase, @unchecked Sendable {
     var str1: SwiftStringObject!
     var str2: SwiftStringObject!
     var realm: Realm!
@@ -968,7 +968,6 @@ class MapTests: TestCase {
         token.invalidate()
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @MainActor func testObserveOnActor() async throws {
         let map = createMapObject().swiftObjectMap
@@ -1030,10 +1029,9 @@ class MapTests: TestCase {
         await fulfillment(of: [changeEx])
         token.invalidate()
     }
-#endif // swift(>=5.8)
 }
 
-class MapStandaloneTests: MapTests {
+class MapStandaloneTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         return createMapObject().map
     }
@@ -1081,7 +1079,6 @@ class MapStandaloneTests: MapTests {
         assertThrows(mapObj.observe {_ in })
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @MainActor override func testObserveOnActor() async throws {
     }
@@ -1089,10 +1086,9 @@ class MapStandaloneTests: MapTests {
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     @MainActor override func testObserveOnActorTypedKeyPath() async throws {
     }
-#endif
 }
 
-class MapNewlyAddedTests: MapTests {
+class MapNewlyAddedTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         realm.add(mapObj)
@@ -1115,7 +1111,7 @@ class MapNewlyAddedTests: MapTests {
     }
 }
 
-class MapNewlyCreatedTests: MapTests {
+class MapNewlyCreatedTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
@@ -1137,7 +1133,7 @@ class MapNewlyCreatedTests: MapTests {
     }
 }
 
-class MapRetrievedTests: MapTests {
+class MapRetrievedTests: MapTests, @unchecked Sendable {
     override func createMap() -> Map<String, SwiftStringObject?> {
         realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()

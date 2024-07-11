@@ -64,7 +64,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  Note that user objects are only vended out via SDK APIs, and cannot be directly
  initialized. User objects can be accessed from any thread.
  */
-RLM_SWIFT_SENDABLE RLM_FINAL // internally thread-safe
+RLM_SWIFT_SENDABLE // internally thread-safe
 @interface RLMUser : NSObject
 
 /**

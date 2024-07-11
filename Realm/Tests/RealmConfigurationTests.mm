@@ -109,8 +109,7 @@
     configuration.deleteRealmIfMigrationNeeded = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
 
-    RLMUser *user = RLMDummyUser();
-    configuration.syncConfiguration = [user configurationWithPartitionValue:@"dummy"].syncConfiguration;
+    configuration = [RLMRealmConfiguration fakeSyncConfiguration];
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
     configuration.objectClasses = @[];
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
@@ -126,10 +125,6 @@
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
     configuration.readOnly = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
-
-    [user logOut];
-    [RLMApp resetAppCache];
-
 }
 
 #pragma mark - Default Configuration

@@ -45,7 +45,7 @@ class SwiftDynamicDefaultObject: Object {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectTests: TestCase {
+class ObjectTests: TestCase, @unchecked Sendable {
     // init() Tests are in ObjectCreationTests.swift
     // init(value:) tests are in ObjectCreationTests.swift
 
@@ -315,7 +315,7 @@ class ObjectTests: TestCase {
             XCTAssertNil(object.value(forKey: "anyCol"))
 
             let expected = object.value(forKey: "binaryCol") as! Data
-            let actual = "a".data(using: String.Encoding.utf8)!
+            let actual = Data("a".utf8)
             XCTAssertEqual(expected, actual)
 
             XCTAssertEqual(object.value(forKey: "dateCol") as! Date?, Date(timeIntervalSince1970: 1))
@@ -526,9 +526,9 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual(getter(object, "stringCol") as! String?, "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8)! as Data, "binaryCol")
+        setter(object, Data("z".utf8), "binaryCol")
         let gotData = getter(object, "binaryCol") as! Data
-        XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
+        XCTAssertTrue(gotData == Data("z".utf8))
 
         setter(object, Date(timeIntervalSince1970: 333), "dateCol")
         XCTAssertEqual(getter(object, "dateCol") as! Date?, Date(timeIntervalSince1970: 333))
@@ -629,9 +629,9 @@ class ObjectTests: TestCase {
         setter(object, "z", "stringCol")
         XCTAssertEqual((getter(object, "stringCol") as! String), "z")
 
-        setter(object, "z".data(using: String.Encoding.utf8)! as Data, "binaryCol")
+        setter(object, Data("z".utf8), "binaryCol")
         let gotData = getter(object, "binaryCol") as! Data
-        XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
+        XCTAssertTrue(gotData == Data("z".utf8))
 
         setter(object, Date(timeIntervalSince1970: 333), "dateCol")
         XCTAssertEqual((getter(object, "dateCol") as! Date), Date(timeIntervalSince1970: 333))
@@ -805,7 +805,7 @@ class ObjectTests: TestCase {
         let realm = try! Realm()
         var object: SwiftObjectiveCTypesObject!
         let now = NSDate()
-        let data = "fizzbuzz".data(using: .utf8)! as Data as NSData
+        let data = Data("fizzbuzz".utf8) as NSData
         try! realm.write {
             object = SwiftObjectiveCTypesObject()
             realm.add(object)
@@ -1530,7 +1530,6 @@ class ObjectTests: TestCase {
         queue.sync { }
     }
 
-#if swift(>=5.8)
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     func expectChange<T: Object>(_ obj: T, _ ex: XCTestExpectation, newValue: Int)
     -> @Sendable (isolated CustomGlobalActor, ObjectChange<T>) -> Void {
@@ -1712,7 +1711,6 @@ class ObjectTests: TestCase {
             XCTAssertEqual(active.value, completed.value)
         }
     }
-#endif
 
     // MARK: Equality Tests
 
@@ -1883,7 +1881,7 @@ class ObjectTests: TestCase {
                     "floatCol": 4.56 as Float,
                     "doubleCol": 45.6,
                     "stringCol": "b",
-                    "binaryCol": "b".data(using: String.Encoding.utf8)!,
+                    "binaryCol": Data("b".utf8),
                     "dateCol": Date(timeIntervalSince1970: 2),
                     "objectCol": [true],
                     "uuidCol": UUID(),
@@ -1912,7 +1910,7 @@ class ObjectTests: TestCase {
                     "float": [6.6 as Float],
                     "double": [7.7],
                     "string": ["8"],
-                    "data": ["9".data(using: String.Encoding.utf8)!],
+                    "data": [Data("9".utf8)],
                     "date": [Date(timeIntervalSince1970: 10)],
                     "intOpt": [11, nil],
                     "int8Opt": [12, nil],
@@ -1922,7 +1920,7 @@ class ObjectTests: TestCase {
                     "floatOpt": [16.16, nil],
                     "doubleOpt": [17.17, nil],
                     "stringOpt": ["18", nil],
-                    "dataOpt": ["19".data(using: String.Encoding.utf8)!, nil],
+                    "dataOpt": [Data("19".utf8), nil],
                     "dateOpt": [Date(timeIntervalSince1970: 20), nil],
                     "uuid": [UUID()],
                     "uuidOpt": [UUID(), nil],

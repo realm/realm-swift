@@ -38,6 +38,7 @@ extension URLSession {
                 completionHandler(.success(data))
             } else if let error = error {
                 completionHandler(.failure(error))
+            // swiftlint:disable:next non_optional_string_data_conversion
             } else if let data = data, let string = String(data: data, encoding: .utf8) {
                 completionHandler(.failure(NSError(domain: URLError.errorDomain,
                                                    code: URLError.badServerResponse.rawValue,
@@ -49,7 +50,6 @@ extension URLSession {
     }
 
     // Synchronously perform a data task, returning the data from it
-    @available(macOS 10.12, *)
     fileprivate func resultDataTask(with request: URLRequest) -> Result<Data, Error> {
         let result = Locked(Result<Data, Error>?.none)
         let group = DispatchGroup()
@@ -125,10 +125,6 @@ private extension Property {
     }
 }
 
-// Swift 5.8 complains if collections are inferred as having type Any and adding
-// explicit types everywhere makes things awful, but this doesn't quite work on
-// older versions of Swift
-#if swift(>=5.8)
 internal protocol Json {}
 extension Bool: Json {}
 extension Int: Json {}
@@ -138,9 +134,6 @@ extension Double: Json {}
 extension Dictionary: Json where Key == String, Value == Json {}
 extension Array: Json where Element == Json {}
 extension Optional: Json where Wrapped: Json {}
-#else
-typealias Json = Any
-#endif
 
 private extension ObjectSchema {
     func stitchRule(_ partitionKeyType: String?, id: String? = nil, appId: String, title: String?) -> [String: Json] {
@@ -197,9 +190,11 @@ struct AdminProfile: Codable {
     struct Role: Codable {
         enum CodingKeys: String, CodingKey {
             case groupId = "group_id"
+            case roleName = "role_name"
         }
 
-        let groupId: String
+        let roleName: String
+        let groupId: String?
     }
 
     let roles: [Role]
@@ -219,7 +214,6 @@ private extension DispatchGroup {
 
 // MARK: AdminSession
 /// An authenticated session for using the Admin API
-@available(macOS 10.12, *)
 class AdminSession {
     /// The access token of the authenticated user
     var accessToken: String
@@ -426,7 +420,6 @@ class AdminSession {
 }
 
 // MARK: - Admin
-@available(macOS 10.12, *)
 class Admin {
     private func userProfile(accessToken: String) -> Result<AdminProfile, Error> {
         var request = URLRequest(url: URL(string: "http://localhost:9090/api/admin/v3.0/auth/profile")!)
@@ -464,7 +457,9 @@ class Admin {
             }
             .flatMap { (accessToken: String) -> Result<AdminSession, Error> in
                 self.userProfile(accessToken: accessToken).map {
-                    AdminSession(accessToken: accessToken, groupId: $0.roles[0].groupId)
+                    AdminSession(accessToken: accessToken, groupId: $0.roles.first(where: { role in
+                        role.roleName == "GROUP_OWNER"
+                    })!.groupId!)
                 }
             }
             .get()
@@ -483,7 +478,6 @@ public enum SyncMode {
  A sandboxed server. This singleton launches and maintains all server processes
  and allows for app creation.
  */
-@available(OSX 10.13, *)
 @objc(RealmServer)
 public class RealmServer: NSObject {
     public enum LogLevel: Sendable {
@@ -662,6 +656,7 @@ public class RealmServer: NSObject {
         let logLevel = self.logLevel
         pipe.fileHandleForReading.readabilityHandler = { file in
             guard file.availableData.count > 0,
+                  // swiftlint:disable:next non_optional_string_data_conversion
                   let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t") else {
                 return
             }
@@ -682,9 +677,9 @@ public class RealmServer: NSObject {
                 } else if part.contains("ERROR") {
                     parts.append("🔴")
                 } else if let json = try? JSONSerialization.jsonObject(with: part.data(using: .utf8)!) {
-                    parts.append(String(data: try! JSONSerialization.data(withJSONObject: json,
-                                                                          options: .prettyPrinted),
-                                  encoding: .utf8)!)
+                    parts.append(String(decoding: try! JSONSerialization.data(withJSONObject: json,
+                                                                              options: .prettyPrinted),
+                                        as: UTF8.self))
                 } else if !part.isEmpty {
                     parts.append(String(part))
                 }
@@ -991,6 +986,13 @@ public class RealmServer: NSObject {
             "version": 1
         ], failOnError)
 
+
+        // Disable exponential backoff when the server isn't ready for us to connect
+        // TODO: this is returning 403 with current server. Reenable once it's fixed - see https://mongodb.slack.com/archives/C0121N9LJ14/p1713885482349059
+        // session.privateApps[appId].settings.patch(on: group, [
+        //    "sync": ["disable_client_error_backoff": true]
+        // ], failOnError)
+
         try group.throwingWait(timeout: .now() + 5.0)
 
         // Wait for initial sync to complete as connecting before that has a lot of problems
@@ -1253,7 +1255,7 @@ public class RealmServer: NSObject {
         let appServerId = try retrieveAppServerId(appId)
         let ident = RLMGetClientFileIdent(ObjectiveCSupport.convert(object: realm))
         XCTAssertNotEqual(ident, 0)
-        _ = try session.privateApps[appServerId].sync.forceReset.put(["file_ident": ident]).get()
+        _ = try session.apps[appServerId].sync.forceReset.put(["file_ident": ident]).get()
     }
 
     public func waitForSync(appId: String) throws {

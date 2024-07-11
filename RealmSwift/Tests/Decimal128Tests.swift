@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class Decimal128Tests: TestCase {
+class Decimal128Tests: TestCase, @unchecked Sendable {
 
     // MARK: - Initialization
     func testDecimal128Initialization() {

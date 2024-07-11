@@ -374,6 +374,8 @@ struct ObservedSectionedResultsKeyPathTestView: View {
                     Section(header: Text(section.key)) {
                         ForEach(section) { object in
                             ObservedResultsKeyPathTestRow(list: object)
+                        }.onDelete {
+                            $reminders.remove(atOffsets: $0, section: section)
                         }
                     }
                 }
@@ -443,10 +445,10 @@ struct ObservedSectionedResultsSearchableTestView: View {
             .navigationTitle("Reminders")
             .navigationBarItems(trailing:
                 Button("add") {
-                let realm = $reminders.wrappedValue.realm
-                try! realm?.write {
-                    realm?.add(ReminderList())
-                }
+                    let realm = $reminders.wrappedValue.realm?.thaw()
+                    try! realm?.write {
+                        realm?.add(ReminderList())
+                    }
                 }.accessibility(identifier: "addList"))
         }
     }
@@ -488,7 +490,7 @@ struct ObservedSectionedResultsConfiguration: View {
             .navigationTitle("Reminders")
             .navigationBarItems(leading:
                 Button("add A") {
-                    let realm = $remindersA.wrappedValue.realm
+                    let realm = $remindersA.wrappedValue.realm?.thaw()
                     try! realm?.write {
                         realm?.add(ReminderList())
                     }
@@ -496,7 +498,7 @@ struct ObservedSectionedResultsConfiguration: View {
             )
             .navigationBarItems(trailing:
                 Button("add B") {
-                    let realm = $remindersB.wrappedValue.realm
+                    let realm = $remindersB.wrappedValue.realm?.thaw()
                     try! realm?.write {
                         realm?.add(ReminderList())
                     }

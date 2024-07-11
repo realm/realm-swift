@@ -362,7 +362,7 @@ extension String: MapValueFactoryOptional {
 // MARK: - Data
 
 extension Data: ValueFactory {
-    private static let _values: [Data] = ["a".data(using: .utf8)!, "b".data(using: .utf8)!, "c".data(using: .utf8)!]
+    private static let _values: [Data] = [Data("a".utf8), Data("b".utf8), Data("c".utf8)]
     static func values() -> [Data] {
         return _values
     }

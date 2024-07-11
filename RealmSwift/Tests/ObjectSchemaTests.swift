@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class ObjectSchemaTests: TestCase {
+class ObjectSchemaTests: TestCase, @unchecked Sendable {
     var objectSchema: ObjectSchema!
 
     var swiftObjectSchema: ObjectSchema {

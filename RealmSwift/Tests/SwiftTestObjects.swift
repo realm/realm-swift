@@ -81,7 +81,7 @@ class SwiftObject: Object {
     @objc dynamic var floatCol = 1.23 as Float
     @objc dynamic var doubleCol = 12.3
     @objc dynamic var stringCol = "a"
-    @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
+    @objc dynamic var binaryCol = Data("a".utf8)
     @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
     @objc dynamic var decimalCol = Decimal128("123e4")
     @objc dynamic var objectIdCol = ObjectId("1234567890ab1234567890ab")
@@ -104,7 +104,7 @@ class SwiftObject: Object {
             "floatCol": 1.23 as Float,
             "doubleCol": 12.3,
             "stringCol": "a",
-            "binaryCol": "a".data(using: String.Encoding.utf8)!,
+            "binaryCol": Data("a".utf8),
             "dateCol": Date(timeIntervalSince1970: 1),
             "decimalCol": Decimal128("123e4"),
             "objectIdCol": ObjectId("1234567890ab1234567890ab"),
@@ -254,7 +254,7 @@ class SwiftImplicitlyUnwrappedOptionalObject: Object {
 class SwiftOptionalDefaultValuesObject: Object {
     @objc dynamic var optNSStringCol: NSString? = "A"
     @objc dynamic var optStringCol: String? = "B"
-    @objc dynamic var optBinaryCol: Data? = "C".data(using: String.Encoding.utf8)! as Data
+    @objc dynamic var optBinaryCol: Data? = Data("C".utf8)
     @objc dynamic var optDateCol: Date? = Date(timeIntervalSince1970: 10)
     @objc dynamic var optDecimalCol: Decimal128? = "123"
     @objc dynamic var optObjectIdCol: ObjectId? = ObjectId("1234567890ab1234567890ab")
@@ -273,7 +273,7 @@ class SwiftOptionalDefaultValuesObject: Object {
         return [
             "optNSStringCol": "A",
             "optStringCol": "B",
-            "optBinaryCol": "C".data(using: String.Encoding.utf8)!,
+            "optBinaryCol": Data("C".utf8),
             "optDateCol": Date(timeIntervalSince1970: 10),
             "optDecimalCol": Decimal128("123"),
             "optObjectIdCol": ObjectId("1234567890ab1234567890ab"),
@@ -295,7 +295,7 @@ class SwiftOptionalIgnoredPropertiesObject: Object {
 
     @objc dynamic var optNSStringCol: NSString? = "A"
     @objc dynamic var optStringCol: String? = "B"
-    @objc dynamic var optBinaryCol: Data? = "C".data(using: String.Encoding.utf8)! as Data
+    @objc dynamic var optBinaryCol: Data? = Data("C".utf8)
     @objc dynamic var optDateCol: Date? = Date(timeIntervalSince1970: 10)
     @objc dynamic var optDecimalCol: Decimal128? = "123"
     @objc dynamic var optObjectIdCol: ObjectId? = ObjectId("1234567890ab1234567890ab")

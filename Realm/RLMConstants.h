@@ -58,7 +58,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 /**
  `RLMPropertyType` is an enumeration describing all property types supported in Realm models.
 
- For more information, see [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/).
+ For more information, see [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/object-models/).
  */
 typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
@@ -84,16 +84,59 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
     RLMPropertyTypeDate   = 4,
+    RLMPropertyTypeObjectId = 10,
+    RLMPropertyTypeDecimal128 = 11,
+
+#pragma mark - Linked object types
+
+    /** Realm model objects. See [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/object-models/) for more information. */
+    RLMPropertyTypeObject = 7,
+    /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/relationships/#define-an-inverse-relationship-property) for more information. */
+    RLMPropertyTypeLinkingObjects = 8,
+};
+
+/**
+ `RLMAnyValueType` is an enumeration describing all property types supported by RLMValue (AnyRealmValue).
+
+ For more information, see [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/supported-types/#std-label-ios-anyrealmvalue-data-type).
+ */
+typedef RLM_CLOSED_ENUM(int32_t, RLMAnyValueType) {
+#pragma mark - Primitive types
+    /** Integers: `NSInteger`, `int`, `long`, `Int` (Swift) */
+    RLMAnyValueTypeInt    = 0,
+    /** Booleans: `BOOL`, `bool`, `Bool` (Swift) */
+    RLMAnyValueTypeBool   = 1,
+    /** Floating-point numbers: `float`, `Float` (Swift) */
+    RLMAnyValueTypeFloat  = 5,
+    /** Double-precision floating-point numbers: `double`, `Double` (Swift) */
+    RLMAnyValueTypeDouble = 6,
+    /** NSUUID, UUID */
+    RLMAnyValueTypeUUID   = 12,
+
+#pragma mark - Object types
+
+    /** Strings: `NSString`, `String` (Swift) */
+    RLMAnyValueTypeString = 2,
+    /** Binary data: `NSData` */
+    RLMAnyValueTypeData   = 3,
+    /** Any type: `id<RLMValue>`, `AnyRealmValue` (Swift) */
+    RLMAnyValueTypeAny    = 9,
+    /** Dates: `NSDate` */
+    RLMAnyValueTypeDate   = 4,
+    RLMAnyValueTypeObjectId = 10,
+    RLMAnyValueTypeDecimal128 = 11,
 
 #pragma mark - Linked object types
 
     /** Realm model objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/object-models-and-schemas/) for more information. */
-    RLMPropertyTypeObject = 7,
+    RLMAnyValueTypeObject = 7,
     /** Realm linking objects. See [Realm Models](https://www.mongodb.com/docs/realm/sdk/swift/fundamentals/relationships/#inverse-relationship) for more information. */
-    RLMPropertyTypeLinkingObjects = 8,
+    RLMAnyValueTypeLinkingObjects = 8,
 
-    RLMPropertyTypeObjectId = 10,
-    RLMPropertyTypeDecimal128 = 11
+    /** Dictionary: `RLMDictionary`, `Map` (Swift) */
+    RLMAnyValueTypeDictionary = 512,
+    /** Set: `RLMArray`, `List` (Swift) */
+    RLMAnyValueTypeList = 128,
 };
 
 #pragma mark - Notification Constants

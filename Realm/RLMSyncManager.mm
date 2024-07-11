@@ -38,6 +38,7 @@ using namespace realm;
 
 // NEXT-MAJOR: All the code associated to the logger from sync manager should be removed.
 using Level = realm::util::Logger::Level;
+using LogCategory = realm::util::LogCategory;
 
 namespace {
 Level levelForSyncLogLevel(RLMSyncLogLevel logLevel) {
@@ -73,14 +74,14 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
 #pragma mark - Loggers
 
 struct CocoaSyncLogger : public realm::util::Logger {
-    void do_log(const realm::util::LogCategory&, Level, const std::string& message) override {
-        NSLog(@"Sync: %@", RLMStringDataToNSString(message));
+    void do_log(const realm::util::LogCategory& category, Level, const std::string& message) override {
+        NSLog(@"%s: %s", category.get_name().c_str(), message.c_str());
     }
 };
 
 static std::unique_ptr<realm::util::Logger> defaultSyncLogger(realm::util::Logger::Level level) {
     auto logger = std::make_unique<CocoaSyncLogger>();
-    logger->set_level_threshold(level);
+    logger->set_level_threshold(LogCategory::sync, level);
     return std::move(logger);
 }
 
@@ -119,10 +120,6 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
     return nil;
 }
 
-- (std::weak_ptr<realm::app::App>)app {
-    return _syncManager->app();
-}
-
 - (NSDictionary<NSString *,NSString *> *)customRequestHeaders {
     std::lock_guard lock(_mutex);
     return _customRequestHeaders;
@@ -134,15 +131,13 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
         _customRequestHeaders = customRequestHeaders.copy;
     }
 
-    for (auto&& user : _syncManager->all_users()) {
-        for (auto&& session : user->all_sessions()) {
-            auto config = session->config();
-            config.custom_http_headers.clear();
-            for (NSString *key in customRequestHeaders) {
-                config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
-            }
-            session->update_configuration(std::move(config));
+    for (auto&& session : _syncManager->get_all_sessions()) {
+        auto config = session->config();
+        config.custom_http_headers.clear();
+        for (NSString *key in customRequestHeaders) {
+            config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
         }
+        session->update_configuration(std::move(config));
     }
 }
 
@@ -160,7 +155,7 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
         _syncManager->set_logger_factory([logFn](realm::util::Logger::Level level) {
             auto logger = std::make_unique<CallbackLogger>();
             logger->logFn = logFn;
-            logger->set_level_threshold(level);
+            logger->set_level_threshold(LogCategory::sync, level);
             return logger;
         });
     }
@@ -200,12 +195,10 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
 - (void)resetForTesting {
     _errorHandler = nil;
     _logger = nil;
-    _authorizationHeaderName = nil;
-    _customRequestHeaders = nil;
     _syncManager->tear_down_for_testing();
 }
 
-- (std::shared_ptr<realm::SyncManager>)syncManager {
+- (std::shared_ptr<realm::SyncManager> const&)syncManager {
     return _syncManager;
 }
 
@@ -222,6 +215,10 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
             config.custom_http_headers.emplace(key.UTF8String, header.UTF8String);
         }];
     }
+}
+
+- (bool)hasAnySessions {
+    return _syncManager->get_all_sessions().size() > 0;
 }
 @end
 

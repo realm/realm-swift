@@ -21,7 +21,7 @@
 import Combine
 import Realm
 import Realm.Private
-import RealmSwift
+@_spi(RealmSwiftExperimental) import RealmSwift
 import XCTest
 
 #if canImport(RealmTestSupport)
@@ -62,6 +62,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         ]
     }
 
+    func testUpdateBaseUrl() {
+        let app = App(id: appId)
+        XCTAssertEqual(app.baseURL, "https://services.cloud.mongodb.com")
+
+        app.updateBaseUrl(to: "http://localhost:9090").await(self)
+        XCTAssertEqual(app.baseURL, "http://localhost:9090")
+
+        app.updateBaseUrl(to: "http://127.0.0.1:9090").await(self)
+        XCTAssertEqual(app.baseURL, "http://127.0.0.1:9090")
+
+        app.updateBaseUrl(to: nil).awaitFailure(self)
+        XCTAssertEqual(app.baseURL, "http://127.0.0.1:9090")
+    }
+
     func testBasicSwiftSync() throws {
         XCTAssert(try openRealm().isEmpty, "Freshly synced Realm was not empty...")
     }
@@ -87,7 +101,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(obj.intCol, 1)
         XCTAssertEqual(obj.doubleCol, 1.1)
         XCTAssertEqual(obj.stringCol, "string")
-        XCTAssertEqual(obj.binaryCol, "string".data(using: String.Encoding.utf8)!)
+        XCTAssertEqual(obj.binaryCol, Data("string".utf8))
         XCTAssertEqual(obj.decimalCol, Decimal128(1))
         XCTAssertEqual(obj.dateCol, Date(timeIntervalSince1970: -1))
         XCTAssertEqual(obj.longCol, Int64(1))
@@ -267,11 +281,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Progress notifiers
     @MainActor
+    @available(*, deprecated)
     func testStreamingDownloadNotifier() throws {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
-        var ex = expectation(description: "first download")
-        var minimumDownloadSize = 1000000
         var callCount = 0
         var progress: SyncSession.Progress?
         let token = session.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
@@ -279,82 +292,72 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 // Verify that progress doesn't decrease, but sometimes it won't
                 // have increased since the last call
                 if let progress = progress {
-                    XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
-                    XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
-                    if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
-                        return
-                    }
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
                 progress = p
                 callCount += 1
-                if p.transferredBytes > minimumDownloadSize && p.isTransferComplete {
-                    ex.fulfill()
-                }
             }
         }
         XCTAssertNotNil(token)
 
         try populateRealm()
-        waitForExpectations(timeout: 60.0, handler: nil)
+        waitForDownloads(for: realm)
 
         XCTAssertGreaterThanOrEqual(callCount, 1)
         let p1 = try XCTUnwrap(progress)
         XCTAssertEqual(p1.transferredBytes, p1.transferrableBytes)
+        XCTAssertEqual(p1.progressEstimate, 1.0)
+        XCTAssertTrue(p1.isTransferComplete)
         let initialCallCount = callCount
-        minimumDownloadSize = p1.transferredBytes + 1000000
 
         // Run a second time to upload more data and verify that the callback continues to be called
-        ex = expectation(description: "second download")
         try populateRealm()
-        waitForExpectations(timeout: 60.0, handler: nil)
-        XCTAssertGreaterThanOrEqual(callCount, initialCallCount)
+        waitForDownloads(for: realm)
+
+        XCTAssertGreaterThan(callCount, initialCallCount)
         let p2 = try XCTUnwrap(progress)
         XCTAssertEqual(p2.transferredBytes, p2.transferrableBytes)
+        XCTAssertEqual(p2.progressEstimate, 1.0)
+        XCTAssertTrue(p2.isTransferComplete)
 
         token!.invalidate()
     }
 
     @MainActor
+    @available(*, deprecated)
     func testStreamingUploadNotifier() throws {
         let realm = try openRealm(wait: false)
         let session = try XCTUnwrap(realm.syncSession)
 
-        var ex = expectation(description: "initial upload")
-        var progress: SyncSession.Progress?
+        let progress = Locked<SyncSession.Progress?>(nil)
 
         let token = session.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-            DispatchQueue.main.async { @MainActor in
-                if let progress = progress {
-                    XCTAssertGreaterThanOrEqual(p.transferredBytes, progress.transferredBytes)
-                    XCTAssertGreaterThanOrEqual(p.transferrableBytes, progress.transferrableBytes)
-                    // The sync client sometimes sends spurious notifications
-                    // where nothing has changed, and we should just ignore those
-                    if p.transferredBytes == progress.transferredBytes && p.transferrableBytes == progress.transferrableBytes {
-                        return
-                    }
+            progress.withLock { progress in
+                if let progress {
+                    XCTAssertGreaterThanOrEqual(p.progressEstimate, progress.progressEstimate)
                 }
                 progress = p
-                if p.transferredBytes > 100 && p.isTransferComplete {
-                    ex.fulfill()
-                }
             }
         }
         XCTAssertNotNil(token)
-        waitForExpectations(timeout: 10.0, handler: nil)
+        waitForUploads(for: realm)
 
-        for i in 0..<5 {
-            ex = expectation(description: "write transaction upload \(i)")
+        for _ in 0..<5 {
+            progress.value = nil
             try realm.write {
                 for _ in 0..<SwiftSyncTestCase.bigObjectCount {
                     realm.add(SwiftHugeSyncObject.create())
                 }
             }
-            waitForExpectations(timeout: 10.0, handler: nil)
+
+            waitForUploads(for: realm)
         }
         token!.invalidate()
 
-        let p = try XCTUnwrap(progress)
+        let p = try XCTUnwrap(progress.value)
         XCTAssertEqual(p.transferredBytes, p.transferrableBytes)
+        XCTAssertEqual(p.progressEstimate, 1.0)
+        XCTAssertTrue(p.isTransferComplete)
     }
 
     func testStreamingNotifierInvalidate() throws {
@@ -477,7 +480,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "async open")
         ex.expectedFulfillmentCount = 2
         let config = try configuration()
-        let completion = { (result: Result<Realm, Error>) -> Void in
+        let completion = { (result: Result<Realm, Error>) in
             guard case .failure = result else {
                 XCTFail("No error on cancelled async open")
                 return ex.fulfill()
@@ -568,7 +571,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         proxy.stop()
     }
 
-    class LocationOverrideTransport: RLMNetworkTransport {
+    class LocationOverrideTransport: RLMNetworkTransport, Sendable {
         let hostname: String
         let wsHostname: String
         init(hostname: String = "http://localhost:9090", wsHostname: String = "ws://invalid.com:9090") {
@@ -765,6 +768,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let ex = expectation(description: "Error callback should fire upon receiving an error")
         ex.assertForOverFulfill = false // error handler can legally be called multiple times
         app.syncManager.errorHandler = { @Sendable (error, _) in
+            // Connecting to sync with a deleted user sometimes triggers an
+            // internal server error instead of the desired error
+            if (error as NSError).code == SyncError.clientSessionError.rawValue && error.localizedDescription == "error" {
+                ex.fulfill()
+                return
+            }
             assertSyncError(error, .clientUserError, "Unable to refresh the user access token: invalid session: failed to find refresh token")
             ex.fulfill()
         }

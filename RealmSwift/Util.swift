@@ -160,34 +160,43 @@ internal func logRuntimeIssue(_ message: StaticString) {
     }
 }
 
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 @_unavailableFromAsync
-internal func assumeOnMainActorExecutor<T>(_ operation: @MainActor () throws -> T,
-                                           file: StaticString = #fileID, line: UInt = #line
-) rethrows -> T {
-#if swift(>=5.9)
+internal func assumeOnMainActorExecutor(_ operation: @MainActor () throws -> Void,
+                                        file: StaticString = #fileID, line: UInt = #line
+) rethrows {
+#if compiler(>=5.10)
+    // This is backdeployable in Xcode 15.3+, but not 15.1
+    try MainActor.assumeIsolated(operation)
+#else
     if #available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *) {
         return try MainActor.assumeIsolated(operation)
     }
-#endif
 
     precondition(Thread.isMainThread, file: file, line: line)
     return try withoutActuallyEscaping(operation) { fn in
-        try unsafeBitCast(fn, to: (() throws -> T).self)()
-    }
-}
-
-@_unavailableFromAsync
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-internal func assumeOnActorExecutor<A: Actor, T>(_ actor: A,
-                                                 _ operation: (isolated A) throws -> T
-) rethrows -> T {
-#if swift(>=5.9)
-    if #available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *) {
-        return try actor.assumeIsolated(operation)
+        try unsafeBitCast(fn, to: (() throws -> ()).self)()
     }
 #endif
+}
 
-    return try withoutActuallyEscaping(operation) { fn in
-        try unsafeBitCast(fn, to: ((A) throws -> T).self)(actor)
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+extension Actor {
+    @_unavailableFromAsync
+    internal func invokeIsolated<Ret, Arg>(_ operation: (isolated Self, Arg) throws -> Ret, _ arg: Arg,
+                                           file: StaticString = #fileID, line: UInt = #line
+    ) rethrows -> Ret {
+#if compiler(>=5.10)
+        // This is backdeployable in Xcode 15.3+, but not 15.1
+        preconditionIsolated(file: file, line: line)
+#else
+        if #available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *) {
+            preconditionIsolated(file: file, line: line)
+        }
+#endif
+
+        return try withoutActuallyEscaping(operation) { fn in
+            try unsafeBitCast(fn, to: ((Self, Arg) throws -> Ret).self)(self, arg)
+        }
     }
 }

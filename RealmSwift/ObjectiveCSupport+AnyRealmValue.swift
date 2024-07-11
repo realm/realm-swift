@@ -34,8 +34,8 @@ public extension ObjectiveCSupport {
             return b as NSNumber
         case let .float(f):
             return f as NSNumber
-        case let .double(f):
-            return f as NSNumber
+        case let .double(d):
+            return d as NSNumber
         case let .string(s):
             return s as NSString
         case let .data(d):
@@ -50,6 +50,10 @@ public extension ObjectiveCSupport {
             return u as NSUUID
         case let .object(o):
             return o
+        case let .dictionary(d):
+            return d.rlmDictionary
+        case let .list(l):
+            return l.rlmArray
         default:
             return nil
         }
@@ -64,62 +68,73 @@ public extension ObjectiveCSupport {
             return .none
         }
 
-        switch value.rlm_valueType {
-        case RLMPropertyType.int:
+        switch value.rlm_anyValueType {
+        case RLMAnyValueType.int:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .int(val.intValue)
-        case RLMPropertyType.bool:
+        case RLMAnyValueType.bool:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .bool(val.boolValue)
-        case RLMPropertyType.float:
+        case RLMAnyValueType.float:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .float(val.floatValue)
-        case RLMPropertyType.double:
+        case RLMAnyValueType.double:
             guard let val = value as? NSNumber else {
                 return .none
             }
             return .double(val.doubleValue)
-        case RLMPropertyType.string:
+        case RLMAnyValueType.string:
             guard let val = value as? String else {
                 return .none
             }
             return .string(val)
-        case RLMPropertyType.data:
+        case RLMAnyValueType.data:
             guard let val = value as? Data else {
                 return .none
             }
             return .data(val)
-        case RLMPropertyType.date:
+        case RLMAnyValueType.date:
             guard let val = value as? Date else {
                 return .none
             }
             return .date(val)
-        case RLMPropertyType.objectId:
+        case RLMAnyValueType.objectId:
             guard let val = value as? ObjectId else {
                 return .none
             }
             return .objectId(val)
-        case RLMPropertyType.decimal128:
+        case RLMAnyValueType.decimal128:
             guard let val = value as? Decimal128 else {
                 return .none
             }
             return .decimal128(val)
-        case RLMPropertyType.UUID:
+        case RLMAnyValueType.UUID:
             guard let val = value as? UUID else {
                 return .none
             }
             return .uuid(val)
-        case RLMPropertyType.object:
+        case RLMAnyValueType.object:
             guard let val = value as? Object else {
                 return .none
             }
             return .object(val)
+        case RLMAnyValueType.dictionary:
+            guard let val = value as? RLMDictionary<AnyObject, AnyObject> else {
+                return .none
+            }
+            let d = Map<String, AnyRealmValue>(objc: val)
+            return AnyRealmValue.dictionary(d)
+        case RLMAnyValueType.list:
+            guard let val = value as? RLMArray<RLMValue> else {
+                return .none
+            }
+            return AnyRealmValue.list(List<AnyRealmValue>(collection: val))
         default:
             return .none
         }

@@ -53,6 +53,7 @@ class SwiftKVOObject: Object {
     let otherFloatCol = RealmProperty<Float?>()
     let otherDoubleCol = RealmProperty<Double?>()
     let otherBoolCol = RealmProperty<Bool?>()
+    let otherAnyCol = RealmProperty<AnyRealmValue>()
     @objc dynamic var optStringCol: String?
     @objc dynamic var optBinaryCol: Data?
     @objc dynamic var optDateCol: Date?
@@ -71,6 +72,7 @@ class SwiftKVOObject: Object {
     let arrayDate = List<Date>()
     let arrayDecimal = List<Decimal128>()
     let arrayObjectId = List<ObjectId>()
+    let arrayAny = List<AnyRealmValue>()
 
     let arrayOptBool = List<Bool?>()
     let arrayOptInt8 = List<Int8?>()
@@ -97,6 +99,7 @@ class SwiftKVOObject: Object {
     let setDate = MutableSet<Date>()
     let setDecimal = MutableSet<Decimal128>()
     let setObjectId = MutableSet<ObjectId>()
+    let setAny = MutableSet<AnyRealmValue>()
 
     let setOptBool = MutableSet<Bool?>()
     let setOptInt8 = MutableSet<Int8?>()
@@ -123,6 +126,7 @@ class SwiftKVOObject: Object {
     let mapDate = Map<String, Date>()
     let mapDecimal = Map<String, Decimal128>()
     let mapObjectId = Map<String, ObjectId>()
+    let mapAny = Map<String, AnyRealmValue>()
 
     let mapOptBool = Map<String, Bool?>()
     let mapOptInt8 = Map<String, Int8?>()
@@ -144,7 +148,7 @@ class SwiftKVOObject: Object {
 // Most of the testing of KVO functionality is done in the obj-c tests
 // These tests just verify that it also works on Swift types
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class KVOTests: TestCase {
+class KVOTests: TestCase, @unchecked Sendable {
     var realm: Realm! = nil
 
     override func setUp() {
@@ -456,6 +460,21 @@ class KVOTests: TestCase {
         }
     }
 
+    func testCollectionInMixedKVO() {
+        let (obj, obs) = getObject(SwiftKVOObject())
+
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value = AnyRealmValue.fromDictionary([
+            "key1": .int(1234)]) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.dictionaryValue?["key1"] = .string("hello") }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.dictionaryValue?["key1"] = nil }
+
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value = AnyRealmValue.fromArray([.bool(true)]) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?[0] = .float(123.456) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?.append(.bool(true)) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?.insert(.date(Date()), at: 1) }
+        observeSetChange(obs, "otherAnyCol") { obj.otherAnyCol.value.listValue?.remove(at: 0) }
+    }
+
     func testTypedObservation() {
         let (obj, obs) = getObject(SwiftKVOObject())
 
@@ -537,7 +556,7 @@ class KVOTests: TestCase {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class KVOPersistedTests: KVOTests {
+class KVOPersistedTests: KVOTests, @unchecked Sendable {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
         return (obj, obj)
@@ -545,7 +564,7 @@ class KVOPersistedTests: KVOTests {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class KVOMultipleAccessorsTests: KVOTests {
+class KVOMultipleAccessorsTests: KVOTests, @unchecked Sendable {
     override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
         return (obj, realm.object(ofType: SwiftKVOObject.self, forPrimaryKey: obj.pk)!)

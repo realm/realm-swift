@@ -97,7 +97,37 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
  `transferredBytes` refers to the number of bytes that have been uploaded or downloaded.
  `transferrableBytes` refers to the total number of bytes transferred, and pending transfer.
  */
-typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes);
+typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInteger transferrableBytes) __attribute__((deprecated("Use RLMSyncProgressNotificationBlock instead", "RLMSyncProgressNotificationBlock")));
+
+/**
+ A struct encapsulating progress information.
+ */
+typedef struct RLMSyncProgress {
+    /// The number of bytes that have been transferred.
+    NSUInteger transferredBytes;
+    
+    /**
+     The total number of transferrable bytes (bytes that have been transferred,
+     plus bytes pending transfer).
+     */
+    NSUInteger transferrableBytes;
+    
+    /**
+     A value between 0.0 and 1.0 representing the estimated transfer progress. This value is precise for
+     uploads, but will be based on historical data and certain heuristics applied by the server for downloads.
+     
+     Whenever the progress reporting mode is `forCurrentlyOutstandingWork`, that value
+     will monotonically increase until it reaches 1.0. If the progress mode is `reportIndefinitely`, the
+     value may either increase or decrease as new data needs to be transferred.
+     */
+    double progressEstimate;
+} RLMSyncProgress;
+
+/**
+ The type of a progress notification block intended for reporting a session's network
+ activity to the user.
+ */
+typedef void(^RLMSyncProgressNotificationBlock)(RLMSyncProgress progress);
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
@@ -209,8 +239,44 @@ RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
  */
 - (nullable RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                           mode:(RLMSyncProgressMode)mode
-                                                                         block:(RLMProgressNotificationBlock)block
-NS_REFINED_FOR_SWIFT;
+block:(RLMProgressNotificationBlock)block __attribute__((deprecated("Use addSyncProgressNotificationForDirection instead", "addSyncProgressNotificationForDirection")))
+    NS_REFINED_FOR_SWIFT;
+
+
+/**
+ Register a progress notification block.
+
+ Multiple blocks can be registered with the same session at once. Each block
+ will be invoked on a side queue devoted to progress notifications.
+
+ If the session has already received progress information from the
+ synchronization subsystem, the block will be called immediately. Otherwise, it
+ will be called as soon as progress information becomes available.
+
+ The token returned by this method must be retained as long as progress
+ notifications are desired, and the `-invalidate` method should be called on it
+ when notifications are no longer needed and before the token is destroyed.
+
+ If no token is returned, the notification block will never be called again.
+ There are a number of reasons this might be true. If the session has previously
+ experienced a fatal error it will not accept progress notification blocks. If
+ the block was configured in the `RLMSyncProgressForCurrentlyOutstandingWork`
+ mode but there is no additional progress to report (for example, the number
+ of transferrable bytes and transferred bytes are equal), the block will not be
+ called again.
+
+ @param direction The transfer direction (upload or download) to track in this progress notification block.
+ @param mode      The desired behavior of this progress notification block.
+ @param block     The block to invoke when notifications are available.
+
+ @return A token which must be held for as long as you want notifications to be delivered.
+
+ @see ``RLMSyncProgressDirection``, ``RLMSyncProgress``, ``RLMSyncProgressNotificationBlock``, ``RLMProgressNotificationToken``
+ */
+- (nullable RLMProgressNotificationToken *)addSyncProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+                                                                              mode:(RLMSyncProgressMode)mode
+                                                                             block:(RLMSyncProgressNotificationBlock)block
+    NS_REFINED_FOR_SWIFT;
 
 
 /// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.
@@ -219,12 +285,16 @@ NS_REFINED_FOR_SWIFT;
 /// Wait for pending downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
 - (BOOL)waitForDownloadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback NS_REFINED_FOR_SWIFT;
 
+/// :nodoc:
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager
+    __attribute__((deprecated("The syncManager: parameter is no longer required")));
+
 /**
  Given an error action token, immediately handle the corresponding action.
- 
- @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+
+ @see ```RLMSyncErrorClientResetError``, ``RLMSyncErrorPermissionDeniedError``
  */
-+ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token syncManager:(RLMSyncManager *)syncManager;
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
 
 /**
  Get the sync session for the given Realm if it is a synchronized Realm, or `nil`
@@ -246,13 +316,11 @@ NS_REFINED_FOR_SWIFT;
  */
 RLM_SWIFT_SENDABLE RLM_FINAL
 @interface RLMSyncErrorActionToken : NSObject
-
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
 
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
-
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

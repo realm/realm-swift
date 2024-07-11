@@ -26,18 +26,19 @@ import RealmSwiftSyncTestSupport
 import RealmSyncTestSupport
 #endif
 
+protocol AsyncOpenStateWrapper {
+    func cancel()
+    var wrappedValue: AsyncOpenState { get }
+    var projectedValue: Published<AsyncOpenState>.Publisher { get }
+}
+extension AutoOpen: AsyncOpenStateWrapper {}
+extension AsyncOpen: AsyncOpenStateWrapper {}
+
 @available(macOS 13, *)
 @MainActor
 class SwiftUIServerTests: SwiftSyncTestCase {
     override var objectTypes: [ObjectBase.Type] {
         [SwiftHugeSyncObject.self]
-    }
-
-    // Configuration for tests
-    private func configuration<T: BSON>(user: User, partition: T) -> Realm.Configuration {
-        var userConfiguration = user.configuration(partitionValue: partition)
-        userConfiguration.objectTypes = self.objectTypes
-        return userConfiguration
     }
 
     override func tearDown() {
@@ -46,31 +47,40 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         super.tearDown()
     }
 
+    override class var defaultTestSuite: XCTestSuite {
+        // Don't run tests for the base class
+        if self === SwiftUIServerTests.self {
+            return XCTestSuite(name: "SwiftUIServerTests")
+        }
+        return super.defaultTestSuite
+    }
+
     var cancellables: Set<AnyCancellable> = []
 
-    // MARK: - AsyncOpen
-    func asyncOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration?,
-                   timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
-        let asyncOpen = AsyncOpen(appId: appId,
-                                  partitionValue: partitionValue,
-                                  configuration: configuration ?? Realm.Configuration(objectTypes: self.objectTypes),
-                                  timeout: timeout)
-        _ = asyncOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
-        asyncOpen.projectedValue
+    func awaitOpen(_ wrapper: some AsyncOpenStateWrapper,
+                   handler: @escaping (AsyncOpenState) -> Void) {
+        _ = wrapper.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
+        wrapper.projectedValue
             .sink(receiveValue: handler)
             .store(in: &cancellables)
         waitForExpectations(timeout: 10.0)
-        asyncOpen.cancel()
+        wrapper.cancel()
+    }
+
+    // Configuration for tests
+    func configuration(user: User, partition: String) -> Realm.Configuration {
+        fatalError()
+    }
+
+    // MARK: - AsyncOpen
+    func asyncOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration,
+                   timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
+        fatalError()
     }
 
     func asyncOpen(user: User, appId: String?, partitionValue: String, timeout: UInt? = nil,
                    handler: @escaping (AsyncOpenState) -> Void) {
-        let configuration = self.configuration(user: user, partition: partitionValue)
-        asyncOpen(appId: appId,
-                  partitionValue: partitionValue,
-                  configuration: configuration,
-                  timeout: timeout,
-                  handler: handler)
+        fatalError()
     }
 
     func asyncOpen(handler: @escaping (AsyncOpenState) -> Void) throws {
@@ -251,28 +261,14 @@ class SwiftUIServerTests: SwiftSyncTestCase {
     }
 
     // MARK: - AutoOpen
-    func autoOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration?,
+    func autoOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration,
                   timeout: UInt?, handler: @escaping (AsyncOpenState) -> Void) {
-        let autoOpen = AutoOpen(appId: appId,
-                                partitionValue: partitionValue,
-                                configuration: configuration,
-                                timeout: timeout)
-        _ = autoOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
-        autoOpen.projectedValue
-            .sink(receiveValue: handler)
-            .store(in: &cancellables)
-        waitForExpectations(timeout: 10.0)
-        autoOpen.cancel()
+        fatalError()
     }
 
     func autoOpen(user: User, appId: String?, partitionValue: String, timeout: UInt? = nil,
                   handler: @escaping (AsyncOpenState) -> Void) {
-        let configuration = self.configuration(user: user, partition: partitionValue)
-        autoOpen(appId: appId,
-                 partitionValue: partitionValue,
-                 configuration: configuration,
-                 timeout: timeout,
-                 handler: handler)
+        fatalError()
     }
 
     func autoOpen(handler: @escaping (AsyncOpenState) -> Void) throws {
@@ -337,54 +333,6 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         App.resetAppCache()
         proxy.stop()
     }
-
-    #if false
-    // In case of no internet connection AutoOpen should return an opened Realm, offline-first approach
-    func testAutoOpenOpenForFlexibleSyncConfigWithoutInternetConnection() throws {
-        try autoreleasepool {
-            try write { realm in
-                for i in 1...10 {
-                    // Using firstname to query only objects from this test
-                    let person = SwiftPerson(firstName: "\(name)",
-                                             lastName: "lastname_\(i)",
-                                             age: i)
-                    realm.add(person)
-                }
-            }
-        }
-        resetAppCache()
-
-        let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
-        try proxy.start()
-        let appConfig = AppConfiguration(baseURL: "http://localhost:5678",
-                                         transport: AsyncOpenConnectionTimeoutTransport())
-        let app = App(id: flexibleSyncAppId, configuration: appConfig)
-
-        let user = try logInUser(for: basicCredentials(app: app), app: app)
-        var configuration = user.flexibleSyncConfiguration()
-        configuration.objectTypes = [SwiftPerson.self]
-
-        proxy.dropConnections = true
-        let ex = expectation(description: "download-realm-flexible-auto-open-no-connection")
-        let autoOpen = AutoOpen(appId: flexibleSyncAppId, configuration: configuration, timeout: 1000)
-
-        _ = autoOpen.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
-        autoOpen.projectedValue
-            .sink { autoOpenState in
-                if case let .open(realm) = autoOpenState {
-                    XCTAssertTrue(realm.isEmpty) // should not have downloaded anything
-                    ex.fulfill()
-                }
-            }
-            .store(in: &cancellables)
-
-        waitForExpectations(timeout: 10.0)
-        autoOpen.cancel()
-
-        App.resetAppCache()
-        proxy.stop()
-    }
-    #endif
 
     func testAutoOpenProgressNotification() throws {
         try populateRealm()
@@ -564,4 +512,121 @@ class SwiftUIServerTests: SwiftSyncTestCase {
             }
         }
     }
+}
+
+@available(macOS 13, *)
+@MainActor
+class PBSSwiftUIServerTests: SwiftUIServerTests {
+    override func configuration(user: User, partition: String) -> Realm.Configuration {
+        var userConfiguration = user.configuration(partitionValue: partition)
+        userConfiguration.objectTypes = self.objectTypes
+        return userConfiguration
+    }
+
+    // MARK: - AsyncOpen
+    override func asyncOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration,
+                            timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
+        let asyncOpen = AsyncOpen(appId: appId,
+                                  partitionValue: partitionValue,
+                                  configuration: configuration,
+                                  timeout: timeout)
+        awaitOpen(asyncOpen, handler: handler)
+    }
+
+    override func asyncOpen(user: User, appId: String?, partitionValue: String, timeout: UInt? = nil,
+                            handler: @escaping (AsyncOpenState) -> Void) {
+        let configuration = self.configuration(user: user, partition: partitionValue)
+        asyncOpen(appId: appId,
+                  partitionValue: partitionValue,
+                  configuration: configuration,
+                  timeout: timeout,
+                  handler: handler)
+    }
+
+    override func autoOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration,
+                           timeout: UInt?, handler: @escaping (AsyncOpenState) -> Void) {
+        let autoOpen = AutoOpen(appId: appId,
+                                partitionValue: partitionValue,
+                                configuration: configuration,
+                                timeout: timeout)
+        awaitOpen(autoOpen, handler: handler)
+    }
+
+    override func autoOpen(user: User, appId: String?, partitionValue: String, timeout: UInt? = nil,
+                           handler: @escaping (AsyncOpenState) -> Void) {
+        let configuration = self.configuration(user: user, partition: partitionValue)
+        autoOpen(appId: appId,
+                 partitionValue: partitionValue,
+                 configuration: configuration,
+                 timeout: timeout,
+                 handler: handler)
+    }
+}
+
+@available(macOS 13, *)
+@MainActor
+class FLXSwiftUIServerTests: SwiftUIServerTests {
+    override func createApp() throws -> String {
+        try createFlexibleSyncApp()
+    }
+
+    override func configuration(user: User) -> Realm.Configuration {
+        user.flexibleSyncConfiguration { subs in
+            subs.append(QuerySubscription<SwiftHugeSyncObject> {
+                $0.partition == self.name
+            })
+        }
+    }
+
+    override func configuration(user: User, partition: String) -> Realm.Configuration {
+        var userConfiguration = user.flexibleSyncConfiguration { subs in
+            subs.append(QuerySubscription<SwiftHugeSyncObject> {
+                $0.partition == partition
+            })
+        }
+        userConfiguration.objectTypes = self.objectTypes
+        return userConfiguration
+    }
+
+    // MARK: - AsyncOpen
+    override func asyncOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration,
+                            timeout: UInt? = nil, handler: @escaping (AsyncOpenState) -> Void) {
+        let asyncOpen = AsyncOpen(appId: appId,
+                                  configuration: configuration,
+                                  timeout: timeout)
+        awaitOpen(asyncOpen, handler: handler)
+    }
+
+    override func asyncOpen(user: User, appId: String?, partitionValue: String, timeout: UInt? = nil,
+                            handler: @escaping (AsyncOpenState) -> Void) {
+        let configuration = self.configuration(user: user, partition: partitionValue)
+        asyncOpen(appId: appId,
+                  partitionValue: partitionValue,
+                  configuration: configuration,
+                  timeout: timeout,
+                  handler: handler)
+    }
+
+    override func autoOpen(appId: String?, partitionValue: String, configuration: Realm.Configuration,
+                           timeout: UInt?, handler: @escaping (AsyncOpenState) -> Void) {
+        let autoOpen = AutoOpen(appId: appId,
+                                configuration: configuration,
+                                timeout: timeout)
+        awaitOpen(autoOpen, handler: handler)
+    }
+
+    override func autoOpen(user: User, appId: String?, partitionValue: String, timeout: UInt? = nil,
+                           handler: @escaping (AsyncOpenState) -> Void) {
+        let configuration = self.configuration(user: user, partition: partitionValue)
+        autoOpen(appId: appId,
+                 partitionValue: partitionValue,
+                 configuration: configuration,
+                 timeout: timeout,
+                 handler: handler)
+    }
+
+    // These two tests are expecting different partition values to result in
+    // different Realm files, which isn't applicable to FLX
+    override func testAutoOpenWithDifferentPartitionValues() throws {}
+    override func testCombineAsyncOpenAutoOpenWithDifferentPartitionValues() throws {}
 }

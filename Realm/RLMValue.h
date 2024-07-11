@@ -16,8 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Realm/RLMArray.h>
 #import <Realm/RLMConstants.h>
 #import <Realm/RLMDecimal128.h>
+#import <Realm/RLMDictionary.h>
 #import <Realm/RLMObject.h>
 #import <Realm/RLMObjectBase.h>
 #import <Realm/RLMObjectId.h>
@@ -52,11 +54,17 @@
  `RLMObject
  `RLMObjectId`
  `RLMDecimal128`
+ `RLMDictionary`
+ `RLMArray`
+ `NSArray`
+ `NSDictionary`
  */
 @protocol RLMValue
 
 /// Describes the type of property stored.
-@property (readonly) RLMPropertyType rlm_valueType;
+@property (readonly) RLMAnyValueType rlm_valueType __attribute__((deprecated("Use `rlm_anyValueType` instead, which includes collection types as well")));
+/// Describes the type of property stored.
+@property (readonly) RLMAnyValueType rlm_anyValueType;
 
 @end
 
@@ -94,4 +102,20 @@
 
 /// :nodoc:
 @interface RLMObjectId (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface NSDictionary (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface NSArray (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMArray (RLMValue)<RLMValue>
+@end
+
+/// :nodoc:
+@interface RLMDictionary (RLMValue)<RLMValue>
 @end

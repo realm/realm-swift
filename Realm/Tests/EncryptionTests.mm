@@ -88,7 +88,7 @@
     NSData *key = RLMGenerateKey();
     RLMAssertRealmExceptionContains([self realmWithKey:key],
                                     RLMErrorInvalidDatabase,
-                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: 'unable to decrypt after 0 seconds",
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: page 0 in file of size",
                                     RLMDefaultRealmURL().path);
 }
 
@@ -100,7 +100,7 @@
     NSData *key = RLMGenerateKey();
     RLMAssertRealmExceptionContains([self realmWithKey:key],
                                     RLMErrorInvalidDatabase,
-                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed)",
+                                    @"Failed to open Realm file at path '%@': Realm file decryption failed (Decryption failed: page 0 in file of size",
                                     RLMDefaultRealmURL().path);
 }
 

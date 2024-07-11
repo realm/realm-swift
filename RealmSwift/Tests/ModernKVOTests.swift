@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class ModernKVOTests: TestCase {
+class ModernKVOTests: TestCase, @unchecked Sendable {
     var realm: Realm! = nil
 
     override func setUp() {
@@ -367,6 +367,21 @@ class ModernKVOTests: TestCase {
         }
     }
 
+    func testCollectionInMixedKVO() {
+        let (obj, obs) = getObject(ModernAllTypesObject())
+
+        observeSetChange(obs, "anyCol") { obj.anyCol = AnyRealmValue.fromDictionary([
+            "key1": .int(1234)]) }
+        observeSetChange(obs, "anyCol") { obj.anyCol.dictionaryValue?["key1"] = .string("hello") }
+        observeSetChange(obs, "anyCol") { obj.anyCol.dictionaryValue?["key1"] = nil }
+
+        observeSetChange(obs, "anyCol") { obj.anyCol = AnyRealmValue.fromArray([ .int(1234)]) }
+        observeSetChange(obs, "anyCol") { obj.anyCol.listValue?[0] = .float(123.456) }
+        observeSetChange(obs, "anyCol") { obj.anyCol.listValue?.append(.bool(true)) }
+        observeSetChange(obs, "anyCol") { obj.anyCol.listValue?.insert(.date(Date()), at: 1) }
+        observeSetChange(obs, "anyCol") { obj.anyCol.listValue?.remove(at: 0) }
+    }
+
     func testReadSharedSchemaFromObservedObject() {
         let obj = ModernAllTypesObject()
         obj.addObserver(self, forKeyPath: "boolCol", options: [.old, .new], context: nil)
@@ -375,14 +390,14 @@ class ModernKVOTests: TestCase {
     }
 }
 
-class ModernKVOPersistedTests: ModernKVOTests {
+class ModernKVOPersistedTests: ModernKVOTests, @unchecked Sendable {
     override func getObject(_ obj: ModernAllTypesObject) -> (ModernAllTypesObject, ModernAllTypesObject) {
         realm.add(obj)
         return (obj, obj)
     }
 }
 
-class ModernKVOMultipleAccessorsTests: ModernKVOTests {
+class ModernKVOMultipleAccessorsTests: ModernKVOTests, @unchecked Sendable {
     override func getObject(_ obj: ModernAllTypesObject) -> (ModernAllTypesObject, ModernAllTypesObject) {
         realm.add(obj)
         return (obj, realm.object(ofType: ModernAllTypesObject.self, forPrimaryKey: obj.pk)!)

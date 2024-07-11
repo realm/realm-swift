@@ -29,11 +29,13 @@
 #import "RLMCredentials_Private.hpp"
 #import "RLMEmailPasswordAuth.h"
 #import "RLMLogger.h"
+#import "RLMProviderClient_Private.hpp"
 #import "RLMPushClient_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import <realm/object-store/sync/app_user.hpp>
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/sync/config.hpp>
 
@@ -94,15 +96,14 @@ namespace {
 
 #pragma mark RLMAppConfiguration
 @implementation RLMAppConfiguration {
-    realm::app::App::Config _config;
-    SyncClientConfig _clientConfig;
+    realm::app::AppConfig _config;
 }
 
 - (instancetype)init {
     if (self = [super init]) {
         self.enableSessionMultiplexing = true;
         self.encryptMetadata = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
-        RLMNSStringToStdString(_clientConfig.base_file_path, RLMDefaultDirectoryForBundleIdentifier(nil));
+        RLMNSStringToStdString(_config.base_file_path, RLMDefaultDirectoryForBundleIdentifier(nil));
         configureSyncConnectionParameters(_config);
     }
     return self;
@@ -152,7 +153,7 @@ namespace {
     return self;
 }
 
-static void configureSyncConnectionParameters(realm::app::App::Config& config) {
+static void configureSyncConnectionParameters(realm::app::AppConfig& config) {
     // Anonymized BundleId
     NSString *bundleId = [[NSBundle mainBundle] bundleIdentifier];
     NSData *bundleIdData = [bundleId dataUsingEncoding:NSUTF8StringEncoding];
@@ -178,21 +179,16 @@ static void configureSyncConnectionParameters(realm::app::App::Config& config) {
     config.device_info.device_version = systemInfo.machine;
 }
 
-- (const realm::app::App::Config&)config {
+- (const realm::app::AppConfig&)config {
     if (!_config.transport) {
         self.transport = nil;
     }
     return _config;
 }
 
-- (const realm::SyncClientConfig&)clientConfig {
-    return _clientConfig;
-}
-
 - (id)copyWithZone:(NSZone *)zone {
     RLMAppConfiguration *copy = [[RLMAppConfiguration alloc] init];
     copy->_config = _config;
-    copy->_clientConfig = _clientConfig;
     return copy;
 }
 
@@ -250,36 +246,36 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 }
 
 - (BOOL)enableSessionMultiplexing {
-    return _clientConfig.multiplex_sessions;
+    return _config.sync_client_config.multiplex_sessions;
 }
 
 - (void)setEnableSessionMultiplexing:(BOOL)enableSessionMultiplexing {
-    _clientConfig.multiplex_sessions = enableSessionMultiplexing;
+    _config.sync_client_config.multiplex_sessions = enableSessionMultiplexing;
 }
 
 - (BOOL)encryptMetadata {
-    return _clientConfig.metadata_mode == SyncManager::MetadataMode::Encryption;
+    return _config.metadata_mode == app::AppConfig::MetadataMode::Encryption;
 }
 
 - (void)setEncryptMetadata:(BOOL)encryptMetadata {
-    _clientConfig.metadata_mode = encryptMetadata ? SyncManager::MetadataMode::Encryption
-                                                  : SyncManager::MetadataMode::NoEncryption;
+    _config.metadata_mode = encryptMetadata ? app::AppConfig::MetadataMode::Encryption
+                                            : app::AppConfig::MetadataMode::NoEncryption;
 }
 
 - (NSURL *)rootDirectory {
-    return [NSURL fileURLWithPath:RLMStringViewToNSString(_clientConfig.base_file_path)];
+    return [NSURL fileURLWithPath:RLMStringViewToNSString(_config.base_file_path)];
 }
 
 - (void)setRootDirectory:(NSURL *)rootDirectory {
-    RLMNSStringToStdString(_clientConfig.base_file_path, rootDirectory.path);
+    RLMNSStringToStdString(_config.base_file_path, rootDirectory.path);
 }
 
 - (RLMSyncTimeoutOptions *)syncTimeouts {
-    return [[RLMSyncTimeoutOptions alloc] initWithOptions:_clientConfig.timeouts];
+    return [[RLMSyncTimeoutOptions alloc] initWithOptions:_config.sync_client_config.timeouts];
 }
 
 - (void)setSyncTimeouts:(RLMSyncTimeoutOptions *)syncTimeouts {
-    _clientConfig.timeouts = syncTimeouts->_options;
+    _config.sync_client_config.timeouts = syncTimeouts->_options;
 }
 
 @end
@@ -334,7 +330,7 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 - (instancetype)initWithConfiguration:(RLMAppConfiguration *)configuration {
     if (self = [super init]) {
         _app = RLMTranslateError([&] {
-            return app::App::get_app(app::App::CacheMode::Enabled, configuration.config, configuration.clientConfig);
+            return app::App::get_app(app::App::CacheMode::Disabled, configuration.config);
         });
         _configuration = configuration;
         _syncManager = [[RLMSyncManager alloc] initWithSyncManager:_app->sync_manager()];
@@ -342,8 +338,8 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
     return self;
 }
 
+static RLMUnfairMutex s_appMutex;
 static NSMutableDictionary *s_apps = [NSMutableDictionary new];
-static std::mutex& s_appMutex = *new std::mutex();
 
 + (NSArray *)allApps {
     std::lock_guard lock(s_appMutex);
@@ -385,6 +381,11 @@ static std::mutex& s_appMutex = *new std::mutex();
     return s_apps[appId] = [[RLMApp alloc] initWithConfiguration:config];
 }
 
++ (RLMApp *_Nullable)cachedAppWithId:(NSString *)appId {
+    std::lock_guard lock(s_appMutex);
+    return s_apps[appId];
+}
+
 - (NSString *)appId {
     return @(_app->config().app_id.c_str());
 }
@@ -395,32 +396,51 @@ static std::mutex& s_appMutex = *new std::mutex();
 
 - (NSDictionary<NSString *, RLMUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
-    for (auto&& user : _app->sync_manager()->all_users()) {
-        NSString *identity = @(user->identity().c_str());
-        buffer[identity] = [[RLMUser alloc] initWithUser:std::move(user) app:self];
+    for (auto&& user : _app->all_users()) {
+        NSString *user_id = @(user->user_id().c_str());
+        buffer[user_id] = [[RLMUser alloc] initWithUser:std::move(user)];
     }
     return buffer;
 }
 
 - (RLMUser *)currentUser {
-    if (auto user = _app->sync_manager()->get_current_user()) {
-        return [[RLMUser alloc] initWithUser:user app:self];
+    if (auto user = _app->current_user()) {
+        return [[RLMUser alloc] initWithUser:user];
     }
     return nil;
 }
 
 - (RLMEmailPasswordAuth *)emailPasswordAuth {
-    return [[RLMEmailPasswordAuth alloc] initWithApp: self];
+    return [[RLMEmailPasswordAuth alloc] initWithApp:_app];
+}
+
+- (NSString *)baseURL {
+    return getOptionalString(_app->get_base_url()) ?: RLMStringViewToNSString(_app->default_base_url());
+}
+
+- (void)updateBaseURL:(NSString * _Nullable)baseURL completion:(nonnull RLMOptionalErrorBlock)completionHandler {
+    auto completion = ^(std::optional<app::AppError> error) {
+        if (error) {
+            return completionHandler(makeError(*error));
+        }
+
+        completionHandler(nil);
+    };
+    return RLMTranslateError([&] {
+        NSString *url = (baseURL ?: @"");
+        NSString *newUrl = [url stringByReplacingOccurrencesOfString:@"/" withString:@"" options:0 range:NSMakeRange(url.length-1, 1)];
+        return _app->update_base_url(newUrl.UTF8String, completion);
+    });
 }
 
 - (void)loginWithCredential:(RLMCredentials *)credentials
                  completion:(RLMUserCompletionBlock)completionHandler {
-    auto completion = ^(std::shared_ptr<SyncUser> user, std::optional<app::AppError> error) {
+    auto completion = ^(std::shared_ptr<app::User> user, std::optional<app::AppError> error) {
         if (error) {
             return completionHandler(nil, makeError(*error));
         }
 
-        completionHandler([[RLMUser alloc] initWithUser:user app:self], nil);
+        completionHandler([[RLMUser alloc] initWithUser:user], nil);
     };
     return RLMTranslateError([&] {
         return _app->log_in_with_credentials(credentials.appCredentials, completion);
@@ -428,9 +448,10 @@ static std::mutex& s_appMutex = *new std::mutex();
 }
 
 - (RLMUser *)switchToUser:(RLMUser *)syncUser {
-    return RLMTranslateError([&] {
-        return [[RLMUser alloc] initWithUser:_app->switch_user(syncUser._syncUser) app:self];
+    RLMTranslateError([&] {
+        _app->switch_user(syncUser.user);
     });
+    return syncUser;
 }
 
 - (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName {
