@@ -6,6 +6,8 @@ x.y.z Release notes (yyyy-MM-dd)
   ```swift
   Logger.setLogLevel(.info, category: Category.Storage.transactions)
   ```
+* Add `@Realm.requiresMigration(for:config)` which allows to check whether the Realm requires 
+  or not a migration. Compatible with both sync and non-sync Realms.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
