@@ -270,6 +270,15 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
         if isInWriteTransaction { try commitWrite(withoutNotifying: tokens) }
         return ret
     }
+    
+    /**
+     Closes the Realm and all underlying resources.
+     
+     Internal as it is only required for testing purposes.
+     */
+    internal func close () {
+        rlmRealm.close()
+    }
 
     /**
      Begins a write transaction on the Realm.
@@ -758,7 +767,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
 
      - returns: A `Results` containing the objects.
      */
-    public func objects<Element: RealmFetchable>(_ type: Element.Type) -> Results<Element> {
+public func objects<Element: RealmFetchable>(_ type: Element.Type) -> Results<Element> {
         return Results(RLMGetObjects(rlmRealm, type.className(), nil))
     }
 
@@ -1058,6 +1067,16 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      */
     public static func fileExists(for config: Configuration) -> Bool {
         return RLMRealm.fileExists(for: config.rlmConfiguration)
+    }
+    
+    /**
+     Checks if the Realm file for the given configuration requires of a schema migration.
+     
+     It supports both non-sync and sync Realms, and works by validating whether the schema versions
+     of the Realm file and the given configurations match or not.
+     */
+    public static func requiresMigration(for config: Configuration) -> Bool {
+        return config.rlmConfiguration.requiresMigration()
     }
 
     /**

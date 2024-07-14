@@ -214,6 +214,13 @@ extension Realm {
                 self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }
             }
         }
+        
+        /**
+         Whether to return a cached version of the Realm when opening the Realm.
+         
+         Internal as it only used for testing purposes.
+         */
+        internal var cache: Bool = true
         /**
          The maximum number of live versions in the Realm file before an exception will
          be thrown when attempting to start a write transaction.
@@ -290,6 +297,7 @@ extension Realm {
             configuration.migrationObjectClass = MigrationObject.self
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
             configuration.shouldCompactOnLaunch = self.shouldCompactOnLaunch.map(ObjectiveCSupport.convert(object:))
+            configuration.cache = self.cache
             configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             configuration.maximumNumberOfActiveVersions = self.maximumNumberOfActiveVersions ?? 0

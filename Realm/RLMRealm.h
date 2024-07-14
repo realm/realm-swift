@@ -464,6 +464,11 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 - (void)cancelWriteTransaction;
 
 /**
+ Closes the Realm and all underlying resources.
+ */
+- (void)close;
+
+/**
  Performs actions contained within the given block inside a write transaction.
 
  @see `[RLMRealm transactionWithoutNotifying:block:error:]`

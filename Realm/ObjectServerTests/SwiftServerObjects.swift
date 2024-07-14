@@ -220,3 +220,114 @@ public class SwiftCustomColumnObject: Object {
         customColumnPropertiesMapping
     }
 }
+
+public class DogV0: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var owner: String
+    @Persisted public var name: String
+    @Persisted public var breed: String
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+
+    override public class func _realmObjectName() -> String? {
+        "Dog"
+    }
+
+    public convenience init(owner: String, name: String, breed: String) {
+        self.init()
+        self._id = ObjectId.generate()
+        self.owner = owner
+        self.name = name
+        self.breed = breed
+    }
+}
+
+public class DogV1: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var owner: String
+    @Persisted public var name: String
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+
+    override public class func _realmObjectName() -> String? {
+        "Dog"
+    }
+
+    public convenience init(owner: String, name: String) {
+        self.init()
+        self._id = ObjectId.generate()
+        self.owner = owner
+        self.name = name
+    }
+}
+
+public class DogV2: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var owner: String
+    @Persisted public var name: String?
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+
+    override public class func _realmObjectName() -> String? {
+        "Dog"
+    }
+
+    public convenience init(owner: String, name: String?) {
+        self.init()
+        self._id = ObjectId.generate()
+        self.owner = owner
+        self.name = name
+    }
+}
+
+public class DogV3: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var owner: String
+    @Persisted public var name: String?
+    @Persisted public var breed: ObjectId
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+
+    override public class func _realmObjectName() -> String? {
+        "Dog"
+    }
+
+    public convenience init(owner: String, name: String?, breed: ObjectId) {
+        self.init()
+        self._id = ObjectId.generate()
+        self.owner = owner
+        self.name = name
+        self.breed = breed
+    }
+}
+
+public class CatV0: Object {
+    @Persisted(primaryKey: true) public var _id: ObjectId
+    @Persisted public var owner: String
+    @Persisted public var name: String?
+
+    public override class func _realmIgnoreClass() -> Bool {
+        true
+    }
+
+    override public class func _realmObjectName() -> String? {
+        "Cat"
+    }
+
+    public convenience init(owner: String, name: String?) {
+        self.init()
+        self._id = ObjectId.generate()
+        self.owner = owner
+        self.name = name
+    }
+}
+
+

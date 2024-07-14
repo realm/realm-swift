@@ -136,8 +136,9 @@ extension Array: Json where Element == Json {}
 extension Optional: Json where Wrapped: Json {}
 
 private extension ObjectSchema {
-    func stitchRule(_ partitionKeyType: String?, id: String? = nil, appId: String) -> [String: Json] {
+    func stitchRule(_ partitionKeyType: String?, id: String? = nil, appId: String, title: String?) -> [String: Json] {
         var stitchProperties: [String: Json] = [:]
+        let title = title ?? className
 
         // We only add a partition property for pbs
         if let partitionKeyType = partitionKeyType {
@@ -172,12 +173,12 @@ private extension ObjectSchema {
                 // The server currently only supports non-optional collections
                 // but requires them to be marked as optional
                 "required": properties.compactMap { $0.isOptional || $0.type == .any || $0.isArray || $0.isMap || $0.isSet ? nil : $0.columnName },
-                "title": "\(className)"
+                "title": "\(title)"
             ],
             "metadata": [
                 "data_source": "mongodb1",
                 "database": "test_data",
-                "collection": "\(className) \(appId)"
+                "collection": "\(title) \(appId)"
             ],
             "relationships": relationships
         ]
@@ -368,7 +369,7 @@ class AdminSession {
             request(httpMethod: "PUT", completionHandler: completionHandler)
         }
 
-        func put(on group: DispatchGroup, data: Json? = nil,
+        func put(on group: DispatchGroup, data: [String: Json]? = nil,
                  _ completionHandler: @escaping Completion) {
             request(on: group, httpMethod: "PUT", data: data, completionHandler)
         }
@@ -756,7 +757,7 @@ public class RealmServer: NSObject {
     public typealias AppId = String
 
     /// Create a new server app
-    func createApp(syncMode: SyncMode, types: [ObjectBase.Type], persistent: Bool) throws -> AppId {
+    func createApp(syncMode: SyncMode, types: [ObjectBase.Type], persistent: Bool, typeUpdates: [[ObjectBase.Type]] = []) throws -> AppId {
         let session = try XCTUnwrap(session)
 
         let info = try session.apps.post(["name": "test"]).get()
@@ -835,7 +836,7 @@ public class RealmServer: NSObject {
             throw URLError(.badServerResponse)
         }
 
-        let schema = types.map { ObjectiveCSupport.convert(object: $0.sharedSchema()!) }
+        let schema = Dictionary(uniqueKeysWithValues: types.map { ($0._realmObjectName() ?? $0.className(), ObjectiveCSupport.convert(object: $0.sharedSchema()!)) })
 
         let partitionKeyType: String?
         if case .pbs(let bsonType) = syncMode {
@@ -847,12 +848,12 @@ public class RealmServer: NSObject {
         // Creating the schema is a two-step process where we first add all the
         // objects with their properties to them so that we can add relationships
         let lockedSchemaIds = Locked([String: String]())
-        for objectSchema in schema {
-            app.schemas.post(on: group, objectSchema.stitchRule(partitionKeyType, appId: clientAppId)) {
+        for (title, objectSchema) in schema {
+            app.schemas.post(on: group, objectSchema.stitchRule(partitionKeyType, appId: clientAppId, title: title)) {
                 switch $0 {
                 case .success(let data):
                     lockedSchemaIds.withLock {
-                        $0[objectSchema.className] = ((data as! [String: Any])["_id"] as! String)
+                        $0[title] = ((data as! [String: Any])["_id"] as! String)
                     }
                 case .failure(let error):
                     XCTFail(error.localizedDescription)
@@ -862,14 +863,14 @@ public class RealmServer: NSObject {
         try group.throwingWait(timeout: .now() + 5.0)
 
         let schemaIds = lockedSchemaIds.value
-        for objectSchema in schema {
-            let schemaId = schemaIds[objectSchema.className]!
-            app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, id: schemaId, appId: clientAppId), failOnError)
+        for (title, objectSchema) in schema {
+            let schemaId = schemaIds[title]!
+            app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, id: schemaId, appId: clientAppId, title: title), failOnError)
         }
         try group.throwingWait(timeout: .now() + 5.0)
 
         let asymmetricTables = schema.compactMap {
-            $0.isAsymmetric ? $0.className : nil
+            $0.value.isAsymmetric ? $0.key : nil
         }
         let serviceConfig: [String: Json]
         switch syncMode {
@@ -985,6 +986,7 @@ public class RealmServer: NSObject {
             "version": 1
         ], failOnError)
 
+
         // Disable exponential backoff when the server isn't ready for us to connect
         // TODO: this is returning 403 with current server. Reenable once it's fixed - see https://mongodb.slack.com/archives/C0121N9LJ14/p1713885482349059
         // session.privateApps[appId].settings.patch(on: group, [
@@ -996,6 +998,52 @@ public class RealmServer: NSObject {
         // Wait for initial sync to complete as connecting before that has a lot of problems
         try waitForSync(appServerId: appId, expectedCount: schema.count - asymmetricTables.count)
 
+        // Schema updates - if any - need to be applied after sync has been enabled to force the creation
+        // of different schema versions
+        let schemaUpdates = typeUpdates.map {
+            Dictionary(uniqueKeysWithValues: $0.map { ($0._realmObjectName() ?? $0.className(), ObjectiveCSupport.convert(object: $0.sharedSchema()!)) })
+        }
+
+        for update in schemaUpdates {
+            for (title, objectSchema) in update {
+                let schemaId = schemaIds[title]!
+
+                app.schemas[schemaId].put(on: group, data: objectSchema.stitchRule(partitionKeyType, appId: clientAppId, title: title)) {
+                    switch $0 {
+                    case .failure(let error):
+                        XCTFail(error.localizedDescription)
+                    default:
+                        break
+                    }
+                }
+            }
+            
+            schemaIds.filter {
+                !update.keys.contains($0.key)
+            }.forEach {
+                app.schemas[$0.value].delete(on: group) {
+                    switch $0 {
+                    case .failure(let error):
+                        XCTFail(error.localizedDescription)
+                    default:
+                        break
+                    }
+                }
+            }
+
+            try group.throwingWait(timeout: .now() + 5.0)
+        }
+
+        let expectedSchemaVersion = schemaUpdates.count
+        while true {
+            let response = try app.sync.schemas.versions.get().get() as! [String: Any?]
+            let versions = response["versions"] as! [[String: Any?]]
+            let currentMajor = versions.map({ $0["version_major"] as! Int32 }).max()!
+            if currentMajor >= expectedSchemaVersion {
+                break
+            }
+        }
+
         if !persistent {
             appIds.append(appId)
         }
@@ -1003,8 +1051,8 @@ public class RealmServer: NSObject {
         return clientAppId
     }
 
-    @objc public func createApp(fields: [String], types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {
-        return try createApp(syncMode: .flx(fields), types: types, persistent: persistent)
+    @objc public func createApp(fields: [String], types: [ObjectBase.Type], persistent: Bool = false, typeUpdates: [[ObjectBase.Type]] = []) throws -> AppId {
+        return try createApp(syncMode: .flx(fields), types: types, persistent: persistent, typeUpdates: typeUpdates)
     }
 
     @objc public func createApp(partitionKeyType: String = "string", types: [ObjectBase.Type], persistent: Bool = false) throws -> AppId {

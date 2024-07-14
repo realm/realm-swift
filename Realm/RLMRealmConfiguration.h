@@ -185,6 +185,14 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
  */
 @property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
 
+/**
+ Checks if the Realm file for the  configuration requires of a schema migration.
+ 
+ It supports both non-sync and sync Realms, and works by validating whether the schema versions
+ of the Realm file and the given configurations match or not.
+ */
+- (bool)requiresMigration;
+
 @end
 
 RLM_HEADER_AUDIT_END(nullability, sendability)

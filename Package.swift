@@ -71,6 +71,7 @@ let objectServerTestSources = [
     "SwiftServerObjects.swift",
     "SwiftSyncTestCase.swift",
     "SwiftUIServerTests.swift",
+    "SyncMigrationTests.swift",
     "TimeoutProxyServer.swift",
     "WatchTestUtility.swift",
     "certificates",
@@ -376,6 +377,7 @@ let package = Package(
                 "SwiftObjectServerPartitionTests.swift",
                 "SwiftObjectServerTests.swift",
                 "SwiftUIServerTests.swift",
+                "SyncMigrationTests.swift",
             ]
         ),
         objectServerTestTarget(
