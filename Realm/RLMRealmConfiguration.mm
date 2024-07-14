@@ -34,6 +34,8 @@
 #import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/util/bson/bson.hpp>
 #import <realm/sync/config.hpp>
+#import <realm/object-store/shared_realm.hpp>
+#import <realm/object-store/object_store.hpp>
 #else
 @class RLMSyncConfiguration;
 #endif
@@ -50,6 +52,8 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"dynamic",
     @"customSchema",
 };
+
+using namespace realm;
 
 static NSString *const c_defaultRealmFileName = @"default.realm";
 RLMRealmConfiguration *s_defaultConfiguration;
@@ -249,6 +253,29 @@ static bool isSync(realm::Realm::Config const& config) {
 
 - (uint64_t)schemaVersion {
     return _config.schema_version;
+}
+
+- (bool)requiresMigration {
+    // See https://github.com/realm/realm-core/pull/7873
+    
+    if([RLMRealm fileExistsForConfiguration: self]) {
+        realm::Realm::Config config;
+        config.schema_version = RLMNotVersioned;
+        config.path = _config.path;
+        config.encryption_key = _config.encryption_key;
+        
+        if(_config.sync_config != nil) {
+            config.sync_config = nullptr;
+            config.force_sync_history = true;
+        }
+        
+        std::shared_ptr<realm::Realm> realm = Realm::get_shared_realm(config);
+        uint64_t version = ObjectStore::get_schema_version(realm.get()->read_group());
+        
+        return _config.schema_version != version;
+    }
+    
+    return false;
 }
 
 - (void)setSchemaVersion:(uint64_t)schemaVersion {

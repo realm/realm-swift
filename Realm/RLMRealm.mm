@@ -675,6 +675,10 @@ bool copySeedFile(RLMRealmConfiguration *configuration, NSError **error) {
     }
 }
 
+- (void)close {
+    _realm->close();
+}
+
 - (BOOL)isPerformingAsynchronousWriteOperations {
     return _realm->is_in_async_transaction();
 }

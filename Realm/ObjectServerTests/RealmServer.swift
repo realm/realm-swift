@@ -1017,6 +1017,19 @@ public class RealmServer: NSObject {
                     }
                 }
             }
+            
+            schemaIds.filter {
+                !update.keys.contains($0.key)
+            }.forEach {
+                app.schemas[$0.value].delete(on: group) {
+                    switch $0 {
+                    case .failure(let error):
+                        XCTFail(error.localizedDescription)
+                    default:
+                        break
+                    }
+                }
+            }
 
             try group.throwingWait(timeout: .now() + 5.0)
         }
