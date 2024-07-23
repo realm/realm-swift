@@ -6,6 +6,9 @@ x.y.z Release notes (yyyy-MM-dd)
   ```swift
   Logger.setLogLevel(.info, category: Category.Storage.transactions)
   ```
+* Code sign our published xcframeworks. By Apple's requirements, we should sign our release
+  binaries so Xcode can validate it was signed by the same developer on every new version. 
+  ([Apple](https://developer.apple.com/support/third-party-SDK-requirements/)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

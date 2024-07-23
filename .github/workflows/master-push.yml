@@ -185,12 +185,22 @@ jobs:
         - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
+        - name: Install the Apple certificate and provisioning profile
+          env:
+            DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
+            P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+            KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          run: |
+            sh -x build.sh install-apple-certificates
         - name: Restore frameworks
           uses: actions/download-artifact@v4
           with:
             pattern: build-${{ matrix.platform }}*-${{ matrix.xcode-version }}-*
         - name: Create xcframework
-          run: sh -x build.sh release-create-xcframework-${{ matrix.xcode-version }} ${{ matrix.platform }}
+          env:
+            SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
+          run: |
+            sh -x build.sh release-create-xcframework-${{ matrix.xcode-version }} ${{ matrix.platform }}
         - name: Upload xcframework
           uses: actions/upload-artifact@v4
           with:
@@ -204,12 +214,22 @@ jobs:
         - uses: actions/checkout@v4
         - name: Select Xcode Version
           run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
+        - name: Install the Apple certificate and provisioning profile
+          env:
+            DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
+            P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+            KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          run: |
+            sh -x build.sh install-apple-certificates
         - name: Restore packages xcframeworks
           uses: actions/download-artifact@v4
           with:
             pattern: realm-*
         - name: Create release
-          run: sh -x build.sh release-package
+          env:
+            SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
+          run: |
+            sh -x build.sh release-package
         - name: Upload release artifactss
           uses: actions/upload-artifact@v4
           with:
