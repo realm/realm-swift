@@ -9,6 +9,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Code sign our published xcframeworks. By Apple's requirements, we should sign our release
   binaries so Xcode can validate it was signed by the same developer on every new version. 
   ([Apple](https://developer.apple.com/support/third-party-SDK-requirements/)).
+* Report sync warnings from the server such as sync being disabled server-side to the sync error handler.
+  ([#8020](https://github.com/realm/realm-swift/issues/8020)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)

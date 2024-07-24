@@ -1186,6 +1186,20 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(downloadCount.value, 0)
         XCTAssertEqual(uploadCount.value, 0)
     }
+
+    func testFlexibleSyncNotEnabledError() throws {
+        let appId = try RealmServer.shared.createNotSyncApp()
+        let app = app(id: appId)
+        let ex = expectation(description: "Waiting for error handler to be called...")
+        ex.assertForOverFulfill = false // error handler can legally be called multiple times
+        app.syncManager.errorHandler = { @Sendable (error, _) in
+            assertSyncError(error, .serverWarning, "Sync is not enabled for this app")
+            ex.fulfill()
+        }
+
+        _ = try Realm(configuration: configuration(app: app)) // Sync is disabled so we cannot use async open
+        wait(for: [ex], timeout: 10.0)
+    }
 }
 
 #endif // os(macOS)
