@@ -202,32 +202,6 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     return self;
 }
 
-- (void)logWithLevel:(RLMLogLevel)logLevel message:(NSString *)message, ... {
-    auto level = levelForLogLevel(logLevel);
-    if (_logger->would_log(level)) {
-        va_list args;
-        va_start(args, message);
-        _logger->log(level, "%1", [[NSString alloc] initWithFormat:message arguments:args].UTF8String);
-        va_end(args);
-    }
-}
-
-- (void)logWithLevel:(RLMLogLevel)logLevel category:(RLMLogCategory)category message:(NSString *)message {
-    auto level = levelForLogLevel(logLevel);
-    LogCategory& cat = categoryForLogCategory(category);
-    if (_logger->would_log(cat, level)) {
-        _logger->log(cat, levelForLogLevel(logLevel), message.UTF8String);
-    }
-}
-
-- (void)logWithLevel:(RLMLogLevel)logLevel categoryName:(NSString *)categoryName message:(NSString *)message {
-    auto level = levelForLogLevel(logLevel);
-    LogCategory& lcat = LogCategory::get_category(categoryName.UTF8String);
-    if (_logger->would_log(lcat, level)) {
-        _logger->log(lcat, levelForLogLevel(logLevel), message.UTF8String);
-    }
-}
-
 + (void)setLevel:(RLMLogLevel)level forCategory:(RLMLogCategory)category {
     auto defaultLogger = Logger::get_default_logger();
     defaultLogger->set_level_threshold(categoryForLogCategory(category).get_name(), levelForLogLevel(level));
@@ -250,6 +224,12 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     return a;
 }
 
+void RLMTestLog(RLMLogCategory category, RLMLogLevel level, const char *message) {
+    Logger::get_default_logger()->log(categoryForLogCategory(category),
+                                      levelForLogLevel(level),
+                                      "%1", message);
+}
+
 #pragma mark Global Logger Setter
 
 + (instancetype)defaultLogger {
@@ -260,3 +240,31 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     Logger::set_default_logger(logger->_logger);
 }
 @end
+
+void RLMLog(RLMLogLevel logLevel, NSString *format, ...) {
+    auto level = levelForLogLevel(logLevel);
+    auto logger = Logger::get_default_logger();
+    if (logger->would_log(LogCategory::sdk, level)) {
+        va_list args;
+        va_start(args, format);
+        logger->log(LogCategory::sdk, level, "%1",
+                    [[NSString alloc] initWithFormat:format arguments:args].UTF8String);
+        va_end(args);
+    }
+}
+
+void RLMLogDeferred(RLMLogLevel logLevel, NSString *(NS_NOESCAPE ^message)()) {
+    auto level = levelForLogLevel(logLevel);
+    auto logger = Logger::get_default_logger();
+    if (logger->would_log(LogCategory::sdk, level)) {
+        logger->log(LogCategory::sdk, level, "%1", message().UTF8String);
+    }
+}
+
+void RLMLogRaw(RLMLogLevel logLevel, NSString *message) {
+    auto level = levelForLogLevel(logLevel);
+    auto logger = Logger::get_default_logger();
+    if (logger->would_log(LogCategory::sdk, level)) {
+        logger->log(LogCategory::sdk, level, "%1", message.UTF8String);
+    }
+}

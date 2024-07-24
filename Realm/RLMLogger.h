@@ -168,15 +168,6 @@ __attribute__((deprecated("Use `initWithLogFunction:` instead.")));
 @property (class) RLMLogger *defaultLogger NS_SWIFT_NAME(shared);
 
 /**
- Log a message to the supplied level.
-
- @param logLevel The log level for the message.
- @param category The log category for the message.
- @param message The message to log.
- */
-- (void)logWithLevel:(RLMLogLevel)logLevel category:(RLMLogCategory)category message:(NSString *)message;
-
-/**
  Sets the gobal log level for a given category.
 
  @param level The log level to be set for the logger.

@@ -1947,20 +1947,26 @@ extension LogLevel {
 
 @available(macOS 12.0, watchOS 8.0, iOS 15.0, tvOS 15.0, macCatalyst 15.0, *)
 class LoggerTests: TestCase, @unchecked Sendable {
-    var logger: Logger!
+    var oldLogger: Logger!
+    let logs = Locked("")
+
     override func setUp() {
-        logger = Logger.shared
+        oldLogger = Logger.shared
+        let logs = self.logs
+        Logger.shared = Logger(function: { level, category, message in
+            logs.withLock { $0 += "\(Date.now) \(category.rawValue)[\(level.logLevel)]: \(message)\n" }
+        })
     }
+
     override func tearDown() {
-        Logger.shared = logger
+        Logger.shared = oldLogger
+    }
+
+    func assertContains(_ str: String, _ expected: String, line: UInt = #line) {
+        XCTAssert(str.contains(expected), "\"\(str)\" should contain \"\(expected)\"", line: line)
     }
 
     func testSetDefaultLogLevel() throws {
-        let logs = Locked("")
-        let logger = Logger(function: { level, category, message in
-            logs.withLock({ $0 += "\(Date.now)  \(category.rawValue):\(level.logLevel) \(message)" })
-        })
-        Logger.shared = logger
         Logger.setLogLevel(.off, for: Category.realm)
 
         try autoreleasepool { _ = try Realm() }
@@ -1969,16 +1975,11 @@ class LoggerTests: TestCase, @unchecked Sendable {
         Logger.setLogLevel(.all, for: Category.realm)
         try autoreleasepool { _ = try Realm() } // We should be getting logs after changing the log level
         XCTAssertEqual(Logger.logLevel(for: Category.realm), .all)
-        XCTAssertTrue(logs.value.contains("Details DB:"))
-        XCTAssertTrue(logs.value.contains("Trace DB:"))
+        assertContains(logs.value, "[Details]: DB:")
+        assertContains(logs.value, "[Trace]: DB:")
     }
 
     func testSetDefaultLogger() throws {
-        let logs = Locked("")
-        let logger = Logger(function: { level, category, message in
-            logs.withLock({ $0 += "\(Date.now)  \(category.rawValue):\(level.logLevel) \(message)" })
-        })
-        Logger.shared = logger
         Logger.setLogLevel(.off, for: Category.realm)
         XCTAssertEqual(Logger.logLevel(for: Category.realm), .off)
         try autoreleasepool { _ = try Realm() }
@@ -1988,54 +1989,45 @@ class LoggerTests: TestCase, @unchecked Sendable {
         Logger.setLogLevel(.detail, for: Category.realm)
         try autoreleasepool { _ = try Realm() }
 
-        XCTAssertTrue(!logs.value.isEmpty)
-        XCTAssertTrue(logs.value.contains("Details DB:"))
+        assertContains(logs.value, "[Details]: DB:")
 
         // Trace
         logs.wrappedValue = ""
         Logger.setLogLevel(.trace, for: Category.realm)
         try autoreleasepool { _ = try Realm() }
 
-        XCTAssertTrue(!logs.value.isEmpty)
-        XCTAssertTrue(logs.value.contains("Trace DB:"))
+        assertContains(logs.value, "[Trace]: DB:")
 
         // Detail
         logs.wrappedValue = ""
         Logger.setLogLevel(.detail, for: Category.realm)
         try autoreleasepool { _ = try Realm() }
 
-        XCTAssertTrue(!logs.value.isEmpty)
-        XCTAssertTrue(logs.value.contains("Details DB:"))
-        XCTAssertFalse(logs.value.contains("Trace DB:"))
+        assertContains(logs.value, "[Details]: DB:")
+        XCTAssertFalse(logs.value.contains("[Trace]: DB:"))
 
         logs.wrappedValue = ""
+        let logs = self.logs
         Logger.shared = Logger(function: { level, _, message in
             logs.withLock({ $0 += "\(Date.now) \(level.logLevel) \(message)" })
         })
         Logger.setLogLevel(.trace, for: Category.realm)
         XCTAssertEqual(Logger.logLevel(for: Category.realm), .trace)
         try autoreleasepool { _ = try Realm() }
-        XCTAssertTrue(!logs.value.isEmpty)
-        XCTAssertTrue(logs.value.contains("Details DB:"))
-        XCTAssertTrue(logs.value.contains("Trace DB:"))
+        assertContains(logs.value, "Details DB:")
+        assertContains(logs.value, "Trace DB:")
     }
 
     @available(*, deprecated)
     func testOldSetDefaultLogLevel() throws {
-        var logs: String = ""
-        let logger = Logger(level: .off) { level, message in
-            logs += "\(Date.now) \(level.logLevel) \(message)"
-        }
-        Logger.shared = logger
-
         try autoreleasepool { _ = try Realm() }
-        XCTAssertTrue(logs.isEmpty)
+        XCTAssertTrue(logs.wrappedValue.isEmpty)
 
-        logger.level = .all
+        Logger.shared.level = .all
         try autoreleasepool { _ = try Realm() } // We should be getting logs after changing the log level
         XCTAssertEqual(Logger.shared.level, .all)
-        XCTAssertTrue(logs.contains("Details DB:"))
-        XCTAssertTrue(logs.contains("Trace DB:"))
+        assertContains(logs.value, "[Details]: DB:")
+        assertContains(logs.value, "[Trace]: DB:")
     }
 
     @available(*, deprecated)
@@ -2055,7 +2047,7 @@ class LoggerTests: TestCase, @unchecked Sendable {
         try autoreleasepool { _ = try Realm() }
 
         XCTAssertTrue(!logs.isEmpty)
-        XCTAssertTrue(logs.contains("Details DB:"))
+        assertContains(logs, "Details DB:")
 
         // Trace
         logs = ""
@@ -2063,7 +2055,7 @@ class LoggerTests: TestCase, @unchecked Sendable {
         try autoreleasepool { _ = try Realm() }
 
         XCTAssertTrue(!logs.isEmpty)
-        XCTAssertTrue(logs.contains("Trace DB:"))
+        assertContains(logs, "Trace DB:")
 
         // Detail
         logs = ""
@@ -2071,7 +2063,7 @@ class LoggerTests: TestCase, @unchecked Sendable {
         try autoreleasepool { _ = try Realm() }
 
         XCTAssertTrue(!logs.isEmpty)
-        XCTAssertTrue(logs.contains("Details DB:"))
+        assertContains(logs, "Details DB:")
         XCTAssertFalse(logs.contains("Trace DB:"))
 
         logs = ""
@@ -2082,8 +2074,8 @@ class LoggerTests: TestCase, @unchecked Sendable {
         XCTAssertEqual(Logger.shared.level, .trace)
         try autoreleasepool { _ = try Realm() }
         XCTAssertTrue(!logs.isEmpty)
-        XCTAssertTrue(logs.contains("Details DB:"))
-        XCTAssertTrue(logs.contains("Trace DB:"))
+        assertContains(logs, "Details DB:")
+        assertContains(logs, "Trace DB:")
     }
 
     // Core defines the different categories in runtime, forcing the SDK to define the categories again.
@@ -2110,77 +2102,41 @@ class LoggerTests: TestCase, @unchecked Sendable {
         }
     }
 
-    func testLogMessageForCategory() throws {
-        let logs = Locked("")
-        let logger = Logger(function: { level, category, message in
-            logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
-        })
-        Logger.shared = logger
-
-        for category in Logger.allCategories() {
-            logs.wrappedValue = ""
-            let categoryEnum = categoryfromString(category)
-            XCTAssertNotNil(categoryEnum, "LogCategory `\(category)` not added to the Category enum.")
-
-            Logger.setLogLevel(.trace, for: categoryEnum!)
-
-            XCTAssertEqual(Logger.logLevel(for: categoryEnum!), .trace)
-            logger.log(with: .trace, categoryName: category, message: "Test")
-            XCTAssertTrue(logs.value.contains("\(LogLevel.trace.logLevel) \(category) Test"), "Log doesn't contain \(category)")
-        }
-    }
-
     /// This test works because `get_category_names()` returns categories from parent to children.
     func testShouldNotLogParentOrRelatedCategory() throws {
         Logger.setLogLevel(.off, for: Category.realm)
         XCTAssertEqual(Logger.logLevel(for: Category.realm), .off)
 
-        let logs = Locked("")
-        let logger = Logger(function: { level, category, message in
-            logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
-        })
-        Logger.shared = logger
-
         let categories = Logger.allCategories()
         for (index, category) in categories.enumerated() {
-            guard index <= categories.count-2 else { return }
+            guard index <= categories.count - 2 else { return }
             logs.wrappedValue = ""
-            let categoryEnum = categoryfromString(categories[index+1])
-            XCTAssertNotNil(categoryEnum, "LogCategory `\(category)` not added to the Category enum.")
+            let categoryEnum = try XCTUnwrap(categoryfromString(categories[index + 1]),
+                                             "LogCategory `\(category)` not added to the Category enum.")
 
-            Logger.setLogLevel(.trace, for: categoryEnum!)
-            XCTAssertEqual(Logger.logLevel(for: categoryEnum!), .trace)
+            Logger.setLogLevel(.trace, for: categoryEnum)
+            XCTAssertEqual(Logger.logLevel(for: categoryEnum), .trace)
 
-            logger.log(with: .trace, categoryName: category, message: "Test")
-            XCTAssertFalse(logs.value.contains("\(LogLevel.trace.logLevel) \(category) Test"), "Log shouldn't contain message from \(category)")
-            Logger.setLogLevel(.off, for: categoryEnum!)
+            RLMTestLog(ObjectiveCSupport.convert(value: categoryEnum), .trace, "Test")
+            XCTAssertFalse(logs.value.contains("\(LogLevel.trace.logLevel) \(category) Test"),
+                           "Log shouldn't contain message from \(category)")
+            Logger.setLogLevel(.off, for: categoryEnum)
         }
     }
 
     /// Logger should log messages from all child categories
     func testShouldLogWhenParentCategory() throws {
-        let logs = Locked("")
-        let logger = Logger(function: { level, category, message in
-            logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
-        })
-        Logger.shared = logger
         Logger.setLogLevel(.trace, for: Category.realm)
         XCTAssertEqual(Logger.logLevel(for: Category.realm), .trace)
 
         for category in Logger.allCategories() {
             logs.wrappedValue = ""
-            logger.log(with: .trace, categoryName: category, message: "Test")
-            XCTAssertTrue(logs.value.contains("\(LogLevel.trace.logLevel) \(category) Test"), "Log doesn't contain \( Category.realm.rawValue)")
+            RLMTestLog(ObjectiveCSupport.convert(value: categoryfromString(category)!), .trace, "Test")
+            assertContains(logs.value, "\(category)[Trace]: Test")
         }
     }
 
     func testChangeCategoryLevel() throws {
-        let logs = Locked("")
-        let logger = Logger(function: { level, category, message in
-            logs.withLock({ $0 += "\(level.logLevel) \(category.rawValue) \(message) " })
-        })
-        Logger.shared = logger
-
         Logger.setLogLevel(.trace, for: Category.realm)
         XCTAssertEqual(Logger.logLevel(for: Category.realm), .trace)
 
@@ -2220,25 +2176,18 @@ class LoggerTests: TestCase, @unchecked Sendable {
     }
 
     func testCallbackFilteringForCatgories() throws {
-        let logs = Locked("")
-        let logger = Logger(function: { level, _, message in
-            logs.withLock({ $0 += "\(Date.now) \(level.logLevel) \(message)" })
-        })
-
-        Logger.shared = logger
-
         Logger.setLogLevel(.off, for: Category.realm)
         Logger.setLogLevel(.info, for: Category.Storage.all)
 
-        logger.log(with: .info, categoryName: Category.Storage.all.rawValue, message: "Storage test entry")
-        XCTAssertTrue(logs.value.contains("Storage test entry"))
+        RLMTestLog(.storage, .info, "Storage test entry")
+        assertContains(logs.value, "Storage test entry")
         logs.wrappedValue = ""
 
-        logger.log(with: .info, categoryName: Category.Storage.transaction.rawValue, message: "Transaction test entry")
-        XCTAssertTrue(logs.value.contains("Transaction test entry"))
+        RLMTestLog(.storageTransaction, .info, "Transaction test entry")
+        assertContains(logs.value, "Transaction test entry")
         logs.wrappedValue = ""
 
-        logger.log(with: .info, categoryName: Category.realm.rawValue, message: "REALM test entry")
+        RLMTestLog(.realm, .info, "REALM test entry")
         XCTAssertFalse(logs.value.contains("REALM test entry"))
     }
 

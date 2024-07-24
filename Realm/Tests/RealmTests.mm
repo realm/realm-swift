@@ -3030,8 +3030,8 @@
     RLMLogger.defaultLogger = logger;
     [RLMLogger setLevel:RLMLogLevelDebug forCategory:category];
 
-    [logger logWithLevel:RLMLogLevelInfo message:@"%@ IMPORTANT INFO %i", @"TEST:", 0];
-    [logger logWithLevel:RLMLogLevelTrace message:@"IMPORTANT TRACE"];
+    RLMLog(RLMLogLevelInfo, @"%@ IMPORTANT INFO %i", @"TEST:", 0);
+    RLMLog(RLMLogLevelTrace, @"IMPORTANT TRACE");
     XCTAssertTrue([logs containsString:@"TEST: IMPORTANT INFO 0"]); // Detail
     XCTAssertFalse([logs containsString:@"IMPORTANT TRACE"]); // Trace
 }

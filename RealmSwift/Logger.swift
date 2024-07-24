@@ -57,18 +57,18 @@ extension Logger {
      Log a message to the supplied level.
 
      ```swift
-     let logger = Logger(level: .info, logFunction: { level, message in
-         print("Realm Log - \(level): \(message)")
-     })
-     logger.log(level: .info, message: "Info DB: Database opened succesfully")
+     Logger.log(.info, "DB: Database opened succesfully")
      ```
 
      - parameter level: The log level for the message.
      - parameter category: The log category for the message.
      - parameter message: The message to log.
      */
-    internal func log(level: LogLevel, category: LogCategory = Category.sdk, message: String) {
-        self.log(with: level, category: ObjectiveCSupport.convert(value: category), message: message)
+    internal static func log(_ level: LogLevel, _ message: String) {
+        RLMLogRaw(level, message)
+    }
+    internal static func log(_ level: LogLevel, _ message: @autoclosure () -> DefaultStringInterpolation) {
+        RLMLogDeferred(level) { message().description }
     }
 
     /**
@@ -247,7 +247,7 @@ public enum Category: String, LogCategory {
     }
 }
 
-private extension ObjectiveCSupport {
+internal extension ObjectiveCSupport {
 
     /// Converts a Swift category `LogCategory` to an Objective-C `RLMLogCategory.
     /// - Parameter value: The `LogCategory`.

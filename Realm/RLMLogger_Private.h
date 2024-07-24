@@ -23,23 +23,6 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 
 @interface RLMLogger()
 
-/**
- Log a message to the supplied level.
-
- @param logLevel The log level for the message.
- @param message The message to log.
- */
-- (void)logWithLevel:(RLMLogLevel)logLevel message:(NSString *)message, ... NS_SWIFT_UNAVAILABLE("");
-
-/**
- Log a message to the supplied level.
-
- @param logLevel The log level for the message.
- @param categoryName The log category name for the message.
- @param message The message to log.
- */
-- (void)logWithLevel:(RLMLogLevel)logLevel categoryName:(NSString *)categoryName message:(NSString *)message;
-
 #pragma mark Testing
 
 /**
@@ -47,6 +30,18 @@ Gets all the categories from Core. This is to be used for testing purposes only.
  */
 + (NSArray<NSString *> *)allCategories;
 
+/// Log a message via core's default logger for testing purposes
+FOUNDATION_EXTERN void RLMTestLog(RLMLogCategory category, RLMLogLevel level, const char *message);
+
 @end
+
+#pragma mark Internal SDK logging
+
+/// Logger function for operations within the SDK, to be used from obj-c code.
+void RLMLog(RLMLogLevel level, NSString *format, ...);
+
+// Helpers for the Swift Logger.log() function
+FOUNDATION_EXTERN void RLMLogRaw(RLMLogLevel level, NSString *message);
+FOUNDATION_EXTERN void RLMLogDeferred(RLMLogLevel level, NSString *(NS_NOESCAPE ^message)(void));
 
 RLM_HEADER_AUDIT_END(nullability)
