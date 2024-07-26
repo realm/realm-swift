@@ -24,7 +24,7 @@ import Realm.Private
 
  Set the global log level for a given category.
  ```swift
- Logger.setLogLevel(.info, for: Category.sdk)
+ Logger.set(level: .info, for: Category.sdk)
  ```
 
  Read the global log level for a given category.
@@ -32,24 +32,17 @@ import Realm.Private
  let level = Logger.logLevel(for: Category.Storage.all)
  ```
 
- You can define your own custom logger creating an instance of `Logger` and defining the log function which will be
- invoked whenever there is a log message.
+ By default messages are logged to `NSLog` at the `.info` log level. You can
+ remove the default logger by calling `Logger.removeAll()`. You can add your own
+ custom logger by calling `Logger.add()`:
 
  ```swift
- let logger = Logger(function: { level, category, message in
-    print("Realm Log - \(category.rawValue)-\(level): \(message)")
- })
+ Logger.add { level, category, message in
+     print("Realm Log - \(category.rawValue)-\(level): \(message)")
+ }
  ```
 
- Set this custom logger as you default logger using `Logger.shared`. This will replace the default logger.
-
- ```swift
- Logger.shared = logger
- ```
-
- - note: The default log threshold level is `.info`, for the log category `.Category.realm`,
-         and logging strings are output to Apple System Logger.
- - SeeAlso: `LogCategory`
+ Multiple logger callbacks can be registered at once. All will share the same log levels.
 */
 public typealias Logger = RLMLogger
 extension Logger {
@@ -59,67 +52,27 @@ extension Logger {
      ```swift
      Logger.log(.info, "DB: Database opened succesfully")
      ```
-
-     - parameter level: The log level for the message.
-     - parameter category: The log category for the message.
-     - parameter message: The message to log.
      */
     internal static func log(_ level: LogLevel, _ message: String) {
         RLMLogRaw(level, message)
-    }
-    internal static func log(_ level: LogLevel, _ message: @autoclosure () -> DefaultStringInterpolation) {
-        RLMLogDeferred(level) { message().description }
-    }
-
-    /**
-     Creates a logger with the associated log level, and a logic function to define your own logging logic.
-
-     ```swift
-     let logger = Logger(level: .info, category: Category.All, logFunction: { level, category, message in
-         print("\(category.rawValue) - \(level): \(message)")
-     })
-     ```
-
-     - parameter level: The log level to be set for the logger.
-     - parameter function: The log function which will be invoked whenever there is a log message.
-
-     - note: This will set the specified log level for the log category `Category.realm`.
-     */
-    @available(*, deprecated, message: "Use init(function:)")
-    public convenience init(level: LogLevel, function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {
-        self.init(logFunction: { level, category, message in
-            function(level, ObjectiveCSupport.convert(value: category), message)
-        })
-        Logger.setLogLevel(level, for: Category.realm)
-    }
-
-    /**
-     Creates a logger with a callback, which will be invoked whenever there is a log message.
-
-     ```swift
-     let logger = Logger(function: { level, category, message in
-         print("\(category.rawValue) - \(level): \(message)")
-     })
-     ```
-
-     - parameter function: The log function which will be invoked whenever there is a log message.
-     */
-    public convenience init(function: @escaping @Sendable (LogLevel, LogCategory, String) -> Void) {
-        self.init(logFunction: { level, category, message in
-            function(level, ObjectiveCSupport.convert(value: category), message)
-        })
     }
 
     /**
      Sets the global log level for a given log category.
 
-     - parameter level: The log level to be set for the logger.
-     - parameter category: The log category to be set for the logger, by default it will setup the top Category `Category.realm`
+     The registered callbacks will not be called for messages with log levels
+     below the log level set for the category.
 
-     - note:By setting the log level of a category, it will set all its subcategories log level as well.
-     - SeeAlso: `LogCategory`
+     The `Category.realm`, `Category.Storage.all`, `Category.Sync.all`, and
+     `Category.Sync.Client.all` categories are parent categories that set the
+     log level for all child categories. These can be used to quickly set the
+     log level for all messages logged by Realm (or all Sync messages).
+
+     - parameter level: The log level to be set for the category.
+     - parameter category: The log category to update. By default all categories will be updated.
+     - SeeAlso: ``LogCategory``
      */
-    public static func setLogLevel(_ level: LogLevel, for category: LogCategory = Category.realm) {
+    public static func set(level: LogLevel, for category: LogCategory = Category.realm) {
         Logger.__setLevel(level, for: ObjectiveCSupport.convert(value: category))
     }
 
@@ -127,19 +80,52 @@ extension Logger {
      Gets the current global log level of a log category.
 
      - parameter category: The target log category.
-
      - returns: The `LogLevel` for the given category.
      - SeeAlso: `LogCategory`
      */
-    public static func logLevel(for category: LogCategory) -> LogLevel {
+    public static func logLevel(for category: LogCategory = Category.realm) -> LogLevel {
         Logger.__level(for: ObjectiveCSupport.convert(value: category))
+    }
+
+    /// A logger callback function that can be passed to add(logFunction:).
+    /// This function may be called from multiple threads concurrently and is
+    /// responsible for any synchronization that may require.
+    public typealias LogCallback = @Sendable (LogLevel, LogCategory, String) -> Void
+
+    /// A token which can optionally be used to unregister a logger callback.
+    public typealias Token = RLMLoggerToken
+
+    /**
+     Registers a new logger callback function.
+
+     The logger callback function will be invoked each time a message is logged
+     with a log level greater than or equal to the current log level set for the
+     message's category. The log function may be concurrently invoked from
+     multiple threads.
+
+     This function is thread-safe and can be called at any time, including from
+     within other logger callbacks. It is guaranteed to work even if called
+     concurrently with logging operations on another thread, but whether or not
+     those operations are reported to the callback is left unspecified.
+
+     This method returns a token which can be used to unregister the callback.
+     Unlike notification tokens, storing this token is optional. If the token is
+     destroyed without `invalidate` being called, it will be impossible to
+     unregister the callback other than with `Logger.removeAll()` or
+     `Logger.resetToDefault()`.
+     */
+    @discardableResult
+    public static func add(logFunction: @escaping LogCallback) -> RLMLoggerToken {
+        Self.__addLogFunction { level, category, message in
+            logFunction(level, ObjectiveCSupport.convert(value: category), message)
+        }
     }
 }
 
 /// Defines a log category for the Realm `Logger`.
 public protocol LogCategory: Sendable {
     /**
-     Returns the string represtation of the Log category.
+     Returns the string representation of the Log category.
 
      - returns: A string representing the log category.
      - SeeAlso: `LogCategory`
@@ -167,12 +153,12 @@ public protocol LogCategory: Sendable {
   └─► Sdk
  ```
 */
-public enum Category: String, LogCategory {
-    ///  Top level log category for Realm, updating this category level would set all other subcategories too.
+public enum Category: String, LogCategory, CaseIterable {
+    ///  Top level log category for all messages. Setting the log level for this category updates all other categories as well.
     case realm = "Realm"
-    /// Log category for all sdk related logs.
+    /// Log category for things logged by the Realm Swift SDK.
     case sdk = "Realm.SDK"
-    /// Log category for all app related logs.
+    /// Log category for the App type. This includes al HTTP(s) requests made to Atlas, but does not include sync.
     case app = "Realm.App"
 
     /**
@@ -187,7 +173,7 @@ public enum Category: String, LogCategory {
       └─► Notification
      ```
     */
-    public enum Storage: String, LogCategory {
+    public enum Storage: String, LogCategory, CaseIterable {
         /// Log category for all database related logs.
         case all = "Realm.Storage"
         /// Log category for all database transaction related logs.
@@ -214,7 +200,7 @@ public enum Category: String, LogCategory {
       └─► Server
      ```
      */
-    public enum Sync: String, LogCategory {
+    public enum Sync: String, LogCategory, CaseIterable {
         /// Log category for all sync related logs.
         case all = "Realm.Sync"
         /// Log category for all sync server related logs.
@@ -232,7 +218,7 @@ public enum Category: String, LogCategory {
           └─► Reset
          ```
          */
-        public enum Client: String, LogCategory {
+        public enum Client: String, LogCategory, CaseIterable {
             /// Log category for all sync client related logs.
             case all = "Realm.Sync.Client"
             /// Log category for all sync client session related logs.
@@ -247,8 +233,7 @@ public enum Category: String, LogCategory {
     }
 }
 
-internal extension ObjectiveCSupport {
-
+public extension ObjectiveCSupport {
     /// Converts a Swift category `LogCategory` to an Objective-C `RLMLogCategory.
     /// - Parameter value: The `LogCategory`.
     /// - Returns: Conversion of `value` to its Objective-C representation.

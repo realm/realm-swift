@@ -1,13 +1,25 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Added support for filtering logs by category. Users wil have more fine grained control over
-  the log level for each category as well.
+* Redesign the Logger API to allow dynamically adding and removing log
+  callbacks and setting separate log levels for different categories.
+
   ```swift
-  Logger.setLogLevel(.info, category: Category.Storage.transactions)
+  // Unlike setting Logger.shared, this can be done at any time rather than
+  // having to be done before opening a Realm
+  Logger.add { level, category, message in
+    print("Realm Log - \(category.rawValue)-\(level): \(message)")
+  }
+  // Set the log level for just sync messages to warn
+  Logger.set(level: .warn, category: Category.Sync.all)
+  // Equivalent to old Logger.shared.level = .all
+  Logger.set(level: .all, category: Category.realm)
   ```
+
+  The old API remains for backwards compatibility but is deprecated. The two
+  cannot be mixed and setting `Logger.shared` will disable `Logger.add`.
 * Code sign our published xcframeworks. By Apple's requirements, we should sign our release
-  binaries so Xcode can validate it was signed by the same developer on every new version. 
+  binaries so Xcode can validate it was signed by the same developer on every new version.
   ([Apple](https://developer.apple.com/support/third-party-SDK-requirements/)).
 * Report sync warnings from the server such as sync being disabled server-side to the sync error handler.
   ([#8020](https://github.com/realm/realm-swift/issues/8020)).
@@ -18,9 +30,10 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Deprecations
 * `RLMLogger.level`/`Logger.level` has been deprecated in favor of using
-  `RLMLogger.setLevel:forCategory:`/`Logger.setLevel(:category:)` and
-  `RLMLogger.getLevelForCategory:`/`Logger.getLevel(for:)`.
-* It is not recommended to initialize a `RLMLogger/Logger` with a level anymore.
+  `RLMLogger.setLevel:forCategory:`/`Logger.set(level:category:)` and
+  `RLMLogger.levelForCategory:`/`Logger.level(for:)`.
+* Initializing `RLMLogger`/`Logger` instances is deprecated in favor of calling
+  `+[RLMLogger addLogFunction:]`/`Logger.add()`.
 
 ### Compatibility
 * Realm Studio: 15.0.0 or later.

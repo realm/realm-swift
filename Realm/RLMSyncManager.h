@@ -105,25 +105,25 @@ __attribute__((deprecated("This property is not used for anything")));
  The logging threshold which newly opened synced Realms will use. Defaults to
  `RLMSyncLogLevelInfo`.
 
- By default logging strings are output to Apple System Logger. Set `logger` to
+ By default logging strings are output to NSLog. Set `logger` to
  perform custom logging logic instead.
 
  @warning This property must be set before any synced Realms are opened. Setting it after
           opening any synced Realm will do nothing.
  */
 @property (atomic) RLMSyncLogLevel logLevel
-__attribute__((deprecated("Use `RLMLogger.default.level`/`Logger.shared.level` to set/get the default logger threshold level.")));
+__attribute__((deprecated("Use `Logger.set(level: level, category: Category.Sync.all)` to set the log level for sync operations.")));
 
 /**
  The function which will be invoked whenever the sync client has a log message.
 
- If nil, log strings are output to Apple System Logger instead.
+ If nil, log strings are output to RLMLogger instead.
 
  @warning This property must be set before any synced Realms are opened. Setting
           it after opening any synced Realm will do nothing.
  */
 @property (atomic, nullable) RLMSyncLogFunction logger
-__attribute__((deprecated("Use `RLMLogger.default`/`Logger.shared` to set/get the default logger.")));
+__attribute__((deprecated("Use `Logger.add(function:)` and filter messages by category.")));
 
 /**
  The name of the HTTP header to send authorization data in when making requests to Atlas App Services which has

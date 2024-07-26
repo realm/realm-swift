@@ -40,8 +40,7 @@ FOUNDATION_EXTERN void RLMTestLog(RLMLogCategory category, RLMLogLevel level, co
 /// Logger function for operations within the SDK, to be used from obj-c code.
 void RLMLog(RLMLogLevel level, NSString *format, ...);
 
-// Helpers for the Swift Logger.log() function
+// Helper for the Swift Logger.log() function
 FOUNDATION_EXTERN void RLMLogRaw(RLMLogLevel level, NSString *message);
-FOUNDATION_EXTERN void RLMLogDeferred(RLMLogLevel level, NSString *(NS_NOESCAPE ^message)(void));
 
 RLM_HEADER_AUDIT_END(nullability)

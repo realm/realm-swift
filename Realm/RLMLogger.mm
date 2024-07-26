@@ -22,8 +22,6 @@
 
 #import <realm/util/logger.hpp>
 
-typedef void (^RLMLoggerFunction)(RLMLogLevel level, RLMLogCategory category, NSString *message);
-
 using namespace realm;
 using Logger = realm::util::Logger;
 using Level = Logger::Level;
@@ -60,38 +58,38 @@ static RLMLogLevel logLevelForLevel(Level logLevel) {
     REALM_UNREACHABLE();    // Unrecognized log level.
 }
 
-static NSString* levelPrefix(Level logLevel) {
+static NSString* levelPrefix(RLMLogLevel logLevel) {
     switch (logLevel) {
-        case Level::off:    return @"";
-        case Level::all:    return @"";
-        case Level::trace:  return @"Trace";
-        case Level::debug:  return @"Debug";
-        case Level::detail: return @"Detail";
-        case Level::info:   return @"Info";
-        case Level::error:  return @"Error";
-        case Level::warn:   return @"Warning";
-        case Level::fatal:  return @"Fatal";
+        case RLMLogLevelOff:    return @"";
+        case RLMLogLevelAll:    return @"";
+        case RLMLogLevelTrace:  return @"Trace";
+        case RLMLogLevelDebug:  return @"Debug";
+        case RLMLogLevelDetail: return @"Detail";
+        case RLMLogLevelInfo:   return @"Info";
+        case RLMLogLevelError:  return @"Error";
+        case RLMLogLevelWarn:   return @"Warning";
+        case RLMLogLevelFatal:  return @"Fatal";
     }
     REALM_UNREACHABLE();    // Unrecognized log level.
 }
 
 static LogCategory& categoryForLogCategory(RLMLogCategory logCategory) {
     switch (logCategory) {
-        case RLMLogCategoryRealm: return LogCategory::realm;
-        case RLMLogCategorySDK: return LogCategory::sdk;
-        case RLMLogCategoryApp: return LogCategory::app;
-        case RLMLogCategoryStorage: return LogCategory::storage;
-        case RLMLogCategoryStorageTransaction: return LogCategory::transaction;
-        case RLMLogCategoryStorageQuery: return LogCategory::query;
-        case RLMLogCategoryStorageObject: return LogCategory::object;
+        case RLMLogCategoryRealm:               return LogCategory::realm;
+        case RLMLogCategorySDK:                 return LogCategory::sdk;
+        case RLMLogCategoryApp:                 return LogCategory::app;
+        case RLMLogCategoryStorage:             return LogCategory::storage;
+        case RLMLogCategoryStorageTransaction:  return LogCategory::transaction;
+        case RLMLogCategoryStorageQuery:        return LogCategory::query;
+        case RLMLogCategoryStorageObject:       return LogCategory::object;
         case RLMLogCategoryStorageNotification: return LogCategory::notification;
-        case RLMLogCategorySync:  return LogCategory::sync;
-        case RLMLogCategorySyncClient: return LogCategory::client;
-        case RLMLogCategorySyncClientSession: return LogCategory::session;
+        case RLMLogCategorySync:                return LogCategory::sync;
+        case RLMLogCategorySyncClient:          return LogCategory::client;
+        case RLMLogCategorySyncClientSession:   return LogCategory::session;
         case RLMLogCategorySyncClientChangeset: return LogCategory::changeset;
-        case RLMLogCategorySyncClientNetwork: return LogCategory::network;
-        case RLMLogCategorySyncClientReset: return LogCategory::reset;
-        case RLMLogCategorySyncServer: return LogCategory::server;
+        case RLMLogCategorySyncClientNetwork:   return LogCategory::network;
+        case RLMLogCategorySyncClientReset:     return LogCategory::reset;
+        case RLMLogCategorySyncServer:          return LogCategory::server;
     };
     REALM_UNREACHABLE();
 }
@@ -136,28 +134,127 @@ static RLMLogCategory logCategoryForCategory(const LogCategory& category) {
     return find(category);
 }
 
-struct CocoaLogger : public Logger {
+struct DynamicLogger : Logger {
+    RLMUnfairMutex _mutex;
+    NSArray<RLMLogCategoryFunction> *_logFunctions;
+
     void do_log(const LogCategory& category, Level level, const std::string& message) override {
-        NSLog(@"%@:%s %@", levelPrefix(level), category.get_name().c_str(), RLMStringDataToNSString(message));
+        NSArray *loggers;
+        {
+            std::lock_guard lock(_mutex);
+            loggers = _logFunctions;
+        }
+        if (loggers.count == 0) {
+            return;
+        }
+
+        @autoreleasepool {
+            NSString *nsMessage = RLMStringDataToNSString(message);
+            RLMLogCategory rlmCategory = logCategoryForCategory(category);
+            RLMLogLevel rlmLevel = logLevelForLevel(level);
+            for (RLMLogCategoryFunction fn : loggers) {
+                fn(rlmLevel, rlmCategory, nsMessage);
+            }
+        }
     }
 };
+std::optional<DynamicLogger> s_dynamic_logger;
 
 class CustomLogger : public Logger {
 public:
-    RLMLoggerFunction function;
-    void do_log(const LogCategory& category, Level level, const std::string& message) override {
+    RLMLogFunction function;
+    void do_log(const LogCategory&, Level level, const std::string& message) override {
         @autoreleasepool {
-            function(logLevelForLevel(level), logCategoryForCategory(category), RLMStringDataToNSString(message));
+            function(logLevelForLevel(level), RLMStringDataToNSString(message));
         }
     }
 };
 } // anonymous namespace
 
+@implementation RLMLoggerToken {
+    RLMLogCategoryFunction _function;
+}
+
+- (instancetype)initWithFunction:(RLMLogCategoryFunction)function {
+    if (self = [super init]) {
+        _function = function;
+    }
+    return self;
+}
+
+- (void)invalidate {
+    std::lock_guard lock(s_dynamic_logger->_mutex);
+    if (!_function) {
+        return;
+    }
+    auto& functions = s_dynamic_logger->_logFunctions;
+    functions = [functions filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF != %@", _function]];
+    _function = nil;
+}
+
+@end
+
 @implementation RLMLogger {
     std::shared_ptr<Logger> _logger;
 }
 
-typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
+#pragma mark - Dynamic category-based API
+
++ (void)initialize {
+    // Constructing the global logger is deferred slightly because constructing
+    // a Logger references non-constinit global variables (the logger categories)
+    // and so if the logger is a global variable it runs into the initialization
+    // order fiasco.
+    s_dynamic_logger.emplace();
+    [self resetToDefault];
+}
+
++ (void)resetToDefault {
+    {
+        std::lock_guard lock(s_dynamic_logger->_mutex);
+        static RLMLogCategoryFunction defaultLogger = ^(RLMLogLevel level, RLMLogCategory category,
+                                                        NSString *message) {
+            NSLog(@"%@:%s %@", levelPrefix(level), categoryForLogCategory(category).get_name().c_str(), message);
+        };
+        s_dynamic_logger->_logFunctions = @[defaultLogger];
+        s_dynamic_logger->set_level_threshold(LogCategory::realm, Level::info);
+    }
+    // Use a custom no-op deleter because our logger is statically allocated and
+    // shouldn't actually be deleted when there's no references to it
+    Logger::set_default_logger(std::shared_ptr<Logger>(&*s_dynamic_logger, [](Logger *) {}));
+}
+
++ (RLMLoggerToken *)addLogFunction:(RLMLogCategoryFunction)function {
+    {
+        std::lock_guard lock(s_dynamic_logger->_mutex);
+        // We construct a new array each time rather than using a mutable array
+        // so that do_log() can just acquire the pointer under lock without
+        // having to worry about the array being mutated on another thread
+        auto& functions = s_dynamic_logger->_logFunctions;
+        if (functions.count) {
+            functions = [functions arrayByAddingObject:function];
+        }
+        else {
+            functions = @[function];
+        }
+    }
+    return [[RLMLoggerToken alloc] initWithFunction:function];
+}
+
++ (void)removeAll {
+    std::lock_guard lock(s_dynamic_logger->_mutex);
+    s_dynamic_logger->_logFunctions = nil;
+}
+
++ (void)setLevel:(RLMLogLevel)level forCategory:(RLMLogCategory)category {
+    s_dynamic_logger->set_level_threshold(categoryForLogCategory(category), levelForLogLevel(level));
+}
+
++ (RLMLogLevel)levelForCategory:(RLMLogCategory)category {
+    return logLevelForLevel(s_dynamic_logger->get_level_threshold(categoryForLogCategory(category)));
+}
+
+#pragma mark - Deprecated API
 
 - (RLMLogLevel)level {
     return logLevelForLevel(_logger->get_level_threshold());
@@ -165,12 +262,6 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 - (void)setLevel:(RLMLogLevel)level {
     _logger->set_level_threshold(levelForLogLevel(level));
-}
-
-+ (void)initialize {
-    auto defaultLogger = std::make_shared<CocoaLogger>();
-    defaultLogger->set_level_threshold(LogCategory::realm, Level::info);
-    Logger::set_default_logger(defaultLogger);
 }
 
 - (instancetype)initWithLogger:(std::shared_ptr<Logger>)logger {
@@ -185,32 +276,20 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     if (self = [super init]) {
         auto logger = std::make_shared<CustomLogger>();
         logger->set_level_threshold(levelForLogLevel(level));
-        logger->function = ^(RLMLogLevel level, RLMLogCategory, NSString *message) {
-            logFunction(level, message);
-        };
-        self->_logger = logger;
-    }
-    return self;
-}
-
-- (instancetype)initWithLogFunction:(RLMLogCategoryFunction)logFunction {
-    if (self = [super init]) {
-        auto logger = std::make_shared<CustomLogger>();
         logger->function = logFunction;
         self->_logger = logger;
     }
     return self;
 }
 
-+ (void)setLevel:(RLMLogLevel)level forCategory:(RLMLogCategory)category {
-    auto defaultLogger = Logger::get_default_logger();
-    defaultLogger->set_level_threshold(categoryForLogCategory(category).get_name(), levelForLogLevel(level));
++ (instancetype)defaultLogger {
+    return [[RLMLogger alloc] initWithLogger:Logger::get_default_logger()];
 }
 
-+ (RLMLogLevel)levelForCategory:(RLMLogCategory)category {
-    auto defaultLogger = Logger::get_default_logger();
-    return logLevelForLevel(defaultLogger->get_level_threshold(categoryForLogCategory(category).get_name()));
++ (void)setDefaultLogger:(RLMLogger *)logger {
+    Logger::set_default_logger(logger->_logger);
 }
+
 
 #pragma mark Testing
 
@@ -229,17 +308,9 @@ void RLMTestLog(RLMLogCategory category, RLMLogLevel level, const char *message)
                                       levelForLogLevel(level),
                                       "%1", message);
 }
-
-#pragma mark Global Logger Setter
-
-+ (instancetype)defaultLogger {
-    return [[RLMLogger alloc] initWithLogger:Logger::get_default_logger()];
-}
-
-+ (void)setDefaultLogger:(RLMLogger *)logger {
-    Logger::set_default_logger(logger->_logger);
-}
 @end
+
+#pragma mark - Internal logging functions
 
 void RLMLog(RLMLogLevel logLevel, NSString *format, ...) {
     auto level = levelForLogLevel(logLevel);
@@ -250,14 +321,6 @@ void RLMLog(RLMLogLevel logLevel, NSString *format, ...) {
         logger->log(LogCategory::sdk, level, "%1",
                     [[NSString alloc] initWithFormat:format arguments:args].UTF8String);
         va_end(args);
-    }
-}
-
-void RLMLogDeferred(RLMLogLevel logLevel, NSString *(NS_NOESCAPE ^message)()) {
-    auto level = levelForLogLevel(logLevel);
-    auto logger = Logger::get_default_logger();
-    if (logger->would_log(LogCategory::sdk, level)) {
-        logger->log(LogCategory::sdk, level, "%1", message().UTF8String);
     }
 }
 
