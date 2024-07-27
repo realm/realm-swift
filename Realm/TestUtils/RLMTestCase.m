@@ -96,6 +96,9 @@ static BOOL encryptTests(void) {
     // resetting the simulator
     [NSFileManager.defaultManager createDirectoryAtURL:RLMDefaultRealmURL().URLByDeletingLastPathComponent
                            withIntermediateDirectories:YES attributes:nil error:nil];
+
+    [RLMLogger resetToDefault];
+    [RLMLogger setLevel:RLMLogLevelWarn forCategory:RLMLogCategorySync];
 }
 
 // This ensures the shared schema is initialized outside of of a test case,
@@ -114,6 +117,11 @@ static BOOL encryptTests(void) {
 
 @implementation RLMTestCase {
     dispatch_queue_t _bgQueue;
+}
+
+- (void)tearDown {
+    [RLMLogger resetToDefault];
+    [RLMLogger setLevel:RLMLogLevelWarn forCategory:RLMLogCategorySync];
 }
 
 - (void)deleteFiles {
