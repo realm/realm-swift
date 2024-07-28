@@ -986,4 +986,32 @@ class MixedCollectionTest: TestCase, @unchecked Sendable {
         XCTAssertEqual(countValue, 12)
         XCTAssertTrue(accessNestedValueValue)
     }
+
+    func testCollectionReassign() throws {
+        let dictionary: Dictionary<String, AnyRealmValue> = [
+            "key1": .string("hello"),
+            "key2": .bool(false),
+        ]
+
+        let dictionary1: Dictionary<String, AnyRealmValue> = [
+            "key1": .string("adios"),
+        ]
+
+        let o = AnyRealmTypeObject()
+        o.anyValue.value = AnyRealmValue.fromDictionary(dictionary)
+
+        let realm = realmWithTestPath()
+        try realm.write {
+            realm.add(o)
+
+        }
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["key1"], .string("hello"))
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["key2"], .bool(false))
+
+        try realm.write {
+            o.anyValue.value = AnyRealmValue.fromDictionary(dictionary1)
+        }
+        XCTAssertEqual(o.anyValue.value.dictionaryValue?["key1"], .string("adios"))
+        XCTAssertNil(o.anyValue.value.dictionaryValue?["key2"])
+    }
 }
