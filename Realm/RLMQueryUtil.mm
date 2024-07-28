@@ -701,6 +701,14 @@ Query make_diacritic_sensitive_constraint(NSPredicateOperatorType operatorType,
             return column.not_equal(value, caseSensitive);
         case NSLikePredicateOperatorType:
             return column.like(value, caseSensitive);
+        case NSLessThanPredicateOperatorType:
+            return column < value;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return column <= value;
+        case NSGreaterThanPredicateOperatorType:
+            return column > value;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return column >= value;
         default: {
             if constexpr (is_any_v<C, Columns<String>, Columns<Lst<String>>, Columns<Set<String>>, ColumnDictionaryKeys>) {
                 unsupportedOperator(RLMPropertyTypeString, operatorType);
