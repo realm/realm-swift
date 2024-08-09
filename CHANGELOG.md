@@ -1,3 +1,43 @@
+10.52.3 Release notes (2024-08-09)
+=============================================================
+
+### Enhancements
+
+* Improve performance of bulk object creation when the objects have embedded
+  objects. This is particularly significant for applying sync bootstraps.
+  ([Core #7945](https://github.com/realm/realm-core/issues/7945))
+* Client reset cycle detection now checks if the previous recovery attempt was
+  made by the same version of Realm, and if not attempts recovery again
+  ([Core #7944](https://github.com/realm/realm-core/pull/7944)).
+
+### Fixed
+
+* App change notifications were being sent too soon when a new user was logged
+  in, resulting in the user's profile being empty if it was read from within
+  the change notification (since v10.51.0).
+* A conflict resolution bug related to ArrayErase and Clear instructions could
+  sometimes cause an "Invalid prior_size" exception when synchronizing
+  ([Core #7893](https://github.com/realm/realm-core/issues/7893), since v10.51.0.
+* Sync merges which resulted in a changeset's reciprotal transformation being
+  empty were handled incorrectly, possibly resulting in data divergence. No
+  instances of this actually happening have been reported.
+  ([Core #7955](https://github.com/realm/realm-core/pull/7955), since v10.51.0)
+* `Realm.writeCopy()` would sometimes incorrectly throw an exception claiming
+  that there were unuploaded local changes when the source Realm is a
+  synchronized Realm ([Core #7966](https://github.com/realm/realm-core/issues/7966), since v10.7.6).
+
+### Compatibility
+
+* Realm Studio: 15.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 15.4.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 15.1.0-16 beta 5.
+
+### Internal
+
+* Upgraded realm-core from v14.11.1 to 14.12.0
+
 10.52.2 Release notes (2024-07-19)
 =============================================================
 

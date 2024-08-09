@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersion = Version("14.11.0")
-let cocoaVersion = Version("10.52.2")
+let coreVersion = Version("14.12.0")
+let cocoaVersion = Version("10.52.3")
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
