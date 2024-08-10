@@ -469,7 +469,7 @@ class Admin {
 public enum SyncMode {
     case pbs(String) // partition based
     case flx([String]) // flexible sync
-    case notSync
+    case none
 }
 
 // MARK: RealmServer
@@ -816,7 +816,8 @@ public class RealmServer: NSObject {
             }
         }
 
-        if case .notSync = syncMode {
+        if case .none = syncMode {
+            try group.throwingWait(timeout: .now() + 5.0)
             return clientAppId
         }
 
@@ -1018,8 +1019,8 @@ public class RealmServer: NSObject {
         return try createApp(syncMode: .pbs(partitionKeyType), types: types, persistent: persistent)
     }
 
-    @objc public func createNotSyncApp() throws -> AppId {
-        return try createApp(syncMode: .notSync, types: [], persistent: false)
+    @objc public func createNonSyncApp() throws -> AppId {
+        return try createApp(syncMode: .none, types: [], persistent: false)
     }
 
     /// Delete all Apps created without `persistent: true`
