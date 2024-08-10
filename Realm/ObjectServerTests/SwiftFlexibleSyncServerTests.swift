@@ -1188,7 +1188,7 @@ class SwiftFlexibleSyncTests: SwiftSyncTestCase {
     }
 
     func testFlexibleSyncNotEnabledError() throws {
-        let appId = try RealmServer.shared.createNotSyncApp()
+        let appId = try RealmServer.shared.createNonSyncApp()
         let app = app(id: appId)
         let ex = expectation(description: "Waiting for error handler to be called...")
         ex.assertForOverFulfill = false // error handler can legally be called multiple times
