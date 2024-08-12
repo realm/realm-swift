@@ -73,7 +73,7 @@ SwiftVersion.swift
 examples/ios/objc/Draw/Constants.h
 
 ## Sync testing
-/.baas
+/ci_scripts/setup_baas/.baas
 
 ## Swiftpm
 .swiftpm

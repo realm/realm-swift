@@ -5,7 +5,7 @@ require 'fileutils'
 require 'pathname'
 
 BASE_DIR = Dir.pwd
-BUILD_DIR = "#{BASE_DIR}/.baas"
+BUILD_DIR = "#{BASE_DIR}/ci_scripts/setup_baas/.baas"
 BIN_DIR = "#{BUILD_DIR}/bin"
 LIB_DIR = "#{BUILD_DIR}/lib"
 PID_FILE = "#{BUILD_DIR}/pid.txt"
@@ -29,13 +29,13 @@ STITCH_SUPPORT_URL="https://static.realm.io/downloads/swift/stitch-support.tar.x
 MONGO_DIR="#{BUILD_DIR}/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 
 # exit immediately if any subcommand fails
-class Object
-  def `(command)
-    ret = super
-    exit 1 unless $?.success?
-    ret
-  end
-end
+#class Object
+#  def `(command)
+#    ret = super
+#    exit 1 unless $?.success?
+#    ret
+#  end
+#end
 
 def setup_mongod
     if !File.exist?("#{BIN_DIR}/mongo")
@@ -141,6 +141,8 @@ def setup_stitch
         puts `chmod +x '#{assisted_agg_filepath}'`
     end
 
+    puts "Checking node installation #{`which node || true`.empty?}"
+    puts "Checking node local installation #{!Dir.exist?("#{BUILD_DIR}/node-v#{NODE_VERSION}-darwin-x64")}"
     if `which node || true`.empty? && !Dir.exist?("#{BUILD_DIR}/node-v#{NODE_VERSION}-darwin-x64")
         puts "downloading node 🚀"
         puts `cd '#{BUILD_DIR}' && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" && tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
