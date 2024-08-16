@@ -2,10 +2,9 @@
 
 set -eo pipefail
 
-env
-
+cd "$(dirname "$0")"/..
 if [[ "$CI_WORKFLOW" == "sync"* ]]; then
-    cd ..
+    pwd
+    ls -l
     sh build.sh setup-baas
-    sh build.sh download-core
 fi

@@ -519,6 +519,7 @@ public class RealmServer: NSObject {
 
     /// Check if the BaaS files are present and we can run the server
     @objc public class func haveServer() -> Bool {
+        print("SERVER DIR: \(rootUrl)")
         let goDir = RealmServer.buildDir.appendingPathComponent("stitch")
         return FileManager.default.fileExists(atPath: goDir.path)
     }

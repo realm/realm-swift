@@ -2,46 +2,26 @@
 
 set -eo pipefail
 
-######################################
-# Dependency Installer
-######################################
-
-USE_BUNDLE_EXEC=''
-install_dependencies() {
-    echo ">>> Installing dependencies for ${CI_WORKFLOW}"
-
-    if [[ "$CI_WORKFLOW" == "docs"* ]]; then
-        install_ruby
-    elif [[ "$CI_WORKFLOW" == "swiftlint"* ]]; then
-        brew install swiftlint
-    elif [[ "$CI_WORKFLOW" == "cocoapods"* ]]; then
-        install_ruby
-    #elif [[ "$CI_WORKFLOW" == "sync"* ]]; then
-    # elif [[ "$CI_WORKFLOW" == "sync"* ]] || [[ "$CI_WORKFLOW" == "swiftpm"* ]]; then
-#        sh build.sh setup-baas
-#        sh build.sh download-core
-    elif [[ "$CI_WORKFLOW" = *"spm"* ]] || [[ "$CI_WORKFLOW" = "xcframework"* ]]; then
-        install_ruby
-    elif [[ "$CI_WORKFLOW" == *"carthage"* ]]; then
-        brew install carthage
-    else
-        sh build.sh download-core
-    fi
-}
-
-install_ruby() {
-    echo ">>> Installing new Version of ruby"
-    brew install rbenv ruby-build
-    rbenv install
-    eval "$(rbenv init -)"
-    bundle install
-    USE_BUNDLE_EXEC=true
-}
-
-env
-
 cd "$(dirname "$0")"/..
-install_dependencies
+USE_BUNDLE_EXEC=''
+case "$CI_WORKFLOW" in
+    docs* | cocoapods* | *spm* | xcframework*)
+        brew install rbenv ruby-build
+        rbenv install
+        eval "$(rbenv init -)"
+        bundle install
+        USE_BUNDLE_EXEC=true
+        ;;
+    swiftlint*)
+        brew install swiftlint
+        ;;
+    carthage*)
+        brew install carthage
+        ;;
+    *)
+        sh build.sh download-core
+        ;;
+esac
 
 # Xcode Cloud doesn't let us set the configuration to build, so set it by
 # modifying the scheme files
@@ -71,16 +51,9 @@ if [[ "$target" == *-encryption ]]; then
 EOF
 fi
 
-# In release we are creating some workflows which build the framework for each platform, target and configuration, 
-# and we need to set the linker flags in the Configuration file.
 if [[ "$target" == "release-package-build-"* ]]; then
     filename="Configuration/Release.xcconfig"
     sed -i '' "s/REALM_HIDE_SYMBOLS = NO;/REALM_HIDE_SYMBOLS = YES;/" "$filename"
-fi
-
-# Xcode cloud currently doesn't have visionOS installed for Xcode 15.3
-if [[ "$CI_WORKFLOW" == release-package-build-vision*_15.3 ]]; then
-    xcodebuild -downloadAllPlatforms
 fi
 
 # If we're building the dummy CI target then run the test. Other schemes are
