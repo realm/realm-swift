@@ -130,6 +130,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     configuration->_customSchema = _customSchema;
     configuration->_eventConfiguration = _eventConfiguration;
     configuration->_migrationObjectClass = _migrationObjectClass;
+    configuration->_seedFilePath = _seedFilePath;
     return configuration;
 }
 

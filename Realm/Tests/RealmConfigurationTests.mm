@@ -226,4 +226,14 @@
     XCTAssertTrue(migrationCalled);
 }
 
+-(void)testCopyConfiguration {
+    RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
+    configuration.fileURL = [NSURL fileURLWithPath:@"/dev/null"];
+    configuration.seedFilePath = [NSURL fileURLWithPath:@"/dev/null/seed"];
+
+    RLMRealmConfiguration *copy = [configuration copy];
+    XCTAssertEqualObjects(copy.fileURL, [NSURL fileURLWithPath:@"/dev/null"]);
+    XCTAssertEqualObjects(copy.seedFilePath, [NSURL fileURLWithPath:@"/dev/null/seed"]);
+}
+
 @end
