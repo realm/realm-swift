@@ -128,7 +128,9 @@
 }
 @end
 
-@implementation RLMSyncSubscriptionEnumerator
+@implementation RLMSyncSubscriptionEnumerator {
+    RLMSyncSubscriptionSet *_subscriptionSet;
+}
 
 - (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet {
     if (self = [super init]) {

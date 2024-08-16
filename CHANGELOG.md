@@ -13,8 +13,10 @@ x.y.z Release notes (yyyy-MM-dd)
   ([#8020](https://github.com/realm/realm-swift/issues/8020)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* `-[RLMAsymmetricObject createObject:withValue:]` was marked as having a
+  non-null return value despite always returning `nil` (since v10.29.0).
+* Eliminate several clang static analyzer warnings which did not report actual
+  bugs.
 
 ### Deprecations
 * `RLMLogger.level`/`Logger.level` has been deprecated in favor of using

@@ -1088,7 +1088,7 @@ static vm_size_t get_resident_size(void) {
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     RLMResults *results = [DogObject objectsWhere:@"ANY owners.name == 'James'"];
-    id token = [results addNotificationBlock:^(__unused RLMResults *results, RLMCollectionChange *change, __unused NSError *error) {
+    RLMNotificationToken *token = [results addNotificationBlock:^(__unused RLMResults *results, RLMCollectionChange *change, __unused NSError *error) {
         if (change != nil) {
             [expectation fulfill];
         }
@@ -1108,7 +1108,7 @@ static vm_size_t get_resident_size(void) {
     XCTAssertEqualObjects(dog.dogName, [results.firstObject dogName]);
 
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
-    token = nil;
+    [token invalidate];
 }
 
 - (void)testDistinctQuery {

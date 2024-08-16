@@ -219,7 +219,7 @@ static void setOptionalString(std::optional<std::string>& dst, NSString *src) {
 }
 
 - (NSString *)baseURL {
-    return getOptionalString(_config.base_url) ?: RLMStringViewToNSString(app::App::default_base_url());
+    return getOptionalString(_config.base_url) ?: RLMStringViewToNSString(app::App::default_base_url()) ?: @"";
 }
 
 - (void)setBaseURL:(nullable NSString *)baseURL {

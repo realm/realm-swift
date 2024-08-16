@@ -194,11 +194,9 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /// Wait for downloads to complete; drop any error.
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm;
-- (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Wait for uploads to complete; drop any error.
 - (void)waitForUploadsForRealm:(RLMRealm *)realm;
-- (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Set the user's tokens to invalid ones to test invalid token handling.
 - (void)setInvalidTokensForUser:(RLMUser *)user;

@@ -76,7 +76,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
  @return  Returns `nil`
  */
-+ (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value;
++ (nullable instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value;
 
 #pragma mark - Properties
 

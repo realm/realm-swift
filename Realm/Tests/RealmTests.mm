@@ -2849,20 +2849,20 @@
     RLMSetSkipBackupAttribute(true);
     [self measureBlock:^{
         @autoreleasepool {
-            RLMRealm *realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
-            realm = [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
+            [RLMRealm defaultRealm];
         }
         @autoreleasepool { [RLMRealm defaultRealm]; }
     }];
