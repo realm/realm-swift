@@ -132,7 +132,7 @@ Interested in getting started for free with [a template application](https://git
 
 ## Documentation
 
-The documentation can be found at [mongodb.com/docs/atlas/device-sdks/sdk/swift/](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift//).
+The documentation can be found at [mongodb.com/docs/atlas/device-sdks/sdk/swift/](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/).
 The API reference is located at [mongodb.com/docs/realm-sdks/swift/latest/](https://www.mongodb.com/docs/realm-sdks/swift/latest/)
 
 ## Getting Help
