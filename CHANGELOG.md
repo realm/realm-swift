@@ -1,11 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* Added support for filtering logs by category. Users wil have more fine grained control over
-  the log level for each category as well.
-  ```swift
-  Logger.setLogLevel(.info, category: Category.Storage.transactions)
-  ```
 * Code sign our published xcframeworks. By Apple's requirements, we should sign our release
   binaries so Xcode can validate it was signed by the same developer on every new version. 
   ([Apple](https://developer.apple.com/support/third-party-SDK-requirements/)).
@@ -17,12 +12,6 @@ x.y.z Release notes (yyyy-MM-dd)
   non-null return value despite always returning `nil` (since v10.29.0).
 * Eliminate several clang static analyzer warnings which did not report actual
   bugs.
-
-### Deprecations
-* `RLMLogger.level`/`Logger.level` has been deprecated in favor of using
-  `RLMLogger.setLevel:forCategory:`/`Logger.setLevel(:category:)` and
-  `RLMLogger.getLevelForCategory:`/`Logger.getLevel(for:)`.
-* It is not recommended to initialize a `RLMLogger/Logger` with a level anymore.
 
 ### Compatibility
 * Realm Studio: 15.0.0 or later.

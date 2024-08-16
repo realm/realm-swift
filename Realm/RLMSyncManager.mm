@@ -38,7 +38,6 @@ using namespace realm;
 
 // NEXT-MAJOR: All the code associated to the logger from sync manager should be removed.
 using Level = realm::util::Logger::Level;
-using LogCategory = realm::util::LogCategory;
 
 namespace {
 Level levelForSyncLogLevel(RLMSyncLogLevel logLevel) {
@@ -74,14 +73,14 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
 #pragma mark - Loggers
 
 struct CocoaSyncLogger : public realm::util::Logger {
-    void do_log(const realm::util::LogCategory& category, Level, const std::string& message) override {
-        NSLog(@"%s: %s", category.get_name().c_str(), message.c_str());
+    void do_log(const realm::util::LogCategory&, Level, const std::string& message) override {
+        NSLog(@"Sync: %@", RLMStringDataToNSString(message));
     }
 };
 
 static std::unique_ptr<realm::util::Logger> defaultSyncLogger(realm::util::Logger::Level level) {
     auto logger = std::make_unique<CocoaSyncLogger>();
-    logger->set_level_threshold(LogCategory::sync, level);
+    logger->set_level_threshold(level);
     return std::move(logger);
 }
 
@@ -155,7 +154,7 @@ std::shared_ptr<realm::util::Logger> RLMWrapLogFunction(RLMSyncLogFunction fn) {
         _syncManager->set_logger_factory([logFn](realm::util::Logger::Level level) {
             auto logger = std::make_unique<CallbackLogger>();
             logger->logFn = logFn;
-            logger->set_level_threshold(LogCategory::sync, level);
+            logger->set_level_threshold(level);
             return logger;
         });
     }

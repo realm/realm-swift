@@ -22,12 +22,11 @@
 
 #import <realm/util/logger.hpp>
 
-typedef void (^RLMLoggerFunction)(RLMLogLevel level, RLMLogCategory category, NSString *message);
+typedef void (^RLMLoggerFunction)(RLMLogLevel level, NSString *message);
 
 using namespace realm;
 using Logger = realm::util::Logger;
 using Level = Logger::Level;
-using LogCategory = realm::util::LogCategory;
 
 namespace {
 static Level levelForLogLevel(RLMLogLevel logLevel) {
@@ -62,7 +61,7 @@ static RLMLogLevel logLevelForLevel(Level logLevel) {
 
 static NSString* levelPrefix(Level logLevel) {
     switch (logLevel) {
-        case Level::off:    return @"";
+        case Level::off:
         case Level::all:    return @"";
         case Level::trace:  return @"Trace";
         case Level::debug:  return @"Debug";
@@ -75,64 +74,19 @@ static NSString* levelPrefix(Level logLevel) {
     REALM_UNREACHABLE();    // Unrecognized log level.
 }
 
-static LogCategory& categoryForLogCategory(RLMLogCategory logCategory) {
-    switch (logCategory) {
-        case RLMLogCategoryRealm: return LogCategory::realm;
-        case RLMLogCategorySDK: return LogCategory::sdk;
-        case RLMLogCategoryApp: return LogCategory::app;
-        case RLMLogCategoryStorage: return LogCategory::storage;
-        case RLMLogCategoryStorageTransaction: return LogCategory::transaction;
-        case RLMLogCategoryStorageQuery: return LogCategory::query;
-        case RLMLogCategoryStorageObject: return LogCategory::object;
-        case RLMLogCategoryStorageNotification: return LogCategory::notification;
-        case RLMLogCategorySync:  return LogCategory::sync;
-        case RLMLogCategorySyncClient: return LogCategory::client;
-        case RLMLogCategorySyncClientSession: return LogCategory::session;
-        case RLMLogCategorySyncClientChangeset: return LogCategory::changeset;
-        case RLMLogCategorySyncClientNetwork: return LogCategory::network;
-        case RLMLogCategorySyncClientReset: return LogCategory::reset;
-        case RLMLogCategorySyncServer: return LogCategory::server;
-    };
-    REALM_UNREACHABLE();
-}
-
-static RLMLogCategory logCategoryForCategoryName(std::string category) {
-    NSDictionary *categories = @{
-        @"Realm": @(RLMLogCategoryRealm),
-        @"Realm.SDK": @(RLMLogCategorySDK),
-        @"Realm.App": @(RLMLogCategoryApp),
-        @"Realm.Storage": @(RLMLogCategoryStorage),
-        @"Realm.Storage.Transaction": @(RLMLogCategoryStorageTransaction),
-        @"Realm.Storage.Query": @(RLMLogCategoryStorageQuery),
-        @"Realm.Storage.Object": @(RLMLogCategoryStorageObject),
-        @"Realm.Storage.Notification": @(RLMLogCategoryStorageNotification),
-        @"Realm.Sync": @(RLMLogCategorySync),
-        @"Realm.Sync.Client": @(RLMLogCategorySyncClient),
-        @"Realm.Sync.Client.Session": @(RLMLogCategorySyncClientSession),
-        @"Realm.Sync.Client.Changeset": @(RLMLogCategorySyncClientChangeset),
-        @"Realm.Sync.Client.Network": @(RLMLogCategorySyncClientNetwork),
-        @"Realm.Sync.Client.Reset": @(RLMLogCategorySyncClientReset),
-        @"Realm.Sync.Server": @(RLMLogCategorySyncServer)
-    };
-    if (NSNumber *logCategory = [categories objectForKey:RLMStringDataToNSString(category)]) {
-        return RLMLogCategory([logCategory intValue]);
-    }
-    REALM_UNREACHABLE();
-}
-
 struct CocoaLogger : public Logger {
-    void do_log(const LogCategory& category, Level level, const std::string& message) override {
-        NSLog(@"%@:%@ %@", levelPrefix(level), RLMStringDataToNSString(category.get_name()), RLMStringDataToNSString(message));
+    void do_log(const realm::util::LogCategory&, Level level, const std::string& message) override {
+        NSLog(@"%@: %@", levelPrefix(level), RLMStringDataToNSString(message));
     }
 };
 
 class CustomLogger : public Logger {
 public:
     RLMLoggerFunction function;
-    void do_log(const LogCategory& category, Level level, const std::string& message) override {
+    void do_log(const realm::util::LogCategory&, Level level, const std::string& message) override {
         @autoreleasepool {
             if (function) {
-                function(logLevelForLevel(level), logCategoryForCategoryName(category.get_name()), RLMStringDataToNSString(message));
+                function(logLevelForLevel(level), RLMStringDataToNSString(message));
             }
         }
     }
@@ -155,7 +109,7 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
 
 + (void)initialize {
     auto defaultLogger = std::make_shared<CocoaLogger>();
-    defaultLogger->set_level_threshold(LogCategory::realm, Level::info);
+    defaultLogger->set_level_threshold(Level::info);
     Logger::set_default_logger(defaultLogger);
 }
 
@@ -166,27 +120,11 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     return self;
 }
 
-- (instancetype)initWithLevel:(RLMLogLevel)level
-                  logFunction:(RLMLogFunction)logFunction {
+- (instancetype)initWithLevel:(RLMLogLevel)level logFunction:(RLMLogFunction)logFunction {
     if (self = [super init]) {
         auto logger = std::make_shared<CustomLogger>();
         logger->set_level_threshold(levelForLogLevel(level));
-        auto block = [logFunction](RLMLogLevel level, RLMLogCategory, NSString *message) {
-            logFunction(level, message);
-        };
-        logger->function = block;
-        self->_logger = logger;
-    }
-    return self;
-}
-
-- (instancetype)initWithLogFunction:(RLMLogCategoryFunction)logFunction {
-    if (self = [super init]) {
-        auto logger = std::make_shared<CustomLogger>();
-        auto block = [logFunction](RLMLogLevel level, RLMLogCategory category, NSString *message) {
-            logFunction(level, category, message);
-        };
-        logger->function = block;
+        logger->function = logFunction;
         self->_logger = logger;
     }
     return self;
@@ -202,46 +140,11 @@ typedef void(^LoggerBlock)(RLMLogLevel level, NSString *message);
     }
 }
 
-- (void)logWithLevel:(RLMLogLevel)logLevel category:(RLMLogCategory)category message:(NSString *)message {
+- (void)logLevel:(RLMLogLevel)logLevel message:(NSString *)message {
     auto level = levelForLogLevel(logLevel);
-    LogCategory& cat = categoryForLogCategory(category);
-    if (_logger->would_log(cat, level)) {
-        _logger->log(cat, levelForLogLevel(logLevel), message.UTF8String);
+    if (_logger->would_log(level)) {
+        _logger->log(level, "%1", message.UTF8String);
     }
-}
-
-- (void)logWithLevel:(RLMLogLevel)logLevel categoryName:(NSString *)categoryName message:(NSString *)message {
-    auto level = levelForLogLevel(logLevel);
-    LogCategory& lcat = LogCategory::get_category(categoryName.UTF8String);
-    if (_logger->would_log(lcat, level)) {
-        _logger->log(lcat, levelForLogLevel(logLevel), message.UTF8String);
-    }
-}
-
-+ (void)setLevel:(RLMLogLevel)level forCategory:(RLMLogCategory)category {
-    auto defaultLogger = Logger::get_default_logger();
-    defaultLogger->set_level_threshold(categoryForLogCategory(category).get_name(), levelForLogLevel(level));
-}
-
-+ (RLMLogLevel)levelForCategory:(RLMLogCategory)category {
-    auto defaultLogger = Logger::get_default_logger();
-    return logLevelForLevel(defaultLogger->get_level_threshold(categoryForLogCategory(category).get_name()));
-}
-
-#pragma mark Testing
-
-+ (NSArray<NSString *> *)allCategories {
-    NSMutableArray<NSString *> *a = [NSMutableArray new];
-    auto categories = LogCategory::get_category_names();
-    for (const auto& category : categories) {
-        NSString *categoryName = RLMStringDataToNSString(category);
-        [a addObject:categoryName];
-    }
-    return a;
-}
-
-+ (RLMLogCategory)categoryFromString:(NSString *)string {
-    return logCategoryForCategoryName(string.UTF8String);
 }
 
 #pragma mark Global Logger Setter
