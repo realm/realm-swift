@@ -237,6 +237,8 @@
     // Nonexistent aggregate operators
     RLMAssertThrowsWithReason([PersonObject objectsWhere:@"children.@average.age == 5"],
                               @"Unsupported collection operation '@average'");
+    RLMAssertThrowsWithReason([PersonObject objectsWhere:@"name <[c] 'name'"],
+                              @"Lexicographical comparisons must be case-sensitive");
 
     // block-based predicate
     NSPredicate *pred = [NSPredicate predicateWithBlock:^BOOL (__unused id obj, __unused NSDictionary *bindings) {
@@ -373,11 +375,9 @@
 {
     XCTAssertThrows([StringObject objectsWhere:@"stringCol MATCHES 'abc'"]);
     XCTAssertThrows([StringObject objectsWhere:@"stringCol BETWEEN {'a', 'b'}"]);
-    XCTAssertThrows([StringObject objectsWhere:@"stringCol < 'abc'"]);
 
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol MATCHES 'abc'"]);
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol BETWEEN {'a', 'b'}"]);
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol < 'abc'"]);
 }
 
 - (void)testBinaryComparisonInPredicate {
@@ -392,11 +392,10 @@
 
     RLMAssertCount(BinaryObject, 0U, @"binaryCol = %@", data);
     RLMAssertCount(BinaryObject, 0U, @"binaryCol != %@", data);
-
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol < %@", data]));
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol <= %@", data]));
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol > %@", data]));
-    XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol >= %@", data]));
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol > %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol >= %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol < %@", data);
+    RLMAssertCount(BinaryObject, 0U, @"binaryCol <= %@", data);
 
     XCTAssertThrows(([BinaryObject objectsWhere:@"binaryCol MATCHES %@", data]));
 }
@@ -1800,8 +1799,6 @@
 
 - (void)testLinkQueryString
 {
-    RLMRealm *realm = [self realm];
-
     [self makeDogWithName:@"Harvie" owner:@"Tim"];
     RLMAssertCount(OwnerObject, 1U, @"dog.dogName  = 'Harvie'");
     RLMAssertCount(OwnerObject, 0U, @"dog.dogName != 'Harvie'");
@@ -1837,8 +1834,10 @@
     RLMAssertCount(OwnerObject, 4U, @"dog.dogName == dog.dogName");
     RLMAssertCount(OwnerObject, 0U, @"dog.dogName != dog.dogName");
 
-    // test invalid operators
-    XCTAssertThrows([OwnerObject objectsInRealm:realm where:@"dog.dogName > 'Harvie'"], @"Invalid operator should throw");
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName > 'Harvie'");
+    RLMAssertCount(OwnerObject, 3U, @"dog.dogName >= 'Harvie'");
+    RLMAssertCount(OwnerObject, 1U, @"dog.dogName < 'Harvie'");
+    RLMAssertCount(OwnerObject, 3U, @"dog.dogName <= 'Harvie'");
 }
 
 - (void)testLinkQueryInt
@@ -3649,6 +3648,10 @@ static NSData *data(const char *str) {
     RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[c] %@", property, values[0]);
     RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues =[cd] %@", property, values[0]);
     RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues !=[cd] %@", property, values[0]);
+    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues > %@", property, values[0]);
+    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues >= %@", property, values[0]);
+    RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues < %@", property, values[0]);
+    RLMAssertCount(AllDictionariesObject, 2U, @"ANY %K.@allValues <= %@", property, values[0]);
 
     RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues LIKE %@", property,
                    [NSData dataWithBytes:"hello" length:5]);
@@ -3661,9 +3664,6 @@ static NSData *data(const char *str) {
     RLMAssertCount(AllDictionariesObject, 1U, @"ANY %K.@allValues ENDSWITH %@", property,
                    [NSData dataWithBytes:"lo" length:2]);
 
-    // Unsupported
-    RLMAssertThrowsWithReasonMatching(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues > %@", property, values[0]]), @"not supported");
-    RLMAssertThrowsWithReasonMatching(([AllDictionariesObject objectsInRealm:realm where:@"ANY %K.@allValues < %@", property, values[0]]), @"not supported");
 }
 
 - (void)testDictionaryQueryAllValues {

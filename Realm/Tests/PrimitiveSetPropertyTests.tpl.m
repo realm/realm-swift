@@ -755,10 +755,10 @@ static double average(NSArray *values) {
 
     %man RLMAssertCount($class, 0, @"ANY $prop = %@", $v0);
     %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop >= %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop <= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop >= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop <= %@", $v0);
 
     [self createObjectWithValueIndex:0];
 
@@ -766,12 +766,12 @@ static double average(NSArray *values) {
     %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v0);
     %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
     %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v1);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop >= %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
-    %o %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop >= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %r %man %comp RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
+    %o %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
 
     [self createObjectWithValueIndex:1];
 
@@ -779,21 +779,21 @@ static double average(NSArray *values) {
     %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v1);
     %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v0);
     %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v1);
-    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop > %@", $v0);
-    %r %man %minmax RLMAssertCount($class, 2, @"ANY $prop >= %@", $v0);
-    %r %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
-    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
-    %r %man %minmax RLMAssertCount($class, 2, @"ANY $prop <= %@", $v1);
+    %r %man %comp RLMAssertCount($class, 1, @"ANY $prop > %@", $v0);
+    %r %man %comp RLMAssertCount($class, 2, @"ANY $prop >= %@", $v0);
+    %r %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %r %man %comp RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
+    %r %man %comp RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %r %man %comp RLMAssertCount($class, 2, @"ANY $prop <= %@", $v1);
 
-    %o %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
-    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop >= %@", $v1);
-    %o %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
-    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v2);
-    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
-    %o %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v1);
+    %o %man %comp RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %o %man %comp RLMAssertCount($class, 1, @"ANY $prop >= %@", $v1);
+    %o %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
+    %o %man %comp RLMAssertCount($class, 1, @"ANY $prop < %@", $v2);
+    %o %man %comp RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %o %man %comp RLMAssertCount($class, 1, @"ANY $prop <= %@", $v1);
 
-    %noany %man %nominmax RLMAssertThrows(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]));
+    %noany %man %nocomp RLMAssertThrows(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]));
 }
 
 - (void)testQueryBetween {
@@ -1044,28 +1044,28 @@ static double average(NSArray *values) {
 
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop = %@", $v0);
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop != %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop >= %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop <= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop >= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop <= %@", $v0);
 
     [self createObjectWithValueIndex:1];
 
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop = %@", $v1);
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop != %@", $v0);
-    %r %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop > %@", $v0);
-    %o %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v1);
+    %r %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop > %@", $v0);
+    %o %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v1);
 
-    %r %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v0);
-    %o %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v1);
+    %r %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v0);
+    %o %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v1);
 
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
-    %r %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v4);
-    %o %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v2);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
+    %r %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v4);
+    %o %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v2);
 
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v1);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v1);
 
-    %man %nominmax %noany RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
+    %man %nocomp %noany RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testSubstringQueries {

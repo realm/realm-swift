@@ -685,6 +685,28 @@ Query make_diacritic_insensitive_constraint(NSPredicateOperatorType operatorType
 template <typename> struct AlwaysFalse : std::false_type {};
 
 template <typename C, typename T>
+Query make_lexicographical_constraint(NSPredicateOperatorType operatorType,
+                                      bool caseSensitive,
+                                      C& column, T const& value) {
+    if (!caseSensitive) {
+        throwException(@"Invalid predicate",
+                       @"Lexicographical comparisons must be case-sensitive");
+    }
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            return column < value;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            return column <= value;
+        case NSGreaterThanPredicateOperatorType:
+            return column > value;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return column >= value;
+        default:
+            REALM_COMPILER_HINT_UNREACHABLE();
+    }
+}
+
+template <typename C, typename T>
 Query make_diacritic_sensitive_constraint(NSPredicateOperatorType operatorType,
                                           bool caseSensitive, C& column, T const& value)
 {
@@ -701,6 +723,11 @@ Query make_diacritic_sensitive_constraint(NSPredicateOperatorType operatorType,
             return column.not_equal(value, caseSensitive);
         case NSLikePredicateOperatorType:
             return column.like(value, caseSensitive);
+        case NSLessThanPredicateOperatorType:
+        case NSLessThanOrEqualToPredicateOperatorType:
+        case NSGreaterThanPredicateOperatorType:
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            return make_lexicographical_constraint(operatorType, caseSensitive, column, value);
         default: {
             if constexpr (is_any_v<C, Columns<String>, Columns<Lst<String>>, Columns<Set<String>>, ColumnDictionaryKeys>) {
                 unsupportedOperator(RLMPropertyTypeString, operatorType);

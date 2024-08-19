@@ -316,12 +316,12 @@ static double average(NSDictionary *dictionary) {
 - (void)testIndexOfObjectDistinct {
     [$dictionary addEntriesFromDictionary:@{ $k0: $v0, $k1: $v1 }];
 
-    %man %r uncheckedAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %r uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
+    %man %r uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %r uncheckedAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
 
-    %man %o uncheckedAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
-    %man %o uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)$v1]);
-    %man %o uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
+    %man %o uncheckedAssertEqual(0U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %o uncheckedAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)$v1]);
+    %man %o uncheckedAssertEqual(1U, [[$dictionary distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:(id)NSNull.null]);
 }
 
 - (void)testSort {
@@ -329,9 +329,9 @@ static double average(NSDictionary *dictionary) {
     %unman RLMAssertThrowsWithReason([$dictionary sortedResultsUsingDescriptors:@[]], ^n @"This method may only be called on RLMDictionary instances retrieved from an RLMRealm");
     %man RLMAssertThrowsWithReason([$dictionary sortedResultsUsingKeyPath:@"not self" ascending:NO], ^n @"can only be sorted on 'self'");
 
-    [$dictionary addEntriesFromDictionary:@{ $k0: $v0, $k1: $v1 }];
+    [$dictionary addEntriesFromDictionary:@{$k0: $v0, $k1: $v1}];
 
-    %man uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v1, $v0]));
+    %man uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingDescriptors:@[]] valueForKey:@"self"], ^n (@[$v0, $v1]));
 
     %man %r uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v1, $v0]));
     %man %o uncheckedAssertEqualObjects([[$dictionary sortedResultsUsingKeyPath:@"self" ascending:NO] valueForKey:@"self"], ^n (@[$v0, $v1]));
@@ -724,10 +724,10 @@ static double average(NSDictionary *dictionary) {
 
     %man RLMAssertCount($class, 0, @"ANY $prop = %@", $v0);
     %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop >= %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop <= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop >= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop <= %@", $v0);
 
     [self createObject];
 
@@ -735,16 +735,14 @@ static double average(NSDictionary *dictionary) {
     %man RLMAssertCount($class, 1, @"ANY $prop = %@", $v0);
     %man RLMAssertCount($class, 0, @"ANY $prop != %@", $v0);
     %man RLMAssertCount($class, 1, @"ANY $prop != %@", $v1);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop >= %@", $v0);
-    %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
-    %r %man %minmax RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
-    %o %man %minmax RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
-    %man %minmax RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop > %@", $v0);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop >= %@", $v0);
+    %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v0);
+    %r %man %comp RLMAssertCount($class, 1, @"ANY $prop < %@", $v1);
+    %o %man %comp RLMAssertCount($class, 0, @"ANY $prop < %@", $v1);
+    %man %comp RLMAssertCount($class, 1, @"ANY $prop <= %@", $v0);
 
-    %nostring %noany %man %nominmax RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
-    %string %noany %man %nominmax RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for string queries on Dictionary.");
-    %any %string %man %nominmax RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for string queries on Dictionary.");
+    %noany %man %nocomp RLMAssertThrowsWithReason(([$class objectsInRealm:realm where:@"ANY $prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testQueryBetween {
@@ -956,10 +954,10 @@ static double average(NSDictionary *dictionary) {
 
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop = %@", $v0);
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop != %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop >= %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop <= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop >= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop <= %@", $v0);
 
     [self createObject];
 
@@ -967,15 +965,14 @@ static double average(NSDictionary *dictionary) {
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop = %@", $v0);
     %man RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop != %@", $v0);
     %man RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop != %@", $v1);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v0);
-    %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
-    %r %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v1);
-    %o %man %minmax RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v1);
-    %man %minmax RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop > %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop >= %@", $v0);
+    %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v0);
+    %r %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop < %@", $v1);
+    %o %man %comp RLMAssertCount(LinkTo$class, 0, @"ANY link.$prop < %@", $v1);
+    %man %comp RLMAssertCount(LinkTo$class, 1, @"ANY link.$prop <= %@", $v0);
 
-    %noany %nostring %man %nominmax RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
-    %string %man %nominmax RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for string queries on Dictionary.");
+    %noany %man %nocomp RLMAssertThrowsWithReason(([LinkTo$class objectsInRealm:realm where:@"ANY link.$prop > %@", $v0]), ^n @"Operator '>' not supported for type '$basetype'");
 }
 
 - (void)testSubstringQueries {

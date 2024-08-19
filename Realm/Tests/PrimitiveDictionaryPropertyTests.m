@@ -2707,66 +2707,66 @@ static double average(NSDictionary *dictionary) {
     RLMAssertThrowsWithReason([managed.anyUUIDObj sortedResultsUsingKeyPath:@"not self" ascending:NO],
                               @"can only be sorted on 'self'");
 
-    [unmanaged.boolObj addEntriesFromDictionary:@{ @"key1": @NO, @"key2": @YES }];
-    [optUnmanaged.boolObj addEntriesFromDictionary:@{ @"key1": @NO, @"key2": NSNull.null }];
-    [managed.boolObj addEntriesFromDictionary:@{ @"key1": @NO, @"key2": @YES }];
-    [optManaged.boolObj addEntriesFromDictionary:@{ @"key1": @NO, @"key2": NSNull.null }];
-    [unmanaged.intObj addEntriesFromDictionary:@{ @"key1": @2, @"key2": @3 }];
-    [optUnmanaged.intObj addEntriesFromDictionary:@{ @"key1": @2, @"key2": NSNull.null }];
-    [managed.intObj addEntriesFromDictionary:@{ @"key1": @2, @"key2": @3 }];
-    [optManaged.intObj addEntriesFromDictionary:@{ @"key1": @2, @"key2": NSNull.null }];
-    [unmanaged.stringObj addEntriesFromDictionary:@{ @"key1": @"bar", @"key2": @"foo" }];
-    [optUnmanaged.stringObj addEntriesFromDictionary:@{ @"key1": @"bar", @"key2": NSNull.null }];
-    [managed.stringObj addEntriesFromDictionary:@{ @"key1": @"bar", @"key2": @"foo" }];
-    [optManaged.stringObj addEntriesFromDictionary:@{ @"key1": @"bar", @"key2": NSNull.null }];
-    [unmanaged.dateObj addEntriesFromDictionary:@{ @"key1": date(1), @"key2": date(2) }];
-    [optUnmanaged.dateObj addEntriesFromDictionary:@{ @"key1": date(1), @"key2": NSNull.null }];
-    [managed.dateObj addEntriesFromDictionary:@{ @"key1": date(1), @"key2": date(2) }];
-    [optManaged.dateObj addEntriesFromDictionary:@{ @"key1": date(1), @"key2": NSNull.null }];
-    [unmanaged.floatObj addEntriesFromDictionary:@{ @"key1": @2.2f, @"key2": @3.3f }];
-    [optUnmanaged.floatObj addEntriesFromDictionary:@{ @"key1": @2.2f, @"key2": NSNull.null }];
-    [managed.floatObj addEntriesFromDictionary:@{ @"key1": @2.2f, @"key2": @3.3f }];
-    [optManaged.floatObj addEntriesFromDictionary:@{ @"key1": @2.2f, @"key2": NSNull.null }];
-    [unmanaged.doubleObj addEntriesFromDictionary:@{ @"key1": @2.2, @"key2": @3.3 }];
-    [optUnmanaged.doubleObj addEntriesFromDictionary:@{ @"key1": @2.2, @"key2": NSNull.null }];
-    [managed.doubleObj addEntriesFromDictionary:@{ @"key1": @2.2, @"key2": @3.3 }];
-    [optManaged.doubleObj addEntriesFromDictionary:@{ @"key1": @2.2, @"key2": NSNull.null }];
-    [unmanaged.dataObj addEntriesFromDictionary:@{ @"key1": data(1), @"key2": data(2) }];
-    [optUnmanaged.dataObj addEntriesFromDictionary:@{ @"key1": data(1), @"key2": NSNull.null }];
-    [managed.dataObj addEntriesFromDictionary:@{ @"key1": data(1), @"key2": data(2) }];
-    [optManaged.dataObj addEntriesFromDictionary:@{ @"key1": data(1), @"key2": NSNull.null }];
-    [unmanaged.decimalObj addEntriesFromDictionary:@{ @"key1": decimal128(2), @"key2": decimal128(3) }];
-    [optUnmanaged.decimalObj addEntriesFromDictionary:@{ @"key1": decimal128(2), @"key2": NSNull.null }];
-    [managed.decimalObj addEntriesFromDictionary:@{ @"key1": decimal128(2), @"key2": decimal128(3) }];
-    [optManaged.decimalObj addEntriesFromDictionary:@{ @"key1": decimal128(2), @"key2": NSNull.null }];
-    [unmanaged.objectIdObj addEntriesFromDictionary:@{ @"key1": objectId(1), @"key2": objectId(2) }];
-    [optUnmanaged.objectIdObj addEntriesFromDictionary:@{ @"key1": objectId(1), @"key2": NSNull.null }];
-    [managed.objectIdObj addEntriesFromDictionary:@{ @"key1": objectId(1), @"key2": objectId(2) }];
-    [optManaged.objectIdObj addEntriesFromDictionary:@{ @"key1": objectId(1), @"key2": NSNull.null }];
-    [unmanaged.uuidObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") }];
-    [optUnmanaged.uuidObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": NSNull.null }];
-    [managed.uuidObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") }];
-    [optManaged.uuidObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": NSNull.null }];
-    [unmanaged.anyBoolObj addEntriesFromDictionary:@{ @"key1": @NO, @"key2": @YES }];
-    [unmanaged.anyIntObj addEntriesFromDictionary:@{ @"key1": @2, @"key2": @3 }];
-    [unmanaged.anyFloatObj addEntriesFromDictionary:@{ @"key1": @2.2f, @"key2": @3.3f }];
-    [unmanaged.anyDoubleObj addEntriesFromDictionary:@{ @"key1": @2.2, @"key2": @3.3 }];
-    [unmanaged.anyStringObj addEntriesFromDictionary:@{ @"key1": @"a", @"key2": @"b" }];
-    [unmanaged.anyDataObj addEntriesFromDictionary:@{ @"key1": data(1), @"key2": data(2) }];
-    [unmanaged.anyDateObj addEntriesFromDictionary:@{ @"key1": date(1), @"key2": date(2) }];
-    [unmanaged.anyDecimalObj addEntriesFromDictionary:@{ @"key1": decimal128(2), @"key2": decimal128(3) }];
-    [unmanaged.anyObjectIdObj addEntriesFromDictionary:@{ @"key1": objectId(1), @"key2": objectId(2) }];
-    [unmanaged.anyUUIDObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") }];
-    [managed.anyBoolObj addEntriesFromDictionary:@{ @"key1": @NO, @"key2": @YES }];
-    [managed.anyIntObj addEntriesFromDictionary:@{ @"key1": @2, @"key2": @3 }];
-    [managed.anyFloatObj addEntriesFromDictionary:@{ @"key1": @2.2f, @"key2": @3.3f }];
-    [managed.anyDoubleObj addEntriesFromDictionary:@{ @"key1": @2.2, @"key2": @3.3 }];
-    [managed.anyStringObj addEntriesFromDictionary:@{ @"key1": @"a", @"key2": @"b" }];
-    [managed.anyDataObj addEntriesFromDictionary:@{ @"key1": data(1), @"key2": data(2) }];
-    [managed.anyDateObj addEntriesFromDictionary:@{ @"key1": date(1), @"key2": date(2) }];
-    [managed.anyDecimalObj addEntriesFromDictionary:@{ @"key1": decimal128(2), @"key2": decimal128(3) }];
-    [managed.anyObjectIdObj addEntriesFromDictionary:@{ @"key1": objectId(1), @"key2": objectId(2) }];
-    [managed.anyUUIDObj addEntriesFromDictionary:@{ @"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89") }];
+    [unmanaged.boolObj addEntriesFromDictionary:@{@"key1": @NO, @"key2": @YES}];
+    [optUnmanaged.boolObj addEntriesFromDictionary:@{@"key1": @NO, @"key2": NSNull.null}];
+    [managed.boolObj addEntriesFromDictionary:@{@"key1": @NO, @"key2": @YES}];
+    [optManaged.boolObj addEntriesFromDictionary:@{@"key1": @NO, @"key2": NSNull.null}];
+    [unmanaged.intObj addEntriesFromDictionary:@{@"key1": @2, @"key2": @3}];
+    [optUnmanaged.intObj addEntriesFromDictionary:@{@"key1": @2, @"key2": NSNull.null}];
+    [managed.intObj addEntriesFromDictionary:@{@"key1": @2, @"key2": @3}];
+    [optManaged.intObj addEntriesFromDictionary:@{@"key1": @2, @"key2": NSNull.null}];
+    [unmanaged.stringObj addEntriesFromDictionary:@{@"key1": @"bar", @"key2": @"foo"}];
+    [optUnmanaged.stringObj addEntriesFromDictionary:@{@"key1": @"bar", @"key2": NSNull.null}];
+    [managed.stringObj addEntriesFromDictionary:@{@"key1": @"bar", @"key2": @"foo"}];
+    [optManaged.stringObj addEntriesFromDictionary:@{@"key1": @"bar", @"key2": NSNull.null}];
+    [unmanaged.dateObj addEntriesFromDictionary:@{@"key1": date(1), @"key2": date(2)}];
+    [optUnmanaged.dateObj addEntriesFromDictionary:@{@"key1": date(1), @"key2": NSNull.null}];
+    [managed.dateObj addEntriesFromDictionary:@{@"key1": date(1), @"key2": date(2)}];
+    [optManaged.dateObj addEntriesFromDictionary:@{@"key1": date(1), @"key2": NSNull.null}];
+    [unmanaged.floatObj addEntriesFromDictionary:@{@"key1": @2.2f, @"key2": @3.3f}];
+    [optUnmanaged.floatObj addEntriesFromDictionary:@{@"key1": @2.2f, @"key2": NSNull.null}];
+    [managed.floatObj addEntriesFromDictionary:@{@"key1": @2.2f, @"key2": @3.3f}];
+    [optManaged.floatObj addEntriesFromDictionary:@{@"key1": @2.2f, @"key2": NSNull.null}];
+    [unmanaged.doubleObj addEntriesFromDictionary:@{@"key1": @2.2, @"key2": @3.3}];
+    [optUnmanaged.doubleObj addEntriesFromDictionary:@{@"key1": @2.2, @"key2": NSNull.null}];
+    [managed.doubleObj addEntriesFromDictionary:@{@"key1": @2.2, @"key2": @3.3}];
+    [optManaged.doubleObj addEntriesFromDictionary:@{@"key1": @2.2, @"key2": NSNull.null}];
+    [unmanaged.dataObj addEntriesFromDictionary:@{@"key1": data(1), @"key2": data(2)}];
+    [optUnmanaged.dataObj addEntriesFromDictionary:@{@"key1": data(1), @"key2": NSNull.null}];
+    [managed.dataObj addEntriesFromDictionary:@{@"key1": data(1), @"key2": data(2)}];
+    [optManaged.dataObj addEntriesFromDictionary:@{@"key1": data(1), @"key2": NSNull.null}];
+    [unmanaged.decimalObj addEntriesFromDictionary:@{@"key1": decimal128(2), @"key2": decimal128(3)}];
+    [optUnmanaged.decimalObj addEntriesFromDictionary:@{@"key1": decimal128(2), @"key2": NSNull.null}];
+    [managed.decimalObj addEntriesFromDictionary:@{@"key1": decimal128(2), @"key2": decimal128(3)}];
+    [optManaged.decimalObj addEntriesFromDictionary:@{@"key1": decimal128(2), @"key2": NSNull.null}];
+    [unmanaged.objectIdObj addEntriesFromDictionary:@{@"key1": objectId(1), @"key2": objectId(2)}];
+    [optUnmanaged.objectIdObj addEntriesFromDictionary:@{@"key1": objectId(1), @"key2": NSNull.null}];
+    [managed.objectIdObj addEntriesFromDictionary:@{@"key1": objectId(1), @"key2": objectId(2)}];
+    [optManaged.objectIdObj addEntriesFromDictionary:@{@"key1": objectId(1), @"key2": NSNull.null}];
+    [unmanaged.uuidObj addEntriesFromDictionary:@{@"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")}];
+    [optUnmanaged.uuidObj addEntriesFromDictionary:@{@"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": NSNull.null}];
+    [managed.uuidObj addEntriesFromDictionary:@{@"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")}];
+    [optManaged.uuidObj addEntriesFromDictionary:@{@"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": NSNull.null}];
+    [unmanaged.anyBoolObj addEntriesFromDictionary:@{@"key1": @NO, @"key2": @YES}];
+    [unmanaged.anyIntObj addEntriesFromDictionary:@{@"key1": @2, @"key2": @3}];
+    [unmanaged.anyFloatObj addEntriesFromDictionary:@{@"key1": @2.2f, @"key2": @3.3f}];
+    [unmanaged.anyDoubleObj addEntriesFromDictionary:@{@"key1": @2.2, @"key2": @3.3}];
+    [unmanaged.anyStringObj addEntriesFromDictionary:@{@"key1": @"a", @"key2": @"b"}];
+    [unmanaged.anyDataObj addEntriesFromDictionary:@{@"key1": data(1), @"key2": data(2)}];
+    [unmanaged.anyDateObj addEntriesFromDictionary:@{@"key1": date(1), @"key2": date(2)}];
+    [unmanaged.anyDecimalObj addEntriesFromDictionary:@{@"key1": decimal128(2), @"key2": decimal128(3)}];
+    [unmanaged.anyObjectIdObj addEntriesFromDictionary:@{@"key1": objectId(1), @"key2": objectId(2)}];
+    [unmanaged.anyUUIDObj addEntriesFromDictionary:@{@"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")}];
+    [managed.anyBoolObj addEntriesFromDictionary:@{@"key1": @NO, @"key2": @YES}];
+    [managed.anyIntObj addEntriesFromDictionary:@{@"key1": @2, @"key2": @3}];
+    [managed.anyFloatObj addEntriesFromDictionary:@{@"key1": @2.2f, @"key2": @3.3f}];
+    [managed.anyDoubleObj addEntriesFromDictionary:@{@"key1": @2.2, @"key2": @3.3}];
+    [managed.anyStringObj addEntriesFromDictionary:@{@"key1": @"a", @"key2": @"b"}];
+    [managed.anyDataObj addEntriesFromDictionary:@{@"key1": data(1), @"key2": data(2)}];
+    [managed.anyDateObj addEntriesFromDictionary:@{@"key1": date(1), @"key2": date(2)}];
+    [managed.anyDecimalObj addEntriesFromDictionary:@{@"key1": decimal128(2), @"key2": decimal128(3)}];
+    [managed.anyObjectIdObj addEntriesFromDictionary:@{@"key1": objectId(1), @"key2": objectId(2)}];
+    [managed.anyUUIDObj addEntriesFromDictionary:@{@"key1": uuid(@"00000000-0000-0000-0000-000000000000"), @"key2": uuid(@"137DECC8-B300-4954-A233-F89909F4FD89")}];
 
     uncheckedAssertEqualObjects([[managed.boolObj sortedResultsUsingDescriptors:@[]] valueForKey:@"self"],
                                 (@[@NO, @YES]));
@@ -3254,6 +3254,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertNil([unmanaged.anyDecimalObj minOfProperty:@"self"]);
     uncheckedAssertNil([managed.anyFloatObj minOfProperty:@"self"]);
     uncheckedAssertNil([managed.anyDoubleObj minOfProperty:@"self"]);
+    uncheckedAssertNil([managed.anyDateObj minOfProperty:@"self"]);
     uncheckedAssertNil([managed.anyDecimalObj minOfProperty:@"self"]);
 
     [self addObjects];
@@ -3284,6 +3285,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertEqualObjects([unmanaged.anyDecimalObj minOfProperty:@"self"], decimal128(2));
     uncheckedAssertEqualObjects([managed.anyFloatObj minOfProperty:@"self"], @2.2f);
     uncheckedAssertEqualObjects([managed.anyDoubleObj minOfProperty:@"self"], @2.2);
+    uncheckedAssertEqualObjects([managed.anyDateObj minOfProperty:@"self"], date(1));
     uncheckedAssertEqualObjects([managed.anyDecimalObj minOfProperty:@"self"], decimal128(2));
 }
 
@@ -3343,6 +3345,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertNil([unmanaged.anyDecimalObj maxOfProperty:@"self"]);
     uncheckedAssertNil([managed.anyFloatObj maxOfProperty:@"self"]);
     uncheckedAssertNil([managed.anyDoubleObj maxOfProperty:@"self"]);
+    uncheckedAssertNil([managed.anyDateObj maxOfProperty:@"self"]);
     uncheckedAssertNil([managed.anyDecimalObj maxOfProperty:@"self"]);
 
     [self addObjects];
@@ -3363,6 +3366,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertEqualObjects([unmanaged.anyDecimalObj maxOfProperty:@"self"], decimal128(3));
     uncheckedAssertEqualObjects([managed.anyFloatObj maxOfProperty:@"self"], @3.3f);
     uncheckedAssertEqualObjects([managed.anyDoubleObj maxOfProperty:@"self"], @3.3);
+    uncheckedAssertEqualObjects([managed.anyDateObj maxOfProperty:@"self"], date(2));
     uncheckedAssertEqualObjects([managed.anyDecimalObj maxOfProperty:@"self"], decimal128(3));
     uncheckedAssertEqualObjects([optUnmanaged.intObj maxOfProperty:@"self"], @2);
     uncheckedAssertEqualObjects([optManaged.intObj maxOfProperty:@"self"], @2);
@@ -4137,6 +4141,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertNil([unmanaged.anyDecimalObj valueForKeyPath:@"@min.self"]);
     uncheckedAssertNil([managed.anyFloatObj valueForKeyPath:@"@min.self"]);
     uncheckedAssertNil([managed.anyDoubleObj valueForKeyPath:@"@min.self"]);
+    uncheckedAssertNil([managed.anyDateObj valueForKeyPath:@"@min.self"]);
     uncheckedAssertNil([managed.anyDecimalObj valueForKeyPath:@"@min.self"]);
     uncheckedAssertNil([unmanaged.intObj valueForKeyPath:@"@max.self"]);
     uncheckedAssertNil([optUnmanaged.intObj valueForKeyPath:@"@max.self"]);
@@ -4164,6 +4169,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertNil([unmanaged.anyDecimalObj valueForKeyPath:@"@max.self"]);
     uncheckedAssertNil([managed.anyFloatObj valueForKeyPath:@"@max.self"]);
     uncheckedAssertNil([managed.anyDoubleObj valueForKeyPath:@"@max.self"]);
+    uncheckedAssertNil([managed.anyDateObj valueForKeyPath:@"@max.self"]);
     uncheckedAssertNil([managed.anyDecimalObj valueForKeyPath:@"@max.self"]);
     uncheckedAssertEqualObjects([unmanaged.intObj valueForKeyPath:@"@sum.self"], @0);
     uncheckedAssertEqualObjects([optUnmanaged.intObj valueForKeyPath:@"@sum.self"], @0);
@@ -4242,6 +4248,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertEqualObjects([unmanaged.anyDecimalObj valueForKeyPath:@"@min.self"], decimal128(2));
     uncheckedAssertEqualObjects([managed.anyFloatObj valueForKeyPath:@"@min.self"], @2.2f);
     uncheckedAssertEqualObjects([managed.anyDoubleObj valueForKeyPath:@"@min.self"], @2.2);
+    uncheckedAssertEqualObjects([managed.anyDateObj valueForKeyPath:@"@min.self"], date(1));
     uncheckedAssertEqualObjects([managed.anyDecimalObj valueForKeyPath:@"@min.self"], decimal128(2));
     uncheckedAssertEqualObjects([unmanaged.intObj valueForKeyPath:@"@max.self"], @3);
     uncheckedAssertEqualObjects([managed.intObj valueForKeyPath:@"@max.self"], @3);
@@ -4259,6 +4266,7 @@ static double average(NSDictionary *dictionary) {
     uncheckedAssertEqualObjects([unmanaged.anyDecimalObj valueForKeyPath:@"@max.self"], decimal128(3));
     uncheckedAssertEqualObjects([managed.anyFloatObj valueForKeyPath:@"@max.self"], @3.3f);
     uncheckedAssertEqualObjects([managed.anyDoubleObj valueForKeyPath:@"@max.self"], @3.3);
+    uncheckedAssertEqualObjects([managed.anyDateObj valueForKeyPath:@"@max.self"], date(2));
     uncheckedAssertEqualObjects([managed.anyDecimalObj valueForKeyPath:@"@max.self"], decimal128(3));
     uncheckedAssertEqualObjects([optUnmanaged.intObj valueForKeyPath:@"@max.self"], @2);
     uncheckedAssertEqualObjects([optManaged.intObj valueForKeyPath:@"@max.self"], @2);
@@ -5011,6 +5019,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyUUIDObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY stringObj > %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY stringObj > %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY dateObj > %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj > %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj > %@", @2.2f);
@@ -5018,6 +5028,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDecimalObj > %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj >= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj >= %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY stringObj >= %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY stringObj >= %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj >= %@", @2.2f);
@@ -5025,6 +5037,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDecimalObj >= %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY stringObj < %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY stringObj < %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj < %@", @2.2f);
@@ -5032,6 +5046,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDecimalObj < %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj <= %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY stringObj <= %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY stringObj <= %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj <= %@", @2.2f);
@@ -5110,6 +5126,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyUUIDObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj > %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY stringObj > %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY stringObj > %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY dateObj > %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj > %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj > %@", @2.2f);
@@ -5117,6 +5135,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDecimalObj > %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj >= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj >= %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY stringObj >= %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY stringObj >= %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY dateObj >= %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyFloatObj >= %@", @2.2f);
@@ -5124,20 +5144,26 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDecimalObj >= %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY stringObj < %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY stringObj < %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj < %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj < %@", @2.2f);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDoubleObj < %@", @2.2);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDecimalObj < %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj < %@", @3);
+    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY stringObj < %@", @"foo");
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY dateObj < %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyFloatObj < %@", @3.3f);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDoubleObj < %@", @3.3);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDecimalObj < %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY intObj < %@", NSNull.null);
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY stringObj < %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj < %@", NSNull.null);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj <= %@", @2);
+    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY stringObj <= %@", @"bar");
+    RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY stringObj <= %@", @"bar");
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY dateObj <= %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyFloatObj <= %@", @2.2f);
@@ -5148,12 +5174,6 @@ static double average(NSDictionary *dictionary) {
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([AllOptionalPrimitiveDictionaries objectsInRealm:realm where:@"ANY boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"ANY stringObj > %@", @"bar"]),
-                              @"Operator '>' not supported for string queries on Dictionary.");
-    RLMAssertThrowsWithReason(([AllOptionalPrimitiveDictionaries objectsInRealm:realm where:@"ANY stringObj > %@", @"bar"]),
-                              @"Operator '>' not supported for string queries on Dictionary.");
-    RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"ANY anyStringObj > %@", @"a"]),
-                              @"Operator '>' not supported for string queries on Dictionary.");
 }
 
 - (void)testQueryBetween {
@@ -5174,6 +5194,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0, @"ANY dateObj BETWEEN %@", @[date(1), NSNull.null]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj BETWEEN %@", @[@2.2f, @3.3f]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDoubleObj BETWEEN %@", @[@2.2, @3.3]);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDateObj BETWEEN %@", @[date(1), date(2)]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDecimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
 
     [self createObject];
@@ -5182,16 +5203,19 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(1)]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyFloatObj BETWEEN %@", @[@2.2f, @2.2f]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDoubleObj BETWEEN %@", @[@2.2, @2.2]);
+    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDateObj BETWEEN %@", @[date(1), date(1)]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDecimalObj BETWEEN %@", @[decimal128(2), decimal128(2)]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY intObj BETWEEN %@", @[@2, @3]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(2)]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyFloatObj BETWEEN %@", @[@2.2f, @3.3f]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDoubleObj BETWEEN %@", @[@2.2, @3.3]);
+    RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDateObj BETWEEN %@", @[date(1), date(2)]);
     RLMAssertCount(AllPrimitiveDictionaries, 1, @"ANY anyDecimalObj BETWEEN %@", @[decimal128(2), decimal128(3)]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY intObj BETWEEN %@", @[@3, @3]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY dateObj BETWEEN %@", @[date(2), date(2)]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyFloatObj BETWEEN %@", @[@3.3f, @3.3f]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDoubleObj BETWEEN %@", @[@3.3, @3.3]);
+    RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDateObj BETWEEN %@", @[date(2), date(2)]);
     RLMAssertCount(AllPrimitiveDictionaries, 0, @"ANY anyDecimalObj BETWEEN %@", @[decimal128(3), decimal128(3)]);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY intObj BETWEEN %@", @[@2, @2]);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1, @"ANY dateObj BETWEEN %@", @[date(1), date(1)]);
@@ -5669,6 +5693,8 @@ static double average(NSDictionary *dictionary) {
                               @"Invalid keypath 'anyFloatObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"anyDoubleObj.@min.prop = %@", @"a"]),
                               @"Invalid keypath 'anyDoubleObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
+    RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"anyDateObj.@min.prop = %@", @"a"]),
+                              @"Invalid keypath 'anyDateObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"anyDecimalObj.@min.prop = %@", @"a"]),
                               @"Invalid keypath 'anyDecimalObj.@min.prop': @min on a collection of values must appear at the end of a keypath.");
 
@@ -5679,6 +5705,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@min == %@", @2.2f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@min == %@", decimal128(2));
 
     [AllPrimitiveDictionaries createInRealm:realm withValue:@{}];
@@ -5691,11 +5718,13 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@min == %@", @2.2f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@min == %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"intObj.@min == %@", @3);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"dateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@min == %@", @3.3f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@min == %@", @3.3);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@min == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"intObj.@min == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@min == %@", NSNull.null);
@@ -5706,6 +5735,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@min == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyFloatObj.@min == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDoubleObj.@min == nil");
+    RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDateObj.@min == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDecimalObj.@min == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@min == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"intObj.@min == %@", NSNull.null);
@@ -5713,6 +5743,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@min == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyFloatObj.@min == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDoubleObj.@min == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDateObj.@min == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDecimalObj.@min == %@", NSNull.null);
 
     [self createObject];
@@ -5724,11 +5755,13 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyFloatObj.@min == %@", @2.2f);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDoubleObj.@min == %@", @2.2);
+    RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDateObj.@min == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDecimalObj.@min == %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"intObj.@min == %@", @3);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"dateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@min == %@", @3.3f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@min == %@", @3.3);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@min == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@min == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"intObj.@min == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@min == %@", NSNull.null);
@@ -5765,6 +5798,8 @@ static double average(NSDictionary *dictionary) {
                               @"Invalid keypath 'anyFloatObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"anyDoubleObj.@max.prop = %@", @"a"]),
                               @"Invalid keypath 'anyDoubleObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
+    RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"anyDateObj.@max.prop = %@", @"a"]),
+                              @"Invalid keypath 'anyDateObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
     RLMAssertThrowsWithReason(([AllPrimitiveDictionaries objectsInRealm:realm where:@"anyDecimalObj.@max.prop = %@", @"a"]),
                               @"Invalid keypath 'anyDecimalObj.@max.prop': @max on a collection of values must appear at the end of a keypath.");
 
@@ -5775,6 +5810,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@max == %@", @2.2f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@max == %@", decimal128(2));
 
     [AllPrimitiveDictionaries createInRealm:realm withValue:@{}];
@@ -5785,11 +5821,13 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@max == %@", @2.2f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@max == %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"intObj.@max == %@", @3);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"dateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@max == %@", @3.3f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@max == %@", @3.3);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@max == %@", decimal128(3));
 
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 0U, @"intObj.@max == %@", @2);
@@ -5803,6 +5841,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@max == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyFloatObj.@max == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDoubleObj.@max == nil");
+    RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDateObj.@max == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDecimalObj.@max == nil");
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"intObj.@max == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"intObj.@max == %@", NSNull.null);
@@ -5810,6 +5849,7 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@max == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyFloatObj.@max == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDoubleObj.@max == %@", NSNull.null);
+    RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDateObj.@max == %@", NSNull.null);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDecimalObj.@max == %@", NSNull.null);
 
     [self createObject];
@@ -5821,11 +5861,13 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyFloatObj.@max == %@", @2.2f);
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDoubleObj.@max == %@", @2.2);
+    RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDateObj.@max == %@", date(1));
     RLMAssertCount(AllPrimitiveDictionaries, 1U, @"anyDecimalObj.@max == %@", decimal128(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"intObj.@max == %@", @3);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"dateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyFloatObj.@max == %@", @3.3f);
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDoubleObj.@max == %@", @3.3);
+    RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDateObj.@max == %@", date(2));
     RLMAssertCount(AllPrimitiveDictionaries, 0U, @"anyDecimalObj.@max == %@", decimal128(3));
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"intObj.@max == %@", NSNull.null);
     RLMAssertCount(AllOptionalPrimitiveDictionaries, 1U, @"dateObj.@max == %@", NSNull.null);
@@ -5870,6 +5912,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyUUIDObj != %@", uuid(@"00000000-0000-0000-0000-000000000000"));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj > %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.stringObj > %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.stringObj > %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.dateObj > %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.dateObj > %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyFloatObj > %@", @2.2f);
@@ -5877,6 +5921,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyDecimalObj > %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj >= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj >= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.stringObj >= %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.stringObj >= %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyFloatObj >= %@", @2.2f);
@@ -5884,6 +5930,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyDecimalObj >= %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj < %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.stringObj < %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.stringObj < %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyFloatObj < %@", @2.2f);
@@ -5891,6 +5939,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyDecimalObj < %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj <= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.stringObj <= %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.stringObj <= %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyFloatObj <= %@", @2.2f);
@@ -5969,6 +6019,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.anyUUIDObj != %@", uuid(@"137DECC8-B300-4954-A233-F89909F4FD89"));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj > %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj > %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.stringObj > %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.stringObj > %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.dateObj > %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.dateObj > %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyFloatObj > %@", @2.2f);
@@ -5976,6 +6028,8 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyDecimalObj > %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.intObj >= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 1, @"ANY link.intObj >= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.stringObj >= %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 1, @"ANY link.stringObj >= %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 1, @"ANY link.dateObj >= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.anyFloatObj >= %@", @2.2f);
@@ -5983,20 +6037,26 @@ static double average(NSDictionary *dictionary) {
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.anyDecimalObj >= %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.intObj < %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj < %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.stringObj < %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.stringObj < %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.dateObj < %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyFloatObj < %@", @2.2f);
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyDoubleObj < %@", @2.2);
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 0, @"ANY link.anyDecimalObj < %@", decimal128(2));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.intObj < %@", @3);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.stringObj < %@", @"foo");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.dateObj < %@", date(2));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.anyFloatObj < %@", @3.3f);
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.anyDoubleObj < %@", @3.3);
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.anyDecimalObj < %@", decimal128(3));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.intObj < %@", NSNull.null);
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.stringObj < %@", NSNull.null);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 0, @"ANY link.dateObj < %@", NSNull.null);
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.intObj <= %@", @2);
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 1, @"ANY link.intObj <= %@", @2);
+    RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.stringObj <= %@", @"bar");
+    RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 1, @"ANY link.stringObj <= %@", @"bar");
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllOptionalPrimitiveDictionaries, 1, @"ANY link.dateObj <= %@", date(1));
     RLMAssertCount(LinkToAllPrimitiveDictionaries, 1, @"ANY link.anyFloatObj <= %@", @2.2f);
@@ -6007,12 +6067,6 @@ static double average(NSDictionary *dictionary) {
                               @"Operator '>' not supported for type 'bool'");
     RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveDictionaries objectsInRealm:realm where:@"ANY link.boolObj > %@", @NO]),
                               @"Operator '>' not supported for type 'bool'");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveDictionaries objectsInRealm:realm where:@"ANY link.stringObj > %@", @"bar"]),
-                              @"Operator '>' not supported for string queries on Dictionary.");
-    RLMAssertThrowsWithReason(([LinkToAllOptionalPrimitiveDictionaries objectsInRealm:realm where:@"ANY link.stringObj > %@", @"bar"]),
-                              @"Operator '>' not supported for string queries on Dictionary.");
-    RLMAssertThrowsWithReason(([LinkToAllPrimitiveDictionaries objectsInRealm:realm where:@"ANY link.anyStringObj > %@", @"a"]),
-                              @"Operator '>' not supported for string queries on Dictionary.");
 }
 
 - (void)testSubstringQueries {
