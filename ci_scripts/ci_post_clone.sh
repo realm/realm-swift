@@ -18,6 +18,10 @@ case "$CI_WORKFLOW" in
     carthage*)
         brew install carthage
         ;;
+    swiftpm*)
+        sh build.sh download-core
+        sh build.sh setup-baas
+        ;;
     *)
         sh build.sh download-core
         ;;
