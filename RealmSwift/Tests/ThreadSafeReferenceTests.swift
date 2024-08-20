@@ -457,8 +457,11 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests, @unchecked Sendable {
         XCTAssertEqual(testStruct.stringObject, nil)
         XCTAssertEqual(testStruct.intObject, nil)
 
-        var config = Realm.Configuration.defaultConfiguration
-        config.objectTypes = [SwiftStringObject.self, SwiftIntObject.self]
+        let config = {
+            var config = Realm.Configuration.defaultConfiguration
+            config.objectTypes = [SwiftStringObject.self, SwiftIntObject.self]
+            return config
+        }()
         dispatchSyncNewThread {
             let realm = try! Realm(configuration: config)
             try! realm.write({
@@ -716,9 +719,8 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests, @unchecked Sendable {
             self.assertAnyRealmCollectionContains(testStruct.arcSet!, keyPath: \.name, items: ["A", "B", "C", "D"])
         }
     }
-}
 
-extension ThreadSafeWrapperTests {
+#if swift(<6) // Swift 6 has not implemented sendability checking for property wrappers
     func testThreadSafeWrapperInline() throws {
         let values = ["A", "B", "C", "D"]
         try autoreleasepool {
@@ -734,7 +736,7 @@ extension ThreadSafeWrapperTests {
         let realm = try! Realm()
         @ThreadSafe var results = realm.objects(SwiftStringObject.self)
         dispatchSyncNewThread {
-            guard let results = results else {
+            guard let results else {
                 return XCTFail("no results")
             }
             results.indices.forEach { idx in
@@ -743,7 +745,7 @@ extension ThreadSafeWrapperTests {
         }
         @ThreadSafe var swiftStringObject = results!.first
         dispatchSyncNewThread {
-            guard let swiftStringObject = swiftStringObject else {
+            guard let swiftStringObject else {
                 return XCTFail("no results")
             }
 
@@ -773,10 +775,11 @@ extension ThreadSafeWrapperTests {
     }
 
     func testThreadSafeUnmanagedArgument() {
-        let stringObj = SwiftStringObject(value: ["stringCol": "before"])
+        nonisolated(unsafe) let stringObj = SwiftStringObject(value: ["stringCol": "before"])
 
         dispatchSyncNewThread {
-            self.assertThrows(self.mutateStringCol(stringObj: stringObj), reason: "Only managed objects may be wrapped as thread safe.")
+            self.assertThrows(self.mutateStringCol(stringObj: stringObj),
+                              reason: "Only managed objects may be wrapped as thread safe.")
         }
     }
 
@@ -797,4 +800,5 @@ extension ThreadSafeWrapperTests {
         waitForExpectations(timeout: 5, handler: nil)
         XCTAssertNotEqual(obj?.stringCol, "before")
     }
+#endif
 }

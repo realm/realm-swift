@@ -610,6 +610,7 @@ class MixedCollectionTest: TestCase, @unchecked Sendable {
         XCTAssertNotEqual(mixedObject.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0], mixedObject3.anyCol.dictionaryValue?["key0"]?.dictionaryValue?["key5"]?.listValue?[0])
     }
 
+    @MainActor
     func testMixedCollectionObjectNotifications() throws {
         let subArray3: AnyRealmValue = AnyRealmValue.fromArray([ .int(3) ])
         let subArray2: AnyRealmValue = AnyRealmValue.fromArray([ subArray3 ])
@@ -683,6 +684,7 @@ class MixedCollectionTest: TestCase, @unchecked Sendable {
         }
     }
 
+    @MainActor
     func testMixedCollectionDictionaryNotifications() throws {
         let subDict2: AnyRealmValue = AnyRealmValue.fromDictionary([ "key5": .float(43) ])
         let subDict1: AnyRealmValue = AnyRealmValue.fromDictionary([ "key1": subDict2 ])
@@ -754,6 +756,7 @@ class MixedCollectionTest: TestCase, @unchecked Sendable {
         }
     }
 
+    @MainActor
     func testMixedCollectionArrayNotifications() throws {
         let subArray2: AnyRealmValue = AnyRealmValue.fromArray([ .float(43), .string("lunch"), .double(12.34) ])
         let subArray1: AnyRealmValue = AnyRealmValue.fromArray([ subArray2, .bool(false) ])

@@ -141,6 +141,7 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
         }
     }
 
+    @MainActor
     func testObserve() {
         let ex = expectation(description: "initial notification")
         let token = collection.observe { (changes: RealmCollectionChange) in
@@ -177,6 +178,7 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
         token2.invalidate()
     }
 
+    @MainActor
     func testObserveKeyPathNoChange() {
         let ex = expectation(description: "initial notification")
         let token0 = collection.observe(keyPaths: ["firstName"]) { (changes: RealmCollectionChange) in
@@ -191,7 +193,7 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
             ex.fulfill()
         }
 
-        dispatchSyncNewThread {
+        dispatchSyncNewThread { @Sendable in
             let realm = self.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.create(CommonPerson.self)
@@ -258,7 +260,7 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
     }
 
     func testThawFromDifferentThread() {
-        let frozen = collection.freeze()
+        nonisolated(unsafe) let frozen = collection.freeze()
         XCTAssertTrue(frozen.isFrozen)
 
         dispatchSyncNewThread {
@@ -273,14 +275,14 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
     }
 
     func testFreezeFromWrongThread() {
-        let collection = realmWithTestPath().objects(PersonProjection.self).first!.firstFriendsName
+        nonisolated(unsafe) let collection = realmWithTestPath().objects(PersonProjection.self).first!.firstFriendsName
         dispatchSyncNewThread {
             self.assertThrows(collection.freeze(), reason: "Realm accessed from incorrect thread")
         }
     }
 
     func testAccessFrozenCollectionFromDifferentThread() {
-        let frozen = collection.freeze()
+        nonisolated(unsafe) let frozen = collection.freeze()
         dispatchSyncNewThread {
             XCTAssertTrue(frozen.contains(where: { $0 == "Daenerys" }))
             XCTAssertTrue(frozen.contains(where: { $0 == "Tyrion" }))

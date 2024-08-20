@@ -31,6 +31,17 @@ func inMemoryRealm(_ inMememoryIdentifier: String) -> Realm {
     return try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))
 }
 
+@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
+func openRealm(configuration: Realm.Configuration = .defaultConfiguration,
+               actor: isolated any Actor,
+               downloadBeforeOpen: Realm.OpenBehavior = .never) async throws -> Realm {
+#if compiler(<6)
+    try await Realm(configuration: configuration, actor: actor, downloadBeforeOpen: downloadBeforeOpen)
+#else
+    try await Realm.open(configuration: configuration, downloadBeforeOpen: downloadBeforeOpen)
+#endif
+}
+
 class TestCase: RLMTestCaseBase, @unchecked Sendable {
     @Locked var exceptionThrown = false
     var testDir: String! = nil
@@ -89,6 +100,9 @@ class TestCase: RLMTestCaseBase, @unchecked Sendable {
         }
     }
 
+    #if compiler(<6)
+    // This actually should be @Sendable even in Swift 5 mode, but updating the
+    // relevant tests are difficult in that mode
     func dispatchSyncNewThread(block: @escaping () -> Void) {
         queue.async {
             autoreleasepool {
@@ -97,6 +111,16 @@ class TestCase: RLMTestCaseBase, @unchecked Sendable {
         }
         queue.sync { }
     }
+    #else
+    func dispatchSyncNewThread(block: @Sendable @escaping () -> Void) {
+        queue.async {
+            autoreleasepool {
+                block()
+            }
+        }
+        queue.sync { }
+    }
+    #endif
 
     func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {

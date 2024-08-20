@@ -49,14 +49,14 @@ class ObjectiveCSupportTests: TestCase, @unchecked Sendable {
         set.insert(SwiftObject())
         let rlmSet = ObjectiveCSupport.convert(object: set)
         XCTAssert(rlmSet.isKind(of: RLMSet<AnyObject>.self))
-        XCTAssertEqual(unsafeBitCast(rlmSet.allObjects[0], to: SwiftObject.self).floatCol, 1.23)
+        XCTAssertEqual(unsafeDowncast(rlmSet.allObjects[0], to: SwiftObject.self).floatCol, 1.23)
         XCTAssertEqual(rlmSet.count, 1)
 
         let map = Map<String, SwiftObject?>()
         map["0"] = SwiftObject()
         let rlmDictionary = ObjectiveCSupport.convert(object: map)
         XCTAssert(rlmDictionary.isKind(of: RLMDictionary<AnyObject, AnyObject>.self))
-        XCTAssertEqual(unsafeBitCast(rlmDictionary.allValues[0], to: SwiftObject.self).floatCol, 1.23)
+        XCTAssertEqual(unsafeDowncast(rlmDictionary.allValues[0], to: SwiftObject.self).floatCol, 1.23)
         XCTAssertEqual(rlmDictionary.count, 1)
 
         let rlmRealm = ObjectiveCSupport.convert(object: realm)

@@ -709,19 +709,17 @@ class MapTests: TestCase, @unchecked Sendable {
         let mapObj = createMap()
         try! mapObj.realm!.commitWrite()
 
-        let exp = expectation(description: "does receive notification")
+        let ex = expectation(description: "does receive notification")
         let token = mapObj.observe(on: queue) { change in
             switch change {
             case .initial(let map):
                 XCTAssertNotNil(map)
-                exp.fulfill()
-            case .update:
-                XCTFail("should not get here for this test")
-            case .error:
+                ex.fulfill()
+            default:
                 XCTFail("should not get here for this test")
             }
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        wait(for: [ex], timeout: 2.0)
         token.invalidate()
         queue.sync { }
     }
@@ -756,27 +754,27 @@ class MapTests: TestCase, @unchecked Sendable {
                 XCTFail("should not get here for this test")
             }
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        wait(for: [exp], timeout: 2.0)
         exp = expectation(description: "does receive notification")
         try! realm.write {
             mapObj["myNewKey"] = SwiftStringObject(value: ["one"])
             mapObj["anotherNewKey"] = SwiftStringObject(value: ["two"])
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        wait(for: [exp], timeout: 2.0)
         XCTAssertTrue(didInsert)
 
         exp = expectation(description: "does receive notification")
         try! realm.write {
             mapObj["myNewKey"] = SwiftStringObject(value: ["three"])
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        wait(for: [exp], timeout: 2.0)
 
         exp = expectation(description: "does receive notification")
         XCTAssertTrue(didModify)
         try! realm.write {
             mapObj["myNewKey"] = nil
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        wait(for: [exp], timeout: 2.0)
         XCTAssertTrue(didDelete)
 
         token.invalidate()
@@ -804,7 +802,7 @@ class MapTests: TestCase, @unchecked Sendable {
             }
             ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 2.0)
 
         /* Expect notification on "intCol" key path when intCol is changed */
         ex = expectation(description: "change notification")
@@ -816,7 +814,7 @@ class MapTests: TestCase, @unchecked Sendable {
             value.intCol = 8
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 2.0)
         token.invalidate()
     }
 
@@ -839,7 +837,7 @@ class MapTests: TestCase, @unchecked Sendable {
             }
             ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
 
         /* Expect no notification on "intCol" key path when stringCol is changed */
         ex = expectation(description: "NO change notification")
@@ -852,7 +850,7 @@ class MapTests: TestCase, @unchecked Sendable {
             value.stringCol = "new string"
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
         token.invalidate()
     }
 
@@ -878,7 +876,7 @@ class MapTests: TestCase, @unchecked Sendable {
             }
             ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
 
         /* Expect notification on "intCol" key path when intCol is changed */
         ex = expectation(description: "change notification")
@@ -889,7 +887,7 @@ class MapTests: TestCase, @unchecked Sendable {
             obj.swiftObjectMap.removeObject(for: "first")
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
         token.invalidate()
     }
 
@@ -915,7 +913,7 @@ class MapTests: TestCase, @unchecked Sendable {
             }
             ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
 
         ex = expectation(description: "change notification")
         dispatchSyncNewThread {
@@ -926,7 +924,7 @@ class MapTests: TestCase, @unchecked Sendable {
             realm.delete(value)
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
         token.invalidate()
     }
 
@@ -954,7 +952,7 @@ class MapTests: TestCase, @unchecked Sendable {
             }
             ex.fulfill()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
 
         ex = expectation(description: "change notification")
         dispatchSyncNewThread {
@@ -964,7 +962,7 @@ class MapTests: TestCase, @unchecked Sendable {
             obj.name = "Curley"
             try! realm.commitWrite()
         }
-        waitForExpectations(timeout: 0.1, handler: nil)
+        wait(for: [ex], timeout: 0.1)
         token.invalidate()
     }
 

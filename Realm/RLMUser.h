@@ -309,7 +309,7 @@ RLM_SWIFT_SENDABLE // internally thread-safe
 /**
  Refresh a user's custom data. This will, in effect, refresh the user's auth session.
  */
-- (void)refreshCustomDataWithCompletion:(RLMUserCustomDataBlock)completion;
+- (void)refreshCustomDataWithCompletion:(RLMUserCustomDataBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Links the currently authenticated user with a new identity, where the identity is defined by the credential

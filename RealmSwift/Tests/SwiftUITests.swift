@@ -69,48 +69,51 @@ class SwiftUITests: TestCase, @unchecked Sendable {
 
     // MARK: - List Operations
 
-    func testManagedUnmanagedListAppendPrimitive() throws {
+    @MainActor func testManagedUnmanagedListAppendPrimitive() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.primitiveList)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.append(1)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.primitiveList
+        XCTAssertEqual(state.count, 0)
+        $state.append(1)
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.append(2)
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.append(2)
+        XCTAssertEqual(state.count, 2)
     }
-    func testManagedUnmanagedListAppendUnmanagedObject() throws {
+
+    @MainActor func testManagedUnmanagedListAppendUnmanagedObject() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.list)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.append(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.list
+        XCTAssertEqual(state.count, 0)
+        $state.append(SwiftBoolObject())
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.append(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.append(SwiftBoolObject())
+        XCTAssertEqual(state.count, 2)
     }
-    func testManagedListAppendUnmanagedObservedObject() throws {
+
+    @MainActor func testManagedListAppendUnmanagedObservedObject() throws {
         let object = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: object.list)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.list
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.update()
-        state.projectedValue.append(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        _state.update()
+        $state.append(SwiftBoolObject())
+        XCTAssertEqual(state.count, 1)
     }
-    func testManagedListAppendFrozenObject() throws {
+
+    @MainActor func testManagedListAppendFrozenObject() throws {
         let listObj = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: listObj.list)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = listObj.list
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         let obj = SwiftBoolObject()
@@ -120,97 +123,99 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         }
         let frozen = obj.freeze()
 
-        state.update()
-        state.projectedValue.append(frozen)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        _state.update()
+        $state.append(frozen)
+        XCTAssertEqual(state.count, 1)
     }
-    func testManagedUnmanagedListRemovePrimitive() throws {
+
+    @MainActor func testManagedUnmanagedListRemovePrimitive() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.primitiveList)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.append(1)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.primitiveList
+        XCTAssertEqual(state.count, 0)
+        $state.append(1)
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.append(2)
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.append(2)
+        XCTAssertEqual(state.count, 2)
 
-        state.projectedValue.remove(at: 0)
-        XCTAssertEqual(state.wrappedValue[0], 2)
-        XCTAssertEqual(state.wrappedValue.count, 1)
-    }
-    func testManagedUnmanagedListRemoveUnmanagedObject() throws {
-        let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.list)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.append(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        state.projectedValue.remove(at: 0)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        $state.remove(at: 0)
+        XCTAssertEqual(state[0], 2)
+        XCTAssertEqual(state.count, 1)
     }
 
-    func testManagedListAppendRemoveObservedObject() throws {
+    @MainActor func testManagedUnmanagedListRemoveUnmanagedObject() throws {
         let object = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: object.list)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.list
+        XCTAssertEqual(state.count, 0)
+        $state.append(SwiftBoolObject())
+        XCTAssertEqual(state.count, 1)
+        $state.remove(at: 0)
+        XCTAssertEqual(state.count, 0)
+    }
+
+    @MainActor func testManagedListAppendRemoveObservedObject() throws {
+        let object = SwiftUIObject()
+        @StateRealmObject var state = object.list
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.update()
-        state.projectedValue.append(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        _state.update()
+        $state.append(SwiftBoolObject())
+        XCTAssertEqual(state.count, 1)
 
-        state.projectedValue.remove(at: 0)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        $state.remove(at: 0)
+        XCTAssertEqual(state.count, 0)
     }
 
     // MARK: - MutableSet Operations
 
-    func testManagedUnmanagedMutableSetInsertPrimitive() throws {
+    @MainActor func testManagedUnmanagedMutableSetInsertPrimitive() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.primitiveSet)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.insert(1)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.primitiveSet
+        XCTAssertEqual(state.count, 0)
+        $state.insert(1)
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.insert(2)
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.insert(2)
+        XCTAssertEqual(state.count, 2)
     }
-    func testManagedUnmanagedMutableSetInsertUnmanagedObject() throws {
+    @MainActor func testManagedUnmanagedMutableSetInsertUnmanagedObject() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.set)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.insert(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.set
+        XCTAssertEqual(state.count, 0)
+        $state.insert(SwiftBoolObject())
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.insert(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.insert(SwiftBoolObject())
+        XCTAssertEqual(state.count, 2)
     }
-    func testManagedMutableSetInsertUnmanagedObservedObject() throws {
+    @MainActor func testManagedMutableSetInsertUnmanagedObservedObject() throws {
         let object = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: object.set)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.set
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.update()
-        state.projectedValue.insert(SwiftBoolObject())
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        _state.update()
+        $state.insert(SwiftBoolObject())
+        XCTAssertEqual(state.count, 1)
     }
-    func testManagedMutableSetInsertFrozenObject() throws {
+    @MainActor func testManagedMutableSetInsertFrozenObject() throws {
         let object = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: object.set)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.set
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         let obj = SwiftBoolObject()
@@ -219,59 +224,59 @@ class SwiftUITests: TestCase, @unchecked Sendable {
             realm.add(obj)
         }
         let frozen = obj.freeze()
-        state.update()
-        state.projectedValue.insert(frozen)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        _state.update()
+        $state.insert(frozen)
+        XCTAssertEqual(state.count, 1)
     }
-    func testMutableSetRemovePrimitive() throws {
+    @MainActor func testMutableSetRemovePrimitive() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.primitiveSet)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.insert(1)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.primitiveSet
+        XCTAssertEqual(state.count, 0)
+        $state.insert(1)
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.insert(2)
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.insert(2)
+        XCTAssertEqual(state.count, 2)
 
-        state.projectedValue.remove(1)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        $state.remove(1)
+        XCTAssertEqual(state.count, 1)
     }
-    func testUnmanagedMutableSetRemoveUnmanagedObject() throws {
+    @MainActor func testUnmanagedMutableSetRemoveUnmanagedObject() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.set)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.set
+        XCTAssertEqual(state.count, 0)
         let obj = SwiftBoolObject()
-        state.projectedValue.insert(obj)
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        state.projectedValue.remove(obj)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        $state.insert(obj)
+        XCTAssertEqual(state.count, 1)
+        $state.remove(obj)
+        XCTAssertEqual(state.count, 0)
     }
-    func testManagedMutableSetRemoveUnmanagedObject() throws {
+    @MainActor func testManagedMutableSetRemoveUnmanagedObject() throws {
         let object = SwiftUIObject()
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
-        let state = StateRealmObject(wrappedValue: object.set)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.set
+        XCTAssertEqual(state.count, 0)
         let obj = SwiftBoolObject()
-        state.projectedValue.insert(obj)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        $state.insert(obj)
+        XCTAssertEqual(state.count, 1)
         XCTAssertNotNil(obj.realm)
-        state.projectedValue.remove(obj)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        $state.remove(obj)
+        XCTAssertEqual(state.count, 0)
     }
 
-    func testManagedMutableSetRemoveObservedObject() throws {
+    @MainActor func testManagedMutableSetRemoveObservedObject() throws {
         let object = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: object.set)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.set
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.update()
+        _state.update()
         let obj = SwiftBoolObject()
         let objState = StateRealmObject(wrappedValue: obj)
 
@@ -284,105 +289,105 @@ class SwiftUITests: TestCase, @unchecked Sendable {
             }
         objState.wrappedValue.boolCol = true
         XCTAssertEqual(hit, 1)
-        state.projectedValue.insert(objState.wrappedValue)
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        state.projectedValue.remove(objState.wrappedValue)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        $state.insert(objState.wrappedValue)
+        XCTAssertEqual(state.count, 1)
+        $state.remove(objState.wrappedValue)
+        XCTAssertEqual(state.count, 0)
         cancellable.cancel()
     }
 
     // MARK: - Map Operations
 
-    func testManagedUnmanagedMapAppendPrimitive() throws {
+    @MainActor func testManagedUnmanagedMapAppendPrimitive() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.primitiveMap)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.set(object: 1, for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        XCTAssertEqual(state.projectedValue["one"], 1)
+        @StateRealmObject var state = object.primitiveMap
+        XCTAssertEqual(state.count, 0)
+        $state.set(object: 1, for: "one")
+        XCTAssertEqual(state.count, 1)
+        XCTAssertEqual($state["one"], 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.set(object: 2, for: "two")
-        state.projectedValue.set(object: 3, for: "two")
-        XCTAssertEqual(state.wrappedValue.count, 2)
-        XCTAssertEqual(state.projectedValue["two"], 3)
+        $state.set(object: 2, for: "two")
+        $state.set(object: 3, for: "two")
+        XCTAssertEqual(state.count, 2)
+        XCTAssertEqual($state["two"], 3)
     }
 
-    func testManagedUnmanagedMapAppendUnmanagedObject() throws {
+    @MainActor func testManagedUnmanagedMapAppendUnmanagedObject() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.map)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.map
+        XCTAssertEqual(state.count, 0)
+        $state.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.set(object: SwiftBoolObject(), for: "two")
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.set(object: SwiftBoolObject(), for: "two")
+        XCTAssertEqual(state.count, 2)
     }
 
-    func testManagedMapAppendUnmanagedObservedObject() throws {
+    @MainActor func testManagedMapAppendUnmanagedObservedObject() throws {
         let object = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: object.map)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.map
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.update()
-        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        _state.update()
+        $state.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.count, 1)
     }
 
-    func testManagedUnmanagedMapRemovePrimitive() throws {
+    @MainActor func testManagedUnmanagedMapRemovePrimitive() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.primitiveMap)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.set(object: 1, for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        @StateRealmObject var state = object.primitiveMap
+        XCTAssertEqual(state.count, 0)
+        $state.set(object: 1, for: "one")
+        XCTAssertEqual(state.count, 1)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.projectedValue.set(object: 2, for: "two")
-        XCTAssertEqual(state.wrappedValue.count, 2)
+        $state.set(object: 2, for: "two")
+        XCTAssertEqual(state.count, 2)
 
-        state.projectedValue.set(object: nil, for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        XCTAssertEqual(state.wrappedValue.keys, ["two"])
+        $state.set(object: nil, for: "one")
+        XCTAssertEqual(state.count, 1)
+        XCTAssertEqual(state.keys, ["two"])
     }
 
-    func testManagedUnmanagedMapRemoveUnmanagedObject() throws {
+    @MainActor func testManagedUnmanagedMapRemoveUnmanagedObject() throws {
         let object = SwiftUIObject()
-        let state = StateRealmObject(wrappedValue: object.map)
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        state.projectedValue.set(object: nil, for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.map
+        XCTAssertEqual(state.count, 0)
+        $state.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.count, 1)
+        $state.set(object: nil, for: "one")
+        XCTAssertEqual(state.count, 0)
     }
 
-    func testManagedMapAppendRemoveObservedObject() throws {
+    @MainActor func testManagedMapAppendRemoveObservedObject() throws {
         let object = SwiftUIObject()
-        var state = StateRealmObject(wrappedValue: object.map)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @StateRealmObject var state = object.map
+        XCTAssertEqual(state.count, 0)
 
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write { realm.add(object) }
 
-        state.update()
-        state.projectedValue.set(object: SwiftBoolObject(), for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        _state.update()
+        $state.set(object: SwiftBoolObject(), for: "one")
+        XCTAssertEqual(state.count, 1)
 
-        state.projectedValue.set(object: nil, for: "one")
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        $state.set(object: nil, for: "one")
+        XCTAssertEqual(state.count, 0)
     }
 
     // MARK: - ObservedResults Operations
-    func testResultsAppendUnmanagedObject() throws {
+    @MainActor func testResultsAppendUnmanagedObject() throws {
         let object = SwiftUIObject()
         let fullResults = ObservedResults(SwiftUIObject.self,
                                           configuration: inMemoryRealm(inMemoryIdentifier).configuration)
@@ -416,38 +421,35 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(sortedResults.wrappedValue[0].int, 1)
         XCTAssertEqual(sortedResults.wrappedValue[1].int, 0)
     }
-    func testResultsAppendManagedObject() throws {
-        let state = ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+    @MainActor func testResultsAppendManagedObject() throws {
+        @ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
         let object = SwiftUIObject()
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.append(object)
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        state.projectedValue.append(object)
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        XCTAssertEqual(state.count, 0)
+        $state.append(object)
+        XCTAssertEqual(state.count, 1)
+        $state.append(object)
+        XCTAssertEqual(state.count, 1)
     }
-    func testResultsRemoveUnmanagedObject() throws {
-        let state = ObservedResults(SwiftUIObject.self,
-                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+    @MainActor func testResultsRemoveUnmanagedObject() throws {
+        @ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
         let object = SwiftUIObject()
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        assertThrows(state.projectedValue.remove(object))
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        XCTAssertEqual(state.count, 0)
+        assertThrows($state.remove(object))
+        XCTAssertEqual(state.count, 0)
     }
-    func testResultsRemoveManagedObject() throws {
-        let state = ObservedResults(SwiftUIObject.self,
-                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+    @MainActor func testResultsRemoveManagedObject() throws {
+        @ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
         let object = SwiftUIObject()
-        XCTAssertEqual(state.wrappedValue.count, 0)
-        state.projectedValue.append(object)
-        XCTAssertEqual(state.wrappedValue.count, 1)
-        state.projectedValue.remove(object)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        XCTAssertEqual(state.count, 0)
+        $state.append(object)
+        XCTAssertEqual(state.count, 1)
+        $state.remove(object)
+        XCTAssertEqual(state.count, 0)
     }
-    func testResultsMoveUnmanagedObject() throws {
-        let state = ObservedResults(SwiftUIObject.self,
-                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+    @MainActor func testResultsMoveUnmanagedObject() throws {
+        @ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
         let object = SwiftUIObject()
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        XCTAssertEqual(state.count, 0)
 
         object.stringList.append(SwiftStringObject(stringCol: "Tom"))
         object.stringList.append(SwiftStringObject(stringCol: "Sam"))
@@ -478,20 +480,19 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(object.stringList[2].stringCol, "Dan")
         XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
 
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        XCTAssertEqual(state.count, 0)
     }
-    func testResultsMoveManagedObject() throws {
-        let state = ObservedResults(SwiftUIObject.self,
-                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+    @MainActor func testResultsMoveManagedObject() throws {
+        @ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
         let object = SwiftUIObject()
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        XCTAssertEqual(state.count, 0)
 
         object.stringList.append(SwiftStringObject(stringCol: "Tom"))
         object.stringList.append(SwiftStringObject(stringCol: "Sam"))
         object.stringList.append(SwiftStringObject(stringCol: "Dan"))
         object.stringList.append(SwiftStringObject(stringCol: "Paul"))
 
-        state.projectedValue.append(object)
+        $state.append(object)
 
         let binding = object.bind(\.stringList)
         XCTAssertEqual(object.stringList.first!.stringCol, "Tom")
@@ -517,9 +518,9 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(object.stringList[2].stringCol, "Dan")
         XCTAssertEqual(object.stringList.last!.stringCol, "Paul")
 
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        XCTAssertEqual(state.count, 1)
     }
-    func testSwiftQuerySyntax() throws {
+    @MainActor func testSwiftQuerySyntax() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
         try realm.write {
             realm.add(SwiftUIObject(value: ["str": "apple"]))
@@ -534,7 +535,7 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(filteredResults.wrappedValue.count, 2)
         XCTAssertEqual(filteredResults.wrappedValue[0].str, "antenna")
     }
-    func testResultsAppendFrozenObject() throws {
+    @MainActor func testResultsAppendFrozenObject() throws {
         let state1 = ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         let object1 = SwiftUIObject()
         XCTAssertEqual(state1.wrappedValue.count, 0)
@@ -559,34 +560,34 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(state2.wrappedValue.count, 2)
     }
     // MARK: Object Operations
-    func testUnmanagedObjectModification() throws {
-        let state = StateRealmObject(wrappedValue: SwiftUIObject())
-        state.wrappedValue.str = "bar"
-        XCTAssertEqual(state.wrappedValue.str, "bar")
-        XCTAssertEqual(state.projectedValue.wrappedValue.str, "bar")
+    @MainActor func testUnmanagedObjectModification() throws {
+        @StateRealmObject var state = SwiftUIObject()
+        state.str = "bar"
+        XCTAssertEqual(state.str, "bar")
+        XCTAssertEqual($state.wrappedValue.str, "bar")
     }
-    func testManagedObjectModification() throws {
-        let state = StateRealmObject(wrappedValue: SwiftUIObject())
+    @MainActor func testManagedObjectModification() throws {
+        @StateRealmObject var state = SwiftUIObject()
         ObservedResults(SwiftUIObject.self,
                         configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-            .projectedValue.append(state.wrappedValue)
-        assertThrows(state.wrappedValue.str = "bar")
-        state.projectedValue.str.wrappedValue = "bar"
-        XCTAssertEqual(state.projectedValue.wrappedValue.str, "bar")
+            .projectedValue.append(state)
+        assertThrows(state.str = "bar")
+        $state.str.wrappedValue = "bar"
+        XCTAssertEqual($state.wrappedValue.str, "bar")
     }
-    func testManagedObjectDelete() throws {
+    @MainActor func testManagedObjectDelete() throws {
         let results = ObservedResults(SwiftUIObject.self,
                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-        let state = StateRealmObject(wrappedValue: SwiftUIObject())
+        @StateRealmObject var state = SwiftUIObject()
         XCTAssertEqual(results.wrappedValue.count, 0)
-        state.projectedValue.delete()
+        $state.delete()
         XCTAssertEqual(results.wrappedValue.count, 0)
-        results.projectedValue.append(state.wrappedValue)
+        results.projectedValue.append(state)
         XCTAssertEqual(results.wrappedValue.count, 1)
-        state.projectedValue.delete()
+        $state.delete()
     }
     // MARK: Bind
-    func testUnmanagedManagedObjectBind() {
+    @MainActor func testUnmanagedManagedObjectBind() {
         let object = SwiftUIObject()
         let binding = object.bind(\.str)
         XCTAssertEqual(object.str, "foo")
@@ -605,7 +606,7 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(binding.wrappedValue, "baz")
     }
 
-    func testStateRealmObjectKVO() throws {
+    @MainActor func testStateRealmObjectKVO() throws {
         @StateRealmObject var object = SwiftUIObject()
         var hit = 0
 
@@ -633,33 +634,31 @@ class SwiftUITests: TestCase, @unchecked Sendable {
     }
 
     // MARK: - Projection ObservedResults Operations
-    func testResultsAppendProjection() throws {
+    @MainActor func testResultsAppendProjection() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
-        let state = ObservedResults(UIElementsProjection.self,
-                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        @ObservedResults(UIElementsProjection.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
+        XCTAssertEqual(state.count, 0)
         try! realm.write {
             realm.create(SwiftUIObject.self)
         }
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        XCTAssertEqual(state.count, 1)
     }
 
-    func testResultsRemoveProjection() throws {
+    @MainActor func testResultsRemoveProjection() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
-        let state = ObservedResults(UIElementsProjection.self,
-                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
+        @ObservedResults(UIElementsProjection.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
         var object: SwiftUIObject!
         try! realm.write {
             object = realm.create(SwiftUIObject.self)
         }
-        XCTAssertEqual(state.wrappedValue.count, 1)
+        XCTAssertEqual(state.count, 1)
         try! realm.write {
             realm.delete(object)
         }
-        XCTAssertEqual(state.wrappedValue.count, 0)
+        XCTAssertEqual(state.count, 0)
     }
 
-    func testProjectionStateRealmObjectKVO() throws {
+    @MainActor func testProjectionStateRealmObjectKVO() throws {
         @StateRealmObject var projection = UIElementsProjection(projecting: SwiftUIObject())
         var hit = 0
 
@@ -686,22 +685,22 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(hit, 2)
     }
 
-    func testProjectionDelete() throws {
+    @MainActor func testProjectionDelete() throws {
         let results = ObservedResults(UIElementsProjection.self,
                                       configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         let projection = UIElementsProjection(projecting: SwiftUIObject())
-        let state = StateRealmObject(wrappedValue: projection)
+        @StateRealmObject var state = projection
 
         XCTAssertEqual(results.wrappedValue.count, 0)
-        state.projectedValue.delete()
+        $state.delete()
         XCTAssertEqual(results.wrappedValue.count, 0)
-        results.projectedValue.append(state.wrappedValue)
+        results.projectedValue.append(state)
         XCTAssertEqual(results.wrappedValue.count, 1)
-        state.projectedValue.delete()
+        $state.delete()
     }
 
     // MARK: - Projection Bind
-    func testProjectionBind() {
+    @MainActor func testProjectionBind() {
         let projection = UIElementsProjection(projecting: SwiftUIObject())
         let binding = projection.bind(\.label)
         XCTAssertEqual(projection.label, "foo")
@@ -722,7 +721,7 @@ class SwiftUITests: TestCase, @unchecked Sendable {
 
     // MARK: - ObservedSectionedResults
 
-    func testObservedSectionedResults() throws {
+    @MainActor func testObservedSectionedResults() throws {
         let fullResults = ObservedSectionedResults(SwiftUIObject.self,
                                                    sectionKeyPath: \.str,
                                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
@@ -768,7 +767,7 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(fullResults.wrappedValue[0].key, "abc")
     }
 
-    func testObservedSectionedResultsWithProjection() throws {
+    @MainActor func testObservedSectionedResultsWithProjection() throws {
         let fullResults = ObservedSectionedResults(UIElementsProjection.self,
                                                    sectionKeyPath: \.label,
                                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
@@ -801,7 +800,7 @@ class SwiftUITests: TestCase, @unchecked Sendable {
         XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
     }
 
-    func testAllObservedSectionedResultsConstructors() throws {
+    @MainActor func testAllObservedSectionedResultsConstructors() throws {
         let realm = inMemoryRealm(inMemoryIdentifier)
         let object1 = SwiftUIObject()
         let object2 = SwiftUIObject()

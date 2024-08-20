@@ -584,7 +584,13 @@ public typealias InitialSubscriptionsConfiguration = RLMInitialSubscriptionsConf
         config.initialSubscriptions
     }
 
-    @Unchecked internal var config: RLMSyncConfiguration
+    // Although RLMSyncConfiguration objects are mutable, we don't expose a way
+    // to mutate the one wrapped by this struct, which makes this safe
+    #if compiler(<6)
+    internal let config: RLMSyncConfiguration
+    #else
+    nonisolated(unsafe) internal let config: RLMSyncConfiguration
+    #endif
     internal init(config: RLMSyncConfiguration) {
         self.config = config
     }
@@ -1131,19 +1137,33 @@ extension User: ObservableObject {}
 #endif
 
 public extension User {
-    // NEXT-MAJOR: This function returns the incorrect type. It should be Document
-    // rather than `[AnyHashable: Any]`
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
     /// @completion A completion that eventually return `Result.success(Dictionary)` with user's data or `Result.failure(Error)`.
     @preconcurrency
     func refreshCustomData(_ completion: @escaping @Sendable (Result<[AnyHashable: Any], Error>) -> Void) {
-        self.refreshCustomData { customData, error in
+        self.__refreshCustomData { customData, error in
             if let customData = customData {
                 completion(.success(customData))
             } else {
                 completion(.failure(error ?? Realm.Error.callFailed))
             }
         }
+    }
+
+    /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    @discardableResult
+    func refreshCustomData() async throws -> Document {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            self.__refreshCustomData { _, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+        return customData
     }
 }
 

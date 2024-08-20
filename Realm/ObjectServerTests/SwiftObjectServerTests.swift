@@ -32,13 +32,13 @@ import RealmSwiftTestSupport
 #endif
 
 func assertAppError(_ error: AppError, _ code: AppError.Code, _ message: String,
-                    line: UInt = #line, file: StaticString = #file) {
+                    line: UInt = #line, file: StaticString = #filePath) {
     XCTAssertEqual(error.code, code, file: file, line: line)
     XCTAssertEqual(error.localizedDescription, message, file: file, line: line)
 }
 
 func assertSyncError(_ error: Error, _ code: SyncError.Code, _ message: String,
-                     line: UInt = #line, file: StaticString = #file) {
+                     line: UInt = #line, file: StaticString = #filePath) {
     let e = error as NSError
     XCTAssertEqual(e.domain, RLMSyncErrorDomain, file: file, line: line)
     XCTAssertEqual(e.code, code.rawValue, file: file, line: line)
@@ -76,10 +76,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(app.baseURL, "http://127.0.0.1:9090")
     }
 
+    @MainActor
     func testBasicSwiftSync() throws {
         XCTAssert(try openRealm().isEmpty, "Freshly synced Realm was not empty...")
     }
 
+    @MainActor
     func testSwiftAddObjects() throws {
         let realm = try openRealm()
         checkCount(expected: 0, realm, SwiftPerson.self)
@@ -110,6 +112,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(obj.objectCol!.firstName, "George")
     }
 
+    @MainActor
     func testSwiftRountripForDistinctPrimaryKey() throws {
         let realm = try openRealm()
         checkCount(expected: 0, realm, SwiftPerson.self) // ObjectId
@@ -153,6 +156,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(swiftIntPrimaryKeyObject.intCol, 30)
     }
 
+    @MainActor
     func testSwiftAddObjectsWithNilPartitionValue() throws {
         // Use a fresh app as other tests touch the nil partition on the shared app
         let app = app(id: try RealmServer.shared.createApp(types: [SwiftPerson.self]))
@@ -178,6 +182,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         checkCount(expected: 3, realm, SwiftPerson.self)
     }
 
+    @MainActor
     func testSwiftDeleteObjects() throws {
         let realm = try openRealm()
         try realm.write {
@@ -198,6 +203,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         checkCount(expected: 0, realm, SwiftTypesSyncObject.self)
     }
 
+    @MainActor
     func testMultiplePartitions() throws {
         let partitionValueA = name
         let partitionValueB = "\(name)bar"
@@ -254,6 +260,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count, 0)
     }
 
+    @MainActor
     func testConnectionState() throws {
         let realm = try openRealm(wait: false)
         let session = realm.syncSession!
@@ -360,7 +367,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertTrue(p.isTransferComplete)
     }
 
-    func testStreamingNotifierInvalidate() throws {
+    @MainActor func testStreamingNotifierInvalidate() throws {
         let realm = try openRealm()
         let session = try XCTUnwrap(realm.syncSession)
         let downloadCount = Locked(0)
@@ -411,6 +418,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Download Realm
 
+    @MainActor
     func testDownloadRealm() throws {
         try populateRealm()
 
@@ -439,6 +447,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
     }
 
+    @MainActor
     func testDownloadRealmToCustomPath() throws {
         try populateRealm()
 
@@ -469,6 +478,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
     }
 
+    @MainActor
     func testCancelDownloadRealm() throws {
         try populateRealm()
 
@@ -493,7 +503,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
-    func testAsyncOpenProgress() throws {
+    @MainActor func testAsyncOpenProgress() throws {
         try populateRealm()
 
         let ex1 = expectation(description: "async open")
@@ -513,6 +523,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
+    @MainActor
     func config(baseURL: String, transport: RLMNetworkTransport, syncTimeouts: SyncTimeoutOptions? = nil) throws -> Realm.Configuration {
         let appId = try RealmServer.shared.createApp(types: [])
         let appConfig = AppConfiguration(baseURL: baseURL, transport: transport, syncTimeouts: syncTimeouts)
@@ -524,6 +535,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         return config
     }
 
+    @MainActor
     func testAsyncOpenTimeout() throws {
         let proxy = TimeoutProxyServer(port: 5678, targetPort: 9090)
         try proxy.start()
@@ -591,6 +603,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    @MainActor
     func testDNSError() throws {
         let config = try config(baseURL: "http://localhost:9090", transport: LocationOverrideTransport(wsHostname: "ws://invalid.com:9090"))
         Realm.asyncOpen(configuration: config).awaitFailure(self, timeout: 40) { error in
@@ -598,6 +611,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    @MainActor
     func testTLSError() throws {
         let config = try config(baseURL: "http://localhost:9090", transport: LocationOverrideTransport(wsHostname: "wss://localhost:9090"))
         Realm.asyncOpen(configuration: config).awaitFailure(self) { error in
@@ -647,7 +661,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Authentication
 
-    func testInvalidCredentials() throws {
+    @MainActor func testInvalidCredentials() throws {
         let email = "testInvalidCredentialsEmail"
         let credentials = basicCredentials()
         let user = try logInUser(for: credentials)
@@ -676,7 +690,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - User-specific functionality
 
-    func testUserExpirationCallback() throws {
+    @MainActor func testUserExpirationCallback() throws {
         let user = createUser()
 
         // Set a callback on the user
@@ -982,7 +996,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, destinationRealm, SwiftHugeSyncObject.self)
     }
 
-    func testSeedFilePathOpenSyncToSync() throws {
+    @MainActor func testSeedFilePathOpenSyncToSync() throws {
         // user1 creates and writeCopies a realm to be opened by another user
         var config = try configuration()
         config.objectTypes = [SwiftHugeSyncObject.self]
@@ -1017,7 +1031,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         checkCount(expected: SwiftSyncTestCase.bigObjectCount + 1, destinationRealm, SwiftHugeSyncObject.self)
     }
 
-    func testSeedFilePathOpenSyncToLocal() throws {
+    @MainActor func testSeedFilePathOpenSyncToLocal() throws {
         let seedURL = RLMTestRealmURL().deletingLastPathComponent().appendingPathComponent("seed.realm")
         let user1 = try logInUser(for: basicCredentials())
         var syncConfig = user1.configuration(partitionValue: name)
@@ -1055,7 +1069,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: Write Copy For Configuration
 
-    func testWriteCopySyncedRealm() throws {
+    @MainActor func testWriteCopySyncedRealm() throws {
         // user1 creates and writeCopies a realm to be opened by another user
         var config = try configuration()
         config.objectTypes = [SwiftHugeSyncObject.self]
@@ -1106,7 +1120,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(obj3.data, obj4?.data)
     }
 
-    func testWriteCopyLocalRealmToSync() throws {
+    @MainActor func testWriteCopyLocalRealmToSync() throws {
         var localConfig = Realm.Configuration()
         localConfig.objectTypes = [SwiftPerson.self]
         localConfig.fileURL = realmURLForFile("test.realm")
@@ -1135,7 +1149,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(syncedResults.where { $0.firstName == "Jane" }.count, 1)
     }
 
-    func testWriteCopySynedRealmToLocal() throws {
+    @MainActor func testWriteCopySynedRealmToLocal() throws {
         var syncConfig = try configuration()
         syncConfig.objectTypes = [SwiftPerson.self]
         let syncedRealm = try Realm(configuration: syncConfig)
@@ -1166,7 +1180,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(results.where { $0.firstName == "Jane" }.count, 1)
     }
 
-    func testWriteCopyLocalRealmForSyncWithExistingData() throws {
+    @MainActor func testWriteCopyLocalRealmForSyncWithExistingData() throws {
         var initialSyncConfig = try configuration()
         initialSyncConfig.objectTypes = [SwiftPerson.self]
 
@@ -1217,7 +1231,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertTrue(syncedRealm.objects(SwiftPerson.self).count == 4)
     }
 
-    func testWriteCopyFailBeforeSynced() throws {
+    @MainActor func testWriteCopyFailBeforeSynced() throws {
         var user1Config = try configuration()
         user1Config.objectTypes = [SwiftPerson.self]
         let user1Realm = try Realm(configuration: user1Config)
@@ -1259,7 +1273,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    func testVerifyDocumentsWithCustomColumnNames() throws {
+    @MainActor func testVerifyDocumentsWithCustomColumnNames() throws {
         let collection = try setupMongoCollection(for: SwiftCustomColumnObject.self)
         let objectId = ObjectId.generate()
         let linkedObjectId = ObjectId.generate()
@@ -1296,7 +1310,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// The purpose of this test is to confirm that when an Object is set on a mixed Column and an old
     /// version of an app does not have that Realm Object / Schema we can still access that object via
     /// `AnyRealmValue.dynamicSchema`.
-    func testMissingSchema() throws {
+    @MainActor func testMissingSchema() throws {
         try autoreleasepool {
             // Imagine this is v2 of an app with 3 classes
             var config = createUser().configuration(partitionValue: name)

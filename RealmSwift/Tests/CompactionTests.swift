@@ -19,24 +19,16 @@
 import XCTest
 import RealmSwift
 
-// MARK: Expected Sizes
-
-private var expectedTotalBytesBefore = 0
-private let expectedUsedBytesBeforeMin = 50000
-private var count = 1000
-
-// MARK: Helpers
-
 private func fileSize(path: String) -> Int {
     let attributes = try! FileManager.default.attributesOfItem(atPath: path)
     return attributes[.size] as! Int
 }
 
-// MARK: Tests
-
 class CompactionTests: TestCase, @unchecked Sendable {
-    override func setUp() {
-        super.setUp()
+    func testSuccessfulCompactOnLaunch() {
+        let expectedUsedBytesBeforeMin = 50000
+        let count = 1000
+
         autoreleasepool {
             // Make compactable Realm
             let realm = realmWithTestPath()
@@ -49,10 +41,8 @@ class CompactionTests: TestCase, @unchecked Sendable {
                 realm.create(SwiftStringObject.self, value: ["B"])
             }
         }
-        expectedTotalBytesBefore = fileSize(path: testRealmURL().path)
-    }
+        let expectedTotalBytesBefore = fileSize(path: testRealmURL().path)
 
-    func testSuccessfulCompactOnLaunch() {
         // Configure the Realm to compact on launch
         let config = Realm.Configuration(fileURL: testRealmURL(),
                                          shouldCompactOnLaunch: { totalBytes, usedBytes in

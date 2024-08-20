@@ -24,9 +24,10 @@ import Combine
 #if canImport(RealmTestSupport)
 import RealmSwiftSyncTestSupport
 import RealmSyncTestSupport
+import RealmSwiftTestSupport
 #endif
 
-protocol AsyncOpenStateWrapper {
+@MainActor protocol AsyncOpenStateWrapper {
     func cancel()
     var wrappedValue: AsyncOpenState { get }
     var projectedValue: Published<AsyncOpenState>.Publisher { get }
@@ -41,9 +42,12 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         [SwiftHugeSyncObject.self]
     }
 
+    nonisolated let cancellables = Locked(Set<AnyCancellable>())
     override func tearDown() {
-        cancellables.forEach { $0.cancel() }
-        cancellables = []
+        cancellables.withLock {
+            $0.forEach { $0.cancel() }
+            $0 = []
+        }
         super.tearDown()
     }
 
@@ -55,14 +59,13 @@ class SwiftUIServerTests: SwiftSyncTestCase {
         return super.defaultTestSuite
     }
 
-    var cancellables: Set<AnyCancellable> = []
 
     func awaitOpen(_ wrapper: some AsyncOpenStateWrapper,
                    handler: @escaping (AsyncOpenState) -> Void) {
         _ = wrapper.wrappedValue // Retrieving the wrappedValue to simulate a SwiftUI environment where this is called when initialising the view.
         wrapper.projectedValue
             .sink(receiveValue: handler)
-            .store(in: &cancellables)
+            .store(in: cancellables)
         waitForExpectations(timeout: 10.0)
         wrapper.cancel()
     }
@@ -565,7 +568,7 @@ class PBSSwiftUIServerTests: SwiftUIServerTests {
 
 @available(macOS 13, *)
 @MainActor
-class FLXSwiftUIServerTests: SwiftUIServerTests {
+class FLXSwiftUIServerTests: SwiftUIServerTests, Sendable {
     override func createApp() throws -> String {
         try createFlexibleSyncApp()
     }

@@ -39,6 +39,7 @@ private func thawObjectIfFrozen<Value>(_ value: Value) -> Value where Value: Obj
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@MainActor
 private func createBinding<T: ThreadConfined, V>(
     _ value: T,
     forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
@@ -63,6 +64,7 @@ private func createBinding<T: ThreadConfined, V>(
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@MainActor
 private func createCollectionBinding<T: ThreadConfined, V: RLMSwiftCollectionBase & ThreadConfined>(
     _ value: T,
     forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
@@ -88,6 +90,7 @@ private func createCollectionBinding<T: ThreadConfined, V: RLMSwiftCollectionBas
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+@MainActor
 private func createEquatableBinding<T: ThreadConfined, V: Equatable>(
     _ value: T,
     forKeyPath keyPath: ReferenceWritableKeyPath<T, V>) -> Binding<V> {
@@ -365,6 +368,7 @@ private class ObservableResultsStorage<T>: ObservableStorage<T> where T: RealmSu
 ///
 /// This will write the modified `isEnabled` property to the `model` object's Realm.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@MainActor
 @propertyWrapper public struct StateRealmObject<T: RealmSubscribable & ThreadConfined & Equatable>: DynamicProperty {
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
     @StateObject private var storage: ObservableStorage<T>
@@ -621,7 +625,7 @@ extension Projection: _ObservedResultsValue { }
     }
 
     nonisolated public func update() {
-        assumeOnMainActorExecutor {
+        MainActor.assumeIsolated {
             // When the view updates, it will inject the @Environment
             // into the propertyWrapper
             if storage.configuration == nil {
@@ -1012,7 +1016,7 @@ extension Projection: _ObservedResultsValue { }
     }
 
     nonisolated public func update() {
-        assumeOnMainActorExecutor {
+        MainActor.assumeIsolated {
             // When the view updates, it will inject the @Environment
             // into the propertyWrapper
             if storage.configuration == nil {
@@ -1028,9 +1032,12 @@ extension Projection: _ObservedResultsValue { }
 /// A property wrapper type that subscribes to an observable Realm `Object` or `List` and
 /// invalidates a view whenever the observable object changes.
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-@propertyWrapper public struct ObservedRealmObject<ObjectType>: DynamicProperty where ObjectType: RealmSubscribable & ThreadConfined & ObservableObject & Equatable {
+@MainActor
+@propertyWrapper public struct ObservedRealmObject<ObjectType>: DynamicProperty
+where ObjectType: RealmSubscribable & ThreadConfined & ObservableObject & Equatable {
     /// A wrapper of the underlying observable object that can create bindings to
     /// its properties using dynamic member lookup.
+    @MainActor
     @dynamicMemberLookup @frozen public struct Wrapper {
         /// :nodoc:
         public var wrappedValue: ObjectType
@@ -1118,14 +1125,17 @@ extension Projection: _ObservedResultsValue { }
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Binding where Value: ObjectBase & ThreadConfined {
     /// :nodoc:
+    @MainActor
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable {
         createBinding(wrappedValue, forKeyPath: member)
     }
     /// :nodoc:
+    @MainActor
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & RLMSwiftCollectionBase & ThreadConfined {
         createCollectionBinding(wrappedValue, forKeyPath: member)
     }
     /// :nodoc:
+    @MainActor
     public subscript<V>(dynamicMember member: ReferenceWritableKeyPath<Value, V>) -> Binding<V> where V: _Persistable & Equatable {
         createEquatableBinding(wrappedValue, forKeyPath: member)
     }
@@ -1388,10 +1398,12 @@ extension ThreadConfined where Self: ProjectionObservable {
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
+    @MainActor
     public func bind<V: _Persistable & Equatable>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
         createEquatableBinding(self, forKeyPath: keyPath)
     }
     /// :nodoc:
+    @MainActor
     public func bind<V: _Persistable & RLMSwiftCollectionBase & ThreadConfined>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
         createCollectionBinding(self, forKeyPath: keyPath)
     }
@@ -1420,10 +1432,12 @@ extension ThreadConfined where Self: ObjectBase {
      - parameter keyPath The key path to the member property.
      - returns A `Binding` to the member property.
      */
+    @MainActor
     public func bind<V: _Persistable & Equatable>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
         createEquatableBinding(self, forKeyPath: keyPath)
     }
     /// :nodoc:
+    @MainActor
     public func bind<V: _Persistable & RLMSwiftCollectionBase & ThreadConfined>(_ keyPath: ReferenceWritableKeyPath<Self, V>) -> Binding<V> {
         createCollectionBinding(self, forKeyPath: keyPath)
     }
@@ -1713,6 +1727,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 ///     ListView()
 ///        .environment(\.realm, realm)
 ///
+@MainActor
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct AsyncOpen: DynamicProperty {
     @Environment(\.realmConfiguration) var configuration
@@ -1776,7 +1791,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     }
 
     nonisolated public func update() {
-        assumeOnMainActorExecutor {
+        MainActor.assumeIsolated {
             storage.update(partitionValue, configuration)
         }
     }
@@ -1824,7 +1839,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
 ///
 /// This property wrapper behaves similar as `AsyncOpen`, and in terms of declaration and use is completely identical,
 /// but with the difference of a offline-first approach.
-///
+@MainActor
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @propertyWrapper public struct AutoOpen: DynamicProperty {
     @Environment(\.realmConfiguration) var configuration
@@ -1888,7 +1903,7 @@ private class ObservableAsyncOpenStorage: ObservableObject {
     }
 
     nonisolated public func update() {
-        assumeOnMainActorExecutor {
+        MainActor.assumeIsolated {
             storage.update(partitionValue, configuration)
         }
     }
@@ -2181,7 +2196,7 @@ extension View {
     }
 
     private func filterCollection<T: ObjectBase>(_ collection: ObservedResults<T>, for text: String, on keyPath: KeyPath<T, String>) {
-        assumeOnMainActorExecutor {
+        MainActor.assumeIsolated {
             collection.searchText(text, on: keyPath)
         }
     }
@@ -2476,7 +2491,7 @@ extension View {
     }
 
     private func filterCollection<Key, T: ObjectBase>(_ collection: ObservedSectionedResults<Key, T>, for text: String, on keyPath: KeyPath<T, String>) {
-        assumeOnMainActorExecutor {
+        MainActor.assumeIsolated {
             collection.searchText(text, on: keyPath)
         }
     }

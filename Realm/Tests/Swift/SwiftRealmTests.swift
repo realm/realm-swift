@@ -24,8 +24,7 @@ import RealmTestSupport
 #endif
 
 @available(iOS 13.0, *) // For @MainActor
-@MainActor
-class SwiftRLMRealmTests: RLMTestCase {
+class SwiftRLMRealmTests: RLMTestCase, @unchecked Sendable {
 
     // No models
 
@@ -68,6 +67,7 @@ class SwiftRLMRealmTests: RLMTestCase {
         XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "b", "Expecting column to be 'b'")
     }
 
+    @MainActor
     func testRealmIsUpdatedAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
 
@@ -116,6 +116,7 @@ class SwiftRLMRealmTests: RLMTestCase {
         XCTAssertEqual(retrievedObject.objectSchema.properties.count, 2, "Only 'name' and 'age' properties should be detected by Realm")
     }
 
+    @MainActor
     func testUpdatingSortedArrayAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
         let objs = SwiftRLMIntObject.allObjects(in: realm)
@@ -146,6 +147,7 @@ class SwiftRLMRealmTests: RLMTestCase {
         token.invalidate()
     }
 
+    @MainActor
     func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
 
@@ -203,6 +205,7 @@ class SwiftRLMRealmTests: RLMTestCase {
         XCTAssertEqual((objects[0] as! StringObject).stringCol!, "b", "Expecting column to be 'b'")
     }
 
+    @MainActor
     func testRealmIsUpdatedAfterBackgroundUpdate_objc() {
         let realm = realmWithTestPath()
 
@@ -230,6 +233,7 @@ class SwiftRLMRealmTests: RLMTestCase {
         XCTAssertEqual((objects[0] as! StringObject).stringCol!, "string", "Value of first column should be 'string'")
     }
 
+    @MainActor
     func testRealmIsUpdatedImmediatelyAfterBackgroundUpdate_objc() {
         let realm = realmWithTestPath()
 

@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 import Foundation
 
-private var dynamicDefaultSeed = 0
+private nonisolated(unsafe) var dynamicDefaultSeed = 0
 private func nextDynamicDefaultSeed() -> Int {
     dynamicDefaultSeed += 1
     return dynamicDefaultSeed

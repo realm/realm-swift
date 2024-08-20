@@ -673,7 +673,7 @@ class ModernObjectAccessorTests: TestCase, @unchecked Sendable {
 
     func testThreadChecking() {
         let realm = try! Realm()
-        var obj: ModernAllTypesObject!
+        nonisolated(unsafe) var obj: ModernAllTypesObject!
         try! realm.write {
             obj = realm.create(ModernAllTypesObject.self)
             // Create the lazily-initialized List to test the cached codepath

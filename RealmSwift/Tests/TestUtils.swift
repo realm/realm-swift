@@ -80,17 +80,10 @@ public class Locked<T>: @unchecked Sendable {
     }
 }
 
-public struct Unchecked<Wrapped>: @unchecked Sendable {
-    public var value: Wrapped
-    public init(_ value: Wrapped) {
-        self.value = value
-    }
-}
-
 public extension XCTestCase {
     /// Check whether two test objects are equal (refer to the same row in the same Realm), even if their models
     /// don't define a primary key.
-    func assertEqual<O: Object>(_ o1: O?, _ o2: O?, fileName: StaticString = #file, lineNumber: UInt = #line) {
+    func assertEqual<O: Object>(_ o1: O?, _ o2: O?, fileName: StaticString = #filePath, lineNumber: UInt = #line) {
         if o1 == nil && o2 == nil {
             return
         }
@@ -102,7 +95,7 @@ public extension XCTestCase {
     }
 
     /// Check whether two collections containing Realm objects are equal.
-    func assertEqual<C: Collection>(_ c1: C, _ c2: C, fileName: StaticString = #file, lineNumber: UInt = #line)
+    func assertEqual<C: Collection>(_ c1: C, _ c2: C, fileName: StaticString = #filePath, lineNumber: UInt = #line)
         where C.Iterator.Element: Object {
             XCTAssertEqual(c1.count, c2.count, "Collection counts were incorrect", file: (fileName), line: lineNumber)
             for (o1, o2) in zip(c1, c2) {
@@ -125,7 +118,7 @@ public extension XCTestCase {
         }
     }
 
-    func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
+    func assertSucceeds(message: String? = nil, fileName: StaticString = #filePath,
                         lineNumber: UInt = #line, block: () throws -> Void) {
         do {
             try block()
@@ -136,7 +129,7 @@ public extension XCTestCase {
     }
 
     func assertFails<T>(_ expectedError: Realm.Error.Code, _ message: String? = nil,
-                        fileName: StaticString = #file, lineNumber: UInt = #line,
+                        fileName: StaticString = #filePath, lineNumber: UInt = #line,
                         block: () throws -> T) {
         do {
             _ = try autoreleasepool(invoking: block)
@@ -153,7 +146,7 @@ public extension XCTestCase {
     }
 
     func assertFails<T>(_ expectedError: Realm.Error.Code, _ file: URL, _ message: String,
-                        fileName: StaticString = #file, lineNumber: UInt = #line,
+                        fileName: StaticString = #filePath, lineNumber: UInt = #line,
                         block: () throws -> T) {
         do {
             _ = try autoreleasepool(invoking: block)
@@ -169,7 +162,7 @@ public extension XCTestCase {
     }
 
     func assertFails<T>(_ expectedError: Error, _ message: String? = nil,
-                        fileName: StaticString = #file, lineNumber: UInt = #line,
+                        fileName: StaticString = #filePath, lineNumber: UInt = #line,
                         block: () throws -> T) {
         do {
             _ = try autoreleasepool(invoking: block)
@@ -184,7 +177,7 @@ public extension XCTestCase {
     }
 
     func assertNil<T>(block: @autoclosure() -> T?, _ message: String? = nil,
-                      fileName: StaticString = #file, lineNumber: UInt = #line) {
+                      fileName: StaticString = #filePath, lineNumber: UInt = #line) {
         XCTAssert(block() == nil, message ?? "", file: (fileName), line: lineNumber)
     }
 
@@ -214,6 +207,7 @@ public extension XCTestCase {
     }
 }
 
+#if compiler(<6)
 @_unsafeInheritExecutor
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public func assertThrowsErrorAsync<T, E: Equatable & Error>(
@@ -287,3 +281,81 @@ public func assertPreconditionFailure<T>(_ message: String, _ expression: () asy
         XCTFail("Expected \"\(str)\" to contain \"\(message)\")", file: file, line: line)
     }
 }
+#else
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+public func assertThrowsErrorAsync<T: Sendable, E: Equatable & Error>(
+    _ expression: @autoclosure () async throws -> T,
+    _ expectedError: E,
+    _isolation: isolated (any Actor)? = #isolation,
+    file: StaticString = #filePath, line: UInt = #line
+) async {
+    do {
+        _ = try await expression()
+        XCTFail("Expected expression to throw error \(expectedError)", file: file, line: line)
+    } catch let error as E {
+        XCTAssertEqual(error, expectedError, file: file, line: line)
+    } catch {
+        XCTFail("Expected expression to throw error \(expectedError) but got \(error)", file: file, line: line)
+    }
+}
+
+// Fork, call an expression which should hit a precondition failure in the child
+// process, and then verify that the expected failure message was printed. Note
+// that Swift and Foundation do not support fork(), so anything which does more
+// than a very limited amount of work before the precondition failure is very
+// likely to break.
+@available(macOS 10.15.4, iOS 13.4, tvOS 13.4, watchOS 6.4, *)
+public func assertPreconditionFailure<T: Sendable>(
+    _ message: String, _ expression: () async throws -> T,
+    _isolation: isolated (any Actor)? = #isolation,
+    file: StaticString = #filePath, line: UInt = #line
+) async throws {
+    // We can't perform these tests on tvOS, watchOS, or on devices
+    guard RLMCanFork() else { return }
+
+    let pipe = Pipe()
+
+    let pid = RLMFork()
+    if pid == -1 {
+        return XCTFail("Failed to fork for test", file: file, line: line)
+    }
+
+    if pid == 0 {
+        // In child process
+        // Point stdout and stderr at our pipe
+        let fd = pipe.fileHandleForWriting.fileDescriptor
+        while dup2(fd, STDOUT_FILENO) == -1 && errno == EINTR {}
+        while dup2(fd, STDERR_FILENO) == -1 && errno == EINTR {}
+        _ = try await expression()
+        exit(0)
+    }
+
+    try pipe.fileHandleForWriting.close()
+    while true {
+        var status: Int32 = 0
+        let ret = waitpid(pid, &status, 0)
+        if ret == -1 && errno == EINTR {
+            continue
+        }
+        guard ret > 0 else {
+            return XCTFail("Failed to wait for child process to exit? errno: \(errno)", file: file, line: line)
+        }
+        guard status != 0 else {
+            return XCTFail("Expected child process to crash with message \"\(message)\", but it exited cleanly", file: file, line: line)
+        }
+        break
+    }
+
+    guard let data = try pipe.fileHandleForReading.readToEnd() else {
+        return XCTFail("Expected child process to crash with message \"\(message)\", but it exited without printing anything", file: file, line: line)
+    }
+    // swiftlint:disable:next non_optional_string_data_conversion
+    guard let str = String(data: data, encoding: .utf8) else {
+        return XCTFail("Expected child process to crash with message \"\(message)\", but it did not print valid utf-8", file: file, line: line)
+    }
+
+    if !str.contains("Precondition failed: \(message)") && !str.contains("Fatal error: \(message)") {
+        XCTFail("Expected \"\(str)\" to contain \"\(message)\")", file: file, line: line)
+    }
+}
+#endif
