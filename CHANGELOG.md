@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.53.0 Release notes (2024-08-20)
 =============================================================
+
 ### Enhancements
+
 * Code sign our published xcframeworks. By Apple's requirements, we should sign our release
   binaries so Xcode can validate it was signed by the same developer on every new version.
   ([Apple](https://developer.apple.com/support/third-party-SDK-requirements/)).
@@ -12,6 +14,7 @@ x.y.z Release notes (yyyy-MM-dd)
   ([#8008](https://github.com/realm/realm-swift/issues/8008)).
 
 ### Fixed
+
 * `-[RLMAsymmetricObject createObject:withValue:]` was marked as having a
   non-null return value despite always returning `nil` (since v10.29.0).
 * Eliminate several clang static analyzer warnings which did not report actual
@@ -20,14 +23,12 @@ x.y.z Release notes (yyyy-MM-dd)
   which took exactly one argument, which had to be an array ([#8669](https://github.com/realm/realm-swift/issues/8669), since 10.16.0).
 
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
 * CocoaPods: 1.10 or later.
 * Xcode: 15.1.0-16 beta 5.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 10.52.3 Release notes (2024-08-09)
 =============================================================
