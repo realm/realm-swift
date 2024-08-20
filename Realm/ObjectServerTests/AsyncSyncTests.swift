@@ -350,7 +350,7 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
 
     func testUserCallFunctionAsyncAwait() async throws {
         let user = try await self.app.login(credentials: basicCredentials())
-        guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
+        guard case let .int32(sum) = try await user.functions.sum(.array([1, 2, 3, 4, 5])) else {
             return XCTFail("Should be int32")
         }
         XCTAssertEqual(sum, 15)

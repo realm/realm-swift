@@ -893,7 +893,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let credentials = Credentials.emailPassword(email: email, password: password)
         let syncUser = app.login(credentials: credentials).await(self)
 
-        let bson = syncUser.functions.sum([1, 2, 3, 4, 5]).await(self)
+        let bson = syncUser.functions.sum(.array([1, 2, 3, 4, 5])).await(self)
         guard case let .int32(sum) = bson else {
             XCTFail("unexpected bson type in sum: \(bson)")
             return

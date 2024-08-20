@@ -16,6 +16,8 @@ x.y.z Release notes (yyyy-MM-dd)
   non-null return value despite always returning `nil` (since v10.29.0).
 * Eliminate several clang static analyzer warnings which did not report actual
   bugs.
+* The async and Future versions of `User.functions` only worked for functions
+  which took exactly one argument, which had to be an array ([#8669](https://github.com/realm/realm-swift/issues/8669), since 10.16.0).
 
 ### Compatibility
 * Realm Studio: 15.0.0 or later.
