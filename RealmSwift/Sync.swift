@@ -667,19 +667,34 @@ public struct FunctionCallable: Sendable {
     fileprivate let name: String
     fileprivate let user: User
 
+    /// :nodoc:
+    @available(*, deprecated, message: "Explicitly specify .array(arg)")
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    public func dynamicallyCall(withArguments args: [[AnyBSON]]) -> Future<AnyBSON, Error> {
+        return future { promise in
+            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+            self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
+                    promise(.success(bson))
+                } else {
+                    promise(.failure(error ?? Realm.Error.callFailed))
+                }
+            }
+        }
+    }
+
     /// The implementation of @dynamicCallable that allows  for `Future<AnyBSON, Error>` callable return.
     ///
-    ///     let cancellable = user.functions.sum([1, 2, 3, 4, 5])
+    ///     let cancellable = user.functions.sum(.array([1, 2, 3, 4, 5]))
     ///        .sink(receiveCompletion: { result in
     ///     }, receiveValue: { value in
     ///        // Returned value from function
     ///     })
     ///
-    @preconcurrency
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    public func dynamicallyCall(withArguments args: [[AnyBSON]]) -> Future<AnyBSON, Error> {
+    public func dynamicallyCall(withArguments args: [AnyBSON]) -> Future<AnyBSON, Error> {
         return future { promise in
-            let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+            let objcArgs = args.map(ObjectiveCSupport.convertBson)
             self.user.__callFunctionNamed(name, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
                 if let b = bson.map(ObjectiveCSupport.convertBson), let bson = b {
                     promise(.success(bson))
@@ -1134,14 +1149,25 @@ public extension User {
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension FunctionCallable {
+    /// :nodoc:
+    @available(*, deprecated, message: "Explicitly specify .array(arg)")
+    public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> AnyBSON {
+        let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+        let ret = try await user.__callFunctionNamed(name, arguments: objcArgs)
+        if let bson = ObjectiveCSupport.convertBson(object: ret) {
+            return bson
+        }
+        throw Realm.Error.callFailed
+    }
+
     /// The implementation of @dynamicMemberLookup that allows  for `async await` callable return.
     ///
-    ///     guard case let .int32(sum) = try await user.functions.sum([1, 2, 3, 4, 5]) else {
+    ///     guard case let .int32(sum) = try await user.functions.sum(.array([1, 2, 3, 4, 5])) else {
     ///        return
     ///     }
     ///
-    public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> AnyBSON {
-        let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
+    public func dynamicallyCall(withArguments args: [AnyBSON]) async throws -> AnyBSON {
+        let objcArgs = args.map(ObjectiveCSupport.convertBson)
         let ret = try await user.__callFunctionNamed(name, arguments: objcArgs)
         if let bson = ObjectiveCSupport.convertBson(object: ret) {
             return bson
