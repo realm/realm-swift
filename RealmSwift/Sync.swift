@@ -668,7 +668,7 @@ public struct FunctionCallable: Sendable {
     fileprivate let user: User
 
     /// :nodoc:
-    @available(*, deprecated, message: "Explicitly specify .array(arg)")
+    @available(*, deprecated, message: "Specify args separately without wrapping them in an array")
     @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
     public func dynamicallyCall(withArguments args: [[AnyBSON]]) -> Future<AnyBSON, Error> {
         return future { promise in
@@ -685,7 +685,7 @@ public struct FunctionCallable: Sendable {
 
     /// The implementation of @dynamicCallable that allows  for `Future<AnyBSON, Error>` callable return.
     ///
-    ///     let cancellable = user.functions.sum(.array([1, 2, 3, 4, 5]))
+    ///     let cancellable = user.functions.sum(1, 2, 3, 4, 5)
     ///        .sink(receiveCompletion: { result in
     ///     }, receiveValue: { value in
     ///        // Returned value from function
@@ -1150,7 +1150,7 @@ public extension User {
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension FunctionCallable {
     /// :nodoc:
-    @available(*, deprecated, message: "Explicitly specify .array(arg)")
+    @available(*, deprecated, message: "Specify args separately without wrapping them in an array")
     public func dynamicallyCall(withArguments args: [[AnyBSON]]) async throws -> AnyBSON {
         let objcArgs = args.first!.map(ObjectiveCSupport.convertBson)
         let ret = try await user.__callFunctionNamed(name, arguments: objcArgs)
@@ -1162,7 +1162,7 @@ extension FunctionCallable {
 
     /// The implementation of @dynamicMemberLookup that allows  for `async await` callable return.
     ///
-    ///     guard case let .int32(sum) = try await user.functions.sum(.array([1, 2, 3, 4, 5])) else {
+    ///     guard case let .int32(sum) = try await user.functions.sum(1, 2, 3, 4, 5) else {
     ///        return
     ///     }
     ///
