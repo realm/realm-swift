@@ -33,8 +33,6 @@ extension String: _MapKey { }
  subclass or one of the following types: Bool, Int, Int8, Int16, Int32, Int64, Float, Double,
  String, Data, Date, Decimal128, and ObjectId (and their optional versions)
 
- - Note: Optional versions of the above types *except* `Object` are only supported in non-synchronized Realms.
- 
  Map only supports `String` as a key.  Realm disallows the use of `.` or `$` characters within a dictionary key.
 
  Unlike Swift's native collections, `Map`s is a reference types, and are only immutable if the Realm that manages them
@@ -134,29 +132,6 @@ public final class Map<Key: _MapKey, Value: RealmCollectionValue>: RLMSwiftColle
             }
             rlmDictionary[key] = staticBridgeCast(fromSwift: selectedValue) as AnyObject
         }
-    }
-
-    /**
-     Merges the given map into this map, using a combining closure to determine
-     the value for any duplicate keys.
-
-     If `other` contains a key which is already present in this map, `combine`
-     will be called with the value currently in the map and the value in the
-     other map. The value returned by the closure will be stored in the map for
-     that key.
-
-     - Note: If a value being added to the map is an unmanaged object and the
-             map is managed then that unmanaged object will be added to the Realm.
-
-     - warning: This method may only be called on managed Maps during a write transaction.
-
-     - parameter other: The map to merge into this map.
-     - parameter combine: A closure that takes the current and new values for
-                 any duplicate keys. The closure returns the desired value for
-                 the final map.
-     */
-    public func merge(_ other: Map<Key, Value>, uniquingKeysWith combine: (Value, Value) throws -> Value) rethrows {
-        try merge(other.asKeyValueSequence(), uniquingKeysWith: combine)
     }
 
     /**
@@ -979,29 +954,9 @@ extension Map: Encodable where Key: Encodable, Value: Encodable {
 // MARK: Sequence Support
 
 extension Map: Sequence {
-    // NEXT-MAJOR: change this to KeyValueSequence
     /// Returns a `RLMMapIterator` that yields successive elements in the `Map`.
-    public func makeIterator() -> RLMMapIterator<SingleMapEntry<Key, Value>> {
-        return RLMMapIterator(collection: rlmDictionary)
-    }
-}
-
-extension Map {
-    /// An adaptor for Map which makes it a sequence of `(key: Key, value: Value)` instead of a sequence of `SingleMapEntry`.
-    public struct KeyValueSequence: Sequence {
-        private let map: Map<Key, Value>
-        fileprivate init(_ map: Map<Key, Value>) {
-            self.map = map
-        }
-
-        public func makeIterator() -> RLMKeyValueIterator<Key, Value> {
-            return RLMKeyValueIterator<Key, Value>(collection: map.rlmDictionary)
-        }
-    }
-
-    /// Returns this Map as a sequence of `(key: Key, value: Value)`
-    public func asKeyValueSequence() -> KeyValueSequence {
-        return KeyValueSequence(self)
+    public func makeIterator() -> RLMKeyValueIterator<Key, Value> {
+        return RLMKeyValueIterator<Key, Value>(collection: rlmDictionary)
     }
 }
 

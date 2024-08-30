@@ -22,7 +22,6 @@
 #import "TestUtils.h"
 
 #import "RLMAccessor.h"
-#import "RLMApp_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMProperty_Private.h"
@@ -30,7 +29,6 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.hpp"
-#import "RLMUser_Private.h"
 #import "RLMUtil.hpp"
 
 #import <realm/object-store/schema.hpp>
@@ -1221,26 +1219,6 @@ RLM_COLLECTION_TYPE(NotARealClass)
     (void)[query lastObject];
     RLMRunChildAndWait();
     XCTAssertEqual(query.count, 3U);
-}
-
-- (void)testExplicitlyIncludedEmbeddedOrphanIsRejectedForSyncRealm {
-    // Test each different order of setting properties because there's a bunch of awkward state involved
-    RLMRealmConfiguration *config = [RLMRealmConfiguration fakeSyncConfiguration];
-    config.objectClasses = @[OrphanObject.class];
-    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
-                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
-
-    config = [RLMRealmConfiguration defaultConfiguration];
-    config.syncConfiguration = [RLMRealmConfiguration fakeSyncConfiguration].syncConfiguration;
-    config.objectClasses = @[OrphanObject.class];
-    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
-                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
-
-    config = [RLMRealmConfiguration defaultConfiguration];
-    config.objectClasses = @[OrphanObject.class];
-    config.syncConfiguration = [RLMRealmConfiguration fakeSyncConfiguration].syncConfiguration;
-    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
-                              @"Embedded object 'OrphanObject' is unreachable by any link path from top level objects.");
 }
 
 - (void)testExplicitlyIncludedEmbeddedOrphanIsAllowedForLocalRealm {

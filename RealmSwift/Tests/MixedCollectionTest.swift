@@ -930,7 +930,7 @@ class MixedCollectionTest: TestCase, @unchecked Sendable {
                     iterateNestedCollectionKeyValue(item)
                 }
             case .dictionary(let d):
-                for (_, val) in d.asKeyValueSequence() {
+                for (_, val) in d {
                     iterateNestedCollectionKeyValue(val)
                 }
             default:

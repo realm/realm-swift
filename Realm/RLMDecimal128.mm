@@ -73,7 +73,7 @@
     return self;
 }
 
-- (instancetype)initWithString:(NSString *)string error:(__unused NSError **)error {
+- (instancetype)initWithString:(NSString *)string {
     if ((self = [self init])) {
         _value = realm::Decimal128(string.UTF8String);
     }
@@ -85,7 +85,7 @@
 }
 
 + (instancetype)decimalWithNSDecimal:(NSDecimalNumber *)number {
-    return [[self alloc] initWithString:number.stringValue error:nil];
+    return [[self alloc] initWithString:number.stringValue];
 }
 
 - (id)copyWithZone:(NSZone *)zone {

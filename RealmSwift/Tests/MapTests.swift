@@ -121,38 +121,6 @@ class MapTests: TestCase, @unchecked Sendable {
         XCTAssertFalse(obj.decimalOpt.contains { $1 == nil })
         XCTAssertFalse(obj.objectIdOpt.contains { $1 == nil })
         XCTAssertFalse(obj.uuidOpt.contains { $1 == nil })
-
-        // Map also supports iteration through `SingleMapEntry` being the element.
-        // We can't create this struct directly so we need to map over the contents of the dictionary
-        // and test if that element exists.
-        XCTAssertFalse(obj.int.map(obj.int.contains).contains(true))
-        XCTAssertFalse(obj.int8.map(obj.int8.contains).contains(true))
-        XCTAssertFalse(obj.int16.map(obj.int16.contains).contains(true))
-        XCTAssertFalse(obj.int32.map(obj.int32.contains).contains(true))
-        XCTAssertFalse(obj.int64.map(obj.int64.contains).contains(true))
-        XCTAssertFalse(obj.float.map(obj.float.contains).contains(true))
-        XCTAssertFalse(obj.double.map(obj.double.contains).contains(true))
-        XCTAssertFalse(obj.string.map(obj.string.contains).contains(true))
-        XCTAssertFalse(obj.data.map(obj.data.contains).contains(true))
-        XCTAssertFalse(obj.date.map(obj.date.contains).contains(true))
-        XCTAssertFalse(obj.decimal.map(obj.decimal.contains).contains(true))
-        XCTAssertFalse(obj.objectId.map(obj.objectId.contains).contains(true))
-        XCTAssertFalse(obj.uuid.map(obj.uuid.contains).contains(true))
-        XCTAssertFalse(obj.object.map(obj.object.contains).contains(true))
-
-        XCTAssertFalse(obj.intOpt.map(obj.intOpt.contains).contains(true))
-        XCTAssertFalse(obj.int8Opt.map(obj.int8Opt.contains).contains(true))
-        XCTAssertFalse(obj.int16Opt.map(obj.int16Opt.contains).contains(true))
-        XCTAssertFalse(obj.int32Opt.map(obj.int32Opt.contains).contains(true))
-        XCTAssertFalse(obj.int64Opt.map(obj.int64Opt.contains).contains(true))
-        XCTAssertFalse(obj.floatOpt.map(obj.floatOpt.contains).contains(true))
-        XCTAssertFalse(obj.doubleOpt.map(obj.doubleOpt.contains).contains(true))
-        XCTAssertFalse(obj.stringOpt.map(obj.stringOpt.contains).contains(true))
-        XCTAssertFalse(obj.dataOpt.map(obj.dataOpt.contains).contains(true))
-        XCTAssertFalse(obj.dateOpt.map(obj.dateOpt.contains).contains(true))
-        XCTAssertFalse(obj.decimalOpt.map(obj.decimalOpt.contains).contains(true))
-        XCTAssertFalse(obj.objectIdOpt.map(obj.objectIdOpt.contains).contains(true))
-        XCTAssertFalse(obj.uuidOpt.map(obj.uuidOpt.contains).contains(true))
     }
 
     func testInvalidated() {
@@ -337,7 +305,7 @@ class MapTests: TestCase, @unchecked Sendable {
         XCTAssertEqual(expected.count, 0)
 
         expected = Set((0..<10).map { "key\($0)" })
-        for (key, value) in map.asKeyValueSequence() {
+        for (key, value) in map {
             XCTAssertEqual(key, value!.stringCol)
             expected.remove(key)
         }

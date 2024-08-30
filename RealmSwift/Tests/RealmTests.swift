@@ -261,9 +261,10 @@ class RealmTests: TestCase, @unchecked Sendable {
     }
 
     func testDynamicWriteSubscripting() {
-        try! Realm().beginWrite()
-        let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
-        try! Realm().commitWrite()
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.dynamicCreate("SwiftStringObject", value: ["1"])
+        try! realm.commitWrite()
 
         XCTAssertNotNil(object, "Dynamic Object Creation Failed")
 
@@ -272,12 +273,13 @@ class RealmTests: TestCase, @unchecked Sendable {
     }
 
     func testBeginWrite() {
-        try! Realm().beginWrite()
-        assertThrows(try! Realm().beginWrite())
-        try! Realm().cancelWrite()
-        try! Realm().beginWrite()
-        try! Realm().create(SwiftStringObject.self, value: ["1"])
-        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
+        let realm = try! Realm()
+        realm.beginWrite()
+        assertThrows(realm.beginWrite())
+        realm.cancelWrite()
+        realm.beginWrite()
+        realm.create(SwiftStringObject.self, value: ["1"])
+        XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 1)
     }
 
     func testWriteReturning() {
@@ -289,28 +291,30 @@ class RealmTests: TestCase, @unchecked Sendable {
     }
 
     func testCommitWrite() {
-        try! Realm().beginWrite()
-        try! Realm().create(SwiftStringObject.self, value: ["1"])
-        try! Realm().commitWrite()
-        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
-        try! Realm().beginWrite()
+        let realm = try! Realm()
+        realm.beginWrite()
+        realm.create(SwiftStringObject.self, value: ["1"])
+        try! realm.commitWrite()
+        XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 1)
+        realm.beginWrite()
     }
 
     func testCancelWrite() {
-        assertThrows(try! Realm().cancelWrite())
-        try! Realm().beginWrite()
-        try! Realm().create(SwiftStringObject.self, value: ["1"])
-        try! Realm().cancelWrite()
-        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
+        let realm = try! Realm()
+        assertThrows(realm.cancelWrite())
+        realm.beginWrite()
+        realm.create(SwiftStringObject.self, value: ["1"])
+        realm.cancelWrite()
+        XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 0)
 
-        try! Realm().write {
+        try! realm.write {
             self.assertThrows(self.realmWithTestPath().cancelWrite())
-            let object = try! Realm().create(SwiftStringObject.self)
-            try! Realm().cancelWrite()
+            let object = realm.create(SwiftStringObject.self)
+            realm.cancelWrite()
             XCTAssertTrue(object.isInvalidated)
-            XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
+            XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 0)
         }
-        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
+        XCTAssertEqual(realm.objects(SwiftStringObject.self).count, 0)
     }
 
     func testThrowsWrite() {
@@ -1511,16 +1515,6 @@ class RealmTests: TestCase, @unchecked Sendable {
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 extension RealmTests {
-    @MainActor
-    func testOpenBehaviorForLocalRealm() async throws {
-        let realm = try await Realm(downloadBeforeOpen: .always)
-        _ = try await Realm(downloadBeforeOpen: .always)
-        _ = try await Task { @CustomGlobalActor in
-            _ = try await openRealm(actor: CustomGlobalActor.shared, downloadBeforeOpen: .always)
-        }.value
-        realm.invalidate()
-    }
-
     // MARK: - Async Refresh
 
     func manuallyAdvancedRealm() throws -> (Realm, String) {

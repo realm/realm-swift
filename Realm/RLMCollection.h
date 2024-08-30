@@ -23,7 +23,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 @protocol RLMValue;
 @class RLMRealm, RLMResults, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange, RLMSectionedResults;
-typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
+typedef NS_CLOSED_ENUM(int32_t, RLMPropertyType);
 /// A callback which is invoked on each element in the Results collection which returns the section key.
 typedef id<RLMValue> _Nullable(^RLMSectionedResultsKeyBlock)(id);
 
@@ -530,7 +530,7 @@ __attribute__((warn_unused_result));
 
  `RLMSortDescriptor` instances are immutable.
  */
-RLM_SWIFT_SENDABLE RLM_FINAL
+NS_SWIFT_SENDABLE RLM_FINAL
 @interface RLMSortDescriptor : NSObject
 
 #pragma mark - Properties

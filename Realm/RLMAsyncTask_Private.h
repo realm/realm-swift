@@ -27,28 +27,18 @@ RLM_HEADER_AUDIT_BEGIN(nullability)
 
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
                            confinedTo:(RLMScheduler *)confinement
-                             download:(bool)waitForDownloadCompletion
                            completion:(RLMAsyncOpenRealmCallback)completion
 __attribute__((objc_direct));
 
 - (instancetype)initWithConfiguration:(RLMRealmConfiguration *)configuration
-                           confinedTo:(RLMScheduler *)confinement
-                             download:(bool)waitForDownloadCompletion;
+                           confinedTo:(RLMScheduler *)confinement;
 
 - (void)waitWithCompletion:(void (^)(NSError *_Nullable))completion;
 - (void)waitForOpen:(RLMAsyncOpenRealmCallback)completion __attribute__((objc_direct));
 @end
 
-// A cancellable task for waiting for downloads on an already-open Realm.
-RLM_SWIFT_SENDABLE
-@interface RLMAsyncDownloadTask : NSObject
-- (instancetype)initWithRealm:(RLMRealm *)realm;
-- (void)cancel;
-- (void)waitWithCompletion:(void (^)(NSError *_Nullable))completion;
-@end
-
 // A cancellable task for beginning an async write
-RLM_SWIFT_SENDABLE
+NS_SWIFT_SENDABLE
 @interface RLMAsyncWriteTask : NSObject
 // Must only be called from within the Actor
 - (instancetype)initWithRealm:(RLMRealm *)realm;
@@ -61,23 +51,11 @@ RLM_SWIFT_SENDABLE
 
 typedef void (^RLMAsyncRefreshCompletion)(bool);
 // A cancellable task for refreshing a Realm
-RLM_SWIFT_SENDABLE
+NS_SWIFT_SENDABLE
 @interface RLMAsyncRefreshTask : NSObject
 - (void)complete:(bool)didRefresh;
 - (void)wait:(RLMAsyncRefreshCompletion)completion;
 + (RLMAsyncRefreshTask *)completedRefresh;
-@end
-
-// A cancellable task for refreshing a Realm
-RLM_SWIFT_SENDABLE
-@interface RLMAsyncSubscriptionTask : NSObject
-
-- (instancetype)initWithSubscriptionSet:(RLMSyncSubscriptionSet *)subscriptionSet
-                                  queue:(nullable dispatch_queue_t)queue
-                                timeout:(NSTimeInterval)timeout
-                             completion:(void(^)(NSError *))completion;
-
-- (void)waitForSubscription;
 @end
 
 RLM_HEADER_AUDIT_END(nullability)

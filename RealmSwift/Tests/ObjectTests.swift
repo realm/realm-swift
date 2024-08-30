@@ -1697,7 +1697,6 @@ class ObjectTests: TestCase, @unchecked Sendable {
 
     @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
     func testCancelTaskWhileWaitingForInitial() async throws {
-        return; // FIXME
         // This can't be tested deterministically as it's trying to hit specific
         // timing windows, so instead spawn a bunch of tasks and hope that at
         // least one is in each of the interesting states. Not handling all of
@@ -1727,7 +1726,7 @@ class ObjectTests: TestCase, @unchecked Sendable {
                 // Actor executors aren't fifo, so we can sometimes prevent the
                 // async opens from ever completing by continuously spawning new
                 // tasks
-                while waitingForRealm.value > 10 {
+                while waitingForRealm.value >= 10 {
                     await Task.yield()
                 }
             }
@@ -2054,7 +2053,7 @@ class ObjectTests: TestCase, @unchecked Sendable {
         let frozen = obj.freeze()
         XCTAssertTrue(frozen.isFrozen)
 
-        try! obj.realm!.write({ obj.boolCol = false })
+        try! obj.realm!.write { obj.boolCol = false }
         XCTAssert(frozen.boolCol, "Frozen objects shouldn't mutate")
 
         let thawed = frozen.thaw()!

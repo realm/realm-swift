@@ -22,16 +22,9 @@
 #import <Realm/Realm.h>
 #import <Realm/RLMSchema_Private.h>
 
-#import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
-#import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncManager_Private.hpp"
-#import "RLMUser_Private.hpp"
 
-#import <realm/object-store/impl/apple/keychain_helper.hpp>
-#import <realm/object-store/sync/impl/sync_file.hpp>
-#import <realm/object-store/sync/sync_manager.hpp>
 #import <realm/util/base64.hpp>
 
 #import <Availability.h>
@@ -165,77 +158,6 @@ void (RLMAssertExceptionReason)(XCTestCase *self,
 bool RLMHasCachedRealmForPath(NSString *path) {
     return RLMGetAnyCachedRealmForPath(path.UTF8String);
 }
-
-// A network transport which doesn't actually do anything
-@interface NoOpTransport : NSObject <RLMNetworkTransport>
-@end
-@implementation NoOpTransport
-- (void)sendRequestToServer:(RLMRequest *)request
-                 completion:(RLMNetworkTransportCompletionBlock)completionBlock {
-}
-- (NSURLSession *)doStreamRequest:(RLMRequest *)request
-                  eventSubscriber:(id<RLMEventDelegate>)subscriber {
-    return nil;
-}
-@end
-
-class FakeSyncUser : public realm::SyncUser {
-    std::string user_id() const noexcept override
-    {
-        return "user id";
-    }
-    std::string app_id() const noexcept override
-    {
-        return "app id";
-    }
-
-    std::string access_token() const override
-    {
-        return "";
-    }
-    std::string refresh_token() const override
-    {
-        return "";
-    }
-    realm::SyncUser::State state() const override
-    {
-        return realm::SyncUser::State::LoggedOut;
-    }
-    bool access_token_refresh_required() const override
-    {
-        return false;
-    }
-    realm::SyncManager* sync_manager() override
-    {
-        return nullptr;
-    }
-
-    void request_log_out() override {}
-    void request_refresh_location(CompletionHandler&&) override {}
-    void request_access_token(CompletionHandler&&) override {}
-
-    void track_realm(std::string_view) override {}
-    std::string create_file_action(realm::SyncFileAction, std::string_view, std::optional<std::string>) override
-    {
-        return "";
-    }
-};
-
-@implementation RLMRealmConfiguration (TestUser)
-+ (RLMRealmConfiguration *)fakeSyncConfiguration {
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    config.configRef.sync_config = std::make_shared<realm::SyncConfig>();
-    config.configRef.sync_config->user = std::make_shared<FakeSyncUser>();
-    [config updateSchemaMode];
-    return config;
-}
-
-+ (RLMRealmConfiguration *)fakeFlexibleSyncConfiguration {
-    RLMRealmConfiguration *config = [RLMRealmConfiguration fakeSyncConfiguration];
-    config.configRef.sync_config->flx_sync_requested = true;
-    return config;
-}
-@end
 
 bool RLMThreadSanitizerEnabled() {
 #if __has_feature(thread_sanitizer)

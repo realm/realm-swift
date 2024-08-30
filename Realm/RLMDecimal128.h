@@ -29,7 +29,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  this type stores up to 34 digits of significand and an exponent from -6143 to
  6144.
  */
-RLM_SWIFT_SENDABLE // immutable
+NS_SWIFT_SENDABLE // immutable
 @interface RLMDecimal128 : NSObject <NSCopying>
 /// Creates a new zero-initialized decimal128.
 - (instancetype)init;
@@ -50,9 +50,8 @@ RLM_SWIFT_SENDABLE // immutable
 
 /// Parses the given string to a RLMDecimal128.
 ///
-/// Returns a decimal where `isNaN` is `YES` if the string cannot be parsed as a decimal. `error` is never set
-/// and this will never actually return `nil`.
-- (nullable instancetype)initWithString:(NSString *)string error:(NSError **)error;
+/// Returns a decimal where `isNaN` is `YES` if the string cannot be parsed as a decimal.
+- (instancetype)initWithString:(NSString *)string;
 
 /// Converts the given number to a RLMDecimal128.
 + (instancetype)decimalWithNumber:(NSNumber *)number;

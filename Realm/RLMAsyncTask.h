@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMConstants.h>
-#import <Realm/RLMSyncSession.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
@@ -31,51 +30,8 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  session as the sync session itself is created asynchronously, and may not exist
  yet when -[RLMRealm asyncOpenWithConfiguration:completion:] returns.
  */
-RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
+NS_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMAsyncOpenTask : NSObject
-/**
- Register a progress notification block.
-
- Each registered progress notification block is called whenever the sync
- subsystem has new progress data to report until the task is either cancelled
- or the completion callback is called. Progress notifications are delivered on
- the main queue.
- */
-- (void)addProgressNotificationBlock:(RLMProgressNotificationBlock)block 
-    __attribute__((deprecated("Use addSyncProgressNotificationBlock instead", "addSyncProgressNotificationBlock")));
-
-/**
- Register a progress notification block.
-
- Each registered progress notification block is called whenever the sync
- subsystem has new progress data to report until the task is either cancelled
- or the completion callback is called. Progress notifications are delivered on
- the main queue.
- */
-- (void)addSyncProgressNotificationBlock:(RLMSyncProgressNotificationBlock)block;
-
-/**
- Register a progress notification block which is called on the given queue.
-
- Each registered progress notification block is called whenever the sync
- subsystem has new progress data to report until the task is either cancelled
- or the completion callback is called. Progress notifications are delivered on
- the supplied queue.
- */
-- (void)addProgressNotificationOnQueue:(dispatch_queue_t)queue
-                                 block:(RLMProgressNotificationBlock)block
-    __attribute__((deprecated("Use addSyncProgressNotificationOnQueue instead", "addSyncProgressNotificationOnQueue")));
-
-/**
- Register a progress notification block which is called on the given queue.
-
- Each registered progress notification block is called whenever the sync
- subsystem has new progress data to report until the task is either cancelled
- or the completion callback is called. Progress notifications are delivered on
- the supplied queue.
- */
-- (void)addSyncProgressNotificationOnQueue:(dispatch_queue_t)queue
-                                     block:(RLMSyncProgressNotificationBlock)block;
 
 /**
  Cancel the asynchronous open.

@@ -53,8 +53,8 @@ NSData *RLMGenerateKey(void);
 - (nullable id)nonLiteralNil;
 - (BOOL)encryptTests;
 
-- (void)dispatchAsync:(RLM_SWIFT_SENDABLE dispatch_block_t)block;
-- (void)dispatchAsyncAndWait:(RLM_SWIFT_SENDABLE dispatch_block_t)block;
+- (void)dispatchAsync:(NS_SWIFT_SENDABLE dispatch_block_t)block;
+- (void)dispatchAsyncAndWait:(NS_SWIFT_SENDABLE dispatch_block_t)block;
 
 @property (nonatomic, readonly) dispatch_queue_t bgQueue;
 

@@ -30,7 +30,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
  Schemas map to collections of tables in the core database.
  */
-RLM_SWIFT_SENDABLE // not actually immutable, but the public API kinda is
+NS_SWIFT_SENDABLE // not actually immutable, but the public API kinda is
 @interface RLMSchema : NSObject<NSCopying>
 
 #pragma mark - Properties

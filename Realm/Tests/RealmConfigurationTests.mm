@@ -20,10 +20,8 @@
 
 #import "TestUtils.h"
 
-#import "RLMApp_Private.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMTestObjects.h"
-#import "RLMUser_Private.h"
 #import "RLMUtil.hpp"
 
 @interface RealmConfigurationTests : RLMTestCase
@@ -108,23 +106,6 @@
 
     configuration.deleteRealmIfMigrationNeeded = false;
     XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::Automatic);
-
-    configuration = [RLMRealmConfiguration fakeSyncConfiguration];
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
-    configuration.objectClasses = @[];
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
-    configuration.readOnly = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.objectClasses = nil;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.readOnly = false;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveDiscovered);
-    configuration.readOnly = true;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.objectClasses = @[];
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::ReadOnly);
-    configuration.readOnly = false;
-    XCTAssertEqual(configuration.schemaMode, realm::SchemaMode::AdditiveExplicit);
 }
 
 #pragma mark - Default Configuration

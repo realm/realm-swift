@@ -38,12 +38,6 @@ This simple app shows how to use an encrypted realm.
 
 This simple app demonstrates how to define models with inverse relationships using `-linkingObjectsOfClass:forProperty:`.
 
-### Draw
-
-This is a simple drawing app designed to show off the collaborative features of the [Realm Mobile Platform](https://realm.io/news/introducing-realm-mobile-platform/).
-
-Any number of users may draw on a single shared canvas in any given moment, with contributions from other devices appearing on the canvas in real-time.
-
 #### Installation Instructions
 
 1. [Download the macOS version](https://realm.io/docs/realm-mobile-platform/get-started/) of the Realm Mobile Platform.
@@ -95,8 +89,6 @@ This app demonstrates how to define Projection on Realm Object and how to use it
 ### AppClip / AppClipParent
 
 These two targets demonstrate how to use Realm to persist data between an App Clip and its parent.
-
-**Note:** This is only supported for non-synchronized realms.
 
 #### Example Usage
 

@@ -21,7 +21,7 @@
 RLM_HEADER_AUDIT_BEGIN(nullability)
 
 /// An enum representing different levels of sync-related logging that can be configured.
-typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
+typedef NS_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
     /// Nothing will ever be logged.
     RLMLogLevelOff,
     /// Only fatal errors will be logged.
@@ -52,7 +52,7 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMLogLevel) {
 ///
 /// The log function may be called from multiple threads simultaneously, and is
 /// responsible for performing its own synchronization if any is required.
-RLM_SWIFT_SENDABLE // invoked on a background thread
+NS_SWIFT_SENDABLE // invoked on a background thread
 typedef void (^RLMLogFunction)(RLMLogLevel level, NSString *message);
 
 /**

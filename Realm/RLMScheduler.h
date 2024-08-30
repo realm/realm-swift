@@ -33,7 +33,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 // an actor. The scheduler ensures that the Realm is only used on one thread at
 // a time, and allows us to dispatch work to the thread where we can access the
 // Realm safely.
-RLM_SWIFT_SENDABLE // is immutable
+NS_SWIFT_SENDABLE // is immutable
 @interface RLMScheduler : NSObject
 + (RLMScheduler *)mainRunLoop __attribute__((objc_direct));
 + (RLMScheduler *)currentRunLoop __attribute__((objc_direct));

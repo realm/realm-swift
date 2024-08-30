@@ -74,20 +74,6 @@ jobs:
             bundler-cache: true
         - name: Publish
           run: bundle exec ./build.sh publish-cocoapods v${{ needs.prepare.outputs.VERSION }}
-  update-checker:
-      runs-on: macos-latest
-      name: Update to latest version update checker file
-      needs: tag-release
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.UPDATE_CHECKER_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.UPDATE_CHECKER_SECRET_KEY }}
-      steps:
-        - uses: actions/checkout@v4
-        - uses: ruby/setup-ruby@v1
-          with:
-            bundler-cache: true
-        - run: brew install s3cmd
-        - run: bundle exec ./build.sh publish-update-checker
   test-installation:
       runs-on: macos-14
       name: Run installation test for ${{ matrix.platform }}, ${{ matrix.installation }} and ${{ matrix.linkage }}
@@ -148,7 +134,7 @@ jobs:
   post-slack-release:
       runs-on: macos-latest
       name: Publish to release Slack channel
-      needs: [create-release, prepare, publish-cocoapods, update-checker, publish-docs]
+      needs: [create-release, prepare, publish-cocoapods, publish-docs]
       env:
         WEBHOOK_URL: ${{ secrets.SLACK_RELEASES_WEBHOOK }}
       steps:

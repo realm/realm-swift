@@ -1,9 +1,10 @@
-x.y.z Release notes (yyyy-MM-dd)
+20.0.0 Release notes (2024-09-09)
 =============================================================
 
 The minimum supported version of Xcode is now 15.3.
 
 ### Enhancements
+
 * Build in Swift 6 language mode when using Xcode 16. Libraries build in Swift
   6 mode can be consumed by apps built in Swift 5 mode, so this should not have
   any immediate effects beyond eliminating some warnings and ensuring that all
@@ -19,9 +20,6 @@ The minimum supported version of Xcode is now 15.3.
   of macros. It can still be used as a property wrapper for class properties
   and as a manual wrapper locally, but note that it does not combine well with
   actor-isolated Realms.
-  - In Swift 6 mode a few mongo client functions have changed from returning
-  `[AnyHashable: Any]` to `Document`. These should have been `Document` all
-  along, and the old return type no longer compiles due to not being Sendable.
 * Some SwiftUI components are now explicitly marked as `@MainActor`. These
   types were implicitly `@MainActor` in Swift 5, but became nonisolated when
   using Xcode 16 in Swift 5 mode due to the removal of implicit isolation when
@@ -30,21 +28,59 @@ The minimum supported version of Xcode is now 15.3.
 * Add Xcode 16 and 16.1 binaries to the release packages (currently built with
   beta 6 and beta 1 respectively).
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+### Breaking Changes
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* All Atlas App Services and Atlas Device Sync functionality has been removed.
+  Users of Atlas Device Sync should pin to v10.
+* Queries on AnyRealmValue properties previously considered strings to be
+  equivalent to Data containing the UTF-8 encoded string. Strings and Data are
+  now considered different types and queries for one of them will not match the
+  other.
+* Realms are no longer autoreleased when initialized. This means that code
+  along the lines of the following will no longer work:
+
+  ```Swift
+  try! Realm().beginWrite()
+  try! Realm().create(MyObject.self, value: ...)
+  try! Realm().commitWrite()
+  ```
+
+  This was a pattern which was somewhat natural with the original version of
+  the objective-c API, but only worked in debug builds and would fail in
+  release builds. We decided to make it consistently work by forcing the Realm
+  to be autoreleased rather than let users write code which appeared to work
+  but was actually broken. In modern Swift this code is very strange, and
+  autoreleasing the Realm made it much more difficult to ensure that the
+  file is actually closed at predictable times.
+
+  Realms are now returned retained in both debug and release modes, so this
+  will always break rather than appearing to work. Note that there is still a
+  weak cache of Realms and `Realm()` will still return a reference to the
+  existing Realm if there is one open on the current thread.
+* Iterating a Map now produces the tuple `(key: KeyType, value: ValueType)`
+  rather than a very similar struct, and `.asKeyValueSequence()` has been
+  removed. This aligns `Map` with `Dictionary` and makes many operations
+  defined by `Sequence` work on `Map`.
+* Passing an empty array for notification keypaths to filter on (e.g.
+  `obj.observe(keyPaths: [])`) was treated the same as passing `nil`, i.e. no
+  filtering was done. It now instead observes no keypaths. For objects this
+  means it will only report the object being deleted, and for collections it
+  will only report collection-level changes and not changes to the objects
+  inside the collection.
+* `Decimal128(string:)` was marked as `throws`, but it never actually threw an
+  error and instead returned `NaN` if the string could not be parsed as a
+  decimal128. That behavior was kept and it is no longer marked as `throws`.
 
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
 * CocoaPods: 1.10 or later.
 * Xcode: 15.3.0-16.1 beta.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v14.12.1 to v20.0.0.
 
 10.53.1 Release notes (2024-09-05)
 =============================================================

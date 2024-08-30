@@ -14,4 +14,3 @@ cp -R "$source_root/core/realm-monorepo.xcframework/ios-arm64/Headers" "$source_
 
 mkdir -p "$source_root/include"
 cp "$source_root/Realm/"*.h "$source_root/Realm/"*.hpp "$source_root/include"
-echo "#define REALM_IOPLATFORMUUID @\"$(sh $source_root/build.sh get-ioplatformuuid)\"" >> "$source_root/Realm/RLMAnalytics.hpp"

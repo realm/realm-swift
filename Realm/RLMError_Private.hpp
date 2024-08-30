@@ -23,14 +23,6 @@
 
 RLM_HIDDEN_BEGIN
 
-namespace realm {
-struct SyncError;
-namespace app {
-class App;
-struct AppError;
-}
-}
-
 NSError *makeError(realm::Status const& status);
 
 template <typename T>
@@ -42,8 +34,5 @@ NSError *makeError(realm::Exception const& exception);
 NSError *makeError(realm::FileAccessError const& exception);
 NSError *makeError(std::exception const& exception);
 NSError *makeError(std::system_error const& exception);
-NSError *makeError(realm::app::AppError const& error);
-NSError *makeError(realm::SyncError&& error, const std::shared_ptr<realm::app::App>& app);
-NSError *makeError(realm::SyncError const& error) = delete;
 
 RLM_HIDDEN_END

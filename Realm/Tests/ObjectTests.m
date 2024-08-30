@@ -1077,9 +1077,10 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     // Unmanaged object can be accessed from other threads
     [self dispatchAsyncAndWait:^{ XCTAssertNoThrow(obj.intCol = 5); }];
 
-    [RLMRealm.defaultRealm beginWriteTransaction];
-    [RLMRealm.defaultRealm addObject:obj];
-    [RLMRealm.defaultRealm commitWriteTransaction];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
 
     [self dispatchAsyncAndWait:^{ RLMAssertThrowsWithReason(obj.intCol, @"incorrect thread"); }];
 }
@@ -1157,7 +1158,8 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
 #pragma mark - Primary Keys
 
 - (void)testPrimaryKey {
-    [[RLMRealm defaultRealm] beginWriteTransaction];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
 
     [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string", @1])];
     [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string2", @1])];
@@ -1182,7 +1184,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     RLMAssertThrowsWithReason([PrimaryNullableIntObject createInDefaultRealmWithValue:(@[NSNull.null, @0])],
                               @"existing primary key value");
 
-    [[RLMRealm defaultRealm] commitWriteTransaction];
+    [realm commitWriteTransaction];
 }
 
 - (void)testCreateOrUpdate {
@@ -1294,7 +1296,8 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
 }
 
 - (void)testObjectInSet {
-    [[RLMRealm defaultRealm] beginWriteTransaction];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
 
     // set object with primary and non primary keys as they both override isEqual and hash
     PrimaryStringObject *obj = [PrimaryStringObject createInDefaultRealmWithValue:(@[@"string2", @1])];
@@ -1311,17 +1314,18 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     XCTAssertTrue([dict containsObject:strObj]);
     XCTAssertFalse([dict containsObject:[[StringObject allObjects] firstObject]]);
 
-    [[RLMRealm defaultRealm] commitWriteTransaction];
+    [realm commitWriteTransaction];
 }
 
 - (void)testObjectForKey {
-    [RLMRealm.defaultRealm beginWriteTransaction];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
     PrimaryStringObject *strObj = [PrimaryStringObject createInDefaultRealmWithValue:@[@"key", @0]];
     PrimaryNullableStringObject *nullStrObj = [PrimaryNullableStringObject createInDefaultRealmWithValue:@[NSNull.null, @0]];
     PrimaryIntObject *intObj = [PrimaryIntObject createInDefaultRealmWithValue:@[@0]];
     PrimaryNullableIntObject *nonNullIntObj = [PrimaryNullableIntObject createInDefaultRealmWithValue:@[@0]];
     PrimaryNullableIntObject *nullIntObj = [PrimaryNullableIntObject createInDefaultRealmWithValue:@[NSNull.null]];
-    [RLMRealm.defaultRealm commitWriteTransaction];
+    [realm commitWriteTransaction];
 
     // no PK
     RLMAssertThrowsWithReason([StringObject objectForPrimaryKey:@""],
@@ -1584,6 +1588,7 @@ static IntObject *managedObject(void) {
 }
 
 - (void)testThawCreatedOnDifferentThread {
+    __attribute((objc_precise_lifetime)) RLMRealm *realm = [RLMRealm defaultRealm];
     XCTAssertEqual([[IntObject allObjects] count], 0);
 
     __block IntObject *frozen;

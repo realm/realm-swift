@@ -33,12 +33,11 @@ func inMemoryRealm(_ inMememoryIdentifier: String) -> Realm {
 
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 func openRealm(configuration: Realm.Configuration = .defaultConfiguration,
-               actor: isolated any Actor,
-               downloadBeforeOpen: Realm.OpenBehavior = .never) async throws -> Realm {
+               actor: isolated any Actor) async throws -> Realm {
 #if compiler(<6)
-    try await Realm(configuration: configuration, actor: actor, downloadBeforeOpen: downloadBeforeOpen)
+    try await Realm(configuration: configuration, actor: actor)
 #else
-    try await Realm.open(configuration: configuration, downloadBeforeOpen: downloadBeforeOpen)
+    try await Realm.open(configuration: configuration)
 #endif
 }
 
@@ -172,16 +171,6 @@ extension Realm {
 }
 
 extension Object {
-    public convenience init(value: [String: Any]) {
-        self.init(value: value as Any)
-    }
-
-    public convenience init(value: [Any]) {
-        self.init(value: value as Any)
-    }
-}
-
-extension AsymmetricObject {
     public convenience init(value: [String: Any]) {
         self.init(value: value as Any)
     }

@@ -67,7 +67,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  @see `RLMThreadConfined`
  @see `-[RLMRealm resolveThreadSafeReference:]`
  */
-RLM_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
+NS_SWIFT_SENDABLE RLM_FINAL // is internally thread-safe
 @interface RLMThreadSafeReference<__covariant Confined : id<RLMThreadConfined>> : NSObject
 
 /**

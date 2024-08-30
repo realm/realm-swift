@@ -704,14 +704,23 @@
                                  @"object must be of type NSArray for BETWEEN operations");
 
     // Binary based comparability
-    RLMAssertCount(AllTypesObject, 2U, @"anyCol == '0'");
-    RLMAssertCount(AllTypesObject, allValues.count-2, @"anyCol != '0'");
-    RLMAssertCount(AllTypesObject, 2U, @"anyCol BEGINSWITH '1'");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == '0'");
+    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != '0'");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol BEGINSWITH '1'");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol BEGINSWITH 'a'");
-    RLMAssertCount(AllTypesObject, 2U, @"anyCol ENDSWITH '1'");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol ENDSWITH '1'");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol ENDSWITH 'a'");
-    RLMAssertCount(AllTypesObject, 2U, @"anyCol CONTAINS '1'");
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol CONTAINS '1'");
     RLMAssertCount(AllTypesObject, 0U, @"anyCol CONTAINS 'a'");
+
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol == %@", [@"0" dataUsingEncoding:NSUTF8StringEncoding]);
+    RLMAssertCount(AllTypesObject, allValues.count-1, @"anyCol != %@", [@"0" dataUsingEncoding:NSUTF8StringEncoding]);
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol BEGINSWITH %@", [@"1" dataUsingEncoding:NSUTF8StringEncoding]);
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol BEGINSWITH %@", [@"a" dataUsingEncoding:NSUTF8StringEncoding]);
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol ENDSWITH %@", [@"1" dataUsingEncoding:NSUTF8StringEncoding]);
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol ENDSWITH %@", [@"a" dataUsingEncoding:NSUTF8StringEncoding]);
+    RLMAssertCount(AllTypesObject, 1U, @"anyCol CONTAINS %@", [@"1" dataUsingEncoding:NSUTF8StringEncoding]);
+    RLMAssertCount(AllTypesObject, 0U, @"anyCol CONTAINS %@", [@"a" dataUsingEncoding:NSUTF8StringEncoding]);
 
     XCTAssertThrowsSpecificNamed([AllTypesObject objectsWhere:@"anyCol CONATINS 0"],
                                  NSException,
@@ -3712,7 +3721,7 @@ static NSData *data(const char *str) {
 }
 
 - (void)testDictionaryQueryKeySubscript {
-    void (^test)(NSString *, NSArray *, BOOL) = ^(NSString *property, NSArray *values, BOOL isNumeric) {
+    void (^test)(NSString *, NSArray *, id (^)(NSString *)) = ^(NSString *property, NSArray *values, id (^string)(NSString *)) {
         RLMRealm *realm = [self realm];
         [realm beginWriteTransaction];
         [AllDictionariesObject createInRealm:realm withValue:@{property: @{@"aKey": values[0]}}];
@@ -3726,7 +3735,7 @@ static NSData *data(const char *str) {
         RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] !=[c] %@", property, values[0]);
         RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] =[cd] %@", property, values[0]);
 
-        if (isNumeric) {
+        if (!string) {
             RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] > %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 3U, @"NOT %K['aKey'] > %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] >[c] %@", property, values[0]);
@@ -3744,51 +3753,53 @@ static NSData *data(const char *str) {
             RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] =[cd] %@", property, values[0]);
             RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] !=[cd] %@", property, values[0]);
             // BEGINSWITH
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH 'he'", property);
-            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] BEGINSWITH 'he'", property);
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH[c] 'he'", property);
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH[cd] 'he'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH %@", property, string(@"he"));
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] BEGINSWITH %@", property, string(@"he"));
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH[c] %@", property, string(@"he"));
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] BEGINSWITH[cd] %@", property, string(@"he"));
             RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] BEGINSWITH NULL", property);
             // CONTAINS
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS 'el'", property);
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS[c] 'el'", property);
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS[cd] 'el'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS %@", property, string(@"el"));
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS[c] %@", property, string(@"el"));
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] CONTAINS[cd] %@", property, string(@"el"));
             RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] CONTAINS NULL", property);
             // ENDSWITH
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH 'lo'", property);
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH[c] 'lo'", property);
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH[cd] 'lo'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH %@", property, string(@"lo"));
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH[c] %@", property, string(@"lo"));
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] ENDSWITH[cd] %@", property, string(@"lo"));
             RLMAssertCount(AllDictionariesObject, 0U, @"%K['aKey'] ENDSWITH NULL", property);
             // LIKE
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] LIKE 'hel*'", property);
-            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] LIKE[c] 'hel*'", property);
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] LIKE %@", property, string(@"hel*"));
+            RLMAssertCount(AllDictionariesObject, 1U, @"%K['aKey'] LIKE[c] %@", property, string(@"hel*"));
             RLMAssertCount(AllDictionariesObject, 2U, @"%K['aKey'] LIKE NULL", property);
-            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE 'hel*'", property);
-            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE[c] 'hel*'", property);
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE %@", property, string(@"hel*"));
+            RLMAssertCount(AllDictionariesObject, 2U, @"NOT %K['aKey'] LIKE[c] %@", property, string(@"hel*"));
             RLMAssertCount(AllDictionariesObject, 1U, @"NOT %K['aKey'] LIKE NULL", property);
-            RLMAssertThrowsWithReasonMatching(([AllDictionariesObject objectsInRealm:realm where:@"%K['aKey'] LIKE[cd] 'hel*'", property]), @"not supported");
+            RLMAssertThrowsWithReasonMatching(([AllDictionariesObject objectsInRealm:realm where:@"%K['aKey'] LIKE[cd] %@", property, string(@"hel*")]), @"not supported");
         }
 
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
     };
-    test(@"intDict", @[@456, @123, @789], YES);
-    test(@"doubleDict", @[@456.123, @123.123, @789.123], YES);
-    test(@"boolDict", @[@NO, @NO, @YES], YES);
+    test(@"intDict", @[@456, @123, @789], nil);
+    test(@"doubleDict", @[@456.123, @123.123, @789.123], nil);
+    test(@"boolDict", @[@NO, @NO, @YES], nil);
     test(@"decimalDict", @[[RLMDecimal128 decimalWithNumber:@456.123],
                            [RLMDecimal128 decimalWithNumber:@123.123],
-                           [RLMDecimal128 decimalWithNumber:@789.123]], YES);
+                           [RLMDecimal128 decimalWithNumber:@789.123]], nil);
     test(@"dateDict", @[[NSDate dateWithTimeIntervalSince1970:4000],
                         [NSDate dateWithTimeIntervalSince1970:2000],
-                        [NSDate dateWithTimeIntervalSince1970:8000]], YES);
+                        [NSDate dateWithTimeIntervalSince1970:8000]], nil);
     test(@"dataDict", @[[NSData dataWithBytes:"hello" length:5],
                         [NSData dataWithBytes:"Héllo" length:5],
-                        [NSData dataWithBytes:"HELLO" length:5]], NO);
+                        [NSData dataWithBytes:"HELLO" length:5]], ^(NSString *str) {
+        return [str dataUsingEncoding:NSUTF8StringEncoding];
+    });
     test(@"objectIdDict", @[[[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1b" error:nil],
                             [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1a" error:nil],
-                            [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1c" error:nil]], YES);
-    test(@"stringDict", @[@"hello", @"Héllo", @"HELLO"], NO);
+                            [[RLMObjectId alloc] initWithString:@"60425fff91d7a195d5ddac1c" error:nil]], nil);
+    test(@"stringDict", @[@"hello", @"Héllo", @"HELLO"], ^(NSString *str) { return str; });
 }
 
 - (void)testDictionaryQueryKeySubscriptWithObjectCol {

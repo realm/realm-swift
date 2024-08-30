@@ -21,20 +21,9 @@
 #define RLM_HEADER_AUDIT_BEGIN NS_HEADER_AUDIT_BEGIN
 #define RLM_HEADER_AUDIT_END NS_HEADER_AUDIT_END
 
-#define RLM_SWIFT_SENDABLE NS_SWIFT_SENDABLE
-
 #define RLM_FINAL __attribute__((objc_subclassing_restricted))
 
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
-
-// Swift 5 considers NS_ENUM to be "open", meaning there could be values present
-// other than the defined cases (which allows adding more cases later without
-// it being a breaking change), while older versions consider it "closed".
-#ifdef NS_CLOSED_ENUM
-#define RLM_CLOSED_ENUM NS_CLOSED_ENUM
-#else
-#define RLM_CLOSED_ENUM NS_ENUM
-#endif
 
 #if __has_attribute(ns_error_domain) && (!defined(__cplusplus) || !__cplusplus || __cplusplus >= 201103L)
 #define RLM_ERROR_ENUM(type, name, domain) \
@@ -60,7 +49,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
  For more information, see [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/object-models/).
  */
-typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
+typedef NS_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
 #pragma mark - Primitive types
     /** Integers: `NSInteger`, `int`, `long`, `Int` (Swift) */
@@ -100,7 +89,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
  For more information, see [Realm Models](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/model-data/supported-types/#std-label-ios-anyrealmvalue-data-type).
  */
-typedef RLM_CLOSED_ENUM(int32_t, RLMAnyValueType) {
+typedef NS_CLOSED_ENUM(int32_t, RLMAnyValueType) {
 #pragma mark - Primitive types
     /** Integers: `NSInteger`, `int`, `long`, `Int` (Swift) */
     RLMAnyValueTypeInt    = 0,

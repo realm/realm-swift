@@ -18,8 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTestCase.h>
-
-#import <Realm/RLMUser.h>
+#import <Realm/RLMConstants.h>
 
 RLM_HEADER_AUDIT_BEGIN(nullability)
 
@@ -30,11 +29,6 @@ FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                                               NSString *fileName,
                                                               NSUInteger lineNumber);
 
-
-@interface RLMRealmConfiguration (TestUser)
-+ (RLMRealmConfiguration *)fakeSyncConfiguration;
-+ (RLMRealmConfiguration *)fakeFlexibleSyncConfiguration;
-@end
 
 // It appears to be impossible to check this from Swift so we need a helper function
 FOUNDATION_EXTERN bool RLMThreadSanitizerEnabled(void);

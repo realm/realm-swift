@@ -849,14 +849,15 @@ class ModernObjectCreationTests: TestCase, @unchecked Sendable {
     }
 
     func testAddAndUpdateChangedWithExisingNestedObjects() {
-        try! Realm().beginWrite()
-        let existingObject = try! Realm().create(SwiftPrimaryStringObject.self, value: ["primary", 1])
-        try! Realm().commitWrite()
+        let realm = try! Realm()
+        realm.beginWrite()
+        let existingObject = realm.create(SwiftPrimaryStringObject.self, value: ["primary", 1])
+        try! realm.commitWrite()
 
-        try! Realm().beginWrite()
+        realm.beginWrite()
         let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2] as [Any]])
-        try! Realm().add(object, update: .modified)
-        try! Realm().commitWrite()
+        realm.add(object, update: .modified)
+        try! realm.commitWrite()
 
         XCTAssertNotNil(object.realm)
         XCTAssertEqual(object.object!, existingObject) // the existing object should be updated

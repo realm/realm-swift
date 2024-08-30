@@ -18,7 +18,6 @@
 
 #import "RLMRealmConfiguration_Private.h"
 
-#import "RLMEvent.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.h"
 #import "RLMSchema_Private.hpp"
@@ -26,17 +25,6 @@
 
 #import <realm/object-store/schema.hpp>
 #import <realm/object-store/shared_realm.hpp>
-
-#if REALM_ENABLE_SYNC
-#import "RLMSyncConfiguration_Private.hpp"
-#import "RLMUser_Private.hpp"
-
-#import <realm/object-store/sync/sync_manager.hpp>
-#import <realm/util/bson/bson.hpp>
-#import <realm/sync/config.hpp>
-#else
-@class RLMSyncConfiguration;
-#endif
 
 static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"fileURL",
@@ -66,7 +54,6 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 
 @implementation RLMRealmConfiguration {
     realm::Realm::Config _config;
-    RLMSyncErrorReportingBlock _manualClientResetHandler;
 }
 
 - (realm::Realm::Config&)configRef {
@@ -128,7 +115,6 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     configuration->_migrationBlock = _migrationBlock;
     configuration->_shouldCompactOnLaunch = _shouldCompactOnLaunch;
     configuration->_customSchema = _customSchema;
-    configuration->_eventConfiguration = _eventConfiguration;
     configuration->_migrationObjectClass = _migrationObjectClass;
     configuration->_seedFilePath = _seedFilePath;
     return configuration;
@@ -204,29 +190,9 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     return _config.immutable() || _config.read_only();
 }
 
-static bool isSync(realm::Realm::Config const& config) {
-#if REALM_ENABLE_SYNC
-    return !!config.sync_config;
-#endif
-    return false;
-}
-
 - (void)updateSchemaMode {
-    if (self.deleteRealmIfMigrationNeeded) {
-        if (isSync(_config)) {
-            @throw RLMException(@"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).");
-        }
-    }
-    else if (self.readOnly) {
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnly : realm::SchemaMode::Immutable;
-    }
-    else if (isSync(_config)) {
-        if (_customSchema) {
-            _config.schema_mode = realm::SchemaMode::AdditiveExplicit;
-        }
-        else {
-            _config.schema_mode = realm::SchemaMode::AdditiveDiscovered;
-        }
+    if (self.readOnly) {
+        _config.schema_mode = realm::SchemaMode::Immutable;
     }
     else {
         _config.schema_mode = realm::SchemaMode::Automatic;
@@ -240,7 +206,7 @@ static bool isSync(realm::Realm::Config const& config) {
         } else if (self.shouldCompactOnLaunch) {
             @throw RLMException(@"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
         }
-        _config.schema_mode = isSync(_config) ? realm::SchemaMode::ReadOnly : realm::SchemaMode::Immutable;
+        _config.schema_mode =  realm::SchemaMode::Immutable;
     }
     else if (self.readOnly) {
         _config.schema_mode = realm::SchemaMode::Automatic;
@@ -267,9 +233,6 @@ static bool isSync(realm::Realm::Config const& config) {
     if (deleteRealmIfMigrationNeeded) {
         if (self.readOnly) {
             @throw RLMException(@"Cannot set `deleteRealmIfMigrationNeeded` when `readOnly` is set.");
-        }
-        if (isSync(_config)) {
-            @throw RLMException(@"Cannot set 'deleteRealmIfMigrationNeeded' when sync is enabled ('syncConfig' is set).");
         }
         _config.schema_mode = realm::SchemaMode::SoftResetFile;
     }
@@ -353,56 +316,8 @@ static bool isSync(realm::Realm::Config const& config) {
     _config.automatic_change_notifications = !disableAutomaticChangeNotifications;
 }
 
-#if REALM_ENABLE_SYNC
-- (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
-    if (syncConfiguration == nil) {
-        _config.sync_config = nullptr;
-        return;
-    }
-    auto& rawConfig = syncConfiguration.rawConfiguration;
-    if (rawConfig.user->state() == realm::SyncUser::State::Removed) {
-        @throw RLMException(@"Cannot set a sync configuration which has a removed user.");
-    }
-
-    _config.sync_config = std::make_shared<realm::SyncConfig>(rawConfig);
-    _config.path = syncConfiguration.path;
-
-    // The manual client reset handler doesn't exist on the raw config,
-    // so assign it here.
-    _manualClientResetHandler = syncConfiguration.manualClientResetHandler;
-
-    [self updateSchemaMode];
-}
-
-- (RLMSyncConfiguration *)syncConfiguration {
-    if (!_config.sync_config) {
-        return nil;
-    }
-    RLMSyncConfiguration* syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:*_config.sync_config path:_config.path];
-    syncConfig.manualClientResetHandler = _manualClientResetHandler;
-    return syncConfig;
-}
-
-#else // REALM_ENABLE_SYNC
-- (RLMSyncConfiguration *)syncConfiguration {
-    return nil;
-}
-#endif // REALM_ENABLE_SYNC
-
 - (realm::Realm::Config)config {
-    auto config = _config;
-    if (config.sync_config) {
-        config.sync_config = std::make_shared<realm::SyncConfig>(*config.sync_config);
-    }
-#if REALM_ENABLE_SYNC
-    if (config.sync_config) {
-        RLMSetConfigInfoForClientResetCallbacks(*config.sync_config, self);
-    }
-    if (_eventConfiguration) {
-        config.audit_config = [_eventConfiguration auditConfigWithRealmConfiguration:self];
-    }
-#endif
-    return config;
+    return _config;
 }
 
 @end

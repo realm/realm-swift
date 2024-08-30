@@ -931,10 +931,11 @@
         XCTAssertNoThrow(company.employeeDict);
         XCTAssertNoThrow(employees[@"eo"]);
     }];
-    
-    [RLMRealm.defaultRealm beginWriteTransaction];
-    [RLMRealm.defaultRealm addObject:company];
-    [RLMRealm.defaultRealm commitWriteTransaction];
+
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    [realm addObject:company];
+    [realm commitWriteTransaction];
     
     employees = company.employeeDict;
     XCTAssertNoThrow(company.employeeDict);

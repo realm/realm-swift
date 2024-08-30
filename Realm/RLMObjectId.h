@@ -34,7 +34,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  ObjectIds are intended to be fast to generate. Sorting by an ObjectId field
  will typically result in the objects being sorted in creation order.
  */
-RLM_SWIFT_SENDABLE // immutable
+NS_SWIFT_SENDABLE // immutable
 @interface RLMObjectId : NSObject <NSCopying>
 /// Creates a new randomly-initialized ObjectId.
 + (nonnull instancetype)objectId NS_SWIFT_NAME(generate());

@@ -140,7 +140,7 @@ extension Decimal128: BuiltInObjcBridgeable {
             return Decimal128(number: number)
         }
         if let str = value as? String {
-            return .some((try? Decimal128(string: str)) ?? Decimal128("nan"))
+            return Decimal128(string: str)
         }
         return .none
     }

@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.description             = <<-DESC
                               The Realm Database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
 
-                              Realm is a fast, easy-to-use replacement for Core Data & SQLite. Use it with Atlas Device Sync for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/.
+                              Realm is a fast, easy-to-use replacement for Core Data & SQLite. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/.
                               DESC
   s.homepage                = "https://realm.io"
   s.source                  = { :git => 'https://github.com/realm/realm-swift.git', :tag => "v#{s.version}" }
@@ -50,32 +50,6 @@ Pod::Spec.new do |s|
                               'include/RLMThreadSafeReference.h',
                               'include/RLMValue.h',
 
-                              # Sync
-                              'include/NSError+RLMSync.h',
-                              'include/RLMApp.h',
-                              'include/RLMAppCredentials.h',
-                              'include/RLMBSON.h',
-                              'include/RLMInitialSubscriptionsConfiguration.h',
-                              'include/RLMNetworkTransport.h',
-                              'include/RLMPushClient.h',
-                              'include/RLMProviderClient.h',
-                              'include/RLMRealm+Sync.h',
-                              'include/RLMSyncConfiguration.h',
-                              'include/RLMCredentials.h',
-                              'include/RLMSyncManager.h',
-                              'include/RLMSyncSession.h',
-                              'include/RLMUser.h',
-                              'include/RLMUserAPIKey.h',
-                              'include/RLMAPIKeyAuth.h',
-                              'include/RLMEmailPasswordAuth.h',
-                              'include/RLMFindOneAndModifyOptions.h',
-                              'include/RLMFindOptions.h',
-                              'include/RLMMongoClient.h',
-                              'include/RLMMongoCollection.h',
-                              'include/RLMMongoDatabase.h',
-                              'include/RLMUpdateResult.h',
-                              'include/RLMSyncSubscription.h',
-
                               # Realm.Dynamic module
                               'include/RLMRealm_Dynamic.h',
                               'include/RLMObjectBase_Dynamic.h',
@@ -85,15 +59,12 @@ Pod::Spec.new do |s|
 
                               # Realm.Private module
   private_header_files      = 'include/RLMAccessor.h',
-                              'include/RLMApp_Private.h',
                               'include/RLMArray_Private.h',
                               'include/RLMAsyncTask_Private.h',
-                              'include/RLMBSON_Private.h',
                               'include/RLMCollection_Private.h',
                               'include/RLMDictionary_Private.h',
                               'include/RLMEvent.h',
                               'include/RLMLogger_Private.h',
-                              'include/RLMMongoCollection_Private.h',
                               'include/RLMObjectBase_Private.h',
                               'include/RLMObjectSchema_Private.h',
                               'include/RLMObjectStore.h',
@@ -101,7 +72,6 @@ Pod::Spec.new do |s|
                               'include/RLMOptionalBase.h',
                               'include/RLMPropertyBase.h',
                               'include/RLMProperty_Private.h',
-                              'include/RLMProviderClient_Private.h',
                               'include/RLMRealmConfiguration_Private.h',
                               'include/RLMRealm_Private.h',
                               'include/RLMResults_Private.h',
@@ -109,17 +79,13 @@ Pod::Spec.new do |s|
                               'include/RLMSchema_Private.h',
                               'include/RLMSet_Private.h',
                               'include/RLMSwiftProperty.h',
-                              'include/RLMSyncConfiguration_Private.h',
-                              'include/RLMSyncSubscription_Private.h',
-                              'include/RLMUpdateResult_Private.h',
-                              'include/RLMUser_Private.h',
 
   s.ios.frameworks          = 'Security'
   s.ios.weak_framework      = 'UIKit'
   s.tvos.weak_framework     = 'UIKit'
   s.watchos.weak_framework  = 'UIKit'
   s.module_map              = 'Realm/Realm.modulemap'
-  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__ -DREALM_ENABLE_SYNC"
+  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
   s.prepare_command         = 'sh scripts/setup-cocoapods.sh'
   s.source_files            = private_header_files + ['Realm/*.{m,mm}']
   s.private_header_files    = private_header_files

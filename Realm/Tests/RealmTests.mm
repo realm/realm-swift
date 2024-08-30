@@ -157,17 +157,17 @@
 - (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime {
     NSString *exceptionReason = @"Realm at path '.*' already opened with different read permissions";
     @autoreleasepool {
-        XCTAssertNoThrow([self realmWithTestPath]);
+        RLMRealm *realm = self.realmWithTestPath;
         RLMAssertThrowsWithReasonMatching([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil], exceptionReason);
     }
 
     @autoreleasepool {
-        XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
+        RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
         RLMAssertThrowsWithReasonMatching([self realmWithTestPath], exceptionReason);
     }
 
     [self dispatchAsyncAndWait:^{
-        XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
+        RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
         RLMAssertThrowsWithReasonMatching([self realmWithTestPath], exceptionReason);
     }];
 }
@@ -2606,19 +2606,20 @@
 }
 
 - (void)testThawPreviousVersion {
-    RLMRealm *frozenRealm = [[RLMRealm defaultRealm] freeze];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    RLMRealm *frozenRealm = [realm freeze];
     XCTAssertTrue(frozenRealm.frozen);
     XCTAssertEqual(frozenRealm.isEmpty, [[RLMRealm defaultRealm] isEmpty]);
 
-    [RLMRealm.defaultRealm beginWriteTransaction];
+    [realm beginWriteTransaction];
     [IntObject createInDefaultRealmWithValue:@[@1]];
-    [RLMRealm.defaultRealm commitWriteTransaction];
-    XCTAssertNotEqual(frozenRealm.isEmpty, [[RLMRealm defaultRealm] isEmpty], "Contents of frozen Realm should not mutate");
+    [realm commitWriteTransaction];
+    XCTAssertNotEqual(frozenRealm.isEmpty, realm.isEmpty, "Contents of frozen Realm should not mutate");
 
 
     RLMRealm *thawed = [frozenRealm thaw];
     XCTAssertFalse(thawed.isFrozen);
-    XCTAssertEqual(thawed.isEmpty, [[RLMRealm defaultRealm] isEmpty], "Thawed realm should reflect transactions since the original reference was frozen");
+    XCTAssertEqual(thawed.isEmpty, realm.isEmpty, "Thawed realm should reflect transactions since the original reference was frozen");
     XCTAssertNotEqual(thawed.isEmpty, frozenRealm.isEmpty);
 }
 
@@ -3029,39 +3030,5 @@
     [logger logWithLevel:RLMLogLevelTrace message:@"IMPORTANT TRACE"];
     XCTAssertTrue([logs containsString:@"TEST: IMPORTANT INFO 0"]); // Detail
     XCTAssertFalse([logs containsString:@"IMPORTANT TRACE"]); // Trace
-}
-@end
-
-@interface RLMMetricsTests : RLMTestCase
-@property (nonatomic, strong) RLMLogger *logger;
-@end
-
-@implementation RLMMetricsTests
-- (void)setUp {
-    _logger = RLMLogger.defaultLogger;
-}
-- (void)tearDown {
-    RLMLogger.defaultLogger = _logger;
-}
-
-- (void)testSyncConnectionMetrics {
-    __block NSMutableString *logs = [[NSMutableString alloc] init];
-    RLMLogger *logger = [[RLMLogger alloc] initWithLevel:RLMLogLevelDebug
-                                             logFunction:^(RLMLogLevel level, NSString * message) {
-        [logs appendFormat:@" %@ %lu %@\n", [NSDate date], level, message];
-    }];
-    RLMLogger.defaultLogger = logger;
-    RLMApp *app = [RLMApp appWithId:@"test-id"];
-    // We don't even need the login to succeed, we only want for the logger
-    // to log the values on device info after trying to login.
-    [app loginWithCredential:RLMCredentials.anonymousCredentials completion:^(RLMUser *, NSError *) {}];
-    // Verifying that this values are set on device_info.
-    // Only the following values are logged by core (sdk, sdk version, platform version).
-    NSString *realmVersion = [NSString stringWithFormat:@"sdk version: %@", REALM_COCOA_VERSION];
-    XCTAssertTrue([logs containsString:realmVersion]);
-    XCTAssertTrue([logs containsString:@"sdk: Realm Swift"]);
-    auto processInfo = [NSProcessInfo processInfo];
-    NSString *version = [NSString stringWithFormat:@"version: %@", processInfo.operatingSystemVersionString];
-    XCTAssertTrue([logs containsString:version]);
 }
 @end

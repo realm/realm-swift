@@ -109,8 +109,6 @@ public:
 
     // KeyPathFromString converts a string keypath to a vector of key
     // pairs to be used for deep change checking across links.
-    // NEXT-MAJOR: This conflates a nil array and an empty array for backwards
-    // compatibility, but core now gives them different semantics
     std::optional<std::vector<std::vector<std::pair<realm::TableKey, realm::ColKey>>>>
     keyPathArrayFromStringArray(NSArray<NSString *> *keyPaths) const;
 

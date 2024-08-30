@@ -717,14 +717,15 @@ RLM_DIRECT_MEMBERS
     }
 
     NSError *error;
-    _realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
-    if (!_realm) {
+    auto realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
+    _realm = realm;
+    if (!realm) {
         block(nil, nil, nil, nil, error);
         return;
     }
-    RLMObjectBase *obj = [_realm resolveThreadSafeReference:tsr];
+    RLMObjectBase *obj = [realm resolveThreadSafeReference:tsr];
 
-    _object = realm::Object(_realm->_realm, *obj->_info->objectSchema, obj->_row);
+    _object = realm::Object(realm->_realm, *obj->_info->objectSchema, obj->_row);
     _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj},
                                                obj->_info->keyPathArrayFromStringArray(keyPaths));
 }

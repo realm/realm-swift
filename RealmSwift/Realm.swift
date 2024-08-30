@@ -152,28 +152,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     }
 
     /**
-     Asynchronously open a Realm and deliver it to a block on the given queue.
-
-     Opening a Realm asynchronously will perform all work needed to get the Realm to
-     a usable state (such as running potentially time-consuming migrations) on a
-     background thread before dispatching to the given queue. In addition,
-     synchronized Realms wait for all remote content available at the time the
-     operation began to be downloaded and available locally.
-
-     The Realm passed to the publisher is confined to the callback
-     queue as if `Realm(configuration:queue:)` was used.
-
-     - parameter configuration: A configuration object to use when opening the Realm.
-     - parameter callbackQueue: The dispatch queue on which the AsyncOpenTask should be run.
-     - returns: A publisher. If the Realm was successfully opened, it will be received by the subscribers.
-                Otherwise, a `Swift.Error` describing what went wrong will be passed upstream instead.
-     */
-    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-    public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration) -> RealmPublishers.AsyncOpenPublisher {
-        return RealmPublishers.AsyncOpenPublisher(configuration: configuration)
-    }
-
-    /**
      A task object which can be used to observe or cancel an async open.
 
      When a synchronized Realm is opened asynchronously, the latest state of the
@@ -195,23 +173,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
          */
         public func cancel() { rlmTask.cancel() }
 
-        /**
-         Register a progress notification block.
-
-         Each registered progress notification block is called whenever the sync
-         subsystem has new progress data to report until the task is either cancelled
-         or the completion callback is called. Progress notifications are delivered on
-         the supplied queue.
-
-         - parameter queue: The queue to deliver progress notifications on.
-         - parameter block: The block to invoke when notifications are available.
-         */
-        public func addProgressNotification(queue: DispatchQueue = .main,
-                                            block: @escaping (SyncSession.Progress) -> Void) {
-            rlmTask.addSyncProgressNotification(on: queue) { progress in
-                block(SyncSession.Progress(transferred: progress.transferredBytes, transferrable: progress.transferrableBytes, estimate: progress.progressEstimate))
-            }
-        }
     }
 
     // MARK: Transactions
@@ -1090,43 +1051,6 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
     }
 }
 
-// MARK: Sync Subscriptions
-
-extension Realm {
-    /**
-     Returns an instance of `SyncSubscriptionSet`, representing the active subscriptions
-     for this realm, which can be used to add/remove/update and search flexible sync subscriptions.
-     Getting the subscriptions from a local or partition-based configured realm will thrown an exception.
-
-     - returns: A `SyncSubscriptionSet`.
-     - Warning: This feature is currently in beta and its API is subject to change.
-     */
-    public var subscriptions: SyncSubscriptionSet {
-        return SyncSubscriptionSet(rlmRealm.subscriptions)
-    }
-}
-
-// MARK: Asymmetric Sync
-
-extension Realm {
-    /**
-     Creates an Asymmetric object, which will be synced unidirectionally and
-     cannot be queried locally. Only objects which inherit from `AsymmetricObject`
-     can be created using this method.
-
-     Objects created using this method will not be added to the Realm.
-
-     - warning: This method may only be called during a write transaction.
-
-     - parameter type:   The type of the object to create.
-     - parameter value:  The value used to populate the object.
-     */
-    public func create<T: AsymmetricObject>(_ type: T.Type, value: Any = [String: Any]()) {
-        let typeName = (type as AsymmetricObject.Type).className()
-        RLMCreateAsymmetricObjectInRealm(rlmRealm, typeName, value)
-    }
-}
-
 // MARK: Equatable
 
 extension Realm: Equatable {
@@ -1169,45 +1093,7 @@ extension Realm {
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-private func shouldAsyncOpen(_ configuration: Realm.Configuration,
-                             _ downloadBeforeOpen: Realm.OpenBehavior) -> Bool {
-    switch downloadBeforeOpen {
-    case .never:
-        return false
-    case .once:
-        return !Realm.fileExists(for: configuration)
-    case .always:
-        return true
-    }
-}
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Realm {
-    /// Options for when to download all data from the server before opening
-    /// a synchronized Realm.
-    @frozen public enum OpenBehavior: Sendable {
-        /// Immediately return the Realm as if the synchronous initializer was
-        /// used. If this is the first time that the Realm has been opened on
-        /// this device, the Realm file will initially be empty. Synchronized
-        /// Realms will contact the server and download new data in the
-        /// background.
-        case never
-        /// Always open the Realm asynchronously and download all data from the
-        /// server before returning the Realm. This mode will fail to open the
-        /// Realm if the device is currently offline.
-        case always
-        /// Open the Realm asynchronously the first time it is opened on the
-        /// current device, and then synchronously afterwards. This mode is
-        /// suitable if you wish to wait to download the server-side data the
-        /// first time your app is launched on each device, but afterwards
-        /// support offline launches using the existing local data.
-        ///
-        /// Note that if .once is used multiple times simultaneously then calls
-        /// after the first may see partial local data from the first call and
-        /// not wait for the download.
-        case once
-    }
-
     /**
      Obtains a `Realm` instance with the given configuration, possibly asynchronously.
      By default this simply returns the Realm instance exactly as if the
@@ -1217,17 +1103,15 @@ extension Realm {
      will be run in the background, and for synchronized Realms all data will
      be downloaded from the server before the Realm is returned.
      - parameter configuration: A configuration object to use when opening the Realm.
-     - parameter downloadBeforeOpen: When opening the Realm should first download
      all data from the server.
      - throws: An `NSError` if the Realm could not be initialized.
      - returns: An open Realm.
      */
     @MainActor
-    public init(configuration: Realm.Configuration = .defaultConfiguration,
-                downloadBeforeOpen: OpenBehavior = .never) async throws {
+    public init(configuration: Realm.Configuration = .defaultConfiguration) async throws {
         let scheduler = RLMScheduler.dispatchQueue(.main)
         let rlmRealm = try await openRealm(configuration: configuration, scheduler: scheduler,
-                                           actor: MainActor.shared, downloadBeforeOpen: downloadBeforeOpen)
+                                           actor: MainActor.shared)
         self = Realm(rlmRealm.wrappedValue)
     }
 
@@ -1255,18 +1139,14 @@ extension Realm {
      either a local actor or a global actor. The calling function does not need
      to be isolated to the actor passed in, but if it is not it will not be
      able to use the returned Realm.
-     - parameter downloadBeforeOpen: When opening the Realm should first download
-     all data from the server.
      - throws: An `NSError` if the Realm could not be initialized.
                `CancellationError` if the task is cancelled.
      - returns: An open Realm.
      */
     public init<A: Actor>(configuration: Realm.Configuration = .defaultConfiguration,
-                          actor: A,
-                          downloadBeforeOpen: OpenBehavior = .never) async throws {
+                          actor: A) async throws {
         let scheduler = RLMScheduler.actor(actor, invoke: actor.invoke, verify: await actor.verifier())
-        let rlmRealm = try await openRealm(configuration: configuration, scheduler: scheduler,
-                                            actor: actor, downloadBeforeOpen: downloadBeforeOpen)
+        let rlmRealm = try await openRealm(configuration: configuration, scheduler: scheduler, actor: actor)
         self = Realm(rlmRealm.wrappedValue)
     }
 
@@ -1293,11 +1173,9 @@ extension Realm {
      - returns: An open Realm.
      */
     public static func open(configuration: Realm.Configuration = .defaultConfiguration,
-                            _isolation actor: isolated any Actor = #isolation,
-                            downloadBeforeOpen: OpenBehavior = .never) async throws -> Realm {
+                            _isolation actor: isolated any Actor = #isolation) async throws -> Realm {
         let scheduler = RLMScheduler.actor(actor, invoke: actor.invoke, verify: actor.verifier())
-        let rlmRealm = try await openRealm(configuration: configuration, scheduler: scheduler,
-                                            actor: actor, downloadBeforeOpen: downloadBeforeOpen)
+        let rlmRealm = try await openRealm(configuration: configuration, scheduler: scheduler, actor: actor)
         return Realm(rlmRealm.wrappedValue)
     }
 #endif
@@ -1534,8 +1412,7 @@ extension Realm {
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private func openRealm<A: Actor>(configuration: Realm.Configuration,
                                  scheduler: RLMScheduler,
-                                 actor: isolated A,
-                                 downloadBeforeOpen: Realm.OpenBehavior
+                                 actor: isolated A
 ) async throws -> Unchecked<RLMRealm> {
     let scheduler = RLMScheduler.actor(actor, invoke: actor.invoke, verify: actor.verifier())
     let rlmConfiguration = configuration.rlmConfiguration
@@ -1551,19 +1428,12 @@ private func openRealm<A: Actor>(configuration: Realm.Configuration,
         }
     }
     if let realm = realm {
-        // This can't be hit on the first open so .once == .never
-        if downloadBeforeOpen == .always {
-            let task = RLMAsyncDownloadTask(realm: realm)
-            try await task.waitWithCancellationHandler()
-        }
         return Unchecked(realm)
     }
 
     // We're doing the first open and hitting the expensive path, so do an async
     // open on a background thread
-    let task = RLMAsyncOpenTask(configuration: rlmConfiguration, confinedTo: scheduler,
-                                download: shouldAsyncOpen(configuration, downloadBeforeOpen))
-    // progress notifications?
+    let task = RLMAsyncOpenTask(configuration: rlmConfiguration, confinedTo: scheduler)
     do {
         try await task.waitWithCancellationHandler()
         let realm = task.localRealm!
@@ -1602,7 +1472,6 @@ extension TaskWithCancellation {
     }
 }
 extension RLMAsyncOpenTask: TaskWithCancellation {}
-extension RLMAsyncDownloadTask: TaskWithCancellation {}
 
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 internal extension Actor {

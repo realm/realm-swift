@@ -18,8 +18,6 @@
 
 #import <Realm/RLMRealm.h>
 
-@class RLMEventConfiguration, RLMSyncConfiguration;
-
 RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
 
 /**
@@ -31,7 +29,7 @@ RLM_HEADER_AUDIT_BEGIN(nullability, sendability)
  Return `YES` to indicate that an attempt to compact the file should be made.
  The compaction will be skipped if another process is accessing it.
  */
-RLM_SWIFT_SENDABLE
+NS_SWIFT_SENDABLE
 typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger bytesUsed);
 
 /**
@@ -173,17 +171,6 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
  will nil out the `inMemoryIdentifier`.
  */
 @property (nonatomic, copy, nullable) NSURL *seedFilePath;
-
-/**
- A configuration object representing configuration state for Realms intended
- to sync with Atlas Device Sync.
-
- This property is mutually exclusive with both `inMemoryIdentifier` and `fileURL`;
- setting any one of the three properties will automatically nil out the other two.
-
- @see `RLMSyncConfiguration`
- */
-@property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
 
 @end
 

@@ -16,7 +16,6 @@
 		227D20DF1CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E01CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E11CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
-		227D20E21CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E31CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E41CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
@@ -26,21 +25,10 @@
 		3F08726027F3C971007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
 		3F08726127F3C977007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
 		3F08726227F3C97D007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
-		3F08726327F3C983007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
 		3F08726427F3C989007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
 		3F08726527F3C98E007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
 		3F08726627F3C993007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
 		3F08726727F3C999007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
-		3F08726827F3D23B007A1175 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F08725D27F3C8CF007A1175 /* libcompression.tbd */; };
-		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
-		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
-		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		3F78C9C01B431CF300A0988E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
-		3F78C9C11B431CF300A0988E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
-		3F78C9C31B431CF300A0988E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E879D9DD1A12AA400035E2EB /* Images.xcassets */; };
-		3F78C9C91B431D6F00A0988E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9AE1B431CDF00A0988E /* AppDelegate.m */; };
-		3F78C9CA1B431D7400A0988E /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9B01B431CDF00A0988E /* TableViewController.m */; };
-		3F78C9CB1B431D7A00A0988E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9AF1B431CDF00A0988E /* main.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
 		7DD1D7E225DC2D3D00E63229 /* default-v2.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D225DC2C7400E63229 /* default-v2.realm */; };
 		7DD1D7E325DC2D3D00E63229 /* default-v3.realm in Resources */ = {isa = PBXBuildFile; fileRef = 7DD1D7D325DC2C7400E63229 /* default-v3.realm */; };
@@ -114,21 +102,6 @@
 		E8F70ED519BA530C006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E8F70ED919BA534E006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E8F70EDD19BA5380006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		F1506E991DDD1E2A00D319DC /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
-		F18464461DC151F000DAB8B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464361DC151F000DAB8B9 /* AppDelegate.m */; };
-		F184644B1DC151F000DAB8B9 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F184643F1DC151F000DAB8B9 /* Images.xcassets */; };
-		F184644D1DC151F000DAB8B9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464411DC151F000DAB8B9 /* main.m */; };
-		F18464521DC1551200DAB8B9 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F18464511DC1551200DAB8B9 /* libc++.tbd */; };
-		F18464531DC1551700DAB8B9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
-		F18464541DC1551D00DAB8B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
-		F18464551DC1569B00DAB8B9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
-		F18464631DC16CDA00DAB8B9 /* DrawPath.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464591DC16CDA00DAB8B9 /* DrawPath.m */; };
-		F18464641DC16CDA00DAB8B9 /* DrawPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F184645B1DC16CDA00DAB8B9 /* DrawPoint.m */; };
-		F18464651DC16CDA00DAB8B9 /* UIColor+Realm.m in Sources */ = {isa = PBXBuildFile; fileRef = F184645D1DC16CDA00DAB8B9 /* UIColor+Realm.m */; };
-		F18464661DC16CDA00DAB8B9 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464601DC16CDA00DAB8B9 /* DrawView.m */; };
-		F18464671DC16CDA00DAB8B9 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464621DC16CDA00DAB8B9 /* SwatchesView.m */; };
-		F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464691DC16D3700DAB8B9 /* CanvasView.m */; };
-		F196C2EF1DD6442400AFB53B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -170,14 +143,6 @@
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		227D20DD1CB6009D008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		3F08725D27F3C8CF007A1175 /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
-		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
-		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
-		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
-		3F78C9AE1B431CDF00A0988E /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = RACTableView/AppDelegate.m; sourceTree = "<group>"; };
-		3F78C9AF1B431CDF00A0988E /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = RACTableView/main.m; sourceTree = "<group>"; };
-		3F78C9B01B431CDF00A0988E /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TableViewController.m; path = RACTableView/TableViewController.m; sourceTree = "<group>"; };
-		3F78C9B11B431CDF00A0988E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RACTableView/Info.plist; sourceTree = "<group>"; };
-		3F78C9C71B431CF300A0988E /* RACTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RACTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FC898FB1A140F550067CBEC /* LabelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelViewController.h; sourceTree = "<group>"; };
 		3FC898FC1A140F550067CBEC /* LabelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelViewController.m; sourceTree = "<group>"; };
 		7D56426A25DD66160079F4C2 /* Example_v0.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Example_v0.h; sourceTree = "<group>"; };
@@ -256,43 +221,10 @@
 		E8F70EC219BA50AB006F60D5 /* Encryption-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Encryption-Info.plist"; sourceTree = "<group>"; };
 		E8F70EC319BA50AB006F60D5 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E8F70ED019BA52E8006F60D5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		F184641D1DC151CD00DAB8B9 /* Draw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Draw.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F18464351DC151F000DAB8B9 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		F18464361DC151F000DAB8B9 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		F184643F1DC151F000DAB8B9 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		F18464401DC151F000DAB8B9 /* Draw-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Draw-Info.plist"; sourceTree = "<group>"; };
-		F18464411DC151F000DAB8B9 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F18464511DC1551200DAB8B9 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		F18464561DC1597C00DAB8B9 /* Draw.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Draw.entitlements; sourceTree = "<group>"; };
-		F18464581DC16CD900DAB8B9 /* DrawPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawPath.h; sourceTree = "<group>"; };
-		F18464591DC16CDA00DAB8B9 /* DrawPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPath.m; sourceTree = "<group>"; };
-		F184645A1DC16CDA00DAB8B9 /* DrawPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawPoint.h; sourceTree = "<group>"; };
-		F184645B1DC16CDA00DAB8B9 /* DrawPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPoint.m; sourceTree = "<group>"; };
-		F184645C1DC16CDA00DAB8B9 /* UIColor+Realm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Realm.h"; sourceTree = "<group>"; };
-		F184645D1DC16CDA00DAB8B9 /* UIColor+Realm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Realm.m"; sourceTree = "<group>"; };
-		F184645F1DC16CDA00DAB8B9 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
-		F18464601DC16CDA00DAB8B9 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
-		F18464611DC16CDA00DAB8B9 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
-		F18464621DC16CDA00DAB8B9 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
-		F18464681DC16D3700DAB8B9 /* CanvasView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CanvasView.h; sourceTree = "<group>"; };
-		F18464691DC16D3700DAB8B9 /* CanvasView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CanvasView.m; sourceTree = "<group>"; };
-		F18DC0A31DC2AFCB007D2D69 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3F78C9BC1B431CF300A0988E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */,
-				3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */,
-				3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */,
-				3F08726327F3C983007A1175 /* libcompression.tbd in Frameworks */,
-				3F78C9C01B431CF300A0988E /* Realm.framework in Frameworks */,
-				3F78C9C11B431CF300A0988E /* UIKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C0DC41C91A7072670067156A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -410,19 +342,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F184641A1DC151CD00DAB8B9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F18464551DC1569B00DAB8B9 /* CoreGraphics.framework in Frameworks */,
-				F18464541DC1551D00DAB8B9 /* Foundation.framework in Frameworks */,
-				F18464521DC1551200DAB8B9 /* libc++.tbd in Frameworks */,
-				F1506E991DDD1E2A00D319DC /* Realm.framework in Frameworks */,
-				F18464531DC1551700DAB8B9 /* UIKit.framework in Frameworks */,
-				3F08726827F3D23B007A1175 /* libcompression.tbd in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -432,20 +351,6 @@
 				227D20DD1CB6009D008F641B /* LaunchScreen.xib */,
 			);
 			path = Common;
-			sourceTree = "<group>";
-		};
-		3F78C9AA1B431CB200A0988E /* RACTableView */ = {
-			isa = PBXGroup;
-			children = (
-				3F78C9AB1B431CDF00A0988E /* AppDelegate.h */,
-				3F78C9AE1B431CDF00A0988E /* AppDelegate.m */,
-				3F78C9AD1B431CDF00A0988E /* Images.xcassets */,
-				3F78C9B11B431CDF00A0988E /* Info.plist */,
-				3F78C9AF1B431CDF00A0988E /* main.m */,
-				3F78C9AC1B431CDF00A0988E /* TableViewController.h */,
-				3F78C9B01B431CDF00A0988E /* TableViewController.m */,
-			);
-			name = RACTableView;
 			sourceTree = "<group>";
 		};
 		7D718BED25DAADE400A74FDD /* Examples */ = {
@@ -527,14 +432,12 @@
 			children = (
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
 				227D20DC1CB6009D008F641B /* Common */,
-				F184641E1DC151CD00DAB8B9 /* Draw */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
 				C0DC41CD1A7072670067156A /* Extension */,
 				E8AB71A819BA502500F3EDB4 /* Frameworks */,
 				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
 				E8F70EAE19BA50A3006F60D5 /* Migration */,
 				E8AB71A719BA502500F3EDB4 /* Products */,
-				3F78C9AA1B431CB200A0988E /* RACTableView */,
 				E8F70EA319BA5093006F60D5 /* REST */,
 				E8F70E8E19BA5083006F60D5 /* Simple */,
 				E8F70E9619BA508B006F60D5 /* TableView */,
@@ -547,12 +450,10 @@
 			isa = PBXGroup;
 			children = (
 				E8BDBFA11A116FAC00450CFF /* Backlink.app */,
-				F184641D1DC151CD00DAB8B9 /* Draw.app */,
 				E8AB723819BA504000F3EDB4 /* Encryption.app */,
 				C0DC41CC1A7072670067156A /* extension.app */,
 				E879D9D81A12AA120035E2EB /* GroupedTableView.app */,
 				E8AB720A19BA503B00F3EDB4 /* Migration.app */,
-				3F78C9C71B431CF300A0988E /* RACTableView.app */,
 				E8AB729419BA504900F3EDB4 /* REST.app */,
 				E8AB71DC19BA503500F3EDB4 /* Simple.app */,
 				E8AB726619BA504500F3EDB4 /* TableView.app */,
@@ -653,68 +554,9 @@
 			path = Encryption;
 			sourceTree = "<group>";
 		};
-		F184641E1DC151CD00DAB8B9 /* Draw */ = {
-			isa = PBXGroup;
-			children = (
-				F18464571DC16CD900DAB8B9 /* Models */,
-				F184645E1DC16CDA00DAB8B9 /* Views */,
-				F18464351DC151F000DAB8B9 /* AppDelegate.h */,
-				F18464361DC151F000DAB8B9 /* AppDelegate.m */,
-				F18DC0A31DC2AFCB007D2D69 /* Constants.h */,
-				F18464401DC151F000DAB8B9 /* Draw-Info.plist */,
-				F18464561DC1597C00DAB8B9 /* Draw.entitlements */,
-				F184643F1DC151F000DAB8B9 /* Images.xcassets */,
-				F18464411DC151F000DAB8B9 /* main.m */,
-			);
-			path = Draw;
-			sourceTree = "<group>";
-		};
-		F18464571DC16CD900DAB8B9 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				F18464581DC16CD900DAB8B9 /* DrawPath.h */,
-				F18464591DC16CDA00DAB8B9 /* DrawPath.m */,
-				F184645A1DC16CDA00DAB8B9 /* DrawPoint.h */,
-				F184645B1DC16CDA00DAB8B9 /* DrawPoint.m */,
-				F184645C1DC16CDA00DAB8B9 /* UIColor+Realm.h */,
-				F184645D1DC16CDA00DAB8B9 /* UIColor+Realm.m */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		F184645E1DC16CDA00DAB8B9 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				F18464681DC16D3700DAB8B9 /* CanvasView.h */,
-				F18464691DC16D3700DAB8B9 /* CanvasView.m */,
-				F184645F1DC16CDA00DAB8B9 /* DrawView.h */,
-				F18464601DC16CDA00DAB8B9 /* DrawView.m */,
-				F18464611DC16CDA00DAB8B9 /* SwatchesView.h */,
-				F18464621DC16CDA00DAB8B9 /* SwatchesView.m */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3F78C9B51B431CF300A0988E /* RACTableView */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */;
-			buildPhases = (
-				3F78C9B81B431CF300A0988E /* Sources */,
-				3F78C9BC1B431CF300A0988E /* Frameworks */,
-				3F78C9C21B431CF300A0988E /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = RACTableView;
-			productName = TableView;
-			productReference = 3F78C9C71B431CF300A0988E /* RACTableView.app */;
-			productType = "com.apple.product-type.application";
-		};
 		C0DC41CB1A7072670067156A /* extension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C0DC41EC1A7072680067156A /* Build configuration list for PBXNativeTarget "extension" */;
@@ -871,24 +713,6 @@
 			productReference = E8BDBFA11A116FAC00450CFF /* Backlink.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F184641C1DC151CD00DAB8B9 /* Draw */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F18464331DC151CD00DAB8B9 /* Build configuration list for PBXNativeTarget "Draw" */;
-			buildPhases = (
-				F18DC0A41DC2B197007D2D69 /* Get Device IP Address */,
-				F18464191DC151CD00DAB8B9 /* Sources */,
-				F184641A1DC151CD00DAB8B9 /* Frameworks */,
-				F184641B1DC151CD00DAB8B9 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Draw;
-			productName = Draw;
-			productReference = F184641D1DC151CD00DAB8B9 /* Draw.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -918,16 +742,6 @@
 					E8BDBFA01A116FAC00450CFF = {
 						CreatedOnToolsVersion = 6.1;
 					};
-					F184641C1DC151CD00DAB8B9 = {
-						CreatedOnToolsVersion = 8.1;
-						LastSwiftMigration = 0810;
-						ProvisioningStyle = Automatic;
-						SystemCapabilities = {
-							com.apple.Keychain = {
-								enabled = 1;
-							};
-						};
-					};
 				};
 			};
 			buildConfigurationList = E8AB71A119BA502500F3EDB4 /* Build configuration list for PBXProject "RealmExamples" */;
@@ -944,12 +758,10 @@
 			projectRoot = "";
 			targets = (
 				E8BDBFA01A116FAC00450CFF /* Backlink */,
-				F184641C1DC151CD00DAB8B9 /* Draw */,
 				E8AB723719BA504000F3EDB4 /* Encryption */,
 				C0DC41CB1A7072670067156A /* extension */,
 				C0DC42051A7079D00067156A /* TodayExtension */,
 				E879D9C61A12AA120035E2EB /* GroupedTableView */,
-				3F78C9B51B431CF300A0988E /* RACTableView */,
 				E8AB720919BA503B00F3EDB4 /* Migration */,
 				E8AB729319BA504900F3EDB4 /* REST */,
 				E8AB71DB19BA503500F3EDB4 /* Simple */,
@@ -999,15 +811,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3F78C9C21B431CF300A0988E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3F78C9C31B431CF300A0988E /* Images.xcassets in Resources */,
-				227D20E21CB6009D008F641B /* LaunchScreen.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C0DC42041A7079D00067156A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1048,45 +851,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F184641B1DC151CD00DAB8B9 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F184644B1DC151F000DAB8B9 /* Images.xcassets in Resources */,
-				F196C2EF1DD6442400AFB53B /* LaunchScreen.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		F18DC0A41DC2B197007D2D69 /* Get Device IP Address */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Get Device IP Address";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kIPAddress = @\\\"${LOCAL_IP_ADDR:-127.0.0.1}\\\";\" > \"$SRCROOT/Draw/Constants.h\"";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		3F78C9B81B431CF300A0988E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3F78C9C91B431D6F00A0988E /* AppDelegate.m in Sources */,
-				3F78C9CB1B431D7A00A0988E /* main.m in Sources */,
-				3F78C9CA1B431D7400A0988E /* TableViewController.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C0DC41C81A7072670067156A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1173,21 +940,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F18464191DC151CD00DAB8B9 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F18464461DC151F000DAB8B9 /* AppDelegate.m in Sources */,
-				F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */,
-				F18464631DC16CDA00DAB8B9 /* DrawPath.m in Sources */,
-				F18464641DC16CDA00DAB8B9 /* DrawPoint.m in Sources */,
-				F18464661DC16CDA00DAB8B9 /* DrawView.m in Sources */,
-				F184644D1DC151F000DAB8B9 /* main.m in Sources */,
-				F18464671DC16CDA00DAB8B9 /* SwatchesView.m in Sources */,
-				F18464651DC16CDA00DAB8B9 /* UIColor+Realm.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1199,48 +951,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		3F78C9C51B431CF300A0988E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$PODS_CONFIGURATION_BUILD_DIR\"",
-					"\"$PODS_CONFIGURATION_BUILD_DIR/ReactiveCocoa\"",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = RACTableView;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Debug;
-		};
-		3F78C9C61B431CF300A0988E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$PODS_CONFIGURATION_BUILD_DIR\"",
-					"\"$PODS_CONFIGURATION_BUILD_DIR/ReactiveCocoa\"",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = RACTableView;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
 		AC1CA6392B1FF0BE002167B0 /* Static */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1304,28 +1014,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Static;
-		};
-		AC1CA63B2B1FF0BE002167B0 /* Static */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_SUSPICIOUS_MOVES = YES;
-				CODE_SIGN_ENTITLEMENTS = Draw/Draw.entitlements;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = "$(SRCROOT)/Draw/Draw-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "-lz";
-				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Draw;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Draw/Draw-Bridging-Header.h";
 			};
 			name = Static;
 		};
@@ -1398,25 +1086,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = GroupedTableView;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Static;
-		};
-		AC1CA6402B1FF0BE002167B0 /* Static */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$PODS_CONFIGURATION_BUILD_DIR\"",
-					"\"$PODS_CONFIGURATION_BUILD_DIR/ReactiveCocoa\"",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = RACTableView;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Static;
@@ -1910,63 +1579,9 @@
 			};
 			name = Release;
 		};
-		F18464311DC151CD00DAB8B9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_SUSPICIOUS_MOVES = YES;
-				CODE_SIGN_ENTITLEMENTS = Draw/Draw.entitlements;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = "$(SRCROOT)/Draw/Draw-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = "-lz";
-				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Draw;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Draw/Draw-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
-		F18464321DC151CD00DAB8B9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_SUSPICIOUS_MOVES = YES;
-				CODE_SIGN_ENTITLEMENTS = Draw/Draw.entitlements;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = "$(SRCROOT)/Draw/Draw-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "-lz";
-				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Draw;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Draw/Draw-Bridging-Header.h";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3F78C9C51B431CF300A0988E /* Debug */,
-				3F78C9C61B431CF300A0988E /* Release */,
-				AC1CA6402B1FF0BE002167B0 /* Static */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		C0DC41EC1A7072680067156A /* Build configuration list for PBXNativeTarget "extension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2063,16 +1678,6 @@
 				E8BDBFC11A116FAC00450CFF /* Debug */,
 				E8BDBFC21A116FAC00450CFF /* Release */,
 				AC1CA63A2B1FF0BE002167B0 /* Static */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F18464331DC151CD00DAB8B9 /* Build configuration list for PBXNativeTarget "Draw" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F18464311DC151CD00DAB8B9 /* Debug */,
-				F18464321DC151CD00DAB8B9 /* Release */,
-				AC1CA63B2B1FF0BE002167B0 /* Static */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

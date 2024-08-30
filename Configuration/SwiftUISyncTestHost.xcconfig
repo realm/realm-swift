@@ -1,4 +1,0 @@
-#include "TestHost.xcconfig"
-
-INFOPLIST_FILE = Realm/Tests/SwiftUISyncTestHost/Info.plist;
-SUPPORTED_PLATFORMS = macosx;

@@ -69,8 +69,7 @@ import Realm.Private
 ///  to the initializer. Compound primary keys are not supported, and setting
 ///  more than one property as the primary key will throw an exception at
 ///  runtime. Only Int, String, UUID and ObjectID properties can be made the
-///  primary key, and when using Atlas App Services, the primary key must be named
-///  `_id`. The primary key property can only be mutated on unmanaged objects,
+///  primary key. The primary key property can only be mutated on unmanaged objects,
 ///  and mutating it on an object which has been added to a Realm will throw an
 ///  exception.
 ///

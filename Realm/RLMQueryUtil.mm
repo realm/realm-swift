@@ -625,17 +625,16 @@ void QueryBuilder::add_bool_constraint(RLMPropertyType datatype,
 template<typename T>
 void QueryBuilder::add_substring_constraint(const T& value, Query condition) {
     // Foundation always returns false for substring operations with a RHS of null or "".
-    m_query.and_query(value.size()
-                      ? std::move(condition)
-                      : std::unique_ptr<Expression>(new FalseExpression));
+    m_query.and_query(value.size() ? std::move(condition)
+                                   : std::unique_ptr<Expression>(new FalseExpression));
 }
 
 template<>
 void QueryBuilder::add_substring_constraint(const Mixed& value, Query condition) {
     // Foundation always returns false for substring operations with a RHS of null or "".
-    m_query.and_query(value.get_string().size()
-                      ? std::move(condition)
-                      : std::unique_ptr<Expression>(new FalseExpression));
+    bool empty = value.is_type(type_String) ? value.get_string().size() : value.get_binary().size();
+    m_query.and_query(empty ? std::move(condition)
+                            : std::unique_ptr<Expression>(new FalseExpression));
 }
 
 
@@ -760,29 +759,6 @@ void QueryBuilder::do_add_diacritic_sensitive_string_constraint(NSPredicateOpera
     bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
     Query condition = make_diacritic_sensitive_constraint(operatorType, caseSensitive, column, value);
 
-    // Queries on Mixed used to coerce Strings to Binary and vice-versa. Core
-    // no longer does this, but we can maintain compatibility by doing the
-    // coercion and checking both
-    // NEXT-MAJOR: we should remove this and realign with core's behavior
-    if constexpr (is_any_v<C, Columns<Mixed>, Columns<Lst<Mixed>>, Columns<Set<Mixed>>, Columns<Dictionary>>) {
-        Mixed m = value;
-        if (!m.is_null()) {
-            if (m.get_type() == type_String) {
-                m = m.export_to_type<BinaryData>();
-            }
-            else {
-                m = m.export_to_type<StringData>();
-            }
-
-            // Equality and substring operations need (col == strValue OR col == binValue),
-            // but not equals needs (col != strValue AND col != binValue)
-            if (operatorType != NSNotEqualToPredicateOperatorType) {
-                condition.Or();
-            }
-
-            condition.and_query(make_diacritic_sensitive_constraint(operatorType, caseSensitive, column, m));
-        }
-    }
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
         case NSEndsWithPredicateOperatorType:

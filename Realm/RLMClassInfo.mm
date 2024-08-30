@@ -146,7 +146,7 @@ static KeyPath keyPathFromString(RLMRealm *realm,
 
 std::optional<realm::KeyPathArray> RLMClassInfo::keyPathArrayFromStringArray(NSArray<NSString *> *keyPaths) const {
     std::optional<KeyPathArray> keyPathArray;
-    if (keyPaths.count) {
+    if (keyPaths) {
         keyPathArray.emplace();
         for (NSString *keyPath in keyPaths) {
             keyPathArray->push_back(keyPathFromString(realm, realm.schema, this,
