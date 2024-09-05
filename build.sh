@@ -1084,14 +1084,7 @@ case "$COMMAND" in
         platform="$2"
         xcode_version=$(echo "$COMMAND" | cut -d- -f4)
 
-        # Artifacts are nested zips so need to be extracted twice
         find . -name 'build-*.zip' -exec unzip {} \;
-        find . -name 'xcode-cloud-build-*.zip' -exec unzip {} \;
-
-        # Spaces with xargs are complicated so get rid of them
-        for dir in "RealmSwift Build "*; do
-            mv "$dir" build-$(echo "$dir" | cut -d' ' -f3)
-        done
 
         create_xcframework Realm Release "$platform"
         create_xcframework RealmSwift Release "$platform"
