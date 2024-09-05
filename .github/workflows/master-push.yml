@@ -7,33 +7,15 @@ on:
       - "release/**"
 env:
   XCODE_VERSION: "['15.1', '15.2', '15.3', '15.4']"
-  XCODE_TEST_VERSIONS: "['15.1', '15.2', '15.3', '15.4']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
-  BUILD_PLATFORM: "['ios', 'iossimulator', 'osx', 'watchos', 'watchossimulator', 'tvos', 'tvossimulator', 'catalyst', 'visionos', 'visionossimulator']"
   DOC_VERSION: '15.4'
   RELEASE_VERSION: '15.4'
-  TEST_VERSION: '15.4'
 jobs:
-  cleanup: # Clean-up XCode cloud workflows, before running the pipeline
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - name: Get Token
-          id: token
-          run: |
-            token=$(echo $(ruby ./scripts/xcode_cloud_helper.rb --issuer-id ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }} --key-id ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }} --pk "${{ secrets.APPLE_STORE_CONNECT_API_KEY }}" get-token))
-            echo "TOKEN=$token" >> $GITHUB_OUTPUT
-        - name: Clean up release-packages xcode cloud workflows
-          run: |
-            ruby ./scripts/xcode_cloud_helper.rb clean-up-release-workflows -t ${{ steps.token.outputs.TOKEN }}
   prepare:
       runs-on: ubuntu-latest
       name: Prepare outputs
-      needs: [cleanup]
       outputs:
         XCODE_VERSIONS_MATRIX: ${{ env.XCODE_VERSION }}
-        XCODE_TEST_VERSIONS_MATRIX: ${{ env.XCODE_TEST_VERSIONS }}
-        BUILD_PLATFORM_MATRIX: ${{ env.BUILD_PLATFORM }}
         PLATFORM_MATRIX: ${{ env.PLATFORM }}
         VERSION: ${{ steps.get-version.outputs.VERSION }}
       steps:
@@ -41,7 +23,6 @@ jobs:
           run: |
             echo "XCODE_VERSIONS_MATRIX=${{ env.XCODE_VERSION }}" >> $GITHUB_OUTPUT
             echo "PLATFORM_MATRIX=${{ env.PLATFORM }}" >> $GITHUB_OUTPUT
-            echo "BUILD_PLATFORM_MATRIX=${{ env.BUILD_PLATFORM }}" >> $GITHUB_OUTPUT
         - uses: actions/checkout@v4
         - name: Read SDK version
           id: get-version
@@ -86,9 +67,9 @@ jobs:
       strategy:
         max-parallel: 20 # Blocks of 20, therefore if any of the build fails, we don't get a lot of XCode Clouds builds hanging, which are expensive.
         matrix:
-          platform: ${{ fromJSON(needs.prepare.outputs.BUILD_PLATFORM_MATRIX) }}
+          platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
-          configuration: [release, static]
+          configuration: [swift, static]
           exclude:
             - platform: osx
               configuration: static
@@ -100,76 +81,19 @@ jobs:
               configuration: static
             - platform: catalyst
               configuration: static
-            - platform: tvossimulator
-              configuration: static
-            - platform: watchossimulator
-              configuration: static
-            - platform: visionossimulator
-              configuration: static
             - platform: visionos
-              xcode-version: 15.1
-            - platform: visionossimulator
               xcode-version: 15.1
       steps:
         - uses: actions/checkout@v4
-        - name: Get Token
-          id: token
-          run: |
-            token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }} --key-id ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }} --pk "${{ secrets.APPLE_STORE_CONNECT_API_KEY }}" get-token)
-            echo "TOKEN=$token" >> $GITHUB_OUTPUT
-        - name: Creates on demand XCode Cloud's workflows with a build action
-          id: create-workflow
-          uses: nick-fields/retry@v2
-          with:
-            timeout_minutes: 10
-            max_attempts: 3
-            command: |
-              workflow_id=$(ruby ./scripts/xcode_cloud_helper.rb create-workflow release-package-build ${{ matrix.platform }} ${{ matrix.xcode-version }} RealmSwift ${{ matrix.configuration }} -t ${{ steps.token.outputs.TOKEN }})
-              echo "WORKFLOW_ID=$workflow_id" >> $GITHUB_OUTPUT
-        - name: Runs the XCode Cloud workflow created by the previous step
-          id: build-run
-          uses: nick-fields/retry@v2
-          with:
-            timeout_minutes: 15
-            max_attempts: 3
-            command: |
-              build_run_id=$(ruby ./scripts/xcode_cloud_helper.rb build-workflow ${{ steps.create-workflow.outputs.WORKFLOW_ID }} ${{ github.ref_name }} -t ${{ steps.token.outputs.TOKEN }})
-              echo "BUILD_RUN_ID=$build_run_id" >> $GITHUB_OUTPUT
-        - name: Check build status and wait for it to finish
-          uses: nick-fields/retry@v2
-          with:
-            timeout_minutes: 15
-            max_attempts: 3
-            command: |
-              while [ "$status" != 'COMPLETE' ]
-              do
-                token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }} --key-id ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }} --pk "${{ secrets.APPLE_STORE_CONNECT_API_KEY }}" get-token)
-                status=$(ruby ./scripts/xcode_cloud_helper.rb get-build-status ${{ steps.build-run.outputs.BUILD_RUN_ID }} -t $token)
-                echo "Status $status"
-                sleep 20
-              done
-              completion_status=$(ruby ./scripts/xcode_cloud_helper.rb get-build-result ${{ steps.build-run.outputs.BUILD_RUN_ID }} -t $token)
-              echo "Completion Status $completion_status"
-              if [ "$completion_status" != 'SUCCEEDED' ]; then
-                echo "XCode Cloud build failed"
-                ruby ./scripts/xcode_cloud_helper.rb print-build-logs ${{ steps.build-run.outputs.BUILD_RUN_ID }} -t $token
-                exit 1
-              fi
-              ruby ./scripts/xcode_cloud_helper.rb print-build-logs ${{ steps.build-run.outputs.BUILD_RUN_ID }} -t $token
-        - name: Download framework package from XCode Cloud artifacts
-          uses: nick-fields/retry@v2
-          with:
-            timeout_minutes: 10
-            max_attempts: 3
-            command: |
-              token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id ${{ secrets.APPLE_STORE_CONNECT_ISSUER_ID }} --key-id ${{ secrets.APPLE_STORE_CONNECT_KEY_ID }} --pk "${{ secrets.APPLE_STORE_CONNECT_API_KEY }}" get-token)
-              ruby ./scripts/xcode_cloud_helper.rb download-artifact ${{ steps.build-run.outputs.BUILD_RUN_ID }} -t $token
+        - name: Build ${{ matrix.platform }} with Xcode ${{ matrix.xcode-version }}
+          run: DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode-version }}.app/Contents/Developer sh build.sh ${{ matrix.platform }}-${{matrix.configuration}}
+        - run: rm -r build/DerivedData
         - name: Upload framework
           uses: actions/upload-artifact@v4
           with:
             name: build-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.configuration }}
-            path: xcode-cloud-build-${{ steps.build-run.outputs.BUILD_RUN_ID }}.zip
-            compression-level: 0
+            path: build
+            compression-level: 1
   package-xcframework-platform: # Creates xcframework for each platform and xcode version
       runs-on: macos-14
       name: Package xcframework for platform
@@ -247,7 +171,7 @@ jobs:
       steps:
         - uses: actions/checkout@v4
         - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
+          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Restore release
           uses: actions/download-artifact@v4
           with:
@@ -261,7 +185,7 @@ jobs:
       steps:
         - uses: actions/checkout@v4
         - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
+          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Test ios static
           run: sh -x build.sh test-ios-static
   test-osx-static:
@@ -271,7 +195,7 @@ jobs:
       steps:
         - uses: actions/checkout@v4
         - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
+          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Test osx static
           run: |
             export REALM_DISABLE_METADATA_ENCRYPTION=1
@@ -303,17 +227,17 @@ jobs:
           with:
             bundler-cache: true
         - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.TEST_VERSION }}.app
+          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Restore release
           uses: actions/download-artifact@v4
           if: ${{ matrix.installation == 'xcframework' }}
           with:
-            name: realm-${{ matrix.platform }}-${{ env.TEST_VERSION }}
+            name: realm-${{ matrix.platform }}-${{ env.RELEASE_VERSION }}
         - name: Unzip package release
           if: ${{ matrix.installation == 'xcframework' }}
           run: |
             mkdir -p build
-            unzip realm-${{ matrix.platform }}-${{ env.TEST_VERSION }}.zip -d build
+            unzip realm-${{ matrix.platform }}-${{ env.RELEASE_VERSION }}.zip -d build
         - name: Run installation test
           run: |
             echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
@@ -327,7 +251,7 @@ jobs:
         PLATFORM: 'osx'
       strategy:
         matrix:
-          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_TEST_VERSIONS_MATRIX) }}
+          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
       steps:
         - uses: actions/checkout@v4
         - uses: ruby/setup-ruby@v1
