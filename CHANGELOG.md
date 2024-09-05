@@ -1,15 +1,27 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.53.1 Release notes (2024-09-05)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Add the file path to the exception thrown by File::rw_lock() when it fails to
+  open the file. ([Core #7999](https://github.com/realm/realm-core/issues/7999))
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Filtering notifications with a LinkingObjects property as the final element
+  could sometimes give wrong results
+  ([Core #7530](https://github.com/realm/realm-core/issues/7530), since v10.11.0)
+* Fix a potential crash during process termination when Logger log level is set
+  higher than Info. ([Core #7969](https://github.com/realm/realm-core/issues/7969), since v10.45.0)
+* The check for maximum path length was incorrect and lengths between 240 and
+  250 would fail to use the hashed fallback ([Core #8007](https://github.com/realm/realm-core/issues/8007), since v10.0.0).
+* API misuse resulting in an exception being thrown from within a callback
+  would sometimes terminate due to hitting `REALM_UNREACHABLE()` rather than
+  the exception being propagated to the caller
+  ([Core #7836](https://github.com/realm/realm-core/issues/7836)).
 
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
@@ -17,7 +29,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.1.0-16 beta 5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v14.12.0 to 14.12.1
 
 10.53.0 Release notes (2024-08-20)
 =============================================================
