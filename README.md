@@ -1,3 +1,10 @@
+> [!WARNING]
+> We announced the deprecation of Atlas Device Sync + Realm SDKs in September 2024. For more information please see:
+> - [SDK Deprecation](https://www.mongodb.com/docs/atlas/device-sdks/device-sdk-deprecation)
+> - [Device Sync Deprecation](https://www.mongodb.com/docs/atlas/app-services/sync/device-sync-deprecation)
+>
+> For a version of `realm-swift` without sync features, install version 20 or see the `community` branch.
+
 <picture>
     <source srcset="./media/logo-dark.svg" media="(prefers-color-scheme: dark)" alt="realm by MongoDB">
     <img src="./media/logo.svg" alt="realm by MongoDB">
