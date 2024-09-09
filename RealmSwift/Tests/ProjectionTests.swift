@@ -25,6 +25,13 @@ import XCTest
 import RealmTestSupport
 #endif
 
+// Keypaths are supposed to be Sendable but that never got implemented
+#if compiler(<6)
+extension KeyPath: @unchecked Sendable {}
+#else
+extension KeyPath: @retroactive @unchecked Sendable {}
+#endif
+
 // MARK: Test objects definitions
 
 enum IntegerEnum: Int, PersistableEnum {
@@ -691,7 +698,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
     func observeKeyPathChange<E: Equatable>(
         _ obj: AllTypesPrimitiveProjection,
         _ keyPath: ReferenceWritableKeyPath<AllTypesPrimitiveProjection, E>,
-        _ name: String, _ new: E, fileName: StaticString = #file, lineNumber: UInt = #line
+        _ name: String, _ new: E, fileName: StaticString = #filePath, lineNumber: UInt = #line
     ) {
         let old = obj[keyPath: keyPath]
         let (ex, token) = expectPropertyChange(obj, keyPath, name) { _, oldValue, newValue in
@@ -707,12 +714,13 @@ class ProjectionTests: TestCase, @unchecked Sendable {
 
         // Write on a background thread so that oldValue is present
         let tsr = ThreadSafeReference(to: obj)
+        nonisolated(unsafe) let newValue = new
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
             let obj = realm.resolve(tsr)!
             try! realm.write {
                 obj.int8Col = 5 // Write to another property to verify keypath filtering works
-                obj[keyPath: keyPath] = new
+                obj[keyPath: keyPath] = newValue
             }
         }
         wait(for: [ex], timeout: 2.0)
@@ -945,6 +953,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         observeKeyPathChange(obs, \.mapOptUuid, "mapOptUuid", uuid)
     }
 
+    @MainActor
     func testObserveKeyPath() {
         let realm = populatedRealm()
         let johnProjection = realm.objects(PersonProjection.self).filter("lastName == 'Snow'").first!
@@ -953,7 +962,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         let token = johnProjection.observe(keyPaths: ["lastName"], on: nil) { _ in
             ex.fulfill()
         }
-        dispatchSyncNewThread {
+        dispatchSyncNewThread { @Sendable in
             let realm = self.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
@@ -964,6 +973,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         token.invalidate()
     }
 
+    @MainActor
     func testObserveNestedProjection() {
         let realm = populatedRealm()
         let johnProjection = realm.objects(PersonProjection.self).first!
@@ -978,7 +988,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
                 XCTFail("expected .change, got \(changes)")
             }
         }
-        dispatchSyncNewThread {
+        dispatchSyncNewThread { @Sendable in
             let realm = self.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
@@ -998,7 +1008,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
                 XCTFail("expected .change, got \(changes)")
             }
         }
-        dispatchSyncNewThread {
+        dispatchSyncNewThread { @Sendable in
             let realm = self.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
@@ -1011,14 +1021,16 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         ex = expectation(description: "testProjectionNotificationEmbeddedNested")
         let token3 = johnProjection.observe { changes in
             if case .change(_, let propertyChange) = changes {
-                XCTAssertEqual(propertyChange[0].name, "homeCity")
-                XCTAssertEqual(propertyChange[0].newValue as? String, "Barranquilla")
+                // this appears to be required due to an autoclosure bug
+                nonisolated(unsafe) let change = propertyChange[0]
+                XCTAssertEqual(change.name, "homeCity")
+                XCTAssertEqual(change.newValue as? String, "Barranquilla")
                 ex.fulfill()
             } else {
                 XCTFail("expected .change, got \(changes)")
             }
         }
-        dispatchSyncNewThread {
+        dispatchSyncNewThread { @Sendable in
             let realm = self.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
@@ -1048,7 +1060,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
     }
 
     func observeChange<T: Equatable>(_ obj: AllTypesPrimitiveProjection, _ key: String, _ old: T?, _ new: T?,
-                                     fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+                                     fileName: StaticString = #filePath, lineNumber: UInt = #line, _ block: () -> Void) {
         guard let change = observeChange(obj, key, block) else {
             return XCTFail("did not get a notification", file: fileName, line: lineNumber)
         }
@@ -1059,7 +1071,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
 
     func observeListChange(_ obj: AllTypesPrimitiveProjection, _ key: String, _ kind: NSKeyValueChange,
                            _ indexes: NSIndexSet = NSIndexSet(index: 0),
-                           fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+                           fileName: StaticString = #filePath, lineNumber: UInt = #line, _ block: () -> Void) {
         guard let change = observeChange(obj, key, block) else {
             return XCTFail("did not get a notification", file: fileName, line: lineNumber)
         }
@@ -1081,7 +1093,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
     }
 
     func observeSetChange(_ obj: AllTypesPrimitiveProjection, _ key: String,
-                          fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+                          fileName: StaticString = #filePath, lineNumber: UInt = #line, _ block: () -> Void) {
         guard let change = observeChange(obj, key, block) else {
             return XCTFail("did not get a notification", file: fileName, line: lineNumber)
         }
@@ -1660,7 +1672,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
     }
 
     func testFreezeFromWrongThread() {
-        let projection = simpleProjection()
+        nonisolated(unsafe) let projection = simpleProjection()
         dispatchSyncNewThread {
             self.assertThrows(projection.freeze(), "Realm accessed from incorrect thread")
         }
@@ -1668,7 +1680,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
 
     func testAccessFrozenObjectFromDifferentThread() {
         let projection = simpleProjection()
-        let frozen = projection.freeze()
+        nonisolated(unsafe) let frozen = projection.freeze()
         dispatchSyncNewThread {
             XCTAssertEqual(frozen.int, 0)
         }
@@ -1756,7 +1768,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         let realm = realmWithTestPath()
         let projection = simpleProjection()
         let tsr = ThreadSafeReference(to: projection)
-        var frozen: SimpleProjection!
+        nonisolated(unsafe) var frozen: SimpleProjection!
 
         dispatchSyncNewThread {
             let realm = self.realmWithTestPath()
@@ -1776,7 +1788,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
     func testThawCreatedOnDifferentThread() {
         let realm = realmWithTestPath()
         XCTAssertEqual(realm.objects(SimpleProjection.self).count, 0)
-        var frozen: SimpleProjection!
+        nonisolated(unsafe) var frozen: SimpleProjection!
         dispatchSyncNewThread {
             let projection = self.simpleProjection()
             frozen = projection.freeze()
@@ -1787,6 +1799,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         XCTAssertEqual(realm.objects(SimpleProjection.self).count, 1)
     }
 
+    @MainActor
     func testObserveComputedChange() throws {
         let realm = populatedRealm()
         let johnProjection = realm.objects(PersonProjection.self).first!
@@ -1810,7 +1823,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         // Wait for the notifier to be registered before we do the write
         realm.refresh()
 
-        dispatchSyncNewThread {
+        dispatchSyncNewThread { @Sendable in
             let realm = self.realmWithTestPath()
             let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
             try! realm.write {

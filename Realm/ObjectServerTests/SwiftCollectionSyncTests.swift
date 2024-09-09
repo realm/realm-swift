@@ -30,24 +30,11 @@ import RealmTestSupport
 class CollectionSyncTestCase: SwiftSyncTestCase {
     var readRealm: Realm!
 
-    override func setUp() {
-        super.setUp()
-        // This autoreleasepool is needed to ensure that the Realms are closed
-        // immediately in tearDown() rather than escaping to an outer pool.
-        autoreleasepool {
-            readRealm = try! openRealm()
-        }
-    }
-
-    override func tearDown() {
-        readRealm = nil
-        super.tearDown()
-    }
-
     override var objectTypes: [ObjectBase.Type] {
         [SwiftCollectionSyncObject.self, SwiftPerson.self]
     }
 
+    @MainActor
     func write(_ fn: (Realm) -> Void) throws {
         try super.write(fn)
         waitForDownloads(for: readRealm)
@@ -61,8 +48,13 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
         }
     }
 
+    @MainActor
     private func roundTrip<T>(keyPath: KeyPath<SwiftCollectionSyncObject, List<T>>,
                               values: [T], partitionValue: String = #function) throws {
+        autoreleasepool {
+            readRealm = try! openRealm()
+        }
+
         checkCount(expected: 0, readRealm, SwiftCollectionSyncObject.self)
 
         // Create the object
@@ -108,8 +100,11 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
         try write { realm in
             realm.deleteAll()
         }
+
+        readRealm = nil
     }
 
+    @MainActor
     func testLists() throws {
         try roundTrip(keyPath: \.intList, values: [1, 2, 3])
         try roundTrip(keyPath: \.boolList, values: [true, false, false])
@@ -137,9 +132,13 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
     private typealias MutableSetKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, MutableSet<T>>
     private typealias MutableSetKeyValues<T: RealmCollectionValue> = (keyPath: MutableSetKeyPath<T>, values: [T])
 
+    @MainActor
     private func roundTrip<T>(set: MutableSetKeyValues<T>,
                               otherSet: MutableSetKeyValues<T>,
                               partitionValue: String = #function) throws {
+        autoreleasepool {
+            readRealm = try! openRealm()
+        }
         checkCount(expected: 0, readRealm, SwiftCollectionSyncObject.self)
 
         // Create the object
@@ -196,8 +195,10 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
         try write { realm in
             realm.deleteAll()
         }
+        readRealm = nil
     }
 
+    @MainActor
     func testSets() throws {
         try roundTrip(set: (\.intSet, [1, 2, 3]), otherSet: (\.otherIntSet, [3, 4, 5]))
         try roundTrip(set: (\.stringSet, ["Who", "What", "When"]),
@@ -248,8 +249,13 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
 
     private typealias MapKeyPath<T: RealmCollectionValue> = KeyPath<SwiftCollectionSyncObject, Map<String, T>>
 
+    @MainActor
     private func roundTrip<T>(keyPath: MapKeyPath<T>, values: [T],
                               partitionValue: String = #function) throws {
+        autoreleasepool {
+            readRealm = try! openRealm()
+        }
+
         checkCount(expected: 0, readRealm, SwiftCollectionSyncObject.self)
 
         // Create the object
@@ -296,8 +302,10 @@ class CollectionSyncTestCase: SwiftSyncTestCase {
         try write { realm in
             realm.deleteAll()
         }
+        readRealm = nil
     }
 
+    @MainActor
     func testMaps() throws {
         try roundTrip(keyPath: \.intMap, values: [1, 2, 3, 4, 5])
         try roundTrip(keyPath: \.stringMap, values: ["Who", "What", "When", "Strings", "Collide"])

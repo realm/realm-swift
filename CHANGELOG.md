@@ -1,7 +1,34 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+The minimum supported version of Xcode is now 15.3.
+
 ### Enhancements
-* None.
+* Build in Swift 6 language mode when using Xcode 16. Libraries build in Swift
+  6 mode can be consumed by apps built in Swift 5 mode, so this should not have
+  any immediate effects beyond eliminating some warnings and ensuring that all
+  Realm APIs can be used in Swift 6 mode. Some notes about using Realm Swift in
+  Swift 6:
+  - `try await Realm(actor: actor)` has been replaced with `try await
+  Realm.open()` to work around isolated parameters not being implemented for
+  initializers (https://github.com/swiftlang/swift/issues/71174). The actor is
+  now automatically inferred and should not be manually passed in.
+  - `@ThreadSafe` is not usable as a property wrapper on local variables and
+  function arguments in Swift 6 mode. Sendability checking for property
+  wrappers never got implemented due to them being quietly deprecated in favor
+  of macros. It can still be used as a property wrapper for class properties
+  and as a manual wrapper locally, but note that it does not combine well with
+  actor-isolated Realms.
+  - In Swift 6 mode a few mongo client functions have changed from returning
+  `[AnyHashable: Any]` to `Document`. These should have been `Document` all
+  along, and the old return type no longer compiles due to not being Sendable.
+* Some SwiftUI components are now explicitly marked as `@MainActor`. These
+  types were implicitly `@MainActor` in Swift 5, but became nonisolated when
+  using Xcode 16 in Swift 5 mode due to the removal of implicit isolation when
+  using property wrappers on member variables. This resulted in some new
+  sendability warnings in Xcode 16 (or errors in Swift 6 mode).
+* Add Xcode 16 and 16.1 binaries to the release packages (currently built with
+  beta 6 and beta 1 respectively).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
@@ -14,7 +41,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 15.4.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 15.1.0-16 beta 5.
+* Xcode: 15.3.0-16.1 beta.
 
 ### Internal
 * Upgraded realm-core from ? to ?

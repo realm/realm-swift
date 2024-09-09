@@ -16,13 +16,8 @@ jobs:
       core-version: ${{ steps.get-core-version.outputs.version }}
     strategy:
       matrix:
-        target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst]
-        xcode: ["15.1"]
-        include:
-          - target: xros
-            xcode: "15.2.0"
-          - target: xrsimulator
-            xcode: "15.2.0"
+        target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst, xros, xrsimulator]
+        xcode: ["15.3"]
     steps:
       - uses: actions/checkout@v4
 

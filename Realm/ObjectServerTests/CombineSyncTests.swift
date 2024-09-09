@@ -31,6 +31,14 @@ import RealmTestSupport
 import RealmSwiftTestSupport
 #endif
 
+extension AnyCancellable {
+    func store(in lockedSet: Locked<Set<AnyCancellable>>) {
+        lockedSet.withLock {
+            self.store(in: &$0)
+        }
+    }
+}
+
 @available(macOS 13, *)
 @objc(CombineSyncTests)
 class CombineSyncTests: SwiftSyncTestCase {
@@ -38,10 +46,12 @@ class CombineSyncTests: SwiftSyncTestCase {
         [Dog.self, SwiftPerson.self, SwiftHugeSyncObject.self]
     }
 
-    var subscriptions: Set<AnyCancellable> = []
+    nonisolated let subscriptions = Locked(Set<AnyCancellable>())
     override func tearDown() {
-        subscriptions.forEach { $0.cancel() }
-        subscriptions = []
+        subscriptions.withLock {
+            $0.forEach { $0.cancel() }
+            $0 = []
+        }
         super.tearDown()
     }
 
@@ -62,7 +72,7 @@ class CombineSyncTests: SwiftSyncTestCase {
             .sink(receiveCompletion: { @Sendable _ in }) { @Sendable _ in
                 XCTAssertFalse(Thread.isMainThread)
                 watchEx1.wrappedValue.fulfill()
-            }.store(in: &subscriptions)
+            }.store(in: subscriptions)
 
         collection.watch()
             .onOpen {
@@ -73,7 +83,7 @@ class CombineSyncTests: SwiftSyncTestCase {
             .sink(receiveCompletion: { _ in }) { _ in
                 XCTAssertTrue(Thread.isMainThread)
                 watchEx2.wrappedValue.fulfill()
-            }.store(in: &subscriptions)
+            }.store(in: subscriptions)
 
         for _ in 0..<3 {
             wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
@@ -116,7 +126,7 @@ class CombineSyncTests: SwiftSyncTestCase {
                 if objectId == objectIds[0] {
                     watchEx1.wrappedValue.fulfill()
                 }
-            }.store(in: &subscriptions)
+            }.store(in: subscriptions)
 
         collection.watch(filterIds: [objectIds[1]])
             .onOpen {
@@ -134,7 +144,7 @@ class CombineSyncTests: SwiftSyncTestCase {
                 if objectId == objectIds[1] {
                     watchEx2.wrappedValue.fulfill()
                 }
-            }.store(in: &subscriptions)
+            }.store(in: subscriptions)
 
         for i in 0..<3 {
             wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
@@ -187,7 +197,7 @@ class CombineSyncTests: SwiftSyncTestCase {
                 if objectId == objectIds[0] {
                     watchEx1.wrappedValue.fulfill()
                 }
-        }.store(in: &subscriptions)
+        }.store(in: subscriptions)
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[1])])
             .onOpen {
@@ -205,7 +215,7 @@ class CombineSyncTests: SwiftSyncTestCase {
                 if objectId == objectIds[1] {
                     watchEx2.wrappedValue.fulfill()
                 }
-        }.store(in: &subscriptions)
+        }.store(in: subscriptions)
 
         for i in 0..<3 {
             wait(for: [watchEx1.wrappedValue, watchEx2.wrappedValue], timeout: 60.0)
@@ -243,10 +253,11 @@ class CombineSyncTests: SwiftSyncTestCase {
             if triggered == 2 {
                 appEx.fulfill()
             }
-        }.store(in: &subscriptions)
+        }.store(in: subscriptions)
 
+        let app = self.app
         app.emailPasswordAuth.registerUser(email: email, password: password)
-            .flatMap { @Sendable in self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { @Sendable in app.login(credentials: .emailPassword(email: email, password: password)) }
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { result in
                 if case let .failure(error) = result {
@@ -256,11 +267,11 @@ class CombineSyncTests: SwiftSyncTestCase {
                 user.objectWillChange.sink { @Sendable user in
                     XCTAssert(!user.isLoggedIn)
                     loginEx.fulfill()
-                }.store(in: &self.subscriptions)
+                }.store(in: self.subscriptions)
                 XCTAssertEqual(user.id, self.app.currentUser?.id)
                 user.logOut { _ in } // logout user and make sure it is observed
             })
-            .store(in: &subscriptions)
+            .store(in: subscriptions)
         wait(for: [loginEx, appEx], timeout: 30.0)
         XCTAssertEqual(self.app.allUsers.count, 1)
         XCTAssertEqual(triggered, 2)
@@ -269,10 +280,12 @@ class CombineSyncTests: SwiftSyncTestCase {
     func testAsyncOpenCombine() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
+        let app = self.app
+        let name = self.name
         app.emailPasswordAuth.registerUser(email: email, password: password)
-            .flatMap { @Sendable in self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { @Sendable in app.login(credentials: .emailPassword(email: email, password: password)) }
             .flatMap { @Sendable (user: User) in
-                var config = user.configuration(partitionValue: self.name)
+                var config = user.configuration(partitionValue: name)
                 config.objectTypes = [SwiftHugeSyncObject.self]
                 return Realm.asyncOpen(configuration: config)
             }
@@ -296,7 +309,7 @@ class CombineSyncTests: SwiftSyncTestCase {
         let progressEx = expectation(description: "Should receive progress notification")
         app.login(credentials: .anonymous)
             .flatMap { @Sendable user in
-                var config = user.configuration(partitionValue: self.name)
+                var config = user.configuration(partitionValue: name)
                 config.objectTypes = [SwiftHugeSyncObject.self]
                 return Realm.asyncOpen(configuration: config).onProgressNotification {
                     if $0.isTransferComplete {
@@ -306,7 +319,7 @@ class CombineSyncTests: SwiftSyncTestCase {
             }
             .expectValue(self, chainEx) { realm in
                 XCTAssertEqual(realm.objects(SwiftHugeSyncObject.self).count, 2)
-            }.store(in: &subscriptions)
+            }.store(in: subscriptions)
         wait(for: [chainEx, progressEx], timeout: 30.0)
     }
 
@@ -334,10 +347,11 @@ class CombineSyncTests: SwiftSyncTestCase {
             if triggered == 2 {
                 appEx.fulfill()
             }
-        }.store(in: &subscriptions)
+        }.store(in: subscriptions)
 
+        let app = self.app
         app.emailPasswordAuth.registerUser(email: email, password: password)
-            .flatMap { @Sendable in self.app.login(credentials: .emailPassword(email: email, password: password)) }
+            .flatMap { @Sendable in app.login(credentials: .emailPassword(email: email, password: password)) }
             .flatMap { @Sendable in $0.delete() }
             .await(self)
         wait(for: [appEx], timeout: 30.0)
@@ -576,7 +590,7 @@ class CombineSyncTests: SwiftSyncTestCase {
             XCTAssertNotNil(user)
         }
 
-        app.currentUser?.functions.sum([1, 2, 3, 4, 5]).await(self) { bson in
+        app.currentUser?.functions.sum(1, 2, 3, 4, 5).await(self) { bson in
             guard case let .int32(sum) = bson else {
                 XCTFail("Should be int32")
                 return
@@ -584,7 +598,7 @@ class CombineSyncTests: SwiftSyncTestCase {
             XCTAssertEqual(sum, 15)
         }
 
-        app.currentUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]).await(self) { bson in
+        app.currentUser?.functions.updateUserData(["favourite_colour": "green", "apples": 10]).await(self) { bson in
             guard case let .bool(upd) = bson else {
                 XCTFail("Should be bool")
                 return
@@ -639,13 +653,16 @@ class CombineFlexibleSyncTests: SwiftSyncTestCase {
         try createFlexibleSyncApp()
     }
 
-    var cancellables: Set<AnyCancellable> = []
+    nonisolated let cancellables = Locked(Set<AnyCancellable>())
     override func tearDown() {
-        cancellables.forEach { $0.cancel() }
-        cancellables = []
+        cancellables.withLock {
+            $0.forEach { $0.cancel() }
+            $0 = []
+        }
         super.tearDown()
     }
 
+    @MainActor
     func testFlexibleSyncCombineWrite() throws {
         try write { realm in
             for i in 1...25 {
@@ -669,7 +686,7 @@ class CombineFlexibleSyncTests: SwiftSyncTestCase {
             })
         }.sink(receiveCompletion: { @Sendable _ in },
                receiveValue: { @Sendable _ in ex.fulfill() }
-        ).store(in: &cancellables)
+        ).store(in: cancellables)
 
         waitForExpectations(timeout: 20.0, handler: nil)
 
@@ -677,6 +694,7 @@ class CombineFlexibleSyncTests: SwiftSyncTestCase {
         checkCount(expected: 15, realm, SwiftPerson.self)
     }
 
+    @MainActor
     func testFlexibleSyncCombineWriteFails() throws {
         let realm = try openRealm()
         checkCount(expected: 0, realm, SwiftPerson.self)
@@ -690,20 +708,20 @@ class CombineFlexibleSyncTests: SwiftSyncTestCase {
                 $0.longCol == Int64(1)
             })
         }
-        .sink(receiveCompletion: { result in
+        .sink(receiveCompletion: { @Sendable result in
             if case .failure(let error as Realm.Error) = result {
                 XCTAssertEqual(error.code, .subscriptionFailed)
-                guard case .error = subscriptions.state else {
-                    return XCTFail("Adding a query for a not queryable field should change the subscription set state to error")
-                }
             } else {
                 XCTFail("Expected an error but got \(result)")
             }
             ex.fulfill()
         }, receiveValue: { _ in })
-        .store(in: &cancellables)
+        .store(in: cancellables)
 
         waitForExpectations(timeout: 20.0, handler: nil)
+        guard case .error = subscriptions.state else {
+            return XCTFail("Adding a query for a not queryable field should change the subscription set state to error")
+        }
 
         waitForDownloads(for: realm)
         checkCount(expected: 0, realm, SwiftPerson.self)

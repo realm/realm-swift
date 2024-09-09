@@ -40,9 +40,9 @@ class SwiftIntProjection: Projection<SwiftIntObject> {
     @Projected(\SwiftIntObject.intCol) var intCol
 }
 
-private var smallRealm: Realm!
-private var mediumRealm: Realm!
-private var largeRealm: Realm!
+private nonisolated(unsafe) var smallRealm: Realm!
+private nonisolated(unsafe) var mediumRealm: Realm!
+private nonisolated(unsafe) var largeRealm: Realm!
 
 private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
 
@@ -418,7 +418,7 @@ class SwiftPerformanceTests: TestCase, @unchecked Sendable {
     }
 
     func testRealmCreationCached() {
-        var realm: Realm!
+        nonisolated(unsafe) var realm: Realm!
         dispatchSyncNewThread {
             realm = try! Realm()
         }
@@ -453,9 +453,12 @@ class SwiftPerformanceTests: TestCase, @unchecked Sendable {
     }
 
     func testSyncRealmCreationCached() {
-        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
-        config.objectTypes = []
-        var realm: Realm!
+        let config = {
+            var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
+            config.objectTypes = []
+            return config
+        }()
+        nonisolated(unsafe) var realm: Realm!
         dispatchSyncNewThread {
             realm = try! Realm(configuration: config)
         }
@@ -468,9 +471,12 @@ class SwiftPerformanceTests: TestCase, @unchecked Sendable {
     }
 
     func testSyncRealmMultithreadedCacheLookup() {
-        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
-        config.objectTypes = []
-        var realm: Realm!
+        let config = {
+            var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
+            config.objectTypes = []
+            return config
+        }()
+        nonisolated(unsafe) var realm: Realm!
         dispatchSyncNewThread {
             realm = try! Realm(configuration: config)
         }
@@ -493,9 +499,12 @@ class SwiftPerformanceTests: TestCase, @unchecked Sendable {
     }
 
     func testSyncRealmMultithreadedCreationCached() {
-        var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
-        config.objectTypes = []
-        var realm: Realm!
+        let config = {
+            var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeSync())
+            config.objectTypes = []
+            return config
+        }()
+        nonisolated(unsafe) var realm: Realm!
         dispatchSyncNewThread {
             realm = try! Realm(configuration: config)
         }
@@ -978,7 +987,7 @@ class SwiftSyncRealmPerformanceTests: TestCase, @unchecked Sendable {
 
     func testSyncRealmCreationCached() {
         let config = self.config
-        var realm: Realm!
+        nonisolated(unsafe) var realm: Realm!
         dispatchSyncNewThread {
             // Open on a different thread so that the test hits the path where
             // the cache lookup is a miss but there's a cached Realm on a

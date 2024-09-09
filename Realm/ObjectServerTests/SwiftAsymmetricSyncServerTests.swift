@@ -135,7 +135,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
         return super.defaultTestSuite
     }
 
-    static let objectTypes = [
+    nonisolated static let objectTypes = [
         HugeObjectAsymmetric.self,
         SwiftCustomColumnAsymmetricObject.self,
         SwiftObjectAsymmetric.self,
@@ -153,6 +153,7 @@ class SwiftAsymmetricSyncTests: SwiftSyncTestCase {
         user.flexibleSyncConfiguration()
     }
 
+    @MainActor
     func testAsymmetricObjectSchema() throws {
         let realm = try openRealm()
         XCTAssertTrue(realm.schema.objectSchema[0].isAsymmetric)

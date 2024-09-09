@@ -367,6 +367,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         XCTAssertEqual(obj.stringCol, "apple")
     }
 
+    @MainActor
     func testObservation() {
         let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
@@ -403,6 +404,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         token2.invalidate()
     }
 
+    @MainActor
     func testObserveWithKeyPathFilter() {
         let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
@@ -443,6 +445,7 @@ class SectionedResultsTests: SectionedResultsTestsBase {
         realmToken.invalidate()
     }
 
+    @MainActor
     func testObserveWithKeyPathFilterOnSection() {
         let realm = createObjects()
         let results = realm.objects(ModernAllTypesObject.self)
@@ -845,6 +848,7 @@ class SectionedResultsProjectionTests: SectionedResultsTestsBase {
         assert(ascending: false, sectionCount: 3, sectionKeys: ["c", "b", "a"])
     }
 
+    @MainActor
     func testObservation() {
         let realm = createObjects()
         let results = realm.objects(ModernAllTypesProjection.self)

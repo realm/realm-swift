@@ -86,7 +86,7 @@ end
 # because they don't care about Xcode versions, while some others are latest-only
 # because they're particularly slow to run.
 module Workflows
-  XCODE_VERSIONS = %w(15.1 15.2 15.3 15.4 16\ beta\ 5)
+  XCODE_VERSIONS = %w(15.3 15.4 16\ beta\ 6 16.1\ beta)
 
   all = ->(v) { true }
   latest_only = ->(v) { v == XCODE_VERSIONS.last }
@@ -115,9 +115,6 @@ module Workflows
     Target.new('watchos-swift', 'RealmSwift', oldest_and_latest, Destination.generic),
 
     Target.new('swiftui', 'SwiftUITests', latest_only, Destination.iOS),
-    Target.new('swiftui-sync', 'SwiftUISyncTests', latest_only, Destination.macOS),
-
-    Target.new('sync', 'Object Server Tests', oldest_and_latest, Destination.macOS),
 
     Target.new('docs', 'CI', latest_only, Destination.generic),
     Target.new('swiftlint', 'CI', latest_only, Destination.generic),

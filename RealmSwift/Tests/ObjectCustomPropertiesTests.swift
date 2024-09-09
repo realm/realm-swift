@@ -71,6 +71,6 @@ private final class CustomPropertiesObject: Object {
         return injected_customRealmProperties
     }
 
-    static var injected_customRealmProperties: [RLMProperty]?
+    static nonisolated(unsafe) var injected_customRealmProperties: [RLMProperty]?
     static let preMadeRLMProperty = RLMProperty(name: "value", objectType: CustomPropertiesObject.self, valueType: String.self)
 }

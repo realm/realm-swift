@@ -58,6 +58,7 @@ class PrimitiveMapTests<O: ObjectFactory, V: MapValueFactory>: PrimitiveMapTests
         }
     }
 
+    @MainActor
     func testEnumeration() {
         XCTAssertEqual(0, map.count)
         map.merge(values) { $1 }

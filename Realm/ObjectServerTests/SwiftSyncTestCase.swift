@@ -51,7 +51,6 @@ public enum ProcessKind {
 // SwiftSyncTestCase wraps RLMSyncTestCase to make it more pleasant to use from
 // Swift. Most of the comments there apply to this as well.
 @available(macOS 13, *)
-@MainActor
 open class SwiftSyncTestCase: RLMSyncTestCase {
     // overridden in subclasses to generate a FLX config instead of a PBS one
     open func configuration(user: User) -> Realm.Configuration {
@@ -60,7 +59,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
 
     // Must be overriden in each subclass to specify which types will be used
     // in this test case.
-    open var objectTypes: [ObjectBase.Type] {
+    nonisolated open var objectTypes: [ObjectBase.Type] {
         [SwiftPerson.self]
     }
 
@@ -68,7 +67,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         objectTypes
     }
 
-    public func executeChild(file: StaticString = #file, line: UInt = #line) {
+    public func executeChild(file: StaticString = #filePath, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
@@ -85,6 +84,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return credentials
     }
 
+    @MainActor
     public func openRealm(app: App? = nil, wait: Bool = true) throws -> Realm {
         let realm = try Realm(configuration: configuration(app: app))
         if wait {
@@ -93,6 +93,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return realm
     }
 
+    @MainActor
     public func configuration(app: App? = nil) throws -> Realm.Configuration {
         let user = try createUser(app: app)
         var config = configuration(user: user)
@@ -100,21 +101,25 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         return config
     }
 
+    @MainActor
     public func openRealm(configuration: Realm.Configuration) throws -> Realm {
         Realm.asyncOpen(configuration: configuration).await(self)
     }
 
+    @MainActor
     public func openRealm(user: User, partitionValue: String) throws -> Realm {
         var config = user.configuration(partitionValue: partitionValue)
         config.objectTypes = self.objectTypes
         return try openRealm(configuration: config)
     }
 
+    @MainActor
     public func createUser(app: App? = nil) throws -> User {
         let app = app ?? self.app
         return try logInUser(for: basicCredentials(app: app), app: app)
     }
 
+    @MainActor
     public func logInUser(for credentials: Credentials, app: App? = nil) throws -> User {
         let user = (app ?? self.app).login(credentials: credentials).await(self, timeout: 60.0)
         XCTAssertTrue(user.isLoggedIn)
@@ -132,6 +137,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     // Populate the server-side data using the given block, which is called in
     // a write transaction. Note that unlike the obj-c versions, this works for
     // both PBS and FLX sync.
+    @MainActor
     public func write(app: App? = nil, _ block: (Realm) throws -> Void) throws {
         try autoreleasepool {
             let realm = try openRealm(app: app)
@@ -151,14 +157,13 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     public func checkCount<T: Object>(expected: Int,
                                       _ realm: Realm,
                                       _ type: T.Type,
-                                      file: StaticString = #file,
+                                      file: StaticString = #filePath,
                                       line: UInt = #line) {
         realm.refresh()
         let actual = realm.objects(type).count
         XCTAssertEqual(actual, expected,
                        "Error: expected \(expected) items, but got \(actual) (process: \(isParent ? "parent" : "child"))",
-                       file: file,
-                       line: line)
+                       file: file, line: line)
     }
 
     var exceptionThrown = false
@@ -182,6 +187,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     public static let bigObjectCount = 2
+    @MainActor
     public func populateRealm() throws {
         try write { realm in
             for _ in 0..<SwiftSyncTestCase.bigObjectCount {
@@ -209,6 +215,7 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         wait(for: [deleteEx], timeout: 30.0)
     }
 
+    @MainActor
     public func waitForCollectionCount(_ collection: MongoCollection, _ count: Int) {
         let waitStart = Date()
         while collection.count(filter: [:]).await(self) < count && waitStart.timeIntervalSinceNow > -600.0 {
@@ -220,8 +227,9 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     // MARK: - Async helpers
 
     // These are async versions of the synchronous functions defined above.
-    // They should function identially other than being async rather than using
+    // They should function identically other than being async rather than using
     // expecatations to synchronously await things.
+#if compiler(<6)
     public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
         let email = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
@@ -229,6 +237,17 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         try await (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password)
         return credentials
     }
+#else
+    public func basicCredentials(
+        usernameSuffix: String = "", app: App? = nil, _isolation: isolated (any Actor)? = #isolation
+    ) async throws -> Credentials {
+        let email = "\(randomString(10))\(usernameSuffix)"
+        let password = "abcdef"
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        try await (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password)
+        return credentials
+    }
+#endif
 
     @MainActor
     @nonobjc public func openRealm() async throws -> Realm {
@@ -249,10 +268,17 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         }.value
     }
 
+#if compiler(<6)
     public func createUser(app: App? = nil) async throws -> User {
         let credentials = try await basicCredentials(app: app)
         return try await (app ?? self.app).login(credentials: credentials)
     }
+#else
+    public func createUser(app: App? = nil, _isolation: isolated (any Actor)? = #isolation) async throws -> User {
+        let credentials = try await basicCredentials(app: app)
+        return try await (app ?? self.app).login(credentials: credentials)
+    }
+#endif
 }
 
 @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)
@@ -271,7 +297,6 @@ public extension Publisher {
 
     // Synchronously await non-error completion of the publisher, calling the
     // `receiveValue` callback with the value if supplied.
-    @MainActor
     func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0, receiveValue: (@Sendable (Self.Output) -> Void)? = nil) {
         let expectation = testCase.expectation(description: "Async combine pipeline")
         let cancellable = self.expectValue(testCase, expectation, receiveValue: receiveValue)
@@ -281,7 +306,6 @@ public extension Publisher {
 
     // Synchronously await non-error completion of the publisher, returning the published value.
     @discardableResult
-    @MainActor
     func await(_ testCase: XCTestCase, timeout: TimeInterval = 20.0) -> Self.Output {
         let expectation = testCase.expectation(description: "Async combine pipeline")
         let value = Locked(Self.Output?.none)
@@ -292,7 +316,6 @@ public extension Publisher {
     }
 
     // Synchrously await error completion of the publisher
-    @MainActor
     func awaitFailure(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
                       _ errorHandler: (@Sendable (Self.Failure) -> Void)? = nil) {
         let expectation = testCase.expectation(description: "Async combine pipeline should fail")
@@ -308,7 +331,6 @@ public extension Publisher {
         cancellable.cancel()
     }
 
-    @MainActor
     func awaitFailure<E: Error>(_ testCase: XCTestCase, timeout: TimeInterval = 20.0,
                                 _ errorHandler: @escaping (@Sendable (E) -> Void)) {
         awaitFailure(testCase, timeout: timeout) { error in

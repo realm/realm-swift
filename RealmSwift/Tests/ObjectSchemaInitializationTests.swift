@@ -806,7 +806,7 @@ class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
     @objc dynamic var objectCol = SwiftBoolObject()
 }
 
-#if compiler(<6)
+#if compiler(<6) || SWIFT_PACKAGE
 extension Set: RealmOptionalType {
     public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Set<Element>? {
         fatalError()

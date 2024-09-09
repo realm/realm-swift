@@ -44,6 +44,7 @@ func waitForEditRecoveryMode(flexibleSync: Bool = false, appId: String, disable:
 
 @available(macOS 13, *)
 class ClientResetTests: SwiftSyncTestCase {
+    @MainActor
     func prepareClientReset(app: App? = nil) throws -> User {
         let app = app ?? self.app
         let config = try configuration(app: app)
@@ -68,6 +69,7 @@ class ClientResetTests: SwiftSyncTestCase {
         return user
     }
 
+    @MainActor
     func expectSyncError(_ fn: () -> Void) -> SyncError? {
         let error = Locked(SyncError?.none)
         let ex = expectation(description: "Waiting for error handler to be called...")
@@ -183,6 +185,7 @@ class ClientResetTests: SwiftSyncTestCase {
 
 @available(macOS 13, *)
 class PBSClientResetTests: ClientResetTests {
+    @MainActor
     func testClientResetManual() throws {
         let user = try prepareClientReset()
         try autoreleasepool {
@@ -206,6 +209,7 @@ class PBSClientResetTests: ClientResetTests {
         try verifyClientResetDiscardedLocalChanges(user)
     }
 
+    @MainActor
     func testClientResetManualWithEnumCallback() throws {
         let user = try prepareClientReset()
         try autoreleasepool {
@@ -232,6 +236,7 @@ class PBSClientResetTests: ClientResetTests {
         try verifyClientResetDiscardedLocalChanges(user)
     }
 
+    @MainActor
     func testClientResetManualManagerFallback() throws {
         let user = try prepareClientReset()
 
@@ -259,6 +264,7 @@ class PBSClientResetTests: ClientResetTests {
 
     // If the syncManager.ErrorHandler and manual enum callback
     // are both set, use the enum callback.
+    @MainActor
     func testClientResetManualEnumCallbackNotManager() throws {
         let user = try prepareClientReset()
 
@@ -294,6 +300,7 @@ class PBSClientResetTests: ClientResetTests {
         try verifyClientResetDiscardedLocalChanges(user)
     }
 
+    @MainActor
     func testClientResetManualWithoutLiveRealmInstance() throws {
         let user = try prepareClientReset()
 
@@ -316,6 +323,7 @@ class PBSClientResetTests: ClientResetTests {
         resetSyncManager()
     }
 
+    @MainActor
     @available(*, deprecated) // .discardLocal
     func testClientResetDiscardLocal() throws {
         let user = try prepareClientReset()
@@ -347,6 +355,7 @@ class PBSClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testClientResetDiscardUnsyncedChanges() throws {
         let user = try prepareClientReset()
 
@@ -375,6 +384,7 @@ class PBSClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     @available(*, deprecated) // .discardLocal
     func testClientResetDiscardLocalAsyncOpen() throws {
         let user = try prepareClientReset()
@@ -393,6 +403,7 @@ class PBSClientResetTests: ClientResetTests {
         waitForExpectations(timeout: 15.0)
     }
 
+    @MainActor
     func testClientResetRecover() throws {
         let user = try prepareClientReset()
 
@@ -419,6 +430,7 @@ class PBSClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testClientResetRecoverAsyncOpen() throws {
         let user = try prepareClientReset()
 
@@ -445,6 +457,7 @@ class PBSClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testClientResetRecoverWithSchemaChanges() throws {
         let user = try prepareClientReset()
 
@@ -484,6 +497,7 @@ class PBSClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testClientResetRecoverOrDiscardLocalFailedRecovery() throws {
         let appId = try RealmServer.shared.createApp(types: [SwiftPerson.self])
         // Disable recovery mode on the server.
@@ -526,11 +540,13 @@ class FLXClientResetTests: ClientResetTests {
     }
 
     override func configuration(user: User) -> Realm.Configuration {
-        user.flexibleSyncConfiguration { subscriptions in
-            subscriptions.append(QuerySubscription<SwiftPerson> { $0.lastName == self.name })
+        let name = self.name
+        return user.flexibleSyncConfiguration { subscriptions in
+            subscriptions.append(QuerySubscription<SwiftPerson> { $0.lastName == name })
         }
     }
 
+    @MainActor
     @available(*, deprecated) // .discardLocal
     func testFlexibleSyncDiscardLocalClientReset() throws {
         let user = try prepareClientReset()
@@ -560,6 +576,7 @@ class FLXClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testFlexibleSyncDiscardUnsyncedChangesClientReset() throws {
         let user = try prepareClientReset()
 
@@ -588,6 +605,7 @@ class FLXClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testFlexibleSyncClientResetRecover() throws {
         let user = try prepareClientReset()
 
@@ -619,6 +637,7 @@ class FLXClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testFlexibleSyncClientResetRecoverOrDiscardLocalFailedRecovery() throws {
         let appId = try RealmServer.shared.createApp(fields: ["lastName"], types: [SwiftPerson.self])
         try waitForEditRecoveryMode(flexibleSync: true, appId: appId, disable: true)
@@ -654,6 +673,7 @@ class FLXClientResetTests: ClientResetTests {
         }
     }
 
+    @MainActor
     func testFlexibleClientResetManual() throws {
         let user = try prepareClientReset()
         try autoreleasepool {
@@ -676,8 +696,9 @@ class FLXClientResetTests: ClientResetTests {
             }
         }
 
+        let name = self.name
         var config = user.flexibleSyncConfiguration { subscriptions in
-            subscriptions.append(QuerySubscription<SwiftPerson> { $0.lastName == self.name })
+            subscriptions.append(QuerySubscription<SwiftPerson> { $0.lastName == name })
         }
         config.objectTypes = [SwiftPerson.self]
 

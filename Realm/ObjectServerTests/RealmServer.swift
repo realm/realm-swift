@@ -213,15 +213,21 @@ private extension DispatchGroup {
 
 // MARK: AdminSession
 /// An authenticated session for using the Admin API
-class AdminSession {
+final class AdminSession: Sendable {
     /// The access token of the authenticated user
-    var accessToken: String
+    let accessToken: String
     /// The group id associated with the authenticated user
-    var groupId: String
+    let groupId: String
 
     init(accessToken: String, groupId: String) {
         self.accessToken = accessToken
         self.groupId = groupId
+        apps = .init(accessToken: accessToken,
+                     groupId: groupId,
+                     url: URL(string: "http://localhost:9090/api/admin/v3.0/groups/\(groupId)/apps")!)
+        privateApps = .init(accessToken: accessToken,
+                            groupId: groupId,
+                            url: URL(string: "http://localhost:9090/api/private/v1.0/groups/\(groupId)/apps")!)
     }
 
     // MARK: AdminEndpoint
@@ -408,14 +414,10 @@ class AdminSession {
     }
 
     /// The initial endpoint to access the admin server
-    lazy var apps = AdminEndpoint(accessToken: accessToken,
-                                  groupId: groupId,
-                                  url: URL(string: "http://localhost:9090/api/admin/v3.0/groups/\(groupId)/apps")!)
+    let apps: AdminEndpoint///
 
     /// The initial endpoint to access the private API
-    lazy var privateApps = AdminEndpoint(accessToken: accessToken,
-                                  groupId: groupId,
-                                  url: URL(string: "http://localhost:9090/api/private/v1.0/groups/\(groupId)/apps")!)
+    let privateApps: AdminEndpoint
 }
 
 // MARK: - Admin
@@ -479,24 +481,24 @@ public enum SyncMode {
  and allows for app creation.
  */
 @objc(RealmServer)
-public class RealmServer: NSObject {
+final public class RealmServer: NSObject, Sendable {
     public enum LogLevel: Sendable {
         case none, info, warn, error
     }
 
     /// Shared RealmServer. This class only needs to be initialized and torn down once per test suite run.
-    @objc public static let shared = RealmServer()
+    @objc public static let shared: RealmServer! = RealmServer(())
 
     /// Log level for the server and mongo processes.
-    public var logLevel = LogLevel.none
+    public let logLevel = LogLevel.none
 
     /// Process that runs the local mongo server. Should be terminated on exit.
-    private let mongoProcess = Process()
+    private let mongoProcess: Process
     /// Process that runs the local backend server. Should be terminated on exit.
-    private let serverProcess = Process()
+    private let serverProcess: Process
 
     /// The root URL of the project.
-    private static let rootUrl = URL(string: #file)!
+    private static let rootUrl = URL(string: #filePath)!
         .deletingLastPathComponent() // RealmServer.swift
         .deletingLastPathComponent() // ObjectServerTests
         .deletingLastPathComponent() // Realm
@@ -505,45 +507,42 @@ public class RealmServer: NSObject {
 
     /// The directory where mongo stores its files. This is a unique value so that
     /// we have a fresh mongo each run.
-    private lazy var tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
-                                   isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
+    private let tempDir = URL(fileURLWithPath: NSTemporaryDirectory(),
+                              isDirectory: true).appendingPathComponent("realm-test-\(UUID().uuidString)")
 
     /// Whether or not this is a parent or child process.
-    private lazy var isParentProcess = (getenv("RLMProcessIsChild") == nil)
+    private let isParentProcess = (getenv("RLMProcessIsChild") == nil)
 
     /// The current admin session
-    private var session: AdminSession?
+    private let session: AdminSession
 
     /// Created appIds which should be cleaned up
-    private var appIds = [String]()
+    private let appIds = Locked([String]())
 
     /// Check if the BaaS files are present and we can run the server
-    @objc public class func haveServer() -> Bool {
+    @objc public static func haveServer() -> Bool {
         let goDir = RealmServer.buildDir.appendingPathComponent("stitch")
         return FileManager.default.fileExists(atPath: goDir.path)
     }
 
-    private override init() {
-        super.init()
+    private init?(_: Void) {
+        guard isParentProcess else { return nil }
+        atexit {
+            RealmServer.shared.tearDown()
+        }
 
-        if isParentProcess {
-            atexit {
-                _ = RealmServer.shared.tearDown
-            }
-
-            do {
-                try launchMongoProcess()
-                try launchServerProcess()
-                self.session = try Admin().login()
-                try makeUserAdmin()
-            } catch {
-                fatalError("Could not initiate admin session: \(error.localizedDescription)")
-            }
+        do {
+            mongoProcess = try Self.launchMongoProcess(at: tempDir)
+            serverProcess = try Self.launchServerProcess(at: tempDir, logLevel: logLevel)
+            session = try Admin().login()
+            super.init()
+            try makeUserAdmin()
+        } catch {
+            fatalError("Could not initiate admin session: \(error.localizedDescription)")
         }
     }
 
-    /// Lazy teardown for exit only.
-    private lazy var tearDown: () = {
+    private func tearDown() {
         serverProcess.terminate()
 
         let mongo = RealmServer.binDir.appendingPathComponent("mongo").path
@@ -571,15 +570,16 @@ public class RealmServer: NSObject {
         mongoProcess.terminate()
 
         try? FileManager().removeItem(at: tempDir)
-    }()
+    }
 
     /// Launch the mongo server in the background.
     /// This process should run until the test suite is complete.
-    private func launchMongoProcess() throws {
+    private static func launchMongoProcess(at tempDir: URL) throws -> Process {
         try FileManager().createDirectory(at: tempDir,
                                           withIntermediateDirectories: false,
                                           attributes: nil)
 
+        let mongoProcess = Process()
         mongoProcess.launchPath = RealmServer.binDir.appendingPathComponent("mongod").path
         mongoProcess.arguments = [
             "--quiet",
@@ -600,9 +600,10 @@ public class RealmServer: NSObject {
         initProcess.standardOutput = nil
         try initProcess.run()
         initProcess.waitUntilExit()
+        return mongoProcess
     }
 
-    private func launchServerProcess() throws {
+    private static func launchServerProcess(at tempDir: URL, logLevel: LogLevel) throws -> Process {
         let binDir = Self.buildDir.appendingPathComponent("bin").path
         let libDir = Self.buildDir.appendingPathComponent("lib").path
         let binPath = "$PATH:\(binDir)"
@@ -638,6 +639,7 @@ public class RealmServer: NSObject {
             }
         }
 
+        let serverProcess = Process()
         serverProcess.environment = env
         // golang server needs a tmp directory
 
@@ -653,7 +655,6 @@ public class RealmServer: NSObject {
         ]
 
         let pipe = Pipe()
-        let logLevel = self.logLevel
         pipe.fileHandleForReading.readabilityHandler = { file in
             guard file.availableData.count > 0,
                   // swiftlint:disable:next non_optional_string_data_conversion
@@ -696,9 +697,10 @@ public class RealmServer: NSObject {
 
         try serverProcess.run()
         waitForServerToStart()
+        return serverProcess
     }
 
-    private func waitForServerToStart() {
+    private static func waitForServerToStart() {
         let group = DispatchGroup()
         group.enter()
         @Sendable func pingServer(_ tries: Int = 0) {
@@ -1005,7 +1007,7 @@ public class RealmServer: NSObject {
         try waitForSync(appServerId: appId, expectedCount: schema.count - asymmetricTables.count)
 
         if !persistent {
-            appIds.append(appId)
+            appIds.withLock { $0.append(appId) }
         }
 
         return clientAppId
@@ -1025,11 +1027,11 @@ public class RealmServer: NSObject {
 
     /// Delete all Apps created without `persistent: true`
     @objc func deleteApps() throws {
-        for appId in appIds {
+        for appId in appIds.value {
             let app = try XCTUnwrap(session).apps[appId]
             _ = try app.delete().get()
         }
-        appIds = []
+        appIds.value = []
     }
 
     @objc func deleteApp(_ appId: String) throws {
@@ -1079,9 +1081,6 @@ public class RealmServer: NSObject {
     }
 
     public func getSyncServiceConfiguration(appServerId: String, syncServiceId: String) throws -> [String: Any]? {
-        guard let session = session else {
-            fatalError()
-        }
         let app = session.apps[appServerId]
         do {
             return try app.services[syncServiceId].config.get().get() as? [String: Any]
@@ -1101,33 +1100,23 @@ public class RealmServer: NSObject {
     }
 
     public func isDevModeEnabled(appServerId: String, syncServiceId: String) throws -> Bool {
-        guard let session = session else {
-            fatalError()
-        }
         let app = session.apps[appServerId]
         let res = try app.sync.config.get().get() as! [String: Any]
         return res["development_mode_enabled"] as? Bool ?? false
     }
 
     public func enableDevMode(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
-        guard let session = session else {
-            return .failure(URLError(.unknown))
-        }
         let app = session.apps[appServerId]
         return app.sync.config.put(["development_mode_enabled": true])
     }
 
     public func disableSync(appServerId: String, syncServiceId: String) throws -> Any? {
-        let session = try XCTUnwrap(session)
         let app = session.apps[appServerId]
         return app.services[syncServiceId].config.patch(["flexible_sync": ["state": ""]])
     }
 
     public func enableSync(appServerId: String, syncServiceId: String, syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
         var syncConfig = syncServiceConfiguration
-        guard let session = session else {
-            return .failure(URLError(.unknown))
-        }
         let app = session.apps[appServerId]
         guard var syncInfo = syncConfig["flexible_sync"] as? [String: Any] else {
             return .failure(URLError(.unknown))
@@ -1139,10 +1128,6 @@ public class RealmServer: NSObject {
 
     public func patchRecoveryMode(flexibleSync: Bool, disable: Bool, _ appServerId: String,
                                   _ syncServiceId: String, _ syncServiceConfiguration: [String: Any]) -> Result<Any?, Error> {
-        guard let session = session else {
-            return .failure(URLError(.unknown))
-        }
-
         let configOption = flexibleSync ? "flexible_sync" : "sync"
         let app = session.apps[appServerId]
         var syncConfig = syncServiceConfiguration
@@ -1168,8 +1153,7 @@ public class RealmServer: NSObject {
     }
 
     public func retrieveUser(_ appId: String, userId: String) -> Result<Any?, Error> {
-        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
-              let session = session else {
+        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId) else {
             return .failure(URLError(.unknown))
         }
         return session.apps[appServerId].users[userId].get()
@@ -1177,26 +1161,22 @@ public class RealmServer: NSObject {
 
     // Remove User from Atlas App Services using the Admin API
     public func removeUserForApp(_ appId: String, userId: String) -> Result<Any?, Error> {
-        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
-              let session = session else {
+        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId) else {
             return .failure(URLError(.unknown))
         }
         return session.apps[appServerId].users[userId].delete()
     }
 
     public func revokeUserSessions(_ appId: String, userId: String) -> Result<Any?, Error> {
-        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
-              let session = session else {
+        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId) else {
             return .failure(URLError(.unknown))
         }
         return session.apps[appServerId].users[userId].logout.put([:])
     }
 
-    public func retrieveSchemaProperties(_ appId: String, className: String, _ completion: @escaping (Result<[String], Error>) -> Void) {
-        guard let appServerId = try? RealmServer.shared.retrieveAppServerId(appId),
-              let session = session else {
-            fatalError()
-        }
+    public func retrieveSchemaProperties(_ appId: String, className: String,
+                                         _ completion: @escaping (Result<[String], Error>) -> Void) {
+        let appServerId = try! RealmServer.shared.retrieveAppServerId(appId)
 
         guard let schemasList = try? session.apps[appServerId].schemas.get().get(),
               let schemas = schemasList as? [[String: Any]],

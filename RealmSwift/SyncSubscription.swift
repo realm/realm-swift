@@ -170,6 +170,7 @@ import Realm.Private
     /// :nodoc:
     public typealias QueryFunction = (Query<T>) -> Query<Bool>
 
+#if compiler(<6)
     /**
      Creates a `QuerySubscription` for the given type.
 
@@ -181,6 +182,18 @@ import Realm.Private
         self.className = "\(T.self)"
         self.predicate = query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE")
     }
+#else
+    /**
+     Creates a `QuerySubscription` which subscribes to all documents of the given type.
+
+     - parameter name: Name of the subscription.
+     */
+    public init(name: String? = nil) {
+        self.name = name
+        self.className = "\(T.self)"
+        self.predicate = NSPredicate(format: "TRUEPREDICATE")
+    }
+#endif
 
     /**
      Creates a `QuerySubscription` for the given type.
@@ -188,7 +201,7 @@ import Realm.Private
      - parameter name: Name of the subscription.
      - parameter query: The query for the subscription.
      */
-    public init(name: String? = nil, query: QueryFunction) {
+    public init(name: String? = nil, query: borrowing QueryFunction) {
         // This overload is required to make `query` non-escaping, as optional
         // function parameters always are.
         self.name = name

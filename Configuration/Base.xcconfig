@@ -76,6 +76,9 @@ APPLICATION_EXTENSION_API_ONLY = YES;
 REALM_MACH_O_TYPE = mh_dylib;
 SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator watchos watchsimulator appletvos appletvsimulator xros xrsimulator;
 SUPPORTS_MACCATALYST = YES;
-SWIFT_VERSION = 5.7;
 TARGETED_DEVICE_FAMILY = 1,2,3,4,6,7;
+
+SWIFT_VERSION_1500 = 5.7;
+SWIFT_VERSION_1600 = 5.7;
+SWIFT_VERSION = $(SWIFT_VERSION_$(XCODE_VERSION_MAJOR));
 

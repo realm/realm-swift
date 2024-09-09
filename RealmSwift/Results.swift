@@ -149,6 +149,7 @@ extension Projection: KeypathSortable {}
 
     // MARK: Flexible Sync
 
+#if compiler(<6)
     /**
      Creates a SyncSubscription matching the Results' local query.
      After committing the subscription to the realm's local subscription set, the method
@@ -194,6 +195,65 @@ extension Projection: KeypathSortable {}
         rlmResults = try await rlmResults.subscribe(withName: name, waitForSync: waitForSync, confinedTo: scheduler, timeout: timeout ?? 0)
         return self
     }
+#else
+    /**
+     Creates a SyncSubscription matching the Results' local query.
+     After committing the subscription to the realm's local subscription set, the method
+     will wait for downloads according to `WaitForSyncMode`.
+
+     ### Unnamed subscriptions ###
+     If `.subscribe()` is called without a name whose query matches an unnamed subscription, another subscription is not created.
+
+     If `.subscribe()` is called without a name whose query matches a named subscription, an additional  unnamed subscription is created.
+     ### Named Subscriptions ###
+     If `.subscribe()` is called with a name whose query matches an unnamed subscription, an additional named subscription is created.
+     ### Existing name and query ###
+     If `.subscribe()` is called with a name whose name is taken on a different query, the old subscription is updated with the new query.
+
+     If `.subscribe()` is called with a name that's in already in use by an identical query, no new subscription is created.
+
+
+     - Note: This method will wait for all data to be downloaded before returning when `WaitForSyncMode.always` and `.onCreation` (when the subscription is first created) is used. This requires an internet connection if no timeout is set.
+
+     - Note: This method opens a update transaction that creates or updates a subscription.
+     It's advised to *not* loop over this method in order to create multiple subscriptions.
+     This could create a performance bottleneck by opening multiple unnecessary update transactions.
+     To create multiple subscriptions at once use `SyncSubscription.update`.
+
+     - parameter name: The name applied to the subscription
+     - parameter waitForSync: ``WaitForSyncMode`` Determines the download behavior for the subscription. Defaults to `.onCreation`.
+     - parameter timeout: An optional client timeout. The client will cancel waiting for subscription downloads after this time has elapsed. Reaching this timeout doesn't imply a server error.
+     - returns: Returns `self`.
+
+     - warning: This function is only supported for main thread and
+                actor-isolated Realms.
+     */
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+    public func subscribe(
+        name: String? = nil,
+        waitForSync: WaitForSyncMode = .onCreation,
+        timeout: TimeInterval? = nil,
+        _isolation: isolated any Actor = #isolation
+    ) async throws -> Results<Element> {
+        guard let actor = realm?.rlmRealm.actor as? Actor else {
+            fatalError("`subscribe` can only be called on main thread or actor-isolated Realms")
+        }
+
+        let rlmResults = ObjectiveCSupport.convert(object: self)
+        let scheduler = await RLMScheduler.actor(actor, invoke: actor.invoke, verify: actor.verifier())
+        _ = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            rlmResults.subscribe(withName: name, waitForSync: waitForSync, confinedTo: scheduler, timeout: timeout ?? 0) { _, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+        return self
+    }
+#endif
+
     /**
      Removes a SyncSubscription matching the Results' local filter.
 

@@ -1270,6 +1270,38 @@ extension Realm {
         self = Realm(rlmRealm.wrappedValue)
     }
 
+#if compiler(>=6)
+    /**
+     Asynchronously obtains a `Realm` instance isolated to the current Actor.
+
+     Opening a Realm with an actor isolates the Realm to that actor. Rather
+     than being confined to the specific thread which the Realm was opened on,
+     the Realm can instead only be used from within that actor or functions
+     isolated to that actor. Isolating a Realm to an actor also enables using
+     ``asyncWrite`` and ``asyncRefresh``.
+
+     All initialization work to prepare the Realm for work, such as creating,
+     migrating, or compacting the file on disk, and waiting for synchronized
+     Realms to download the latest data from the server is done on a background
+     thread and does not block the calling executor.
+
+     - parameter configuration: A configuration object to use when opening the Realm.
+     - parameter downloadBeforeOpen: When opening the Realm should first download
+     all data from the server.
+     - throws: An `NSError` if the Realm could not be initialized.
+               `CancellationError` if the task is cancelled.
+     - returns: An open Realm.
+     */
+    public static func open(configuration: Realm.Configuration = .defaultConfiguration,
+                            _isolation actor: isolated any Actor = #isolation,
+                            downloadBeforeOpen: OpenBehavior = .never) async throws -> Realm {
+        let scheduler = RLMScheduler.actor(actor, invoke: actor.invoke, verify: actor.verifier())
+        let rlmRealm = try await openRealm(configuration: configuration, scheduler: scheduler,
+                                            actor: actor, downloadBeforeOpen: downloadBeforeOpen)
+        return Realm(rlmRealm.wrappedValue)
+    }
+#endif
+
 #if compiler(<6)
     /**
      Performs actions contained within the given block inside a write transaction.
@@ -1458,7 +1490,9 @@ extension Realm {
 
         if realm.inWriteTransaction {
             let error = await withCheckedContinuation { continuation in
-                realm.commitAsyncWrite(withGrouping: false, completion: continuation.resume)
+                realm.commitAsyncWrite(withGrouping: false) { error in
+                    continuation.resume(returning: error)
+                }
             }
             if let error {
                 throw error

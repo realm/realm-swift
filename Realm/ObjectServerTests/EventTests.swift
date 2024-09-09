@@ -66,10 +66,10 @@ class SwiftEventTests: SwiftSyncTestCase {
     var collection: MongoCollection!
     var start: Date!
 
-    override func setUp() {
-        user = createUser()
+    override func setUp() async throws {
+        user = try await createUser()
         collection = user.collection(for: AuditEvent.self, app: app)
-        _ = collection.deleteManyDocuments(filter: [:]).await(self)
+        try await _ = collection.deleteManyDocuments(filter: [:])
 
         // The server truncates date values to lower precision than we support,
         // so we need to set the start date to slightly in the past
@@ -96,6 +96,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         [AuditEvent.self, SwiftPerson.self, SwiftCustomEventRepresentation.self, LinkToSwiftPerson.self]
     }
 
+    @MainActor
     func scope<T>(_ events: Events, _ name: String, body: () throws -> T) rethrows -> T {
         let scope = events.beginScope(activity: name)
         XCTAssertTrue(scope.isActive)
@@ -105,6 +106,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         return result
     }
 
+    @MainActor
     func getEvents(expectedCount: Int) -> [AuditEvent] {
         waitForCollectionCount(collection, expectedCount)
 
@@ -166,6 +168,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         XCTAssertEqual(matching[0].data, data, line: line)
     }
 
+    @MainActor
     func testBasicEvents() throws {
         let realm = try openRealm()
         let events = realm.events!
@@ -209,6 +212,7 @@ class SwiftEventTests: SwiftSyncTestCase {
                     ["SwiftPerson": ["deletions": [mutatedPersonJson]]])
     }
 
+    @MainActor
     func testBasicWithAsyncOpen() throws {
         let realm = Realm.asyncOpen(configuration: try configuration()).await(self)
         let events = try XCTUnwrap(realm.events)
@@ -226,6 +230,7 @@ class SwiftEventTests: SwiftSyncTestCase {
                     ["SwiftPerson": ["insertions": [personJson]]])
     }
 
+    @MainActor
     func testCustomEventRepresentation() throws {
         let realm = try openRealm()
         let events = realm.events!
@@ -257,6 +262,7 @@ class SwiftEventTests: SwiftSyncTestCase {
                     ["SwiftCustomEventRepresentation": ["insertions": [["int": 2]]]])
     }
 
+    @MainActor
     func testReadEvents() throws {
         let realm = try openRealm()
         let events = realm.events!
@@ -327,6 +333,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         assertEvent("lookup by primary key", [full(a)])
     }
 
+    @MainActor
     func testLinkTracking() throws {
         let realm = try openRealm()
         let events = realm.events!
@@ -431,6 +438,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         assertEvent("dynamic dictionary property", personCount: 1, dictionaryAccessed)
     }
 
+    @MainActor
     func testMetadata() throws {
         let realm = try openRealm()
         let events = realm.events!
@@ -458,6 +466,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         assertEvent(result, activity: "metadata removed", userId: nil)
     }
 
+    @MainActor
     func testCustomLogger() throws {
         let ex = expectation(description: "saw message with scope name")
         ex.assertForOverFulfill = false
@@ -475,6 +484,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 2.0)
     }
 
+    @MainActor
     func testCustomEvent() throws {
         let realm = try openRealm()
         let events = realm.events!
@@ -494,6 +504,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         assertEvent(result, activity: "event and data", event: "custom json event", ["bar": "foo"])
     }
 
+    @MainActor
     func testScopeLifetimes() throws {
         let realm = try openRealm()
         let events = realm.events!
@@ -516,6 +527,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         XCTAssertEqual(result[0].activity, "scope 3")
     }
 
+    @MainActor
     func testScopeCanOutliveSourceRealm() throws {
         var scope: Events.Scope?
         try autoreleasepool {
@@ -533,6 +545,7 @@ class SwiftEventTests: SwiftSyncTestCase {
         XCTAssertEqual(result[0].activity, "scope")
     }
 
+    @MainActor
     func testErrorHandler() throws {
         var config = try configuration()
         let blockCalled = Locked(false)
