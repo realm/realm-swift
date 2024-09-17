@@ -1,0 +1,505 @@
+
+# This is a generated file produced by scripts/pr-ci-matrix.rb.
+name: Pull request build and test
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: macos-15
+    name: Test docs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: sudo xcode-select -switch /Applications/Xcode_16.2.app
+      - run: bundle exec sh build.sh verify-docs
+  swiftlint:
+    runs-on: macos-15
+    name: Check swiftlint
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo xcode-select -switch /Applications/Xcode_16.2.app
+      - run: brew install swiftlint
+      - run: sh build.sh verify-swiftlint
+
+  osx-15_3:
+    runs-on: macos-14
+    name: Test osx on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx
+
+  osx-15_4:
+    runs-on: macos-14
+    name: Test osx on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx
+
+  osx-16:
+    runs-on: macos-15
+    name: Test osx on Xcode 16
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx
+
+  osx-16_1:
+    runs-on: macos-15
+    name: Test osx on Xcode 16.1
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx
+
+  osx-16_2:
+    runs-on: macos-15
+    name: Test osx on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx
+
+  osx-encryption-16_2:
+    runs-on: macos-15
+    name: Test osx-encryption on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx-encryption
+
+  swiftpm-15_3:
+    runs-on: macos-14
+    name: Test swiftpm on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm
+
+  swiftpm-16_2:
+    runs-on: macos-15
+    name: Test swiftpm on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm
+
+  swiftpm-debug-15_3:
+    runs-on: macos-14
+    name: Test swiftpm-debug on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm-debug
+
+  swiftpm-debug-15_4:
+    runs-on: macos-14
+    name: Test swiftpm-debug on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm-debug
+
+  swiftpm-debug-16:
+    runs-on: macos-15
+    name: Test swiftpm-debug on Xcode 16
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm-debug
+
+  swiftpm-debug-16_1:
+    runs-on: macos-15
+    name: Test swiftpm-debug on Xcode 16.1
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm-debug
+
+  swiftpm-debug-16_2:
+    runs-on: macos-15
+    name: Test swiftpm-debug on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm-debug
+
+  swiftpm-address-16_2:
+    runs-on: macos-15
+    name: Test swiftpm-address on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm-address
+
+  swiftpm-thread-16_2:
+    runs-on: macos-15
+    name: Test swiftpm-thread on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr swiftpm-thread
+
+  ios-static-15_3:
+    runs-on: macos-14
+    name: Test ios-static on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios-static
+
+  ios-static-16_2:
+    runs-on: macos-15
+    name: Test ios-static on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios-static
+
+  ios-15_3:
+    runs-on: macos-14
+    name: Test ios on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios
+
+  ios-16_2:
+    runs-on: macos-15
+    name: Test ios on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios
+
+  watchos-15_3:
+    runs-on: macos-14
+    name: Test watchos on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr watchos
+
+  watchos-16_2:
+    runs-on: macos-15
+    name: Test watchos on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr watchos
+
+  tvos-15_3:
+    runs-on: macos-14
+    name: Test tvos on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr tvos
+
+  tvos-16_2:
+    runs-on: macos-15
+    name: Test tvos on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr tvos
+
+  visionos-15_3:
+    runs-on: macos-14
+    name: Test visionos on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr visionos
+
+  visionos-16_2:
+    runs-on: macos-15
+    name: Test visionos on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr visionos
+
+  osx-swift-15_3:
+    runs-on: macos-14
+    name: Test osx-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx-swift
+
+  osx-swift-15_4:
+    runs-on: macos-14
+    name: Test osx-swift on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx-swift
+
+  osx-swift-16:
+    runs-on: macos-15
+    name: Test osx-swift on Xcode 16
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx-swift
+
+  osx-swift-16_1:
+    runs-on: macos-15
+    name: Test osx-swift on Xcode 16.1
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx-swift
+
+  osx-swift-16_2:
+    runs-on: macos-15
+    name: Test osx-swift on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx-swift
+
+  ios-swift-15_3:
+    runs-on: macos-14
+    name: Test ios-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios-swift
+
+  ios-swift-16_2:
+    runs-on: macos-15
+    name: Test ios-swift on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios-swift
+
+  tvos-swift-15_3:
+    runs-on: macos-14
+    name: Test tvos-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr tvos-swift
+
+  tvos-swift-16_2:
+    runs-on: macos-15
+    name: Test tvos-swift on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr tvos-swift
+
+  osx-swift-evolution-16_2:
+    runs-on: macos-15
+    name: Test osx-swift-evolution on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr osx-swift-evolution
+
+  ios-swift-evolution-16_2:
+    runs-on: macos-15
+    name: Test ios-swift-evolution on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios-swift-evolution
+
+  tvos-swift-evolution-16_2:
+    runs-on: macos-15
+    name: Test tvos-swift-evolution on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr tvos-swift-evolution
+
+  catalyst-15_3:
+    runs-on: macos-14
+    name: Test catalyst on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr catalyst
+
+  catalyst-16_2:
+    runs-on: macos-15
+    name: Test catalyst on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr catalyst
+
+  catalyst-swift-15_3:
+    runs-on: macos-14
+    name: Test catalyst-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr catalyst-swift
+
+  catalyst-swift-16_2:
+    runs-on: macos-15
+    name: Test catalyst-swift on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr catalyst-swift
+
+  xcframework-16_2:
+    runs-on: macos-15
+    name: Test xcframework on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr xcframework
+
+  cocoapods-osx-15_3:
+    runs-on: macos-14
+    name: Test cocoapods-osx on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-osx
+
+  cocoapods-osx-15_4:
+    runs-on: macos-14
+    name: Test cocoapods-osx on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-osx
+
+  cocoapods-osx-16:
+    runs-on: macos-15
+    name: Test cocoapods-osx on Xcode 16
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-osx
+
+  cocoapods-osx-16_1:
+    runs-on: macos-15
+    name: Test cocoapods-osx on Xcode 16.1
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-osx
+
+  cocoapods-osx-16_2:
+    runs-on: macos-15
+    name: Test cocoapods-osx on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-osx
+
+  cocoapods-ios-static-16_2:
+    runs-on: macos-15
+    name: Test cocoapods-ios-static on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-ios-static
+
+  cocoapods-ios-16_2:
+    runs-on: macos-15
+    name: Test cocoapods-ios on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-ios
+
+  cocoapods-watchos-16_2:
+    runs-on: macos-15
+    name: Test cocoapods-watchos on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-watchos
+
+  cocoapods-tvos-16_2:
+    runs-on: macos-15
+    name: Test cocoapods-tvos on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-tvos
+
+  cocoapods-catalyst-16_2:
+    runs-on: macos-15
+    name: Test cocoapods-catalyst on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr cocoapods-catalyst
+
+  ios-swiftui-16_2:
+    runs-on: macos-15
+    name: Test ios-swiftui on Xcode 16.2
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.2.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh ci-pr ios-swiftui

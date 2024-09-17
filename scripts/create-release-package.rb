@@ -12,7 +12,7 @@ XCODE_VERSIONS = ARGV[2..]
 ROOT = Pathname(__FILE__).+('../..').expand_path
 BUILD_SH = Pathname(__FILE__).+('../../build.sh').expand_path
 VERBOSE = false
-OBJC_XCODE_VERSION = XCODE_VERSIONS.last
+OBJC_XCODE_VERSION = XCODE_VERSIONS.reduce { |a, e| e.include?('beta') ? a : e }
 
 def sh(*args)
   puts "executing: #{args.join(' ')}" if VERBOSE
@@ -31,7 +31,7 @@ def create_xcframework(root, xcode_version, configuration, name)
   signing_identity = ENV['SIGNING_IDENTITY']
   prefix = "#{root}/#{xcode_version}"
   output = "#{prefix}/#{configuration}/#{name}.xcframework"
-  files = Dir.glob "#{prefix}/#{configuration}/*/#{name}.xcframework/*/#{name}.framework"
+  files = Dir.glob "#{prefix}/build/#{configuration}/*/#{name}.xcframework/*/#{name}.framework"
 
   sh 'xcodebuild', '-create-xcframework', '-allow-internal-distribution',
      '-output', output, *files.flat_map {|f| ['-framework', f]}
@@ -58,8 +58,9 @@ Dir.mktmpdir do |tmp|
     FileUtils.mkdir_p "#{tmp}/#{version}"
     Dir.chdir("#{tmp}/#{version}") do
       for platform in platforms(version)
-        sh 'unzip', "#{ROOT}/realm-#{platform}-#{version}/realm-#{platform}-#{version}.zip"
+        sh 'tar', 'xf', "#{ROOT}/build-#{platform}-#{version}-swift/build.tar"
       end
+      sh 'tar', 'xf', "#{ROOT}/build-ios-#{version}-static/build.tar"
     end
   end
 
@@ -117,7 +118,7 @@ Dir.mktmpdir do |tmp|
   tmp = File.realpath tmp
   Dir.chdir(tmp) do
     for platform in platforms('15.1')
-      sh 'unzip', "#{ROOT}/realm-#{platform}-#{OBJC_XCODE_VERSION}/realm-#{platform}-#{OBJC_XCODE_VERSION}.zip"
+      sh 'tar', 'xf', "#{ROOT}/build-#{platform}-#{OBJC_XCODE_VERSION}-swift/build.tar"
     end
     create_xcframework tmp, '', 'Release', 'RealmSwift'
     create_xcframework tmp, '', 'Release', 'Realm'
