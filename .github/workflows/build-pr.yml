@@ -1,0 +1,469 @@
+
+# This is a generated file produced by scripts/pr-ci-matrix.rb.
+name: Pull request build and test
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: macos-14
+    name: Test docs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+      - run: bundle exec sh build.sh verify-docs
+  swiftlint:
+    runs-on: macos-14
+    name: Check swiftlint
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+      - run: brew install swiftlint
+      - run: sh build.sh verify-swiftlint
+
+  osx-15_3:
+    runs-on: macos-14
+    name: Test osx on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx
+
+  osx-15_4:
+    runs-on: macos-14
+    name: Test osx on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx
+
+  osx-16_beta_6:
+    runs-on: macos-14
+    name: Test osx on Xcode 16_beta_6
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx
+
+  osx-16_1_beta:
+    runs-on: macos-14
+    name: Test osx on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx
+
+  osx-encryption-16_1_beta:
+    runs-on: macos-14
+    name: Test osx-encryption on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx-encryption
+
+  swiftpm-15_3:
+    runs-on: macos-14
+    name: Test swiftpm on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm
+
+  swiftpm-16_1_beta:
+    runs-on: macos-14
+    name: Test swiftpm on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm
+
+  swiftpm-debug-15_3:
+    runs-on: macos-14
+    name: Test swiftpm-debug on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm-debug
+
+  swiftpm-debug-15_4:
+    runs-on: macos-14
+    name: Test swiftpm-debug on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm-debug
+
+  swiftpm-debug-16_beta_6:
+    runs-on: macos-14
+    name: Test swiftpm-debug on Xcode 16_beta_6
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm-debug
+
+  swiftpm-debug-16_1_beta:
+    runs-on: macos-14
+    name: Test swiftpm-debug on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm-debug
+
+  swiftpm-address-16_1_beta:
+    runs-on: macos-14
+    name: Test swiftpm-address on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm-address
+
+  swiftpm-thread-16_1_beta:
+    runs-on: macos-14
+    name: Test swiftpm-thread on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-swiftpm-thread
+
+  ios-static-15_3:
+    runs-on: macos-14
+    name: Test ios-static on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios-static
+
+  ios-static-16_1_beta:
+    runs-on: macos-14
+    name: Test ios-static on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios-static
+
+  ios-15_3:
+    runs-on: macos-14
+    name: Test ios on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios
+
+  ios-16_1_beta:
+    runs-on: macos-14
+    name: Test ios on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios
+
+  watchos-15_3:
+    runs-on: macos-14
+    name: Test watchos on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-watchos
+
+  watchos-16_1_beta:
+    runs-on: macos-14
+    name: Test watchos on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-watchos
+
+  tvos-15_3:
+    runs-on: macos-14
+    name: Test tvos on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-tvos
+
+  tvos-16_1_beta:
+    runs-on: macos-14
+    name: Test tvos on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-tvos
+
+  visionos-15_3:
+    runs-on: macos-14
+    name: Test visionos on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-visionos
+
+  visionos-16_1_beta:
+    runs-on: macos-14
+    name: Test visionos on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-visionos
+
+  osx-swift-15_3:
+    runs-on: macos-14
+    name: Test osx-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx-swift
+
+  osx-swift-15_4:
+    runs-on: macos-14
+    name: Test osx-swift on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx-swift
+
+  osx-swift-16_beta_6:
+    runs-on: macos-14
+    name: Test osx-swift on Xcode 16_beta_6
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx-swift
+
+  osx-swift-16_1_beta:
+    runs-on: macos-14
+    name: Test osx-swift on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx-swift
+
+  ios-swift-15_3:
+    runs-on: macos-14
+    name: Test ios-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios-swift
+
+  ios-swift-16_1_beta:
+    runs-on: macos-14
+    name: Test ios-swift on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios-swift
+
+  tvos-swift-15_3:
+    runs-on: macos-14
+    name: Test tvos-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-tvos-swift
+
+  tvos-swift-16_1_beta:
+    runs-on: macos-14
+    name: Test tvos-swift on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-tvos-swift
+
+  osx-swift-evolution-16_1_beta:
+    runs-on: macos-14
+    name: Test osx-swift-evolution on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-osx-swift-evolution
+
+  ios-swift-evolution-16_1_beta:
+    runs-on: macos-14
+    name: Test ios-swift-evolution on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios-swift-evolution
+
+  tvos-swift-evolution-16_1_beta:
+    runs-on: macos-14
+    name: Test tvos-swift-evolution on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-tvos-swift-evolution
+
+  catalyst-15_3:
+    runs-on: macos-14
+    name: Test catalyst on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-catalyst
+
+  catalyst-16_1_beta:
+    runs-on: macos-14
+    name: Test catalyst on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-catalyst
+
+  catalyst-swift-15_3:
+    runs-on: macos-14
+    name: Test catalyst-swift on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-catalyst-swift
+
+  catalyst-swift-16_1_beta:
+    runs-on: macos-14
+    name: Test catalyst-swift on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-catalyst-swift
+
+  xcframework-16_1_beta:
+    runs-on: macos-14
+    name: Test xcframework on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-xcframework
+
+  cocoapods-osx-15_3:
+    runs-on: macos-14
+    name: Test cocoapods-osx on Xcode 15.3
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.3.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-osx
+
+  cocoapods-osx-15_4:
+    runs-on: macos-14
+    name: Test cocoapods-osx on Xcode 15.4
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_15.4.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-osx
+
+  cocoapods-osx-16_beta_6:
+    runs-on: macos-14
+    name: Test cocoapods-osx on Xcode 16_beta_6
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-osx
+
+  cocoapods-osx-16_1_beta:
+    runs-on: macos-14
+    name: Test cocoapods-osx on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-osx
+
+  cocoapods-ios-static-16_1_beta:
+    runs-on: macos-14
+    name: Test cocoapods-ios-static on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-ios-static
+
+  cocoapods-ios-16_1_beta:
+    runs-on: macos-14
+    name: Test cocoapods-ios on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-ios
+
+  cocoapods-watchos-16_1_beta:
+    runs-on: macos-14
+    name: Test cocoapods-watchos on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-watchos
+
+  cocoapods-tvos-16_1_beta:
+    runs-on: macos-14
+    name: Test cocoapods-tvos on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-tvos
+
+  cocoapods-catalyst-16_1_beta:
+    runs-on: macos-14
+    name: Test cocoapods-catalyst on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-cocoapods-catalyst
+
+  ios-swiftui-16_1_beta:
+    runs-on: macos-14
+    name: Test ios-swiftui on Xcode 16.1_beta
+    env:
+      DEVELOPER_DIR: '/Applications/Xcode_16.1_beta.app/Contents/Developer'
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh -x build.sh verify-ios-swiftui

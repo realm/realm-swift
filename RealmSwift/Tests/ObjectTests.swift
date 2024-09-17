@@ -1641,7 +1641,7 @@ class ObjectTests: TestCase, @unchecked Sendable {
             let realm = try await Realm(actor: CustomGlobalActor.shared)
             let obj = realm.objects(SwiftObject.self).first!
             var value = 0
-            for try await change in changesetPublisher(obj).values {
+            for try await change in changesetPublisher(obj).buffer(size: 10, prefetch: .byRequest, whenFull: .dropOldest).values {
                 guard case let .change(object, props) = change else {
                     return XCTFail("Expected .change, got \(change)")
                 }
@@ -1696,8 +1696,7 @@ class ObjectTests: TestCase, @unchecked Sendable {
     }
 
     @available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
-    func testCancelTaskWhileWaitingForInitial() async throws {
-        return; // FIXME
+    func skip_testCancelTaskWhileWaitingForInitial() async throws {
         // This can't be tested deterministically as it's trying to hit specific
         // timing windows, so instead spawn a bunch of tasks and hope that at
         // least one is in each of the interesting states. Not handling all of
@@ -1727,7 +1726,7 @@ class ObjectTests: TestCase, @unchecked Sendable {
                 // Actor executors aren't fifo, so we can sometimes prevent the
                 // async opens from ever completing by continuously spawning new
                 // tasks
-                while waitingForRealm.value > 10 {
+                while waitingForRealm.value >= 10 {
                     await Task.yield()
                 }
             }
