@@ -70,6 +70,7 @@ public final class ObjectId: RLMObjectId, Decodable, @unchecked Sendable {
     ///
     /// Aborts if the string is not 24 characters or contains any characters other than 0-9a-fA-F. Use the initializer which takes a String to handle invalid strings at runtime.
     public required init(_ str: StaticString) {
+        // swiftlint:disable:next optional_data_string_conversion
         try! super.init(string: str.withUTF8Buffer { String(decoding: $0, as: UTF8.self) })
     }
 

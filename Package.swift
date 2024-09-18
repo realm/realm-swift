@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersion = Version("14.12.1")
+let coreVersion = Version("14.13.0")
 let cocoaVersion = Version("10.53.1")
 
 #if compiler(>=6)

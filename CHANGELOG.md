@@ -27,14 +27,12 @@ The minimum supported version of Xcode is now 15.3.
   using Xcode 16 in Swift 5 mode due to the removal of implicit isolation when
   using property wrappers on member variables. This resulted in some new
   sendability warnings in Xcode 16 (or errors in Swift 6 mode).
-* Add Xcode 16 and 16.1 binaries to the release packages (currently built with
-  beta 6 and beta 1 respectively).
+* Add Xcode 16 and 16.1 binaries to the release packages.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Having a query with a number of predicates ORed together may result in a
+  crash on some platforms (strict weak ordering check failing on iphone)
+  ([#8028](https://github.com/realm/realm-core/issues/8028), since v10.50.0)
 
 ### Compatibility
 * Realm Studio: 15.0.0 or later.
@@ -44,7 +42,7 @@ The minimum supported version of Xcode is now 15.3.
 * Xcode: 15.3.0-16.1 beta.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v14.12.1 to 14.13.0
 
 10.53.1 Release notes (2024-09-05)
 =============================================================
