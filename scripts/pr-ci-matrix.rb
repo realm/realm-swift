@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-XCODE_VERSIONS = %w(15.3 15.4 16_beta_6 16.1_beta)
+XCODE_VERSIONS = %w(15.3 15.4 16_Release_Candidate 16.1_beta)
 DOC_VERSION = '15.4'
 
 all = ->(v) { true }

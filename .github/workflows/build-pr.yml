@@ -45,11 +45,11 @@ jobs:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-osx
 
-  osx-16_beta_6:
+  osx-16_Release_Candidate:
     runs-on: macos-14
-    name: Test osx on Xcode 16_beta_6
+    name: Test osx on Xcode 16_Release_Candidate
     env:
-      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+      DEVELOPER_DIR: '/Applications/Xcode_16_Release_Candidate.app/Contents/Developer'
     steps:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-osx
@@ -108,11 +108,11 @@ jobs:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-swiftpm-debug
 
-  swiftpm-debug-16_beta_6:
+  swiftpm-debug-16_Release_Candidate:
     runs-on: macos-14
-    name: Test swiftpm-debug on Xcode 16_beta_6
+    name: Test swiftpm-debug on Xcode 16_Release_Candidate
     env:
-      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+      DEVELOPER_DIR: '/Applications/Xcode_16_Release_Candidate.app/Contents/Developer'
     steps:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-swiftpm-debug
@@ -252,11 +252,11 @@ jobs:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-osx-swift
 
-  osx-swift-16_beta_6:
+  osx-swift-16_Release_Candidate:
     runs-on: macos-14
-    name: Test osx-swift on Xcode 16_beta_6
+    name: Test osx-swift on Xcode 16_Release_Candidate
     env:
-      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+      DEVELOPER_DIR: '/Applications/Xcode_16_Release_Candidate.app/Contents/Developer'
     steps:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-osx-swift
@@ -396,11 +396,11 @@ jobs:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-cocoapods-osx
 
-  cocoapods-osx-16_beta_6:
+  cocoapods-osx-16_Release_Candidate:
     runs-on: macos-14
-    name: Test cocoapods-osx on Xcode 16_beta_6
+    name: Test cocoapods-osx on Xcode 16_Release_Candidate
     env:
-      DEVELOPER_DIR: '/Applications/Xcode_16_beta_6.app/Contents/Developer'
+      DEVELOPER_DIR: '/Applications/Xcode_16_Release_Candidate.app/Contents/Developer'
     steps:
       - uses: actions/checkout@v4
       - run: sh -x build.sh verify-cocoapods-osx
