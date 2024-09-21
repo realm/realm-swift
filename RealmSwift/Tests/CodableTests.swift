@@ -305,10 +305,10 @@ class CodableTests: TestCase, @unchecked Sendable {
     func encode<T: RealmOptionalType & Codable & _RealmSchemaDiscoverable>(_ value: T?) -> String {
         let opt = RealmOptional<T>()
         opt.value = value
-        return try! String(decoding: encoder.encode([opt]), as: UTF8.self)
+        return try! String(data: encoder.encode([opt]), encoding: .utf8)!
     }
     func encode<T: Codable>(_ value: T?) -> String {
-        return try! String(decoding: encoder.encode([value]), as: UTF8.self)
+        return try! String(data: encoder.encode([value]), encoding: .utf8)!
     }
 
     func legacyObjectString(_ nullRealmProperty: Bool = false) -> String {
@@ -1535,7 +1535,6 @@ class CodableTests: TestCase, @unchecked Sendable {
         // Verify that it encodes to exactly the original string (which requires
         // that the original string be formatted how JSONEncoder formats things)
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        // swiftlint:disable:next non_optional_string_data_conversion
         let actual = try XCTUnwrap(String(data: encoder.encode(obj), encoding: .utf8))
         XCTAssertEqual(str, actual)
 
@@ -2221,7 +2220,6 @@ class CodableTests: TestCase, @unchecked Sendable {
         // Verify that it encodes to exactly the original string (which requires
         // that the original string be formatted how JSONEncoder formats things)
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        // swiftlint:disable:next non_optional_string_data_conversion
         let actual = try String(data: encoder.encode(obj), encoding: .utf8)
         XCTAssertEqual(str, actual)
     }
@@ -2431,7 +2429,6 @@ class CodableTests: TestCase, @unchecked Sendable {
         obj.objectId = ObjectId("1234567890abcdef12345678")
         obj.uuid = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         obj.date = Date(timeIntervalSince1970: 0)
-        // swiftlint:disable:next non_optional_string_data_conversion
         let actual = try XCTUnwrap(String(data: encoder.encode(obj), encoding: .utf8))
         // Before the 2024 OS versions, int8 was sorted before int16
         let expected = if #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, *) {

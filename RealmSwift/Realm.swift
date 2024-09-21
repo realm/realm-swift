@@ -1404,7 +1404,7 @@ extension Realm {
     @discardableResult
     @_unsafeInheritExecutor
     public func asyncRefresh() async -> Bool {
-        guard rlmRealm.actor as? Actor != nil else {
+        guard rlmRealm.actor is Actor else {
             fatalError("asyncRefresh() can only be called on main thread or actor-isolated Realms")
         }
         guard let task = RLMRealmRefreshAsync(rlmRealm) else {
