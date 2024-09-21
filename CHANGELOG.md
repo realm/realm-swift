@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.54.0 Release notes (2024-09-20)
 =============================================================
 
 The minimum supported version of Xcode is now 15.3.
