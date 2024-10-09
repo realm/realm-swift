@@ -8,8 +8,8 @@ on:
 env:
   XCODE_VERSION: "['15.3', '15.4', '16', '16.1_beta_2']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
-  DOC_VERSION: '15.4'
   RELEASE_VERSION: '15.4'
+  DEVELOPER_DIR: /Applications/Xcode_15.4.app/Contents/Developer
 jobs:
   prepare:
       runs-on: ubuntu-latest
@@ -38,8 +38,6 @@ jobs:
         - uses: ruby/setup-ruby@v1
           with:
             bundler-cache: true
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.DOC_VERSION }}.app
         - name: Prepare docs for packaging
           run: bundle exec sh -x build.sh release-package-docs
         - name: Upload docs to artifacts library
@@ -61,15 +59,23 @@ jobs:
             name: realm-examples
             path: realm-examples.zip
   build-product: # Creates framework for each platform, xcode version, target and configuration
-      runs-on: macos-14
       name: Package framework
       needs: prepare
       strategy:
-        max-parallel: 20 # Blocks of 20, therefore if any of the build fails, we don't get a lot of XCode Clouds builds hanging, which are expensive.
+        max-parallel: 20
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
           configuration: [swift, static]
+          include:
+            - xcode-version: 15.3
+              os: macos-14
+            - xcode-version: 15.4
+              os: macos-14
+            - xcode-version: 16
+              os: macos-15
+            - xcode-version: 16.1_beta_2
+              os: macos-15
           exclude:
             - platform: osx
               configuration: static
@@ -81,79 +87,38 @@ jobs:
               configuration: static
             - platform: catalyst
               configuration: static
-            - platform: visionos
-              xcode-version: 15.1
+      runs-on: ${{ matrix.os }}
+      env:
+        DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode-version }}.app/Contents/Developer
       steps:
         - uses: actions/checkout@v4
+        - name: Download visionOS
+          if: matrix.platform == 'visionos' && matrix.os == 'macos-14'
+          run: xcodebuild -downloadPlatform visionOS
         - name: Build ${{ matrix.platform }} with Xcode ${{ matrix.xcode-version }}
-          run: DEVELOPER_DIR=/Applications/Xcode_${{ matrix.xcode-version }}.app/Contents/Developer sh build.sh ${{ matrix.platform }}-${{matrix.configuration}}
+          run: sh build.sh ${{ matrix.platform }}-${{matrix.configuration}}
         - run: rm -r build/DerivedData
         - name: Upload framework
-          uses: actions/upload-artifact@v4
+          uses: eXhumer/upload-artifact@0b7d5f5684d3f642f978d2faad9ade64f5b4dd57
           with:
             name: build-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.configuration }}
             path: build
             compression-level: 1
-  package-xcframework-platform: # Creates xcframework for each platform and xcode version
-      runs-on: macos-14
-      name: Package xcframework for platform
-      needs: [build-product, prepare]
-      strategy:
-        matrix:
-          platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
-          xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
-          exclude:
-            - platform: visionos
-              xcode-version: 15.1
-      steps:
-        - uses: actions/checkout@v4
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
-        - name: Install the Apple certificate and provisioning profile
-          env:
-            DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
-            P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-            KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          run: |
-            sh -x build.sh install-apple-certificates
-        - name: Restore frameworks
-          uses: actions/download-artifact@v4
-          with:
-            pattern: build-${{ matrix.platform }}*-${{ matrix.xcode-version }}-*
-        - name: Create xcframework
-          env:
-            SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
-          run: |
-            sh -x build.sh release-create-xcframework-${{ matrix.xcode-version }} ${{ matrix.platform }}
-        - name: Upload xcframework
-          uses: actions/upload-artifact@v4
-          with:
-            name: realm-${{ matrix.platform }}-${{ matrix.xcode-version }}
-            path: realm-${{ matrix.platform }}-${{ matrix.xcode-version }}.zip
-  package-release: # Creates xcframework for each platform and xcode version
+            follow-symlinks: false
+  package-release:
       runs-on: macos-14
       name: Package release file
-      needs: [package-xcframework-platform, prepare]
+      needs: [build-product, prepare]
       steps:
         - uses: actions/checkout@v4
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
-        - name: Install the Apple certificate and provisioning profile
-          env:
-            DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
-            P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-            KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          run: |
-            sh -x build.sh install-apple-certificates
         - name: Restore packages xcframeworks
           uses: actions/download-artifact@v4
           with:
-            pattern: realm-*
+            pattern: build-*
         - name: Create release
           env:
             SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
-          run: |
-            sh -x build.sh release-package
+          run: sh -x build.sh release-package
         - name: Upload release artifactss
           uses: actions/upload-artifact@v4
           with:
@@ -170,8 +135,6 @@ jobs:
       needs: [package-release, prepare]
       steps:
         - uses: actions/checkout@v4
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Restore release
           uses: actions/download-artifact@v4
           with:
@@ -184,8 +147,6 @@ jobs:
       needs: package-release
       steps:
         - uses: actions/checkout@v4
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Test ios static
           run: sh -x build.sh test-ios-static
   test-osx-static:
@@ -194,8 +155,6 @@ jobs:
       needs: package-release
       steps:
         - uses: actions/checkout@v4
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
         - name: Test osx static
           run: |
             export REALM_DISABLE_METADATA_ENCRYPTION=1
@@ -226,8 +185,9 @@ jobs:
         - uses: ruby/setup-ruby@v1
           with:
             bundler-cache: true
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ env.RELEASE_VERSION }}.app
+        - name: Download visionOS
+          if: matrix.platform == 'visionos' && matrix.os == 'macos-14'
+          run: xcodebuild -downloadPlatform visionOS
         - name: Restore release
           uses: actions/download-artifact@v4
           if: ${{ matrix.installation == 'xcframework' }}
@@ -244,21 +204,29 @@ jobs:
             cd examples/installation
             bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
   test-installation-xcframework:
-      runs-on: macos-14
       name: Run installation test for xcframework
       needs: [package-release, prepare]
-      env:
-        PLATFORM: 'osx'
       strategy:
         matrix:
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
+          include:
+            - xcode-version: 15.3
+              os: macos-14
+            - xcode-version: 15.4
+              os: macos-14
+            - xcode-version: 16
+              os: macos-15
+            - xcode-version: 16.1_beta_2
+              os: macos-15
+      env:
+        PLATFORM: 'osx'
+        DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode-version }}.app/Contents/Developer
+      runs-on: ${{ matrix.os }}
       steps:
         - uses: actions/checkout@v4
         - uses: ruby/setup-ruby@v1
           with:
             bundler-cache: true
-        - name: Select Xcode Version
-          run: sudo xcode-select -switch /Applications/Xcode_${{ matrix.xcode-version }}.app
         - name: Restore release
           uses: actions/download-artifact@v4
           with:

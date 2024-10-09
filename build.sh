@@ -200,89 +200,12 @@ build_combined() {
         -framework "$os_path" "${simulator_framework[@]}"
 }
 
-# To be used with Github actions runner
-build_platform() {
-    local product="$1"
-    local platform="$2"
-    local config="$CONFIGURATION"
-
-    local destination build_args config_suffix
-    case "$platform" in
-        osx)
-            config_suffix=
-            destination='generic/platform=macOS'
-            ;;
-        ios)
-            config_suffix=-iphoneos
-            destination='generic/platform=iOS'
-            ;;
-        watchos)
-            config_suffix=-watchos
-            destination='generic/platform=watchOS'
-            ;;
-        tvos)
-            config_suffix=-appletvos
-            destination='generic/platform=tvOS'
-            ;;
-        visionos)
-            config_suffix=-xros
-            destination='generic/platform=visionOS'
-            ;;
-        catalyst)
-            config_suffix=-maccatalyst
-            destination='generic/platform=macOS,variant=Mac Catalyst'
-            ;;
-        osx)
-            destination='generic/platform=macOS'
-            ;;
-        iossimulator)
-            config_suffix=-iphonesimulator
-            destination='generic/platform=iOS'
-            ;;
-        watchossimulator)
-            config_suffix=-watchsimulator
-            destination='generic/platform=watchOS'
-            ;;
-        tvossimulator)
-            config_suffix=-appletvsimulator
-            destination='generic/platform=tvOS'
-            ;;
-        visionossimulator)
-            config_suffix=-xrsimulator
-            destination='generic/platform=visionOS'
-            ;;
-    esac
-
-    build_products_path="$DERIVED_DATA/Realm/Build/Products"
-    build_path="$build_products_path/$config${config_suffix}"
-
-    build_args=(-scheme "$product" -configuration "$config" build REALM_HIDE_SYMBOLS=YES)
-
-    if [[ "$platform" = *"simulator" ]]; then
-        xc -destination "$destination Simulator" "${build_args[@]}"
-    else
-        xc -destination "$destination" "${build_args[@]}"
-    fi
-
-    # This is only for test, and simulates how it is packaged by XCode Cloud
-    number="$((10000 + $RANDOM % 99999))"
-    folder_name="RealmSwift Build $number Build Products for $product on iOS"
-    dir="$folder_name/$config${config_suffix}"
-    mkdir -p "$dir"
-    cp -a "$build_path/." "$dir"
-
-    config_name="$(tr [A-Z] [a-z] <<< "$config")"
-    zip -r product.zip "$dir"
-    rm -rf "$folder_name"
-}
-
 create_xcframework() {
     local product="$1"
     local config="$2"
-    local platform="$3"
 
-    local out_path="$ROOT_WORKSPACE/$config/$platform/$product.xcframework"
-    find "$ROOT_WORKSPACE" -path "*/$config*/$product.framework" \
+    local out_path="$ROOT_WORKSPACE/$config/$product.xcframework"
+    find "$ROOT_WORKSPACE"/build-*/"$config" -name "$product.framework" \
         | sed 's/.*/-framework &/' \
         | xargs xcodebuild -create-xcframework -allow-internal-distribution -output "$out_path"
     codesign --timestamp -s "$SIGNING_IDENTITY" "$out_path"
@@ -1086,29 +1009,10 @@ case "$COMMAND" in
         zip -r docs/realm-docs.zip docs/objc_output docs/swift_output
         ;;
 
-    release-create-xcframework-*)
-        platform="$2"
-        xcode_version=$(echo "$COMMAND" | cut -d- -f4)
-
-        find . -name 'build-*.zip' -exec unzip {} \;
-
-        create_xcframework Realm Release "$platform"
-        create_xcframework RealmSwift Release "$platform"
-
-        if [ "$platform" = "ios" ]; then
-            create_xcframework Realm Static "$platform"
-        else
-            mkdir -p "Static/$platform"
-        fi
-
-        zip --symlinks -r "realm-$platform-$xcode_version.zip" "Release/$platform" "Static/$platform"
-        exit 0
-        ;;
-
     "release-package")
         version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        find . -name 'realm-*-1*' -maxdepth 1 \
-            | sed 's@./realm-[a-z]*-\(.*\)@\1@' \
+        find . -name 'build-*-1*' -maxdepth 1 \
+            | sed 's@./build-[a-z]*-\(.*\)-.*@\1@' \
             | sort -u --version-sort \
             | xargs ./scripts/create-release-package.rb "${ROOT_WORKSPACE}/pkg" "${version}"
         ;;
@@ -1159,90 +1063,6 @@ case "$COMMAND" in
     # Release tests
     ######################################
 
-    # Should select xcode version `xcode-select` first.
-    # Pass xcode version as argument
-    # This simulates what is done in XCode Cloud
-    "test-create-frameworks")
-        xcode_version="$2"
-        targets="Realm RealmSwift"
-
-        platforms=("ios" "iossimulator" "osx" "tvos" "tvossimulator" "watchos" "watchossimulator" "catalyst")
-        if [ "$xcode_version" == "15.2" ]; then
-            platforms+=("visionos" "visionossimulator")
-        fi
-
-        for platform in "${platforms[@]}"; do
-            for target in $targets; do
-                echo "Building $platform and $target release"
-                ./build.sh "release-package-$platform-$xcode_version-$target-release"
-                ./build.sh "release-build_$platform-$xcode_version-$target-release"
-
-                # Only generates Realm framework for Static configuration and ios platform
-                if [[ "$platform" == "ios"  || "$platform" == "iossimulator" ]] && [[ "$target" == "Realm" ]]; then
-                    echo "Building $platform and $target static"
-                    ./build.sh "release-package-$platform-$xcode_version-$target-static"
-                    ./build.sh "release-package-build_$platform-$xcode_version-$target-static"
-                fi
-            done
-        done
-        ;;
-
-    "test-build-product-workflow-xcode-cloud")
-        issuer_id=""
-        key_id=""
-        pk_path=""
-
-        token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id $issuer_id --key-id $key_id --pk-path $pk_path get-token)
-        echo "Authentication token -> $token"
-
-        # Test parameters
-        platform="ios"
-        target="RealmSwift"
-        xcode_version="15.2"
-        configuration="release"
-
-        workflow_id=$(ruby ./scripts/xcode_cloud_helper.rb create-workflow release-package-build $platform $xcode_version $target $configuration -t $token)
-        echo "Created workflow -> $workflow_id"
-        build_run_id=$(ruby ./scripts/xcode_cloud_helper.rb build-workflow $workflow_id dp/new_migration_branch -t $token)
-        echo "Build Run -> $build_run_id"
-        while [ "$status" != 'COMPLETE' ]
-        do
-            token=$(ruby ./scripts/xcode_cloud_helper.rb --issuer-id $issuer_id --key-id $key_id --pk-path $pk_path get-token)
-            status=$(ruby ./scripts/xcode_cloud_helper.rb get-build-status $build_run_id -t $token)
-            echo "Status $status" | ts
-            sleep 20
-        done
-        completion_status=$(ruby ./scripts/xcode_cloud_helper.rb get-build-result $build_run_id -t $token)
-        echo "Completion Status $completion_status" | ts
-        if [ "$completion_status" != 'SUCCEEDED' ]; then
-            echo "XCode build failed"
-            ruby ./scripts/xcode_cloud_helper.rb print-build-logs $build_run_id -t $token
-            exit 1
-        fi
-
-        ruby ./scripts/xcode_cloud_helper.rb print-build-logs $build_run_id -t $token
-        ruby ./scripts/xcode_cloud_helper.rb download-artifact $build_run_id -t $token
-        ruby ./scripts/xcode_cloud_helper.rb delete-workflow $workflow_id -t $token
-        ;;
-
-    # Pass xcode version as argument
-    # For this to work, product builds should be located in the root of the project
-    "test-create-platform-xcframeworks")
-        xcode_version="$2"
-
-        platforms=("ios" "osx" "tvos" "watchos" "catalyst")
-        if [ "$xcode_version" == "15.1" ]; then
-            platforms+=("visionos")
-        fi
-
-        for platform in "${platforms[@]}"; do
-            ./build.sh release-create-xcframework_$xcode_version $platform
-
-            rm -rf "$ROOT_WORKSPACE/Release"
-            rm -rf "$ROOT_WORKSPACE/Static"
-        done
-        ;;
-
     "test-package-examples")
         VERSION="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
         dir="realm-swift-${VERSION}"
@@ -1266,22 +1086,6 @@ case "$COMMAND" in
         sh build.sh examples-osx
         sh build.sh examples-ios-swift
         sh build.sh examples-tvos-swift
-        ;;
-
-     # This is used for test or if we want to use Github Actions to build each framework
-    release-package-build_*)
-        filename="Configuration/Release.xcconfig"
-        sed -i '' "s/REALM_HIDE_SYMBOLS = NO;/REALM_HIDE_SYMBOLS = YES;/" "$filename"
-
-        # Remove the identifier of the command, so we can obtain the parameters from the command
-        build_command=${COMMAND#"release-package-build_"}
-        parameters=(${build_command//-/ })
-
-        platform=${parameters[0]}
-        target=${parameters[1]}
-
-        build_platform "$target" "$platform"
-        exit 0
         ;;
 
     ######################################
@@ -1363,7 +1167,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 15.4.0.
+* Carthage release for Swift is built with Xcode 16.0.0.
 * CocoaPods: 1.10 or later.
 * Xcode: 15.3.0-16.1 beta.
 
