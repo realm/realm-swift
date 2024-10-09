@@ -82,9 +82,10 @@ targets.each { |name, filter|
     if not filter.call(version)
       next
     end
-      output_file << """
+    image = version.start_with?('16') ? 'macos-15' : 'macos-14'
+    output_file << """
   #{name}-#{version.gsub(' ', '_').gsub('.', '_')}:
-    runs-on: macos-14
+    runs-on: #{image}
     name: Test #{name} on Xcode #{version}
     env:
       DEVELOPER_DIR: '/Applications/Xcode_#{version}.app/Contents/Developer'
