@@ -12,7 +12,7 @@ XCODE_VERSIONS = ARGV[2..]
 ROOT = Pathname(__FILE__).+('../..').expand_path
 BUILD_SH = Pathname(__FILE__).+('../../build.sh').expand_path
 VERBOSE = false
-OBJC_XCODE_VERSION = '16'
+OBJC_XCODE_VERSION = XCODE_VERSIONS.reduce { |a, e| e.include?('beta') ? a : e }
 
 def sh(*args)
   puts "executing: #{args.join(' ')}" if VERBOSE
@@ -29,11 +29,10 @@ end
 
 def create_xcframework(root, xcode_version, configuration, name)
   signing_identity = ENV['SIGNING_IDENTITY']
-  output = "#{root}/#{xcode_version}/#{configuration}/#{name}.xcframework"
-  files = Dir.glob "#{ROOT}/build-*-#{xcode_version}-*/#{configuration}/*/#{name}.xcframework/*/#{name}.framework"
-  puts files
+  prefix = "#{root}/#{xcode_version}"
+  output = "#{prefix}/#{configuration}/#{name}.xcframework"
+  files = Dir.glob "#{prefix}/build/#{configuration}/*/#{name}.xcframework/*/#{name}.framework"
 
-  FileUtils.mkdir_p "#{root}/#{xcode_version}"
   sh 'xcodebuild', '-create-xcframework', '-allow-internal-distribution',
      '-output', output, *files.flat_map {|f| ['-framework', f]}
   sh 'codesign', '--timestamp', '-s', signing_identity, output
@@ -53,6 +52,17 @@ Dir.mktmpdir do |tmp|
   # xcodebuild's relative path resolution breaks due to this and we need to
   # give it the fully resolved path
   tmp = File.realpath tmp
+
+  for version in XCODE_VERSIONS
+    puts "Extracting source binaries for Xcode #{version}"
+    FileUtils.mkdir_p "#{tmp}/#{version}"
+    Dir.chdir("#{tmp}/#{version}") do
+      for platform in platforms(version)
+        sh 'tar', 'xf', "#{ROOT}/build-#{platform}-#{version}-swift/build.tar"
+      end
+      sh 'tar', 'xf', "#{ROOT}/build-ios-#{version}-static/build.tar"
+    end
+  end
 
   for version in XCODE_VERSIONS
     puts "Creating Swift XCFrameworks for Xcode #{version}"
@@ -107,8 +117,11 @@ puts 'Creating Carthage release zip'
 Dir.mktmpdir do |tmp|
   tmp = File.realpath tmp
   Dir.chdir(tmp) do
-    create_xcframework tmp, OBJC_XCODE_VERSION, 'Release', 'RealmSwift'
-    create_xcframework tmp, OBJC_XCODE_VERSION, 'Release', 'Realm'
+    for platform in platforms('15.1')
+      sh 'tar', 'xf', "#{ROOT}/build-#{platform}-#{OBJC_XCODE_VERSION}-swift/build.tar"
+    end
+    create_xcframework tmp, '', 'Release', 'RealmSwift'
+    create_xcframework tmp, '', 'Release', 'Realm'
 
     Dir.chdir('Release') do
       zip 'Carthage.xcframework.zip', 'Realm.xcframework', 'RealmSwift.xcframework'
