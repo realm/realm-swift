@@ -6,7 +6,7 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['15.3', '15.4', '16', '16.1_beta_2']"
+  XCODE_VERSION: "['15.3', '15.4', '16', '16.1_beta_3']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   RELEASE_VERSION: '15.4'
   DEVELOPER_DIR: /Applications/Xcode_15.4.app/Contents/Developer
@@ -74,7 +74,7 @@ jobs:
               os: macos-14
             - xcode-version: 16
               os: macos-15
-            - xcode-version: 16.1_beta_2
+            - xcode-version: 16.1_beta_3
               os: macos-15
           exclude:
             - platform: osx
@@ -89,32 +89,33 @@ jobs:
               configuration: static
       runs-on: ${{ matrix.os }}
       env:
-        DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode-version }}.app/Contents/Developer
+        DEVELOPER_DIR: /Applications/Xcode_${{matrix.xcode-version}}.app/Contents/Developer
       steps:
         - uses: actions/checkout@v4
         - name: Download visionOS
           if: matrix.platform == 'visionos' && matrix.os == 'macos-14'
           run: xcodebuild -downloadPlatform visionOS
-        - name: Build ${{ matrix.platform }} with Xcode ${{ matrix.xcode-version }}
-          run: sh build.sh ${{ matrix.platform }}-${{matrix.configuration}}
-        - run: rm -r build/DerivedData
+        - run: sh build.sh ${{matrix.platform}}-${{matrix.configuration}}
+        - run: tar cf build.tar build/*/${{matrix.platform}}
         - name: Upload framework
-          uses: eXhumer/upload-artifact@0b7d5f5684d3f642f978d2faad9ade64f5b4dd57
+          uses: actions/upload-artifact@v4
           with:
-            name: build-${{ matrix.platform }}-${{ matrix.xcode-version }}-${{ matrix.configuration }}
-            path: build
+            name: build-${{matrix.platform}}-${{matrix.xcode-version}}-${{matrix.configuration}}
+            path: build.tar
             compression-level: 1
-            follow-symlinks: false
   package-release:
       runs-on: macos-14
       name: Package release file
       needs: [build-product, prepare]
       steps:
         - uses: actions/checkout@v4
-        - name: Restore packages xcframeworks
-          uses: actions/download-artifact@v4
-          with:
-            pattern: build-*
+        - uses: actions/download-artifact@v4
+        - name: Install the Apple certificate and provisioning profile
+          env:
+            DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
+            P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+            KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          run: sh build.sh install-apple-certificates
         - name: Create release
           env:
             SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
@@ -127,7 +128,7 @@ jobs:
         - name: Upload release for testing
           uses: actions/upload-artifact@v4
           with:
-            name: realm-swift-${{ needs.prepare.outputs.VERSION }}
+            name: test-release-package
             path: pkg/realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
   test-package-examples:
       runs-on: macos-14
@@ -138,7 +139,7 @@ jobs:
         - name: Restore release
           uses: actions/download-artifact@v4
           with:
-            name: realm-swift-${{ needs.prepare.outputs.VERSION }}
+            name: test-release-package
         - name: Test examples
           run: sh -x build.sh release-test-examples
   test-ios-static:
@@ -166,15 +167,13 @@ jobs:
       strategy:
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
-          installation: [cocoapods, spm, carthage, xcframework]
+          installation: [cocoapods, spm, carthage]
           linkage: [dynamic, static]
           exclude:
             - platform: visionos
             - platform: catalyst
               installation: carthage
             - installation: carthage
-              linkage: static
-            - installation: xcframework
               linkage: static
           include:
             - platform: ios
@@ -192,12 +191,7 @@ jobs:
           uses: actions/download-artifact@v4
           if: ${{ matrix.installation == 'xcframework' }}
           with:
-            name: realm-${{ matrix.platform }}-${{ env.RELEASE_VERSION }}
-        - name: Unzip package release
-          if: ${{ matrix.installation == 'xcframework' }}
-          run: |
-            mkdir -p build
-            unzip realm-${{ matrix.platform }}-${{ env.RELEASE_VERSION }}.zip -d build
+            name: test-release-package
         - name: Run installation test
           run: |
             echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
@@ -216,7 +210,7 @@ jobs:
               os: macos-14
             - xcode-version: 16
               os: macos-15
-            - xcode-version: 16.1_beta_2
+            - xcode-version: 16.1_beta_3
               os: macos-15
       env:
         PLATFORM: 'osx'
@@ -230,11 +224,7 @@ jobs:
         - name: Restore release
           uses: actions/download-artifact@v4
           with:
-            name: realm-${{ env.PLATFORM }}-${{ matrix.xcode-version }}
-        - name: Unzip package release
-          run: |
-            mkdir -p build
-            unzip realm-${{ env.PLATFORM }}-${{ matrix.xcode-version }}.zip -d build
+            name: test-release-package
         - name: Run installation test
           run: |
             echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
