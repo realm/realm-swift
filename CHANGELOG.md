@@ -4,8 +4,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
+* The events library would attempt to upload backup files created as part of
+  file format upgrades, causing backup copies of those backups to be made,
+  looping until the maximum file name size was reached
+  ([Core #8040](https://github.com/realm/realm-core/issues/8040), since v10.26.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,7 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.3.0-16.1 beta.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+* Upgraded realm-core from v14.13.0 to 14.13.1
 
 10.54.0 Release notes (2024-09-20)
 =============================================================
