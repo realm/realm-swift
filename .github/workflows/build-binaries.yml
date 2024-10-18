@@ -17,8 +17,13 @@ jobs:
     strategy:
       matrix:
         target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst, xros, xrsimulator]
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.3.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
+      - name: Download visionOS
+        if: matrix.target == 'xros' || matrix.target == 'xrsimulator'
+        run: xcodebuild -downloadPlatform visionOS
 
       - name: Get Core Version
         id: get-core-version
@@ -50,8 +55,6 @@ jobs:
       - name: Build for ${{ matrix.target }}
         run: sh tools/${{ matrix.target != 'macosx' && format('build-apple-device.sh -p {0} -c Release', matrix.target) || 'build-cocoa.sh -bm' }} -v ${{ steps.get-core-version.outputs.version }}
         working-directory: core
-        env:
-          DEVELOPER_DIR: /Applications/Xcode_15.3.app/Contents/Developer
 
       - name: Archive binaries
         uses: actions/upload-artifact@v4
