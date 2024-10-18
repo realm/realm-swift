@@ -310,6 +310,14 @@ plist_get() {
     /usr/libexec/PlistBuddy -c "Print :$2" "$1" 2> /dev/null
 }
 
+iphone_name() {
+    if (( $(xcode_version_major) < 16 )); then
+        echo 'iPhone 14'
+    else
+        echo 'iPhone 16'
+    fi
+}
+
 ######################################
 # Device Test Helper
 ######################################
@@ -519,11 +527,7 @@ case "$COMMAND" in
     "xcframework")
         # Build all of the requested frameworks
         shift
-        if (( $(xcode_version_major) < 15 )); then
-            PLATFORMS="${*:-osx ios watchos tvos catalyst}"
-        else
-            PLATFORMS="${*:-osx ios watchos tvos catalyst visionos}"
-        fi
+        PLATFORMS="${*:-osx ios watchos tvos catalyst visionos}"
         for platform in $PLATFORMS; do
             sh build.sh "$platform-swift"
         done
@@ -591,12 +595,12 @@ case "$COMMAND" in
         ;;
 
     "test-ios")
-        xctest Realm -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 14'
+        xctest Realm -configuration "$CONFIGURATION" -sdk iphonesimulator -destination "name=$(iphone_name)"
         exit 0
         ;;
 
     "test-ios-swift")
-        xctest RealmSwift -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 14'
+        xctest RealmSwift -configuration "$CONFIGURATION" -sdk iphonesimulator -destination "name=$(iphone_name)"
         exit 0
         ;;
 
@@ -665,7 +669,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swiftui")
-        xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination 'name=iPhone 14'
+        xctest 'SwiftUITestHost' -configuration "$CONFIGURATION" -sdk iphonesimulator -destination "name=$(iphone_name)"
         exit 0
         ;;
 
@@ -1059,9 +1063,12 @@ case "$COMMAND" in
 
     "ci-pr")
         echo "Building with Xcode Version $(xcodebuild -version)"
-        export sha="$BRANCH"
         export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
-        target=$(echo "$CI_WORKFLOW" | cut -f1 -d_)
+        target="$2"
+        if [[ "$target" == visionos ]] && (( $(xcode_version_major) < 16 )); then
+            echo 'Installing visionOS'
+            xcodebuild -downloadPlatform visionOS
+        fi
         sh build.sh "verify-$target"
         ;;
 

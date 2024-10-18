@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-XCODE_VERSIONS = %w(15.3 15.4 16 16.1_beta_2)
+XCODE_VERSIONS = %w(15.3 15.4 16 16.1_beta_3)
 DOC_VERSION = '15.4'
 
 all = ->(v) { true }
@@ -82,15 +82,16 @@ targets.each { |name, filter|
     if not filter.call(version)
       next
     end
-      output_file << """
+    image = version.start_with?('16') ? 'macos-15' : 'macos-14'
+    output_file << """
   #{name}-#{version.gsub(' ', '_').gsub('.', '_')}:
-    runs-on: macos-14
+    runs-on: #{image}
     name: Test #{name} on Xcode #{version}
     env:
       DEVELOPER_DIR: '/Applications/Xcode_#{version}.app/Contents/Developer'
     steps:
       - uses: actions/checkout@v4
-      - run: sh -x build.sh verify-#{name}
+      - run: sh -x build.sh ci-pr #{name}
 """
   }
 }
