@@ -164,6 +164,8 @@ jobs:
       runs-on: macos-14
       name: Run installation test
       needs: [package-release, prepare]
+      env:
+        REALM_TEST_BRANCH: "${{github.ref_name}}"
       strategy:
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
@@ -194,7 +196,6 @@ jobs:
             name: test-release-package
         - name: Run installation test
           run: |
-            echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             cd examples/installation
             bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
   test-installation-xcframework:
@@ -215,6 +216,7 @@ jobs:
       env:
         PLATFORM: 'osx'
         DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode-version }}.app/Contents/Developer
+        REALM_TEST_BRANCH: "${{github.ref_name}}"
       runs-on: ${{ matrix.os }}
       steps:
         - uses: actions/checkout@v4
@@ -227,7 +229,6 @@ jobs:
             name: test-release-package
         - name: Run installation test
           run: |
-            echo "REALM_TEST_BRANCH=${{ github.ref_name }}" >> $GITHUB_OUTPUT
             cd examples/installation
             bundle exec ./build.rb osx xcframework dynamic
 
