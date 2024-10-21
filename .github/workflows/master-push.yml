@@ -196,6 +196,7 @@ jobs:
             name: test-release-package
         - name: Run installation test
           run: |
+            find . -name '*.zip' -depth 1 -exec mv {} examples/installation \;
             cd examples/installation
             bundle exec ./build.rb ${{ matrix.platform }} ${{ matrix.installation }} ${{ matrix.linkage }}
   test-installation-xcframework:
@@ -229,9 +230,7 @@ jobs:
             name: test-release-package
         - name: Run installation test
           run: |
-            pwd
-            ls
-            ls realm-swift*
+            find . -name '*.zip' -depth 1 -exec mv {} examples/installation \;
             cd examples/installation
             bundle exec ./build.rb osx xcframework dynamic
 
