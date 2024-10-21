@@ -157,10 +157,15 @@ def download_realm(platform, method, static)
     # If we're testing a branch then we should already have a built zip
     # supplied by Github actions, but we need to know what version tag it has. If
     # we're testing a release, we'll download the zip.
+    puts 'TEST_BRANCH', TEST_BRANCH
+    puts 'TEST_RELEASE', TEST_RELEASE
+    puts "DEPENDENCIES['VERSION']", DEPENDENCIES['VERSION']
     version = TEST_BRANCH ? DEPENDENCIES['VERSION'] : TEST_RELEASE
     if version
+      puts 'downloading'
       download_release version
     else
+      puts 'not downloading'
       if static
         copy_xcframework "../../build/Static/#{platform}", 'Realm', 'Static'
       else
