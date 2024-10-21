@@ -69,12 +69,16 @@ jobs:
           configuration: [swift, static]
           include:
             - xcode-version: 15.3
+              xcode-version-tag: 15.3
               os: macos-14
             - xcode-version: 15.4
+              xcode-version-tag: 15.4
               os: macos-14
             - xcode-version: 16
+              xcode-version-tag: 16.0
               os: macos-15
             - xcode-version: 16.1_beta_3
+              xcode-version-tag: 16.1
               os: macos-15
           exclude:
             - platform: osx
@@ -100,7 +104,7 @@ jobs:
         - name: Upload framework
           uses: actions/upload-artifact@v4
           with:
-            name: build-${{matrix.platform}}-${{matrix.xcode-version}}-${{matrix.configuration}}
+            name: build-${{matrix.platform}}-${{matrix.xcode-version-tag}}-${{matrix.configuration}}
             path: build.tar
             compression-level: 1
   package-release:
