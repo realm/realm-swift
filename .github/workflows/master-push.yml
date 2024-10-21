@@ -229,6 +229,9 @@ jobs:
             name: test-release-package
         - name: Run installation test
           run: |
+            pwd
+            ls
+            ls realm-swift*
             cd examples/installation
             bundle exec ./build.rb osx xcframework dynamic
 
