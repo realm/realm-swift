@@ -1,7 +1,8 @@
 10.54.1 Release notes (2024-10-22)
 =============================================================
 ### Enhancements
-* None.
+* Add support for KeyPath initializiation for LinkingObjects declared with @Persisted: 
+  `@Persisted(originProperty: \.dogs) var persons: LinkingObjects<Person>
 
 ### Fixed
 * The events library would attempt to upload backup files created as part of
