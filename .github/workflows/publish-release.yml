@@ -1,8 +1,8 @@
 name: Publish release
 on: workflow_dispatch
 env:
-  XCODE_VERSION: "['15.3', '15.4', '16_beta_6', '16.1_beta']"
-  TEST_XCODE_VERSION: '15.4'
+  XCODE_VERSION: "['15.3', '15.4', '16', '16.1_beta_3']"
+  TEST_XCODE_VERSION: '16'
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -33,7 +33,7 @@ jobs:
             tag_exists_error: false
             message: ""
   publish-docs:
-      runs-on: macos-latest
+      runs-on: macos-15
       name: Publish docs to S3 Bucket
       needs: tag-release
       env:
@@ -49,7 +49,7 @@ jobs:
         - name: Publish docs
           run: bundle exec sh -x build.sh publish-docs ${{ github.sha }}
   create-release:
-      runs-on: macos-latest
+      runs-on: macos-15
       name: Create github release
       needs: [tag-release, prepare]
       env:
@@ -62,7 +62,7 @@ jobs:
         - name: Create Github release
           run: bundle exec ./build.sh publish-github ${{ github.sha }}
   publish-cocoapods:
-      runs-on: macos-latest
+      runs-on: macos-15
       name: Publish Cocoapods specs
       needs: [tag-release, prepare]
       env:
@@ -75,7 +75,7 @@ jobs:
         - name: Publish
           run: bundle exec ./build.sh publish-cocoapods v${{ needs.prepare.outputs.VERSION }}
   update-checker:
-      runs-on: macos-latest
+      runs-on: macos-15
       name: Update to latest version update checker file
       needs: tag-release
       env:
@@ -89,7 +89,7 @@ jobs:
         - run: brew install s3cmd
         - run: bundle exec ./build.sh publish-update-checker
   test-installation:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Run installation test for ${{ matrix.platform }}, ${{ matrix.installation }} and ${{ matrix.linkage }}
       needs: [create-release, prepare, publish-cocoapods]
       strategy:
@@ -133,10 +133,10 @@ jobs:
         - uses: maxim-lobanov/setup-xcode@v1
           with:
             xcode-version: ${{ env.TEST_XCODE_VERSION }}
-        - name: Set REALM_TEST_RELEASE
-          run: echo "REALM_TEST_RELEASE=${{ needs.prepare.outputs.VERSION }}" >> $GITHUB_ENV
         - name: Run installation test
           uses: nick-fields/retry@v3
+          env:
+            REALM_TEST_RELEASE: ${{ needs.prepare.outputs.VERSION }}
           with:
             command: |
               cd examples/installation
@@ -146,7 +146,7 @@ jobs:
             retry_wait_seconds: 60
             retry_on: error
   post-slack-release:
-      runs-on: macos-latest
+      runs-on: macos-15
       name: Publish to release Slack channel
       needs: [create-release, prepare, publish-cocoapods, update-checker, publish-docs]
       env:
@@ -166,7 +166,7 @@ jobs:
             webhook-url: ${{ env.WEBHOOK_URL }}
             version: ${{ needs.prepare.outputs.VERSION }}
   add-empty-changelog:
-      runs-on: macos-latest
+      runs-on: macos-15
       permissions:
         contents: write
       name: Add empty changelog and commits/push it

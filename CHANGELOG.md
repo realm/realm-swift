@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.54.1 Release notes (2024-10-22)
 =============================================================
 ### Enhancements
 * None.
