@@ -75,7 +75,7 @@ jobs:
               xcode-version-tag: 15.4
               os: macos-14
             - xcode-version: 16
-              xcode-version-tag: 16.0
+              xcode-version-tag: '16.0'
               os: macos-15
             - xcode-version: 16.1_beta_3
               xcode-version-tag: 16.1
