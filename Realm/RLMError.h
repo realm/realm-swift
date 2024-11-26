@@ -202,7 +202,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
      / **
     Denotes an error that occurs when resolving thread safe reference returns a nil object.
      */
-    RLMSyncErrorPermissionDeniedError = 23
+    RLMErrorObjectNotFound = 23
 };
 
 #pragma mark - RLMSyncError
