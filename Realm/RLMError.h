@@ -199,6 +199,10 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
      subscription or the server will reject the write.
      */
     RLMErrorNoSubscriptionForWrite = 22,
+     / **
+    Denotes an error that occurs when resolving thread safe reference returns a nil object.
+     */
+    RLMSyncErrorPermissionDeniedError = 23
 };
 
 #pragma mark - RLMSyncError
