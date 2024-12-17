@@ -235,7 +235,7 @@ plist_get() {
 
 iphone_name() {
     if (( $(xcode_version_major) < 16 )); then
-        echo 'iPhone 14'
+        echo 'iPhone 15'
     else
         echo 'iPhone 16'
     fi
