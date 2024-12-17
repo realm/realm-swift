@@ -6,10 +6,10 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['15.3', '15.4', '16', '16.1_beta_3']"
+  XCODE_VERSION: "['15.3', '15.4', '16', '16.1', '16.2']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
-  RELEASE_VERSION: '15.4'
-  DEVELOPER_DIR: /Applications/Xcode_15.4.app/Contents/Developer
+  RELEASE_VERSION: '16.2'
+  DEVELOPER_DIR: /Applications/Xcode_16.2.app/Contents/Developer
 jobs:
   prepare:
       runs-on: ubuntu-latest
@@ -30,7 +30,7 @@ jobs:
             version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${GITHUB_WORKSPACE}/dependencies.list")"
             echo "VERSION=$version" >> $GITHUB_OUTPUT
   build-docs:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Package docs
       needs: prepare
       steps:
@@ -46,7 +46,7 @@ jobs:
             name: realm-docs
             path: docs/realm-docs.zip
   build-examples:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Package examples
       needs: prepare
       steps:
@@ -77,8 +77,11 @@ jobs:
             - xcode-version: 16
               xcode-version-tag: '16.0'
               os: macos-15
-            - xcode-version: 16.1_beta_3
+            - xcode-version: 16.1
               xcode-version-tag: 16.1
+              os: macos-15
+            - xcode-version: 16.2
+              xcode-version-tag: 16.2
               os: macos-15
           exclude:
             - platform: osx
@@ -108,7 +111,7 @@ jobs:
             path: build.tar
             compression-level: 1
   package-release:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Package release file
       needs: [build-product, prepare]
       steps:
@@ -135,7 +138,7 @@ jobs:
             name: test-release-package
             path: pkg/realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
   test-package-examples:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Test examples
       needs: [package-release, prepare]
       steps:
@@ -147,7 +150,7 @@ jobs:
         - name: Test examples
           run: sh -x build.sh release-test-examples
   test-ios-static:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Run tests on iOS with configuration Static
       needs: package-release
       steps:
@@ -155,7 +158,7 @@ jobs:
         - name: Test ios static
           run: sh -x build.sh test-ios-static
   test-osx-static:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Run tests on macOS
       needs: package-release
       steps:
@@ -165,7 +168,7 @@ jobs:
             export REALM_DISABLE_METADATA_ENCRYPTION=1
             sh -x build.sh test-osx
   test-installation:
-      runs-on: macos-14
+      runs-on: macos-15
       name: Run installation test
       needs: [package-release, prepare]
       env:
@@ -216,7 +219,9 @@ jobs:
               os: macos-14
             - xcode-version: 16
               os: macos-15
-            - xcode-version: 16.1_beta_3
+            - xcode-version: 16.1
+              os: macos-15
+            - xcode-version: 16.2
               os: macos-15
       env:
         PLATFORM: 'osx'
