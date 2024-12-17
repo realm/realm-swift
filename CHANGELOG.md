@@ -1,3 +1,24 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* Add prebuilt binaries for Xcode 16.2.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 15.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 16.2.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 15.3.0-16.2.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
 10.54.1 Release notes (2024-10-22)
 =============================================================
 ### Enhancements

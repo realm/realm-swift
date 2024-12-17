@@ -281,7 +281,7 @@ class PBSClientResetTests: ClientResetTests {
 
             let syncManager = self.app.syncManager
             syncManager.errorHandler = { error, _ in
-                guard nil != error as? SyncError else {
+                guard error is SyncError else {
                     return XCTFail("Bad error type: \(error)")
                 }
                 XCTFail("Expected the syncManager.ErrorHandler to not be called")

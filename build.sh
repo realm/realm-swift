@@ -235,7 +235,7 @@ plist_get() {
 
 iphone_name() {
     if (( $(xcode_version_major) < 16 )); then
-        echo 'iPhone 14'
+        echo 'iPhone 15'
     else
         echo 'iPhone 16'
     fi
@@ -1167,9 +1167,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 16.0.0.
+* Carthage release for Swift is built with Xcode 16.2.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 15.3.0-16.1 beta.
+* Xcode: 15.3.0-16.2.
 
 ### Internal
 * Upgraded realm-core from ? to ?
