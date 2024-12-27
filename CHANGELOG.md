@@ -1,22 +1,26 @@
-x.y.z Release notes (yyyy-MM-dd)
+20.0.1 Release notes (2024-12-27)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Update build scripts for Xcode 16.2.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* A query with a number of predicates ORed together may result in a
+  crash on some platforms (strict weak ordering check failing on iphone)
+  ([#8028](https://github.com/realm/realm-core/issues/8028), since v10.50.0).
 
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
-* Carthage release for Swift is built with Xcode 15.4.0.
+* Carthage release for Swift is built with Xcode 16.2.0.
 * CocoaPods: 1.10 or later.
-* Xcode: 15.3.0-16.1 beta.
+* Xcode: 15.3.0-16.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v20.0.0 to 20.1.0
 
 20.0.0 Release notes (2024-09-09)
 =============================================================

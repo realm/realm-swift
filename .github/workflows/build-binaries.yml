@@ -17,14 +17,13 @@ jobs:
     strategy:
       matrix:
         target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst, xros, xrsimulator]
-        xcode: ["15.3"]
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.3.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
-
-      - name: Switch to Xcode ${{ matrix.xcode }}
-        uses: maxim-lobanov/setup-xcode@v1.6.0
-        with:
-          xcode-version: ${{ matrix.xcode }}
+      - name: Download visionOS
+        if: matrix.target == 'xros' || matrix.target == 'xrsimulator'
+        run: xcodebuild -downloadPlatform visionOS
 
       - name: Get Core Version
         id: get-core-version
@@ -43,6 +42,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0
           fetch-tags: true
+
+      # CMake 3.30 introduced a check which tries to validate that the compiler
+      # supports the requested architextures but it doesn't work.
+      - name: Patch CMake
+        run: sed -i '' 's/CMAKE_HOST_APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin"/CMAKE_HOST_APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND NOT CMAKE_GENERATOR STREQUAL "Xcode"/' /opt/homebrew/Cellar/cmake/*/share/cmake/Modules/CMakeDetermineCompilerABI.cmake 
 
       - name: Checkout Core@${{ steps.get-core-version.outputs.version }}
         run: git checkout ${{ steps.get-core-version.outputs.version }} --recurse-submodules -f
