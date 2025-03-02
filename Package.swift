@@ -32,7 +32,7 @@ let cxxSettings: [CXXSetting] = [
     .define("REALM_VERSION_PATCH", to: String(coreVersion.patch)),
     .define("REALM_VERSION_EXTRA", to: "\"\(coreVersion.prereleaseIdentifiers.first ?? "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersion)\""),
-    .define("REALM_ENABLE_GEOSPATIAL", to: "1"),
+    .define("REALM_ENABLE_GEOSPATIAL", to: "0"),
 ]
 let testCxxSettings: [CXXSetting] = cxxSettings + [
     // Command-line `swift build` resolves header search paths
