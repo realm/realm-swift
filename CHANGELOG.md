@@ -1,15 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.54.3 Release notes (2025-03-07)
 =============================================================
+
 ### Enhancements
-* None.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Enable automatic client reset handling for Events Realms. These Realms
+  typically do not trigger client resets, but may if sync is restarted when one
+  is partially uploaded. ([Core #8072](https://github.com/realm/realm-core/pull/8072)).
 
 ### Compatibility
+
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
 * Carthage release for Swift is built with Xcode 16.2.0.
@@ -17,7 +16,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Xcode: 15.3.0-16.2.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
+* Upgraded realm-core from v14.13.1 to 14.14.0
 
 10.54.2 Release notes (2024-12-17)
 =============================================================
