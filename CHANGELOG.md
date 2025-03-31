@@ -1,3 +1,18 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+### Enhancements
+
+* Add Xcode 16.3 binaries.
+
+### Compatibility
+
+* Realm Studio: 15.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 16.3.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 15.3.0-16.3.
+
 10.54.3 Release notes (2025-03-07)
 =============================================================
 
