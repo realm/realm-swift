@@ -4,7 +4,7 @@ import PackageDescription
 import Foundation
 
 let coreVersion = Version("14.14.0")
-let cocoaVersion = Version("10.54.3")
+let cocoaVersion = Version("10.54.4")
 
 #if compiler(>=6)
 let swiftVersion = [SwiftVersion.version("6")]
