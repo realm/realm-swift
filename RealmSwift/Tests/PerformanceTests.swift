@@ -44,17 +44,14 @@ private nonisolated(unsafe) var smallRealm: Realm!
 private nonisolated(unsafe) var mediumRealm: Realm!
 private nonisolated(unsafe) var largeRealm: Realm!
 
-private let isRunningOnDevice = TARGET_IPHONE_SIMULATOR == 0
-
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
 class SwiftPerformanceTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
-#if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst)
-        if isRunningOnDevice {
-            return super.defaultTestSuite
-        }
-#endif
+#if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst) && !targetEnvironment(simulator)
+        return super.defaultTestSuite
+#else
         return XCTestSuite(name: "SwiftPerformanceTests")
+#endif
     }
 
     override class func setUp() {
@@ -943,12 +940,11 @@ class SwiftPerformanceTests: TestCase, @unchecked Sendable {
 
 class SwiftSyncRealmPerformanceTests: TestCase, @unchecked Sendable {
     override class var defaultTestSuite: XCTestSuite {
-#if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst)
-        if isRunningOnDevice {
-            return super.defaultTestSuite
-        }
-#endif
+#if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst) && !targetEnvironment(simulator)
+        return super.defaultTestSuite
+#else
         return XCTestSuite(name: "SwiftSyncRealmPerformanceTests")
+#endif
     }
 
     override func measure(_ block: (() -> Void)) {
