@@ -279,7 +279,10 @@ static void validateSetBounds(__unsafe_unretained RLMSet *const set,
             return;
         }
         for (id object in objects) {
-            [_backingCollection addObject:object];
+            // object should always be non-nil since it's a value stored in a
+            // NSArray, but as of Xcode 16.3 [Decimal128?] sometimes ends up
+            // with nil instead of NSNull when bridged from Swift.
+            [_backingCollection addObject:object ?: NSNull.null];
         }
     });
 }
