@@ -1,3 +1,16 @@
+20.0.2 Release notes (2025-04-14)
+=============================================================
+
+### Enhancements
+
+* Update build scripts for Xcode 16.2.
+
+### Compatibility
+
+* Carthage release for Swift is built with Xcode 16.3.0.
+* CocoaPods: 1.10 or later.
+* Xcode: 15.3.0-16.3.
+
 20.0.1 Release notes (2024-12-27)
 =============================================================
 
