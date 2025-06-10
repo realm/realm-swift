@@ -226,7 +226,7 @@ NSUInteger RLMUnmanagedFastEnumerate(id collection, NSFastEnumerationState *stat
 
     NSUInteger i = 0;
     for (id object in collection) {
-        copy->items[i++] = object;
+        copy->items.get()[i++] = object;
     }
 
     state->itemsPtr = (__unsafe_unretained id *)(void *)copy->items.get();
