@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-XCODE_VERSIONS = %w(15.3 15.4 16.2 16.3)
-DOC_VERSION = '16.3'
+XCODE_VERSIONS = %w(15.3 15.4 16.2 16.3 16.4)
+DOC_VERSION = '16.4'
 
 all = ->(v) { true }
 latest_only = ->(v) { v == XCODE_VERSIONS.last }

@@ -6,10 +6,10 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['15.3', '15.4', '16.2', '16.3']"
+  XCODE_VERSION: "['15.3', '15.4', '16.2', '16.3', '16.4']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
-  RELEASE_VERSION: '16.3'
-  DEVELOPER_DIR: /Applications/Xcode_16.3.app/Contents/Developer
+  RELEASE_VERSION: '16.4'
+  DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
 jobs:
   prepare:
       runs-on: ubuntu-latest
@@ -79,6 +79,9 @@ jobs:
               os: macos-15
             - xcode-version: 16.3
               xcode-version-tag: 16.3
+              os: macos-15
+            - xcode-version: 16.4
+              xcode-version-tag: 16.4
               os: macos-15
           exclude:
             - platform: osx
@@ -217,6 +220,8 @@ jobs:
             - xcode-version: 16.2
               os: macos-15
             - xcode-version: 16.3
+              os: macos-15
+            - xcode-version: 16.4
               os: macos-15
       env:
         PLATFORM: 'osx'
