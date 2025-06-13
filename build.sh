@@ -345,6 +345,8 @@ case "$COMMAND" in
 esac
 export CONFIGURATION=${CONFIGURATION:-Release}
 
+ls -a /Applications
+
 # Pre-choose Xcode version for those operations that do not override it
 REALM_XCODE_VERSION=${xcode_version:-$REALM_XCODE_VERSION}
 source "${source_root}/scripts/swift-version.sh"
@@ -1167,7 +1169,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 16.3.0.
+* Carthage release for Swift is built with Xcode 16.4.0.
 * CocoaPods: 1.10 or later.
 * Xcode: 15.3.0-26 beta 1.
 
