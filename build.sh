@@ -1011,7 +1011,7 @@ case "$COMMAND" in
 
     "release-package")
         version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        find . -name 'build-*-1*' -maxdepth 1 \
+        find . -regex './build-[a-z]*-[12].*' -maxdepth 1 \
             | sed 's@./build-[a-z]*-\(.*\)-.*@\1@' \
             | sort -u --version-sort \
             | xargs ./scripts/create-release-package.rb "${ROOT_WORKSPACE}/pkg" "${version}"
