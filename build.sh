@@ -345,6 +345,8 @@ case "$COMMAND" in
 esac
 export CONFIGURATION=${CONFIGURATION:-Release}
 
+ls -a /Applications
+
 # Pre-choose Xcode version for those operations that do not override it
 REALM_XCODE_VERSION=${xcode_version:-$REALM_XCODE_VERSION}
 source "${source_root}/scripts/swift-version.sh"
