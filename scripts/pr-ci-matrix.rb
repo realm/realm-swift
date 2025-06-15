@@ -58,7 +58,7 @@ on:
 
 jobs:
   docs:
-    runs-on: macos-14
+    runs-on: macos-15
     name: Test docs
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
       - run: sudo xcode-select -switch /Applications/Xcode_#{DOC_VERSION}.app
       - run: bundle exec sh build.sh verify-docs
   swiftlint:
-    runs-on: macos-14
+    runs-on: macos-15
     name: Check swiftlint
     steps:
       - uses: actions/checkout@v4
