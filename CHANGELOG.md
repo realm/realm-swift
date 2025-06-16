@@ -1,20 +1,16 @@
-x.y.z Release notes (yyyy-MM-dd)
+20.0.3 Release notes (2025-06-15)
 =============================================================
+
 ### Enhancements
+
 * Update build scripts for Xcode 16.4.
 * Add support for building with Xcode 26 beta 1.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
-* None.
-
 ### Compatibility
+
 * Carthage release for Swift is built with Xcode 16.4.0.
 * CocoaPods: 1.10 or later.
 * Xcode: 15.3.0-26 beta 1.
-
-### Internal
-* Upgraded realm-core from ? to ?
 
 20.0.2 Release notes (2025-04-14)
 =============================================================
