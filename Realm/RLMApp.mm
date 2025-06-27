@@ -21,7 +21,9 @@
 #import <sys/utsname.h>
 #if __has_include(<UIKit/UIDevice.h>)
 #import <UIKit/UIDevice.h>
+#ifndef TARGET_OS_WATCH
 #define REALM_UIDEVICE_AVAILABLE
+#endif
 #endif
 
 #import "RLMAnalytics.hpp"
