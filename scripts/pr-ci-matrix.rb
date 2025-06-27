@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-XCODE_VERSIONS = %w(15.3 15.4 16.2 16.3 16.4)
+XCODE_VERSIONS = %w(15.3 15.4 16.2 16.3 16.4 26.0)
 DOC_VERSION = '16.4'
 
 all = ->(v) { true }
@@ -82,7 +82,7 @@ targets.each { |name, filter|
     if not filter.call(version)
       next
     end
-    image = version.start_with?('16') ? 'macos-15' : 'macos-14'
+    image = version.start_with?('15') ? 'macos-14' : 'macos-15'
     output_file << """
   #{name}-#{version.gsub(' ', '_').gsub('.', '_')}:
     runs-on: #{image}
