@@ -378,7 +378,7 @@ static std::optional<RLMPropertyType> typeFromProtocolString(const char *type) {
             @throw RLMException(@"Property '%@' is declared as '%@', which is not a supported RLMObject property type. "
                                 @"All properties must be primitives, NSString, NSDate, NSData, NSNumber, RLMArray, RLMSet, "
                                 @"RLMDictionary, RLMLinkingObjects, RLMDecimal128, RLMObjectId, or subclasses of RLMObject. "
-                                @"See https://www.mongodb.com/docs/realm-legacy/docs/objc/latest/api/Classes/RLMObject.html "
+                                @"See https://www.mongodb.com/docs/realm-sdks/objc/latest/Classes/RLMObject.html "
                                 @"for more information.", _name, className);
         }
 
