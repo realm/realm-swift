@@ -69,7 +69,6 @@ struct SearchableDogsView: View {
 
 ```
 
-
 ## Generating API Reference Docs
 
 You can generate the API docs locally by running `sh build.sh docs` from the root of this repository.
