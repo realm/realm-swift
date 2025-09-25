@@ -1,6 +1,6 @@
 <picture>
-    <source srcset="./media/logo-dark.svg" media="(prefers-color-scheme: dark)" alt="realm by MongoDB">
-    <img src="./media/logo.svg" alt="realm by MongoDB">
+    <source srcset="./media/logo-dark.svg" media="(prefers-color-scheme: dark)" alt="realm">
+    <img src="./media/logo.svg" alt="realm">
 </picture>
 
 # About Realm Database
@@ -125,12 +125,14 @@ let dogs = realm.objects(Dog.self).filter("name contains 'Fido'")
 
 We support installing Realm via Swift Package Manager, CocoaPods, Carthage, or by importing a dynamic XCFramework.
 
-For more information, see the detailed instructions in our [docs](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/install/).
+For more information, see our [Quick Start](docs/guides/quick-start.md).
 
 ## Documentation
 
-The documentation can be found at [mongodb.com/docs/atlas/device-sdks/sdk/swift/](https://www.mongodb.com/docs/atlas/device-sdks/sdk/swift/).
-The API reference is located at [mongodb.com/docs/realm-sdks/swift/latest/](https://www.mongodb.com/docs/realm-sdks/swift/latest/)
+The documentation can be found in the [docs/](docs/README.md) directory.
+
+The API reference can be generated from source using
+[jazzy](https://github.com/realm/jazzy/) by running `sh build.sh docs` from the root of this repository.
 
 ## Getting Help
 
