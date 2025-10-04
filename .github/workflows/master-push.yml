@@ -6,10 +6,10 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['15.3', '15.4', '16.2', '16.3', '16.4']"
+  XCODE_VERSION: "['15.3', '15.4', '16.2', '16.3', '16.4', '26.0']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
-  RELEASE_VERSION: '16.4'
-  DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+  RELEASE_VERSION: '26.0'
+  DEVELOPER_DIR: /Applications/Xcode_26.0.app/Contents/Developer
 jobs:
   prepare:
       runs-on: ubuntu-latest
@@ -83,6 +83,9 @@ jobs:
             - xcode-version: 16.4
               xcode-version-tag: 16.4
               os: macos-15
+            - xcode-version: 26.0
+              xcode-version-tag: 26.0
+              os: macos-26
           exclude:
             - platform: osx
               configuration: static
@@ -111,7 +114,7 @@ jobs:
             path: build.tar
             compression-level: 1
   package-release:
-      runs-on: macos-15
+      runs-on: macos-26
       name: Package release file
       needs: [build-product, prepare]
       steps:
@@ -138,7 +141,7 @@ jobs:
             name: test-release-package
             path: pkg/realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
   test-package-examples:
-      runs-on: macos-15
+      runs-on: macos-26
       name: Test examples
       needs: [package-release, prepare]
       steps:
@@ -150,7 +153,7 @@ jobs:
         - name: Test examples
           run: sh -x build.sh release-test-examples
   test-ios-static:
-      runs-on: macos-15
+      runs-on: macos-26
       name: Run tests on iOS with configuration Static
       needs: package-release
       steps:
@@ -158,7 +161,7 @@ jobs:
         - name: Test ios static
           run: sh -x build.sh test-ios-static
   test-osx-static:
-      runs-on: macos-15
+      runs-on: macos-26
       name: Run tests on macOS
       needs: package-release
       steps:
@@ -168,7 +171,7 @@ jobs:
             export REALM_DISABLE_METADATA_ENCRYPTION=1
             sh -x build.sh test-osx
   test-installation:
-      runs-on: macos-15
+      runs-on: macos-26
       name: Run installation test
       needs: [package-release, prepare]
       env:
@@ -223,6 +226,8 @@ jobs:
               os: macos-15
             - xcode-version: 16.4
               os: macos-15
+            - xcode-version: 26.0
+              os: macos-26
       env:
         PLATFORM: 'osx'
         DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode-version }}.app/Contents/Developer
