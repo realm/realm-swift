@@ -21,7 +21,7 @@ import Realm.Private
 import RealmSwift
 import Foundation
 
-class ModernObjectAccessorTests: TestCase, @unchecked Sendable {
+class ModernObjectAccessorTests: TestCase {
     let data = "b".data(using: .utf8, allowLossyConversion: false)!
     let date = Date(timeIntervalSinceReferenceDate: 2)
     let oid1 = ObjectId("1234567890ab1234567890ab")
@@ -680,11 +680,11 @@ class ModernObjectAccessorTests: TestCase, @unchecked Sendable {
             obj.arrayInt.removeAll()
             obj.arrayInt8.removeAll()
         }
-        dispatchSyncNewThread {
-            self.assertThrows(_ = obj.intCol, reason: "incorrect thread")
-            self.assertThrows(obj.arrayInt.removeAll(), reason: "incorrect thread")
-            self.assertThrows(obj.int8Col = 5, reason: "incorrect thread")
-            self.assertThrows(obj.arrayInt8 = List<Int8>(), reason: "incorrect thread")
+        dispatchSyncBackground { unsafeSelf in
+            unsafeSelf.assertThrows(_ = obj.intCol, reason: "incorrect thread")
+            unsafeSelf.assertThrows(obj.arrayInt.removeAll(), reason: "incorrect thread")
+            unsafeSelf.assertThrows(obj.int8Col = 5, reason: "incorrect thread")
+            unsafeSelf.assertThrows(obj.arrayInt8 = List<Int8>(), reason: "incorrect thread")
         }
     }
 

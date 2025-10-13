@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class MapTests: TestCase, @unchecked Sendable {
+class MapTests: TestCase {
     var str1: SwiftStringObject!
     var str2: SwiftStringObject!
     var realm: Realm!
@@ -806,8 +806,8 @@ class MapTests: TestCase, @unchecked Sendable {
 
         /* Expect notification on "intCol" key path when intCol is changed */
         ex = expectation(description: "change notification")
-        dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+        dispatchSyncBackground { unsafeSelf in
+            let realm = unsafeSelf.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
             let value = obj.swiftObjectMap["first"]!!
@@ -842,8 +842,8 @@ class MapTests: TestCase, @unchecked Sendable {
         /* Expect no notification on "intCol" key path when stringCol is changed */
         ex = expectation(description: "NO change notification")
         ex.isInverted = true
-        dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+        dispatchSyncBackground { unsafeSelf in
+            let realm = unsafeSelf.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
             let value = obj.swiftObjectMap["first"]!!
@@ -880,8 +880,8 @@ class MapTests: TestCase, @unchecked Sendable {
 
         /* Expect notification on "intCol" key path when intCol is changed */
         ex = expectation(description: "change notification")
-        dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+        dispatchSyncBackground { unsafeSelf in
+            let realm = unsafeSelf.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
             obj.swiftObjectMap.removeObject(for: "first")
@@ -916,8 +916,8 @@ class MapTests: TestCase, @unchecked Sendable {
         wait(for: [ex], timeout: 0.1)
 
         ex = expectation(description: "change notification")
-        dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+        dispatchSyncBackground { unsafeSelf in
+            let realm = unsafeSelf.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftMapPropertyObject.self).first!
             let value = obj.swiftObjectMap["first"]!!
@@ -955,8 +955,8 @@ class MapTests: TestCase, @unchecked Sendable {
         wait(for: [ex], timeout: 0.1)
 
         ex = expectation(description: "change notification")
-        dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+        dispatchSyncBackground { unsafeSelf in
+            let realm = unsafeSelf.realmWithTestPath()
             realm.beginWrite()
             let obj = realm.objects(SwiftOwnerObject.self).first!
             obj.name = "Curley"
@@ -1029,7 +1029,7 @@ class MapTests: TestCase, @unchecked Sendable {
     }
 }
 
-class MapStandaloneTests: MapTests, @unchecked Sendable {
+class MapStandaloneTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         return createMapObject().map
     }
@@ -1086,7 +1086,7 @@ class MapStandaloneTests: MapTests, @unchecked Sendable {
     }
 }
 
-class MapNewlyAddedTests: MapTests, @unchecked Sendable {
+class MapNewlyAddedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = SwiftMapPropertyObject()
         realm.add(mapObj)
@@ -1109,7 +1109,7 @@ class MapNewlyAddedTests: MapTests, @unchecked Sendable {
     }
 }
 
-class MapNewlyCreatedTests: MapTests, @unchecked Sendable {
+class MapNewlyCreatedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         let mapObj = realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()
@@ -1131,7 +1131,7 @@ class MapNewlyCreatedTests: MapTests, @unchecked Sendable {
     }
 }
 
-class MapRetrievedTests: MapTests, @unchecked Sendable {
+class MapRetrievedTests: MapTests {
     override func createMap() -> Map<String, SwiftStringObject?> {
         realm.create(SwiftMapPropertyObject.self, value: ["name"])
         try! realm.commitWrite()

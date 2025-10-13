@@ -28,7 +28,7 @@ import Foundation
 #endif
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectSchemaInitializationTests: TestCase, @unchecked Sendable {
+class ObjectSchemaInitializationTests: TestCase {
     func testAllValidTypes() {
         let object = SwiftObject()
         let objectSchema = object.objectSchema

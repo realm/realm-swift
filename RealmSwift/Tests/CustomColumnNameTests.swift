@@ -212,7 +212,7 @@ class EmbeddedCustomObject: EmbeddedObject {
 
 // MARK: - Schema Discovery
 
-class CustomColumnNamesSchemaTest: TestCase, @unchecked Sendable {
+class CustomColumnNamesSchemaTest: TestCase {
     func testCustomColumnNameSchema() {
         let modernCustomObjectSchema = ModernCustomObject().objectSchema
         for property in modernCustomObjectSchema.properties {
@@ -375,7 +375,7 @@ class CustomColumnNamesSchemaTest: TestCase, @unchecked Sendable {
     }
 }
 
-class CustomColumnModernDynamicObjectTest: TestCase, @unchecked Sendable {
+class CustomColumnModernDynamicObjectTest: TestCase {
     var realm: Realm!
 
     override func setUp() {
@@ -443,7 +443,7 @@ class CustomColumnModernDynamicObjectTest: TestCase, @unchecked Sendable {
     }
 }
 
-class CustomColumnTestsBase<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: TestCase, @unchecked Sendable where O.Root == F.Root {
+class CustomColumnTestsBase<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: TestCase where O.Root == F.Root {
     var realm: Realm!
     public var notificationTokens: [NotificationToken] = []
 
@@ -489,7 +489,7 @@ class CustomColumnTestsBase<O: CustomColumnObjectFactory, F: CustomColumnTypeFac
     }
 }
 
-class CustomColumnResultsTestBase<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: CustomColumnTestsBase<O, F>, @unchecked Sendable where O.Root == F.Root, F.ValueType: Equatable {
+class CustomColumnResultsTestBase<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: CustomColumnTestsBase<O, F> where O.Root == F.Root, F.ValueType: Equatable {
     var results: Results<O.Root>!
 
     override func setUp() {
@@ -503,7 +503,7 @@ class CustomColumnResultsTestBase<O: CustomColumnObjectFactory, F: CustomColumnT
     }
 }
 
-class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResultsTypeFactory>: CustomColumnResultsTestBase<O, F>, @unchecked Sendable where O.Root == F.Root, F.ValueType: Equatable {
+class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResultsTypeFactory>: CustomColumnResultsTestBase<O, F> where O.Root == F.Root, F.ValueType: Equatable {
     // MARK: - Create Object
 
     func testCustomColumnResultsCreate() throws {
@@ -640,7 +640,7 @@ class CustomColumnResultsTest<O: CustomColumnObjectFactory, F: CustomColumnResul
     }
 }
 
-class CustomColumnResultsAggregatesTest<O: CustomColumnObjectFactory, F: CustomColumnAggregatesTypeFactory>: CustomColumnResultsTestBase<O, F>, @unchecked Sendable where O.Root == F.Root, F.ValueType: Equatable {
+class CustomColumnResultsAggregatesTest<O: CustomColumnObjectFactory, F: CustomColumnAggregatesTypeFactory>: CustomColumnResultsTestBase<O, F> where O.Root == F.Root, F.ValueType: Equatable {
     // MARK: - Aggregates
 
     func testCustomColumnResultsAggregateAvg() throws {
@@ -698,7 +698,7 @@ class CustomColumnResultsAggregatesTest<O: CustomColumnObjectFactory, F: CustomC
     }
 }
 
-class CustomColumnResultsSectionedTest<O: CustomColumnObjectFactory, F: CustomColumnResultsSectionedTypeFactory>: CustomColumnResultsTestBase<O, F>, @unchecked Sendable where O.Root == F.Root {
+class CustomColumnResultsSectionedTest<O: CustomColumnObjectFactory, F: CustomColumnResultsSectionedTypeFactory>: CustomColumnResultsTestBase<O, F> where O.Root == F.Root {
     // MARK: - Sectioned
 
     func testCustomColumnSectionedResults() throws {
@@ -712,7 +712,7 @@ class CustomColumnResultsSectionedTest<O: CustomColumnObjectFactory, F: CustomCo
     }
 }
 
-class CustomColumnObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomColumnObjectTypeFactory>: CustomColumnTestsBase<O, F>, @unchecked Sendable where O: ObjectBase, O.Root == F.Root, F.ValueType: Equatable {
+class CustomColumnObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomColumnObjectTypeFactory>: CustomColumnTestsBase<O, F> where O: ObjectBase, O.Root == F.Root, F.ValueType: Equatable {
     // MARK: - Subscript
 
     func testCustomColumnObjectKVC() throws {
@@ -764,7 +764,7 @@ class CustomColumnObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomColumn
     }
 }
 
-class CustomColumnKeyedObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomColumnObjectTypeFactory>: CustomColumnTestsBase<O, F>, @unchecked Sendable where O: ObjectBase, O.Root == F.Root, F.ValueType: RealmKeyedCollection {
+class CustomColumnKeyedObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomColumnObjectTypeFactory>: CustomColumnTestsBase<O, F> where O: ObjectBase, O.Root == F.Root, F.ValueType: RealmKeyedCollection {
     func testCustomColumnObjectDynamicMap() throws {
         func testCustomColumnObjectDynamicMap() throws {
             for (keyPath, count) in F.dynamicMutableSetProperty {
@@ -775,7 +775,7 @@ class CustomColumnKeyedObjectTest<O: CustomColumnObjectFactory, F: ObjectCustomC
     }
 }
 
-class CustomColumnListTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: CustomColumnTestsBase<O, F>, @unchecked Sendable where O.Root == F.Root, F.ValueType: RealmCollectionValue {
+class CustomColumnListTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: CustomColumnTestsBase<O, F> where O.Root == F.Root, F.ValueType: RealmCollectionValue {
     var list: List<O.Root>!
 
     override func setUp() {
@@ -818,7 +818,7 @@ class CustomColumnListTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFact
     }
 }
 
-class CustomColumnSetTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: CustomColumnTestsBase<O, F>, @unchecked Sendable where O.Root == F.Root, F.ValueType: RealmCollectionValue {
+class CustomColumnSetTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFactoryBase>: CustomColumnTestsBase<O, F> where O.Root == F.Root, F.ValueType: RealmCollectionValue {
     var set: MutableSet<O.Root>!
 
     override func setUp() {
@@ -856,7 +856,7 @@ class CustomColumnSetTest<O: CustomColumnObjectFactory, F: CustomColumnTypeFacto
     }
 }
 
-class CustomColumnMapTestBase<O: CustomColumnObjectFactory, F: CustomColumnMapTypeBaseFactory>: CustomColumnTestsBase<O, F>, @unchecked Sendable where O.Root == F.Root {
+class CustomColumnMapTestBase<O: CustomColumnObjectFactory, F: CustomColumnMapTypeBaseFactory>: CustomColumnTestsBase<O, F> where O.Root == F.Root {
     var map: Map<String, O.Root?>!
 
     override func setUp() {
@@ -881,7 +881,7 @@ class CustomColumnMapTestBase<O: CustomColumnObjectFactory, F: CustomColumnMapTy
     }
 }
 
-class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFactory>: CustomColumnMapTestBase<O, F>, @unchecked Sendable where O.Root == F.Root, F.ValueType: Equatable {
+class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFactory>: CustomColumnMapTestBase<O, F> where O.Root == F.Root, F.ValueType: Equatable {
     // MARK: - ValueForKey
 
     func testCustomColumnMapGetValueForKey() throws {
@@ -940,7 +940,7 @@ class CustomColumnMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapTypeFa
     }
 }
 
-class CustomColumnAggregatesMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapAggregatesTypeFactory>: CustomColumnMapTestBase<O, F>, @unchecked Sendable where O.Root == F.Root, F.ValueType: RealmCollectionValue {
+class CustomColumnAggregatesMapTest<O: CustomColumnObjectFactory, F: CustomColumnMapAggregatesTypeFactory>: CustomColumnMapTestBase<O, F> where O.Root == F.Root, F.ValueType: RealmCollectionValue {
     // MARK: - Aggregates
 
     func testCustomColumnResultsAggregateAvg() throws {
@@ -998,7 +998,7 @@ class CustomColumnAggregatesMapTest<O: CustomColumnObjectFactory, F: CustomColum
     }
 }
 
-class CustomObjectTests: TestCase, @unchecked Sendable {
+class CustomObjectTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "CustomColumnNameTests")
 
