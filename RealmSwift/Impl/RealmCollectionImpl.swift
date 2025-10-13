@@ -120,20 +120,6 @@ extension RealmCollectionImpl {
         return collection.addNotificationBlock(wrapped, keyPaths: keyPaths, queue: queue)
     }
 
-#if compiler(<6)
-    @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-    @_unsafeInheritExecutor
-    public func observe<A: Actor>(
-        keyPaths: [String]?, on actor: A,
-        _ block: @Sendable @escaping (isolated A, RealmCollectionChange<Self>) -> Void
-    ) async -> NotificationToken {
-        await with(self, on: actor) { actor, collection in
-            collection.observe(keyPaths: keyPaths, on: nil) { change in
-                actor.invokeIsolated(block, change)
-            }
-        }
-    }
-#else
     @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
     public func observe<A: Actor>(
         keyPaths: [String]?, on actor: A,
@@ -146,7 +132,6 @@ extension RealmCollectionImpl {
             }
         }
     }
-#endif
 
     public var isFrozen: Bool {
         return collection.isFrozen
@@ -183,36 +168,6 @@ extension Optional: OptionalProtocol {
 
 // `with(object, on: actor) { object, actor in ... }` hands the object over
 // to the given actor and then invokes the callback within the actor.
-#if compiler(<6)
-@available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
-@_unsafeInheritExecutor
-internal func with<A: Actor, Value: ThreadConfined>(
-    _ value: Value, on actor: A,
-    _ block: @Sendable @escaping (isolated A, Value) async throws -> NotificationToken
-) async rethrows -> NotificationToken {
-    if value.realm == nil {
-        fatalError("Change notifications are only supported for managed objects")
-    }
-
-    let tsr = ThreadSafeReference(to: value)
-    let config = Unchecked(wrappedValue: value.realm!.rlmRealm.configurationSharingSchema())
-    return try await actor.invoke { actor in
-        if Task.isCancelled {
-            return nil
-        }
-        let scheduler = RLMScheduler.actor(actor, invoke: actor.invoke, verify: actor.verifier())
-        let realm = Realm(try! RLMRealm(configuration: config.wrappedValue, confinedTo: scheduler))
-        guard let value = tsr.resolve(in: realm) else {
-            return nil
-        }
-        // This is safe but 5.10's sendability checking can't prove it
-        // nonisolated(unsafe) can't be applied to a let in guard so we need
-        // a second variable
-        nonisolated(unsafe) let v = value
-        return try await block(actor, v)
-    } ?? NotificationToken()
-}
-#else
 @available(macOS 10.15, tvOS 13.0, iOS 13.0, watchOS 6.0, *)
 internal func with<A: Actor, Value: ThreadConfined>(
     _ value: Value,
@@ -238,4 +193,3 @@ internal func with<A: Actor, Value: ThreadConfined>(
         return try await block(actor, value)
     } ?? NotificationToken()
 }
-#endif

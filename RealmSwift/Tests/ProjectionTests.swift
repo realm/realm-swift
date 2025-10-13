@@ -26,11 +26,7 @@ import RealmTestSupport
 #endif
 
 // Keypaths are supposed to be Sendable but that never got implemented
-#if compiler(<6)
-extension KeyPath: @unchecked Sendable {}
-#else
 extension KeyPath: @retroactive @unchecked Sendable {}
-#endif
 
 // MARK: Test objects definitions
 

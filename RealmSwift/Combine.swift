@@ -647,17 +647,10 @@ extension ObjectBase: RealmSubscribable {
     }
 }
 
-#if compiler(>=6)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Object: @retroactive ObservableObject {}
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EmbeddedObject: @retroactive ObservableObject {}
-#else
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension Object: ObservableObject {}
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EmbeddedObject: ObservableObject {}
-#endif
 
 // MARK: - List
 
