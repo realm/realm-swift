@@ -586,11 +586,7 @@ public typealias InitialSubscriptionsConfiguration = RLMInitialSubscriptionsConf
 
     // Although RLMSyncConfiguration objects are mutable, we don't expose a way
     // to mutate the one wrapped by this struct, which makes this safe
-    #if compiler(<6)
-    internal let config: RLMSyncConfiguration
-    #else
     nonisolated(unsafe) internal let config: RLMSyncConfiguration
-    #endif
     internal init(config: RLMSyncConfiguration) {
         self.config = config
     }
@@ -1128,13 +1124,8 @@ extension User {
     }
 }
 
-#if compiler(>=6)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension User: @retroactive ObservableObject {}
-#else
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension User: ObservableObject {}
-#endif
 
 public extension User {
     /// Refresh a user's custom data. This will, in effect, refresh the user's auth session.

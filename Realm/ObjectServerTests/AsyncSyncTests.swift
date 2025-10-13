@@ -279,11 +279,7 @@ class AsyncAwaitSyncTests: SwiftSyncTestCase {
 
         let configuration = try configuration()
         func isolatedOpen(_ actor: isolated CustomExecutorActor) async throws {
-#if compiler(<6)
-            _ = try await Realm(configuration: configuration, actor: actor, downloadBeforeOpen: .always)
-#else
             _ = try await Realm.open(configuration: configuration, downloadBeforeOpen: .always)
-#endif
         }
 
 
@@ -905,11 +901,7 @@ class AsyncFlexibleSyncTests: SwiftSyncTestCase {
         let user = try await createUser()
         var config = user.flexibleSyncConfiguration()
         config.objectTypes = [SwiftPerson.self]
-#if compiler(<6)
-        let realm = try await Realm(configuration: config, actor: CustomGlobalActor.shared)
-#else
         let realm = try await Realm.open(configuration: config)
-#endif
         let name = self.name
         let results1 = try await realm.objects(SwiftPerson.self)
             .where { $0.firstName == name && $0.age > 8 }.subscribe(waitForSync: .onCreation)

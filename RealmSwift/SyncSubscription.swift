@@ -170,19 +170,6 @@ import Realm.Private
     /// :nodoc:
     public typealias QueryFunction = (Query<T>) -> Query<Bool>
 
-#if compiler(<6)
-    /**
-     Creates a `QuerySubscription` for the given type.
-
-     - parameter name: Name of the subscription.
-     - parameter query: The query for the subscription, if nil it will set the query to all documents for the collection.
-     */
-    public init(name: String? = nil, query: QueryFunction? = nil) {
-        self.name = name
-        self.className = "\(T.self)"
-        self.predicate = query?(Query()).predicate ?? NSPredicate(format: "TRUEPREDICATE")
-    }
-#else
     /**
      Creates a `QuerySubscription` which subscribes to all documents of the given type.
 
@@ -193,7 +180,6 @@ import Realm.Private
         self.className = "\(T.self)"
         self.predicate = NSPredicate(format: "TRUEPREDICATE")
     }
-#endif
 
     /**
      Creates a `QuerySubscription` for the given type.

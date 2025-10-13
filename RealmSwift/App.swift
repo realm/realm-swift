@@ -405,11 +405,7 @@ extension App {
         return AppPublisher(self, scheduler: DispatchQueue.main)
     }
 }
-#if compiler(>=6)
 extension App: @retroactive ObservableObject {}
-#else
-extension App: ObservableObject {}
-#endif
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 internal func promisify(_ fn: @escaping (@escaping @Sendable (Error?) -> Void) -> Void) -> Future<Void, Error> {

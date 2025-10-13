@@ -229,15 +229,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
     // These are async versions of the synchronous functions defined above.
     // They should function identically other than being async rather than using
     // expecatations to synchronously await things.
-#if compiler(<6)
-    public func basicCredentials(usernameSuffix: String = "", app: App? = nil) async throws -> Credentials {
-        let email = "\(randomString(10))\(usernameSuffix)"
-        let password = "abcdef"
-        let credentials = Credentials.emailPassword(email: email, password: password)
-        try await (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password)
-        return credentials
-    }
-#else
     public func basicCredentials(
         usernameSuffix: String = "", app: App? = nil, _isolation: isolated (any Actor)? = #isolation
     ) async throws -> Credentials {
@@ -247,7 +238,6 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         try await (app ?? self.app).emailPasswordAuth.registerUser(email: email, password: password)
         return credentials
     }
-#endif
 
     @MainActor
     @nonobjc public func openRealm() async throws -> Realm {
@@ -268,17 +258,10 @@ open class SwiftSyncTestCase: RLMSyncTestCase {
         }.value
     }
 
-#if compiler(<6)
-    public func createUser(app: App? = nil) async throws -> User {
-        let credentials = try await basicCredentials(app: app)
-        return try await (app ?? self.app).login(credentials: credentials)
-    }
-#else
     public func createUser(app: App? = nil, _isolation: isolated (any Actor)? = #isolation) async throws -> User {
         let credentials = try await basicCredentials(app: app)
         return try await (app ?? self.app).login(credentials: credentials)
     }
-#endif
 }
 
 @available(macOS 10.15, watchOS 6.0, iOS 13.0, tvOS 13.0, *)

@@ -97,17 +97,10 @@ extension _RLMDictionaryIterator where Self: RLMCollection {
 
 // Sequence conformance for RLMArray, RLMDictionary, RLMSet and RLMResults is provided by RLMCollection's
 // `makeIterator()` implementation.
-#if compiler(<6.0)
-extension RLMArray: Sequence, _RLMCollectionIterator { }
-extension RLMDictionary: Sequence, _RLMDictionaryIterator {}
-extension RLMSet: Sequence, _RLMCollectionIterator {}
-extension RLMResults: Sequence, _RLMCollectionIterator {}
-#else
 extension RLMArray: @retroactive Sequence, _RLMCollectionIterator { }
 extension RLMDictionary: @retroactive Sequence, _RLMDictionaryIterator {}
 extension RLMSet: @retroactive Sequence, _RLMCollectionIterator {}
 extension RLMResults: @retroactive Sequence, _RLMCollectionIterator {}
-#endif
 
 /**
  This struct enables sequence-style enumeration for RLMObjects in Swift via `RLMCollection.makeIterator`

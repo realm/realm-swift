@@ -35,11 +35,7 @@ func inMemoryRealm(_ inMememoryIdentifier: String) -> Realm {
 func openRealm(configuration: Realm.Configuration = .defaultConfiguration,
                actor: isolated any Actor,
                downloadBeforeOpen: Realm.OpenBehavior = .never) async throws -> Realm {
-#if compiler(<6)
-    try await Realm(configuration: configuration, actor: actor, downloadBeforeOpen: downloadBeforeOpen)
-#else
     try await Realm.open(configuration: configuration, downloadBeforeOpen: downloadBeforeOpen)
-#endif
 }
 
 class TestCase: RLMTestCaseBase {
