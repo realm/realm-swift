@@ -24,7 +24,7 @@ private func fileSize(path: String) -> Int {
     return attributes[.size] as! Int
 }
 
-class CompactionTests: TestCase, @unchecked Sendable {
+class CompactionTests: TestCase {
     func testSuccessfulCompactOnLaunch() {
         let expectedUsedBytesBeforeMin = 50000
         let count = 1000

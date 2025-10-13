@@ -19,7 +19,11 @@
 import XCTest
 import RealmSwift
 
-class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
+class ThreadSafeReferenceTests: TestCase {
     /// Resolve a thread-safe reference confirming that you can't resolve it a second time.
     func assertResolve<T>(_ realm: Realm, _ reference: ThreadSafeReference<T>) -> T? {
         XCTAssertFalse(reference.isInvalidated)
@@ -61,14 +65,16 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
         try! realm.commitWrite()
         let ref2 = ThreadSafeReference(to: stringObject)
         let ref3 = ThreadSafeReference(to: stringObject)
+
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
-            XCTAssertNil(self.realmWithTestPath().resolve(ref1))
+            XCTAssertNil(unsafeSelf.realmWithTestPath().resolve(ref1))
             let realm = try! Realm()
             _ = realm.resolve(ref2)
-            self.assertThrows(realm.resolve(ref2),
-                              reason: "Can only resolve a thread safe reference once")
+            unsafeSelf.assertThrows(realm.resolve(ref2),
+                                    reason: "Can only resolve a thread safe reference once")
             // Assert that we can resolve a different reference to the same object.
-            XCTAssertEqual(self.assertResolve(realm, ref3)!.stringCol, "hello")
+            XCTAssertEqual(unsafeSelf.assertResolve(realm, ref3)!.stringCol, "hello")
         }
     }
 
@@ -87,11 +93,12 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
                 realm.deleteAll()
             }
         }
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
-            XCTAssertEqual(self.assertResolve(realm, ref1)!.intCol, 0)
+            XCTAssertEqual(unsafeSelf.assertResolve(realm, ref1)!.intCol, 0)
             realm.refresh()
-            XCTAssertNil(self.assertResolve(realm, ref2))
+            XCTAssertNil(unsafeSelf.assertResolve(realm, ref2))
         }
     }
 
@@ -106,10 +113,11 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
         let intObjectRef = ThreadSafeReference(to: intObject)
         XCTAssertEqual("", stringObject.stringCol)
         XCTAssertEqual(0, intObject.intCol)
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
-            let stringObject = self.assertResolve(realm, stringObjectRef)!
-            let intObject = self.assertResolve(realm, intObjectRef)!
+            let stringObject = unsafeSelf.assertResolve(realm, stringObjectRef)!
+            let intObject = unsafeSelf.assertResolve(realm, intObjectRef)!
             try! realm.write {
                 stringObject.stringCol = "the meaning of life"
                 intObject.intCol = 42
@@ -132,9 +140,10 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
         XCTAssertEqual(1, company.employees.count)
         XCTAssertEqual("jg", company.employees[0].name)
         let listRef = ThreadSafeReference(to: company.employees)
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
-            let employees = self.assertResolve(realm, listRef)!
+            let employees = unsafeSelf.assertResolve(realm, listRef)!
             XCTAssertEqual(1, employees.count)
             XCTAssertEqual("jg", employees[0].name)
 
@@ -165,9 +174,10 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
         XCTAssertEqual(1, company.employeeSet.count)
         XCTAssertEqual("jg", company.employeeSet[0].name)
         let setRef = ThreadSafeReference(to: company.employeeSet)
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
-            let employeeSet = self.assertResolve(realm, setRef)!
+            let employeeSet = unsafeSelf.assertResolve(realm, setRef)!
             XCTAssertEqual(1, employeeSet.count)
             XCTAssertEqual("jg", employeeSet[0].name)
 
@@ -177,7 +187,7 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
                 employeeSet.insert(SwiftEmployeeObject(value: ["name": "az"]))
             }
             XCTAssertEqual(2, employeeSet.count)
-            self.assertSetContains(employeeSet, keyPath: \.name, items: ["jp", "az"])
+            assertSetContains(employeeSet, keyPath: \.name, items: ["jp", "az"])
         }
         XCTAssertEqual(1, company.employeeSet.count)
         XCTAssertEqual("jg", company.employeeSet[0].name)
@@ -204,9 +214,10 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
         XCTAssertEqual("D", results[0].stringCol)
         XCTAssertEqual("B", results[1].stringCol)
         XCTAssertEqual("A", results[2].stringCol)
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
-            let results = self.assertResolve(realm, resultsRef)!
+            let results = unsafeSelf.assertResolve(realm, resultsRef)!
             let allObjects = realm.objects(SwiftStringObject.self)
             XCTAssertEqual(0, allObjects.count)
             XCTAssertEqual(0, results.count)
@@ -252,10 +263,11 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
         XCTAssertEqual("Andrea", dogA.owners[0].name)
         let ownersARef = ThreadSafeReference(to: dogA.owners)
         let ownersBRef = ThreadSafeReference(to: unaccessedDogB.owners)
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
-            let ownersA = self.assertResolve(realm, ownersARef)!
-            let ownersB = self.assertResolve(realm, ownersBRef)!
+            let ownersA = unsafeSelf.assertResolve(realm, ownersARef)!
+            let ownersB = unsafeSelf.assertResolve(realm, ownersBRef)!
 
             XCTAssertEqual(1, ownersA.count)
             XCTAssertEqual("Andrea", ownersA[0].name)
@@ -314,11 +326,12 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
         let resultsRef = ThreadSafeReference(to: results)
         let listRef = ThreadSafeReference(to: list)
         let setRef = ThreadSafeReference(to: set)
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
-            let results = self.assertResolve(realm, resultsRef)!
-            let list = self.assertResolve(realm, listRef)!
-            let set = self.assertResolve(realm, setRef)!
+            let results = unsafeSelf.assertResolve(realm, resultsRef)!
+            let list = unsafeSelf.assertResolve(realm, listRef)!
+            let set = unsafeSelf.assertResolve(realm, setRef)!
             XCTAssertEqual(6, results.count)
             XCTAssertEqual("D", results[0].name)
             XCTAssertEqual("D", results[1].name)
@@ -329,7 +342,7 @@ class ThreadSafeReferenceTests: TestCase, @unchecked Sendable {
             XCTAssertEqual("C", list[2].name)
             XCTAssertEqual("D", list[3].name)
             XCTAssertEqual(4, set.count)
-            self.assertAnyRealmCollectionContains(set, keyPath: \.name, items: ["A", "B", "C", "D"])
+            assertAnyRealmCollectionContains(set, keyPath: \.name, items: ["A", "B", "C", "D"])
         }
     }
 }
@@ -350,7 +363,7 @@ struct TestThreadSafeWrapperStruct {
 }
 
 // MARK: ThreadSafeWrapperTests
-class ThreadSafeWrapperTests: ThreadSafeReferenceTests, @unchecked Sendable {
+class ThreadSafeWrapperTests: ThreadSafeReferenceTests {
     func wrapperStruct() -> TestThreadSafeWrapperStruct {
         let realm = try! Realm()
         var stringObj: SwiftStringObject?, intObj: SwiftIntObject?
@@ -514,11 +527,12 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests, @unchecked Sendable {
         XCTAssertEqual(testStruct.stringObject!.stringCol, "before")
         XCTAssertEqual(testStruct.intObject!.intCol, 1)
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
-                self.assertThrows(testStruct.stringObject = SwiftStringObject(),
-                                  reason: "Only managed objects may be wrapped as thread safe.")
+                unsafeSelf.assertThrows(testStruct.stringObject = SwiftStringObject(),
+                                        reason: "Only managed objects may be wrapped as thread safe.")
             }
         }
     }
@@ -597,7 +611,7 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests, @unchecked Sendable {
                 testStruct.employeeSet!.insert(SwiftEmployeeObject(value: ["name": "az"]))
             }
             XCTAssertEqual(2, testStruct.employeeSet!.count)
-            self.assertSetContains(testStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
+            assertSetContains(testStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
         }
         XCTAssertEqual(2, testStruct.employeeSet!.count)
         assertSetContains(testStruct.employeeSet!, keyPath: \.name, items: ["jp", "az"])
@@ -716,7 +730,7 @@ class ThreadSafeWrapperTests: ThreadSafeReferenceTests, @unchecked Sendable {
             XCTAssertEqual("C", testStruct.arcList![2].name)
             XCTAssertEqual("D", testStruct.arcList![3].name)
             XCTAssertEqual(4, testStruct.arcSet!.count)
-            self.assertAnyRealmCollectionContains(testStruct.arcSet!, keyPath: \.name, items: ["A", "B", "C", "D"])
+            assertAnyRealmCollectionContains(testStruct.arcSet!, keyPath: \.name, items: ["A", "B", "C", "D"])
         }
     }
 
