@@ -28,7 +28,7 @@ import Foundation
 #endif
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectSchemaInitializationTests: TestCase, @unchecked Sendable {
+class ObjectSchemaInitializationTests: TestCase {
     func testAllValidTypes() {
         let object = SwiftObject()
         let objectSchema = object.objectSchema
@@ -806,7 +806,7 @@ class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
     @objc dynamic var objectCol = SwiftBoolObject()
 }
 
-#if compiler(<6) || SWIFT_PACKAGE
+#if SWIFT_PACKAGE
 extension Set: RealmOptionalType {
     public static func _rlmFromObjc(_ value: Any, insideOptional: Bool) -> Set<Element>? {
         fatalError()

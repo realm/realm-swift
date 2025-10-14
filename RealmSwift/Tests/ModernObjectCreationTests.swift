@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 import Realm.Private
 
-class ModernObjectCreationTests: TestCase, @unchecked Sendable {
+class ModernObjectCreationTests: TestCase {
     var values: [String: Any]!
     override func setUp() {
         values = [
@@ -937,7 +937,7 @@ private func mapValues<T>(_ values: [T]) -> [String: T] {
     return map
 }
 
-class ModernEnumObjectCreationTests: TestCase, @unchecked Sendable {
+class ModernEnumObjectCreationTests: TestCase {
     let values: [String: Any] = [
         "listInt": EnumInt.values(),
         "listInt8": EnumInt8.values(),

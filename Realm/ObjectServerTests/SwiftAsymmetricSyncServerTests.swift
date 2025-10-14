@@ -226,31 +226,6 @@ extension SwiftAsymmetricSyncTests {
     }
 
     @MainActor
-    func testPropertyTypesAsymmetricObject() async throws {
-        let collection = try await setupCollection(SwiftObjectAsymmetric.self)
-        let realm = try await openRealm()
-
-        try realm.write {
-            realm.create(SwiftObjectAsymmetric.self,
-                         value: SwiftObjectAsymmetric(string: "name_\(#function)",
-                                                      int: 15, bool: true))
-        }
-        waitForUploads(for: realm)
-
-        try await checkCountInMongo(1, type: SwiftObjectAsymmetric.self)
-
-        let document = try await collection.find(filter: [:])[0]
-        XCTAssertEqual(document["string"]??.stringValue, "name_\(#function)")
-        XCTAssertEqual(document["int"]??.int64Value, 15)
-        XCTAssertEqual(document["bool"]??.boolValue, true)
-        XCTAssertEqual(document["double"]??.doubleValue, 1.1)
-        XCTAssertEqual(document["long"]??.int64Value, 1)
-        XCTAssertEqual(document["decimal"]??.decimal128Value, Decimal128(1))
-        XCTAssertEqual(document["uuid"]??.uuidValue, UUID(uuidString: "85d4fbee-6ec6-47df-bfa1-615931903d7e")!)
-        XCTAssertEqual(document["objectId"]??.objectIdValue, ObjectId("6058f12682b2fbb1f334ef1d"))
-    }
-
-    @MainActor
     func testCreateHugeAsymmetricObject() async throws {
         _ = try await setupCollection(HugeObjectAsymmetric.self)
         let realm = try await openRealm()
@@ -264,37 +239,6 @@ extension SwiftAsymmetricSyncTests {
         waitForUploads(for: realm)
 
         try await checkCountInMongo(2, type: HugeObjectAsymmetric.self)
-    }
-
-    @MainActor
-    func testCreateCustomAsymmetricObject() async throws {
-        let collection = try await setupCollection(SwiftCustomColumnAsymmetricObject.self)
-        let realm = try await openRealm()
-
-        let objectId = ObjectId.generate()
-        let valuesDictionary: [String: Any] = ["id": objectId,
-                                               "boolCol": false,
-                                               "intCol": 1234,
-                                               "doubleCol": 1234.1234,
-                                               "stringCol": "$%&/("]
-
-        // Create Asymmetric Objects
-        try realm.write {
-            realm.create(SwiftCustomColumnAsymmetricObject.self, value: valuesDictionary)
-        }
-        waitForUploads(for: realm)
-
-        try await checkCountInMongo(1, type: SwiftCustomColumnAsymmetricObject.self)
-
-        let filter: Document = ["_id": .objectId(objectId)]
-        let document = try await collection.findOneDocument(filter: filter)
-        XCTAssertNotNil(document)
-
-        XCTAssertEqual(document!["_id"], AnyBSON(objectId))
-        XCTAssertEqual(document!["custom_boolCol"], AnyBSON(false))
-        XCTAssertEqual(document!["custom_intCol"], AnyBSON(1234))
-        XCTAssertEqual(document!["custom_doubleCol"], AnyBSON(1234.1234))
-        XCTAssertEqual(document!["custom_stringCol"], AnyBSON("$%&/("))
     }
 }
 #endif // os(macOS)

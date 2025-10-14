@@ -19,7 +19,11 @@
 import XCTest
 import RealmSwift
 
-class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: SetValueFactory>: TestCase, @unchecked Sendable {
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
+class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: SetValueFactory>: TestCase {
     var realm: Realm?
     var obj: V.SetRoot!
     var obj2: V.SetRoot!
@@ -46,7 +50,7 @@ class PrimitiveMutableSetTestsBase<O: ObjectFactory, V: SetValueFactory>: TestCa
     }
 }
 
-class PrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V>, @unchecked Sendable {
+class PrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> {
     func testInvalidated() {
         XCTAssertFalse(mutableSet.isInvalidated)
         if let realm = obj.realm {
@@ -187,7 +191,7 @@ class PrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveM
     }
 }
 
-class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V>, @unchecked Sendable where V.PersistedType: MinMaxType {
+class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.PersistedType: MinMaxType {
     func testMin() {
         XCTAssertNil(mutableSet.min())
         mutableSet.insert(objectsIn: values)
@@ -201,7 +205,7 @@ class MinMaxPrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: Prim
     }
 }
 
-class AddablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V>, @unchecked Sendable where V: NumericValueFactory, V.PersistedType: AddableType {
+class AddablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V: NumericValueFactory, V.PersistedType: AddableType {
     func testSum() {
         XCTAssertEqual(mutableSet.sum(), .zero)
         mutableSet.insert(objectsIn: values)
@@ -215,7 +219,7 @@ class AddablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: Pri
     }
 }
 
-class SortablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V>, @unchecked Sendable where V.PersistedType: SortableType {
+class SortablePrimitiveMutableSetTests<O: ObjectFactory, V: SetValueFactory>: PrimitiveMutableSetTestsBase<O, V> where V.PersistedType: SortableType {
     func testSorted() {
         var shuffled = values!
         shuffled.removeFirst()
@@ -329,7 +333,7 @@ func addMutableSetTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type
     MinMaxPrimitiveMutableSetTests<OF, EnumDouble?>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
-class UnmanagedPrimitiveMutableSetTests: TestCase, @unchecked Sendable {
+class UnmanagedPrimitiveMutableSetTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Sets")
         addMutableSetTests(suite, UnmanagedObjectFactory.self)
@@ -337,7 +341,7 @@ class UnmanagedPrimitiveMutableSetTests: TestCase, @unchecked Sendable {
     }
 }
 
-class ManagedPrimitiveMutableSetTests: TestCase, @unchecked Sendable {
+class ManagedPrimitiveMutableSetTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Sets")
         addMutableSetTests(suite, ManagedObjectFactory.self)

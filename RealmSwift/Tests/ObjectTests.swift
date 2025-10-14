@@ -45,7 +45,7 @@ class SwiftDynamicDefaultObject: Object {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectTests: TestCase, @unchecked Sendable {
+class ObjectTests: TestCase {
     // init() Tests are in ObjectCreationTests.swift
     // init(value:) tests are in ObjectCreationTests.swift
 
@@ -599,9 +599,9 @@ class ObjectTests: TestCase, @unchecked Sendable {
         XCTAssertEqual((getter(object, "setCol") as! MutableSet<SwiftBoolObject>).count, 0)
     }
 
-    func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> Void,
-                                   getter: (DynamicObject, String) -> (Any?), object: DynamicObject,
-                                   boolObject: DynamicObject) {
+    static func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> Void,
+                                          getter: (DynamicObject, String) -> (Any?), object: DynamicObject,
+                                          boolObject: DynamicObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual((getter(object, "boolCol") as! Bool), true)
 
@@ -718,7 +718,7 @@ class ObjectTests: TestCase, @unchecked Sendable {
 
         withMigrationObject { migrationObject, migration in
             let boolObject = migration.create("SwiftBoolObject", value: [true])
-            self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
+            Self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
@@ -738,7 +738,7 @@ class ObjectTests: TestCase, @unchecked Sendable {
 
         withMigrationObject { migrationObject, migration in
             let boolObject = migration.create("SwiftBoolObject", value: [true])
-            self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
+            Self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
@@ -752,9 +752,9 @@ class ObjectTests: TestCase, @unchecked Sendable {
         withMigrationObject { migrationObject, migration in
             let boolObject = migration.create("SwiftBoolObject", value: [true])
             migrationObject.anyCol = boolObject
-            self.assertEqual(migrationObject.anyCol as? DynamicObject, boolObject)
+            assertEqual(migrationObject.anyCol as? DynamicObject, boolObject)
             migrationObject.objectCol = boolObject
-            self.assertEqual(migrationObject.objectCol as? DynamicObject, boolObject)
+            assertEqual(migrationObject.objectCol as? DynamicObject, boolObject)
             migrationObject.anyCol = 12345
             XCTAssertEqual(migrationObject.anyCol as! Int, 12345)
         }

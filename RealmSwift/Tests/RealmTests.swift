@@ -30,7 +30,7 @@ import RealmSwiftTestSupport
 #endif
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class RealmTests: TestCase, @unchecked Sendable {
+class RealmTests: TestCase {
     enum TestError: Error {
         case intentional
     }
@@ -1405,6 +1405,7 @@ class RealmTests: TestCase, @unchecked Sendable {
         XCTAssertEqual(2, realm.objects(SwiftStringObject.self).count)
     }
 
+    @MainActor
     func testAsyncTransactionCancel() {
         let waitComplete = expectation(description: "async wait complete")
         let expectation = XCTestExpectation(description: "testAsyncTransactionCancel expectation")
@@ -1412,7 +1413,7 @@ class RealmTests: TestCase, @unchecked Sendable {
         let unexpectation = XCTestExpectation(description: "should not fulfill")
         unexpectation.isInverted = true
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { @MainActor in
             let realm = try! Realm()
             realm.beginAsyncWrite {
                 realm.create(SwiftStringObject.self, value: ["string"])
@@ -1662,8 +1663,9 @@ extension RealmTests {
     @available(macOS 10.15.4, iOS 13.4, tvOS 13.4, watchOS 6.4, *)
     func testAsyncRefreshOnQueueConfinedRealm() async throws {
         let realm = Locked<Realm?>(wrappedValue: nil)
+        let queue = self.queue
         dispatchSyncNewThread {
-            realm.wrappedValue = try! Realm(queue: self.queue)
+            realm.wrappedValue = try! Realm(queue: queue)
         }
         // asyncRefresh() has to be called from a statically isolated context,
         // but the test as whole can't be isolated (or the dispatch async breaks),
@@ -1916,24 +1918,19 @@ extension RealmTests {
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @globalActor actor CustomGlobalActor: GlobalActor {
+#if compiler(<6.2)
     static var shared = CustomGlobalActor()
+#else
+    static let shared = CustomGlobalActor()
+#endif
 }
 
-#if compiler(<6)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension CancellationError: Equatable {
-    public static func == (lhs: CancellationError, rhs: CancellationError) -> Bool {
-        true
-    }
-}
-#else
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension CancellationError: @retroactive Equatable {
     public static func == (lhs: CancellationError, rhs: CancellationError) -> Bool {
         true
     }
 }
-#endif
 
 // Helper
 extension LogLevel {
@@ -1964,7 +1961,7 @@ extension LogLevel {
 }
 
 @available(macOS 12.0, watchOS 8.0, iOS 15.0, tvOS 15.0, macCatalyst 15.0, *)
-class LoggerTests: TestCase, @unchecked Sendable {
+class LoggerTests: TestCase {
     var logger: Logger!
     override func setUp() {
         logger = Logger.shared

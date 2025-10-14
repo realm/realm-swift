@@ -45,7 +45,7 @@ private nonisolated(unsafe) var mediumRealm: Realm!
 private nonisolated(unsafe) var largeRealm: Realm!
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class SwiftPerformanceTests: TestCase, @unchecked Sendable {
+class SwiftPerformanceTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
 #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst) && !targetEnvironment(simulator)
         return super.defaultTestSuite
@@ -938,7 +938,7 @@ class SwiftPerformanceTests: TestCase, @unchecked Sendable {
     }
 }
 
-class SwiftSyncRealmPerformanceTests: TestCase, @unchecked Sendable {
+class SwiftSyncRealmPerformanceTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
 #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst) && !targetEnvironment(simulator)
         return super.defaultTestSuite
@@ -1043,7 +1043,7 @@ class SwiftSyncRealmPerformanceTests: TestCase, @unchecked Sendable {
     }
 }
 
-class SwiftFlexibleSyncRealmPerformanceTests: SwiftSyncRealmPerformanceTests, @unchecked Sendable {
+class SwiftFlexibleSyncRealmPerformanceTests: SwiftSyncRealmPerformanceTests {
     override var config: Realm.Configuration {
         var config = ObjectiveCSupport.convert(object: RLMRealmConfiguration.fakeFlexibleSync())
         config.objectTypes = []

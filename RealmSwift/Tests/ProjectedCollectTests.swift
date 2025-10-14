@@ -30,7 +30,7 @@ class ProjectedCollections: Projection<PersistedCollections> {
     @Projected(\PersistedCollections.set.projectTo.firstName) var set: ProjectedCollection<String>
 }
 
-class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
+class ProjectedCollectionsTestsTemplate: TestCase {
     // To test some of methods there should be a collection of projections instead of collection of strings
     // set value in subclass
     var collection: ProjectedCollection<String>!
@@ -193,8 +193,9 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
             ex.fulfill()
         }
 
+        let config = configurationWithTestPath()
         dispatchSyncNewThread { @Sendable in
-            let realm = self.realmWithTestPath()
+            let realm = try! Realm(configuration: config)
             realm.beginWrite()
             let obj = realm.create(CommonPerson.self)
             obj.firstName = "Name"
@@ -276,8 +277,9 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
 
     func testFreezeFromWrongThread() {
         nonisolated(unsafe) let collection = realmWithTestPath().objects(PersonProjection.self).first!.firstFriendsName
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
-            self.assertThrows(collection.freeze(), reason: "Realm accessed from incorrect thread")
+            unsafeSelf.assertThrows(collection.freeze(), reason: "Realm accessed from incorrect thread")
         }
     }
 
@@ -302,7 +304,7 @@ class ProjectedCollectionsTestsTemplate: TestCase, @unchecked Sendable {
     }
 }
 
-class ProjectedListTests: ProjectedCollectionsTestsTemplate, @unchecked Sendable {
+class ProjectedListTests: ProjectedCollectionsTestsTemplate {
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()
@@ -314,7 +316,7 @@ class ProjectedListTests: ProjectedCollectionsTestsTemplate, @unchecked Sendable
     }
 }
 
-class ProjectedSetTests: ProjectedCollectionsTestsTemplate, @unchecked Sendable {
+class ProjectedSetTests: ProjectedCollectionsTestsTemplate {
     override func setUp() {
         super.setUp()
         let realm = realmWithTestPath()

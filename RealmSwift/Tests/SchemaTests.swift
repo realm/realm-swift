@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SchemaTests: TestCase, @unchecked Sendable {
+class SchemaTests: TestCase {
     var schema: Schema!
 
     override func setUp() {

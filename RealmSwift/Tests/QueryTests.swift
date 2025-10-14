@@ -22,7 +22,7 @@ import RealmSwift
 // This file is generated from a template. Do not edit directly.
 // swiftlint:disable large_tuple vertical_parameter_alignment
 
-class QueryTests: TestCase, @unchecked Sendable {
+class QueryTests: TestCase {
     private var realm: Realm!
 
     // MARK: Test data population

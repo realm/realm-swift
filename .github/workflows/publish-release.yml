@@ -1,8 +1,8 @@
 name: Publish release
 on: workflow_dispatch
 env:
-  XCODE_VERSION: "['15.3', '15.4', '16', '16.1', '16.2', '16.3']"
-  TEST_XCODE_VERSION: '16.3'
+  XCODE_VERSION: "['16.3', '16.4', '26.0.1']"
+  TEST_XCODE_VERSION: '26.0.1'
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -32,22 +32,6 @@ jobs:
             tag: "v${{ needs.prepare.outputs.VERSION }}"
             tag_exists_error: false
             message: ""
-  publish-docs:
-      runs-on: macos-15
-      name: Publish docs to S3 Bucket
-      needs: tag-release
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_DOCS_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_DOCS_SECRET_ACCESS_KEY }}
-        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      steps:
-        - uses: actions/checkout@v4
-        - uses: ruby/setup-ruby@v1
-          with:
-            bundler-cache: true
-        - run: brew install s3cmd
-        - name: Publish docs
-          run: bundle exec sh -x build.sh publish-docs ${{ github.sha }}
   create-release:
       runs-on: macos-15
       name: Create github release
@@ -145,41 +129,3 @@ jobs:
             max_attempts: 10
             retry_wait_seconds: 60
             retry_on: error
-  post-slack-release:
-      runs-on: macos-15
-      name: Publish to release Slack channel
-      needs: [create-release, prepare, publish-cocoapods, update-checker, publish-docs]
-      env:
-        WEBHOOK_URL: ${{ secrets.SLACK_RELEASES_WEBHOOK }}
-      steps:
-        - uses: actions/checkout@v4
-        - uses: ruby/setup-ruby@v1
-          with:
-            bundler-cache: true
-        - name: Prepare Changelog
-          run: bundle exec ./build.sh prepare-publish-changelog
-        - name: 'Post to #realm-releases'
-          uses: realm/ci-actions/release-to-slack@a2191a6cbf2f5b50aa71026dd068582dbd5016cc
-          with:
-            changelog: ExtractedChangelog/CHANGELOG.md
-            sdk: Swift
-            webhook-url: ${{ env.WEBHOOK_URL }}
-            version: ${{ needs.prepare.outputs.VERSION }}
-  add-empty-changelog:
-      runs-on: macos-15
-      permissions:
-        contents: write
-      name: Add empty changelog and commits/push it
-      needs: [post-slack-release]
-      env:
-        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      steps:
-        - uses: actions/checkout@v4
-        - name: Add template to changelog
-          run: |
-            sh build.sh add-empty-changelog
-        - name: Auto-commit CHANGELOG.md
-          uses: stefanzweifel/git-auto-commit-action@v4
-          with:
-            file_pattern: 'CHANGELOG.md'
-            commit_message: 'Add an empty changelog section'
