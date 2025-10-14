@@ -93,7 +93,7 @@ jobs:
         DEVELOPER_DIR: /Applications/Xcode_${{matrix.xcode-version}}.app/Contents/Developer
       steps:
         - uses: actions/checkout@v4
-        - run: sh build.sh ${{matrix.platform}}-${{matrix.configuration}}
+        - run: sh -x build.sh ${{matrix.platform}}-${{matrix.configuration}}
         - run: tar cf build.tar build/*/${{matrix.platform}}
         - name: Upload framework
           uses: actions/upload-artifact@v4
@@ -113,7 +113,7 @@ jobs:
             DEVELOPMENT_CERTIFICATE_BASE64: ${{ secrets.DEVELOPMENT_CERTIFICATE_BASE64 }}
             P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
             KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-          run: sh build.sh install-apple-certificates
+          run: sh -x build.sh install-apple-certificates
         - name: Create release
           env:
             SIGNING_IDENTITY: ${{ secrets.SIGNING_IDENTITY }}
