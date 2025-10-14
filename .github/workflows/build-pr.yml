@@ -16,14 +16,14 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+      - run: sudo xcode-select -switch /Applications/Xcode_26.0.app
       - run: bundle exec sh build.sh verify-docs
   swiftlint:
     runs-on: macos-15
     name: Check swiftlint
     steps:
       - uses: actions/checkout@v4
-      - run: sudo xcode-select -switch /Applications/Xcode_16.4.app
+      - run: sudo xcode-select -switch /Applications/Xcode_26.0.app
       - run: brew install swiftlint
       - run: sh build.sh verify-swiftlint
 

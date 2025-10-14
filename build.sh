@@ -1167,7 +1167,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * Realm Studio: 15.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 10.x.y series.
-* Carthage release for Swift is built with Xcode 16.4.0.
+* Carthage release for Swift is built with Xcode 26.0.1.
 * CocoaPods: 1.10 or later.
 * Xcode: 16.3.0-26.0.1.
 

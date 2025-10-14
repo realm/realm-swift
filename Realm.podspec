@@ -15,8 +15,6 @@ Pod::Spec.new do |s|
   s.author                  = { 'Realm' => 'realm-help@mongodb.com' }
   s.library                 = 'c++', 'z', 'compression'
   s.requires_arc            = true
-  s.social_media_url        = 'https://twitter.com/realm'
-  s.documentation_url       = "https://docs.mongodb.com/realm/sdk/swift"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   public_header_files       = 'include/Realm.h',
