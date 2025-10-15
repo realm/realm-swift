@@ -1,3 +1,24 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-swift/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* Realm Studio: 15.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* Carthage release for Swift is built with Xcode 26.0.1.
+* CocoaPods: 1.10 or later.
+* Xcode: 16.3.0-26.0.1.
+
+### Internal
+* Upgraded realm-core from ? to ?
+
 10.54.6 Release notes (2025-10-15)
 =============================================================
 
