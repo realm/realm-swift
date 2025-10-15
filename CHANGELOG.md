@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.54.6 Release notes (2025-10-15)
 =============================================================
 
 Add Xcode 26.0.1 binaries and drop support for Xcode < 16.3.
