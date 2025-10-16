@@ -20,7 +20,7 @@ import XCTest
 import RealmSwift
 import class Realm.Private.RLMRealmConfiguration
 
-class RealmConfigurationTests: TestCase, @unchecked Sendable {
+class RealmConfigurationTests: TestCase {
     func testDefaultConfiguration() {
         let defaultConfiguration = Realm.Configuration.defaultConfiguration
 

@@ -6,10 +6,10 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['15.3', '15.4', '16.2', '16.3', '16.4']"
+  XCODE_VERSION: "['16.3', '16.4', '26.0.1']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
-  RELEASE_VERSION: '16.4'
-  DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+  RELEASE_VERSION: '26.0.1'
+  DEVELOPER_DIR: /Applications/Xcode_26.0.1.app/Contents/Developer
 jobs:
   prepare:
       runs-on: ubuntu-latest
@@ -68,20 +68,14 @@ jobs:
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
           configuration: [swift, static]
           include:
-            - xcode-version: 15.3
-              xcode-version-tag: 15.3
-              os: macos-14
-            - xcode-version: 15.4
-              xcode-version-tag: 15.4
-              os: macos-14
-            - xcode-version: 16.2
-              xcode-version-tag: 16.2
-              os: macos-15
             - xcode-version: 16.3
               xcode-version-tag: 16.3
               os: macos-15
             - xcode-version: 16.4
               xcode-version-tag: 16.4
+              os: macos-15
+            - xcode-version: 26.0.1
+              xcode-version-tag: 26.0.1
               os: macos-15
           exclude:
             - platform: osx
@@ -213,15 +207,11 @@ jobs:
         matrix:
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
           include:
-            - xcode-version: 15.3
-              os: macos-14
-            - xcode-version: 15.4
-              os: macos-14
-            - xcode-version: 16.2
-              os: macos-15
             - xcode-version: 16.3
               os: macos-15
             - xcode-version: 16.4
+              os: macos-15
+            - xcode-version: 26.0.1
               os: macos-15
       env:
         PLATFORM: 'osx'

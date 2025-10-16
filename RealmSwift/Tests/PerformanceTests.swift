@@ -45,7 +45,7 @@ private nonisolated(unsafe) var mediumRealm: Realm!
 private nonisolated(unsafe) var largeRealm: Realm!
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class SwiftPerformanceTests: TestCase, @unchecked Sendable {
+class SwiftPerformanceTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
 #if !DEBUG && os(iOS) && !targetEnvironment(macCatalyst) && !targetEnvironment(simulator)
         return super.defaultTestSuite

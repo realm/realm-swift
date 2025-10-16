@@ -980,7 +980,7 @@ case "$COMMAND" in
 
     "release-package")
         version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        find . -name 'build-*-1*' -maxdepth 1 \
+        find . -regex './build-[a-z]*-[12].*' -maxdepth 1 \
             | sed 's@./build-[a-z]*-\(.*\)-.*@\1@' \
             | sort -u --version-sort \
             | xargs ./scripts/create-release-package.rb "${ROOT_WORKSPACE}/pkg" "${version}"
@@ -1121,9 +1121,9 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* Carthage release for Swift is built with Xcode 16.4.0.
+* Carthage release for Swift is built with Xcode 26.0.1.
 * CocoaPods: 1.10 or later.
-* Xcode: 15.3.0-16.4.
+* Xcode: 16.3-26.0.1
 
 ### Internal
 * Upgraded realm-core from ? to ?
