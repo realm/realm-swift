@@ -723,6 +723,13 @@ RLM_DIRECT_MEMBERS
         return;
     }
     RLMObjectBase *obj = [_realm resolveThreadSafeReference:tsr];
+    if (!obj) {
+        error = [NSError errorWithDomain:RLMAppErrorDomain
+                                    code:RLMErrorObjectNotFound
+                                userInfo:nil];
+        block(nil, nil, nil, nil, error);
+        return;
+    }
 
     _object = realm::Object(_realm->_realm, *obj->_info->objectSchema, obj->_row);
     _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj},
