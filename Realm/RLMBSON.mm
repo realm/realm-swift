@@ -386,7 +386,7 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
         case realm::bson::Bson::Type::Timestamp:
             return [[NSDate alloc] initWithTimeIntervalSince1970:static_cast<MongoTimestamp>(b).seconds];
         case realm::bson::Bson::Type::Datetime:
-            return [[NSDate alloc] initWithTimeIntervalSince1970:static_cast<Timestamp>(b).get_seconds()];
+            return [[NSDate alloc] initWithTimeIntervalSince1970:double(static_cast<Timestamp>(b).get_seconds()) + double(static_cast<Timestamp>(b).get_nanoseconds() / 1000) / 1000000];
         case realm::bson::Bson::Type::ObjectId:
             return [[RLMObjectId alloc] initWithValue:static_cast<ObjectId>(b)];
         case realm::bson::Bson::Type::Decimal128:
