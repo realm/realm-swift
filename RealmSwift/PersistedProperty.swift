@@ -362,6 +362,9 @@ extension Persisted where Value: LinkingObjectsProtocol {
     public init(originProperty: String) {
         self.init(wrappedValue: Value(fromType: Value.Element.self, property: originProperty))
     }
+    public init<V>(originProperty: KeyPath<Value.Element, V?>) where Value.Element: ObjectBase, V: ObjectBase {
+        self.init(wrappedValue: Value(fromType: Value.Element.self, property: _name(for: originProperty)))
+    }
 }
 extension LinkingObjects: LinkingObjectsProtocol {}
 
