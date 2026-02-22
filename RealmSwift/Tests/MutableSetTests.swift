@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class MutableSetTests: TestCase, @unchecked Sendable {
+class MutableSetTests: TestCase {
     var str1: SwiftStringObject?
     var str2: SwiftStringObject?
     var str3: SwiftStringObject?
@@ -485,7 +485,7 @@ class MutableSetTests: TestCase, @unchecked Sendable {
     }
 }
 
-class MutableSetStandaloneTests: MutableSetTests, @unchecked Sendable {
+class MutableSetStandaloneTests: MutableSetTests {
     override func createSet() -> SwiftMutableSetPropertyObject {
         let set = SwiftMutableSetPropertyObject()
         XCTAssertNil(set.realm)
@@ -499,7 +499,7 @@ class MutableSetStandaloneTests: MutableSetTests, @unchecked Sendable {
     }
 }
 
-class MutableSetNewlyAddedTests: MutableSetTests, @unchecked Sendable {
+class MutableSetNewlyAddedTests: MutableSetTests {
     override func createSet() -> SwiftMutableSetPropertyObject {
         let set = SwiftMutableSetPropertyObject()
         set.name = "name"
@@ -520,7 +520,7 @@ class MutableSetNewlyAddedTests: MutableSetTests, @unchecked Sendable {
     }
 }
 
-class MutableSetNewlyCreatedTests: MutableSetTests, @unchecked Sendable {
+class MutableSetNewlyCreatedTests: MutableSetTests {
     override func createSet() -> SwiftMutableSetPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
@@ -542,7 +542,7 @@ class MutableSetNewlyCreatedTests: MutableSetTests, @unchecked Sendable {
     }
 }
 
-class MutableSetRetrievedTests: MutableSetTests, @unchecked Sendable {
+class MutableSetRetrievedTests: MutableSetTests {
     override func createSet() -> SwiftMutableSetPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()

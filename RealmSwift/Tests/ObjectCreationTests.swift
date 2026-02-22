@@ -20,6 +20,10 @@ import XCTest
 import RealmSwift
 import Realm.Private
 
+#if canImport(RealmTestSupport)
+import RealmSwiftTestSupport
+#endif
+
 class ObjectWithPrivateOptionals: Object {
     private var nilInt: Int?
     private var nilFloat: Float?
@@ -32,7 +36,7 @@ class ObjectWithPrivateOptionals: Object {
 }
 
 @available(*, deprecated) // Silence deprecation warnings for RealmOptional
-class ObjectCreationTests: TestCase, @unchecked Sendable {
+class ObjectCreationTests: TestCase {
     // MARK: - Init tests
 
     func testInitWithDefaults() {

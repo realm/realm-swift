@@ -258,7 +258,7 @@ public final class MultipleProjectionsFromOneProperty: Projection<SimpleObject> 
 // MARK: Tests
 
 @available(iOS 13.0, *)
-class ProjectionTests: TestCase, @unchecked Sendable {
+class ProjectionTests: TestCase {
     func assertSetEquals<T: RealmCollectionValue>(_ set: MutableSet<T>, _ expected: Array<T>) {
         XCTAssertEqual(set.count, Set(expected).count)
         XCTAssertEqual(Set(set), Set(expected))
@@ -715,8 +715,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         // Write on a background thread so that oldValue is present
         let tsr = ThreadSafeReference(to: obj)
         nonisolated(unsafe) let newValue = new
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             let obj = realm.resolve(tsr)!
             try! realm.write {
                 obj.int8Col = 5 // Write to another property to verify keypath filtering works
@@ -962,8 +963,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         let token = johnProjection.observe(keyPaths: ["lastName"], on: nil) { _ in
             ex.fulfill()
         }
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread { @Sendable in
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
                 johnObject.lastName = "Targaryen"
@@ -988,8 +990,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
                 XCTFail("expected .change, got \(changes)")
             }
         }
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread { @Sendable in
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
                 johnObject.extras?.phone?.mobile?.number = "529-345-678"
@@ -1009,7 +1012,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
             }
         }
         dispatchSyncNewThread { @Sendable in
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
                 johnObject.extras?.email = "joe@realm.com"
@@ -1031,7 +1034,7 @@ class ProjectionTests: TestCase, @unchecked Sendable {
             }
         }
         dispatchSyncNewThread { @Sendable in
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             try! realm.write {
                 let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
                 johnObject.address?.city = "Barranquilla"
@@ -1673,8 +1676,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
 
     func testFreezeFromWrongThread() {
         nonisolated(unsafe) let projection = simpleProjection()
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
-            self.assertThrows(projection.freeze(), "Realm accessed from incorrect thread")
+            unsafeSelf.assertThrows(projection.freeze(), "Realm accessed from incorrect thread")
         }
     }
 
@@ -1770,8 +1774,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         let tsr = ThreadSafeReference(to: projection)
         nonisolated(unsafe) var frozen: SimpleProjection!
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             let resolvedProjection: SimpleProjection = realm.resolve(tsr)!
             try! realm.write {
                 resolvedProjection.int = 1
@@ -1789,8 +1794,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         let realm = realmWithTestPath()
         XCTAssertEqual(realm.objects(SimpleProjection.self).count, 0)
         nonisolated(unsafe) var frozen: SimpleProjection!
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
-            let projection = self.simpleProjection()
+            let projection = unsafeSelf.simpleProjection()
             frozen = projection.freeze()
         }
         XCTAssertNil(frozen.thaw())
@@ -1823,8 +1829,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
         // Wait for the notifier to be registered before we do the write
         realm.refresh()
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread { @Sendable in
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             let johnObject = realm.objects(CommonPerson.self).filter("lastName == 'Snow'").first!
             try! realm.write {
                 johnObject.lastName = "Ali"
@@ -1857,8 +1864,9 @@ class ProjectionTests: TestCase, @unchecked Sendable {
 
         try! realm.write {}
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchSyncNewThread {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             try! realm.write {
                 realm.objects(SimpleObject.self).first!.int = 2
             }

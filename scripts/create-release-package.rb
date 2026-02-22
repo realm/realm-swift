@@ -28,14 +28,12 @@ def platforms(xcode_version)
 end
 
 def create_xcframework(root, xcode_version, configuration, name)
-  signing_identity = ENV['SIGNING_IDENTITY']
   prefix = "#{root}/#{xcode_version}"
   output = "#{prefix}/#{configuration}/#{name}.xcframework"
   files = Dir.glob "#{prefix}/build/#{configuration}/*/#{name}.xcframework/*/#{name}.framework"
 
   sh 'xcodebuild', '-create-xcframework', '-allow-internal-distribution',
      '-output', output, *files.flat_map {|f| ['-framework', f]}
-  sh 'codesign', '--timestamp', '-s', signing_identity, output
 end
 
 def zip(name, *files)

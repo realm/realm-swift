@@ -24,7 +24,7 @@ import RealmTestSupport
 #endif
 
 @available(iOS 13.0, *) // For @MainActor
-class SwiftRLMRealmTests: RLMTestCase, @unchecked Sendable {
+class SwiftRLMRealmTests: RLMTestCase {
 
     // No models
 
@@ -78,8 +78,9 @@ class SwiftRLMRealmTests: RLMTestCase, @unchecked Sendable {
             notificationFired.fulfill()
         }
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchAsync {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             realm.beginWriteTransaction()
             _ = SwiftRLMStringObject.create(in: realm, withValue: ["string"])
             try! realm.commitWriteTransaction()
@@ -130,8 +131,9 @@ class SwiftRLMRealmTests: RLMTestCase, @unchecked Sendable {
             updateComplete.fulfill()
         }
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchAsync {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             try! realm.transaction {
                 var obj = SwiftRLMIntObject()
                 obj.intCol = 2;
@@ -157,8 +159,9 @@ class SwiftRLMRealmTests: RLMTestCase, @unchecked Sendable {
             notificationFired.fulfill()
         }
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchAsync {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             let obj = SwiftRLMStringObject(value: ["string"])
             realm.beginWriteTransaction()
             realm.add(obj)
@@ -218,8 +221,9 @@ class SwiftRLMRealmTests: RLMTestCase, @unchecked Sendable {
             }
         }
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchAsync {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             realm.beginWriteTransaction()
             _ = StringObject.create(in: realm, withValue: ["string"])
             try! realm.commitWriteTransaction()
@@ -244,8 +248,9 @@ class SwiftRLMRealmTests: RLMTestCase, @unchecked Sendable {
             notificationFired.fulfill()
         }
 
+        nonisolated(unsafe) let unsafeSelf = self
         dispatchAsync {
-            let realm = self.realmWithTestPath()
+            let realm = unsafeSelf.realmWithTestPath()
             let obj = StringObject(value: ["string"])
             try! realm.transaction {
                 realm.add(obj)

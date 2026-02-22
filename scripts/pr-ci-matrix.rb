@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-XCODE_VERSIONS = %w(15.3 15.4 16.2 16.3 16.4)
-DOC_VERSION = '16.4'
+XCODE_VERSIONS = %w(26.1 26.2 26.3 26.4)
+DOC_VERSION = '26.3'
 
 all = ->(v) { true }
 latest_only = ->(v) { v == XCODE_VERSIONS.last }
@@ -58,7 +58,7 @@ on:
 
 jobs:
   docs:
-    runs-on: macos-15
+    runs-on: macos-26
     name: Test docs
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
       - run: sudo xcode-select -switch /Applications/Xcode_#{DOC_VERSION}.app
       - run: bundle exec sh build.sh verify-docs
   swiftlint:
-    runs-on: macos-15
+    runs-on: macos-26
     name: Check swiftlint
     steps:
       - uses: actions/checkout@v4
@@ -82,7 +82,7 @@ targets.each { |name, filter|
     if not filter.call(version)
       next
     end
-    image = version.start_with?('16') ? 'macos-15' : 'macos-14'
+    image = 'macos-26'
     output_file << """
   #{name}-#{version.gsub(' ', '_').gsub('.', '_')}:
     runs-on: #{image}

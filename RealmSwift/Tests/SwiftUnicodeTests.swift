@@ -19,9 +19,13 @@
 import XCTest
 import RealmSwift
 
+#if canImport(RealmSwiftTestSupport)
+import RealmSwiftTestSupport
+#endif
+
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 
-class SwiftUnicodeTests: TestCase, @unchecked Sendable {
+class SwiftUnicodeTests: TestCase {
     func testUTF8StringContents() {
         let realm = realmWithTestPath()
 

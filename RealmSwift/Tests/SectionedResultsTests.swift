@@ -236,7 +236,7 @@ class BaseOptionalPrimitiveSectionedResultsTests<TestData: OptionalSectionedResu
     }
 }
 
-class PrimitiveSectionedResultsTests: TestCase, @unchecked Sendable {
+class PrimitiveSectionedResultsTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Primitive SectionedResults Tests")
 

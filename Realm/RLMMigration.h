@@ -72,7 +72,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
             properties.
  */
 - (void)enumerateObjects:(NSString *)className
-                   block:(__attribute__((noescape)) RLMObjectMigrationBlock)block NS_REFINED_FOR_SWIFT;
+                   block:(__attribute__((noescape, swift_attr("@nonSendable"))) RLMObjectMigrationBlock)block NS_REFINED_FOR_SWIFT;
 
 /**
  Creates and returns an `RLMObject` instance of type `className` in the Realm being migrated.

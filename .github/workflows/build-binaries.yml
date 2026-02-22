@@ -10,20 +10,20 @@ on:
 
 jobs:
   build-packages:
-    runs-on: macos-14
+    runs-on: macos-26
     name: Build Core ${{ inputs.core-version }} for ${{ matrix.target }}
     outputs:
       core-version: ${{ steps.get-core-version.outputs.version }}
     strategy:
+      fail-fast: false
       matrix:
         target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst, xros, xrsimulator]
     env:
-      DEVELOPER_DIR: /Applications/Xcode_15.3.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_26.1.1.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
-      - name: Download visionOS
-        if: matrix.target == 'xros' || matrix.target == 'xrsimulator'
-        run: xcodebuild -downloadPlatform visionOS
+      - name: Download additional platforms
+        run: xcodebuild -downloadAllPlatforms
 
       - name: Get Core Version
         id: get-core-version

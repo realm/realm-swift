@@ -228,8 +228,10 @@ plist_get() {
 iphone_name() {
     if (( $(xcode_version_major) < 16 )); then
         echo 'iPhone 15'
-    else
+    elif (( $(xcode_version_major) < 26 )); then
         echo 'iPhone 16'
+    else
+        echo 'iPhone 17'
     fi
 }
 
@@ -957,11 +959,24 @@ case "$COMMAND" in
         echo "Building with Xcode Version $(xcodebuild -version)"
         export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
         target="$2"
-        if [[ "$target" == visionos ]] && (( $(xcode_version_major) < 16 )); then
-            echo 'Installing visionOS'
-            xcodebuild -downloadPlatform visionOS
-        fi
+        sh build.sh install-xcode-platform "$target"
         sh build.sh "verify-$target"
+        ;;
+
+    "install-xcode-platform")
+        target="$2"
+        # If there are already simulators installed on the GHA VM we happen to
+        # run on, downloadPlatform sometimes fails due to it being in the middle
+        # of updating caches and timing out. Calling simctl list first waits for
+        # this to happen. If there are no simulators already installed, simctl
+        # also won't be installed yet.
+        xcrun simctl list > /dev/null || true
+        case "$target" in
+            ios*) xcodebuild -downloadPlatform iOS ;;
+            tvos*) xcodebuild -downloadPlatform tvOS ;;
+            visionos*) xcodebuild -downloadPlatform visionOS ;;
+            watchos*) xcodebuild -downloadPlatform watchOS ;;
+        esac
         ;;
 
     ######################################
@@ -980,7 +995,7 @@ case "$COMMAND" in
 
     "release-package")
         version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${source_root}/dependencies.list")"
-        find . -name 'build-*-1*' -maxdepth 1 \
+        find . -regex './build-[a-z]*-[12].*' -maxdepth 1 \
             | sed 's@./build-[a-z]*-\(.*\)-.*@\1@' \
             | sort -u --version-sort \
             | xargs ./scripts/create-release-package.rb "${ROOT_WORKSPACE}/pkg" "${version}"
@@ -1121,9 +1136,9 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* Carthage release for Swift is built with Xcode 16.4.0.
+* Carthage release for Swift is built with Xcode 26.3.
 * CocoaPods: 1.10 or later.
-* Xcode: 15.3.0-16.4.
+* Xcode: 26.1-26.4 beta 1
 
 ### Internal
 * Upgraded realm-core from ? to ?

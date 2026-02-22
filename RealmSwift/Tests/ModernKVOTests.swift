@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class ModernKVOTests: TestCase, @unchecked Sendable {
+class ModernKVOTests: TestCase {
     var realm: Realm! = nil
 
     override func setUp() {
@@ -390,14 +390,14 @@ class ModernKVOTests: TestCase, @unchecked Sendable {
     }
 }
 
-class ModernKVOPersistedTests: ModernKVOTests, @unchecked Sendable {
+class ModernKVOPersistedTests: ModernKVOTests {
     override func getObject(_ obj: ModernAllTypesObject) -> (ModernAllTypesObject, ModernAllTypesObject) {
         realm.add(obj)
         return (obj, obj)
     }
 }
 
-class ModernKVOMultipleAccessorsTests: ModernKVOTests, @unchecked Sendable {
+class ModernKVOMultipleAccessorsTests: ModernKVOTests {
     override func getObject(_ obj: ModernAllTypesObject) -> (ModernAllTypesObject, ModernAllTypesObject) {
         realm.add(obj)
         return (obj, realm.object(ofType: ModernAllTypesObject.self, forPrimaryKey: obj.pk)!)

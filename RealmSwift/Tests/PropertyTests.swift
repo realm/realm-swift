@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class PropertyTests: TestCase, @unchecked Sendable {
+class PropertyTests: TestCase {
     var primitiveProperty: Property!
     var linkProperty: Property!
     var primaryProperty: Property!

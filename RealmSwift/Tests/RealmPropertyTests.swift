@@ -33,7 +33,7 @@ class RealmPropertyObject: Object {
     @objc dynamic var int = 0
 }
 
-class RealmPropertyTests: TestCase, @unchecked Sendable {
+class RealmPropertyTests: TestCase {
     private func test<T: Equatable>(keyPath: KeyPath<RealmPropertyObject, RealmProperty<T?>>,
                                     value: T?) {
         let o = RealmPropertyObject()

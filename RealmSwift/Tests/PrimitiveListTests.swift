@@ -21,6 +21,7 @@ import XCTest
 
 #if canImport(RealmTestSupport)
 import RealmTestSupport
+import RealmSwiftTestSupport
 #endif
 
 class PrimitiveListTestsBase<O: ObjectFactory, V: ListValueFactory>: RLMTestCaseBase {
@@ -499,7 +500,7 @@ func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
     AddablePrimitiveListTests<OF, Decimal128Wrapper?>.defaultTestSuite.tests.forEach(suite.addTest)
 }
 
-class UnmanagedPrimitiveListTests: TestCase, @unchecked Sendable {
+class UnmanagedPrimitiveListTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Lists")
         addTests(suite, UnmanagedObjectFactory.self)
@@ -507,7 +508,7 @@ class UnmanagedPrimitiveListTests: TestCase, @unchecked Sendable {
     }
 }
 
-class ManagedPrimitiveListTests: TestCase, @unchecked Sendable {
+class ManagedPrimitiveListTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Lists")
         addTests(suite, ManagedObjectFactory.self)
