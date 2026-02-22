@@ -63,6 +63,7 @@ jobs:
       needs: prepare
       strategy:
         max-parallel: 20
+        fail-fast: false
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
@@ -97,8 +98,8 @@ jobs:
       steps:
         - uses: actions/checkout@v4
         - name: Install specific platform
-          run: sh build.sh install-xcode-platform "${{matrix.platform}}"
-        - run: sh build.sh ${{matrix.platform}}-${{matrix.configuration}}
+          run: sh -x build.sh install-xcode-platform "${{matrix.platform}}"
+        - run: sh -x build.sh ${{matrix.platform}}-${{matrix.configuration}}
         - run: tar cf build.tar build/*/${{matrix.platform}}
         - name: Upload framework
           uses: actions/upload-artifact@v4
