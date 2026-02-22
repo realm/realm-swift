@@ -6,7 +6,7 @@ on:
       - "master"
       - "release/**"
 env:
-  XCODE_VERSION: "['26.1', '26.2', '26.3', '26.4']"
+  XCODE_VERSION: "['26.1.1', '26.2', '26.3', '26.4']"
   PLATFORM: "['ios', 'osx', 'watchos', 'tvos', 'catalyst', 'visionos']"
   RELEASE_VERSION: '26.3'
   DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
@@ -68,7 +68,7 @@ jobs:
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}
           configuration: [swift, static]
           include:
-            - xcode-version: 26.1
+            - xcode-version: 26.1.1
               xcode-version-tag: 26.1
               os: macos-26
             - xcode-version: 26.2
@@ -96,9 +96,8 @@ jobs:
         DEVELOPER_DIR: /Applications/Xcode_${{matrix.xcode-version}}.app/Contents/Developer
       steps:
         - uses: actions/checkout@v4
-        - name: Download visionOS
-          if: matrix.platform == 'visionos' && matrix.os == 'macos-14'
-          run: xcodebuild -downloadPlatform visionOS
+        - name: Install specific platform
+          run: sh build.sh install-xcode-platform "${{matrix.platform}}"
         - run: sh build.sh ${{matrix.platform}}-${{matrix.configuration}}
         - run: tar cf build.tar build/*/${{matrix.platform}}
         - name: Upload framework

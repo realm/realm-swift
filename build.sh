@@ -959,13 +959,24 @@ case "$COMMAND" in
         echo "Building with Xcode Version $(xcodebuild -version)"
         export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
         target="$2"
+        sh build.sh install-xcode-platform "$target"
+        sh build.sh "verify-$target"
+        ;;
+
+    "install-xcode-platform")
+        target="$2"
+        # If there are already simulators installed on the GHA VM we happen to
+        # run on, downloadPlatform sometimes fails due to it being in the middle
+        # of updating caches and timing out. Calling simctl list first waits for
+        # this to happen. If there are no simulators already installed, simctl
+        # also won't be installed yet.
+        xcrun simctl list > /dev/null || true
         case "$target" in
             ios*) xcodebuild -downloadPlatform iOS ;;
             tvos*) xcodebuild -downloadPlatform tvOS ;;
             visionos*) xcodebuild -downloadPlatform visionOS ;;
             watchos*) xcodebuild -downloadPlatform watchOS ;;
         esac
-        sh build.sh "verify-$target"
         ;;
 
     ######################################
