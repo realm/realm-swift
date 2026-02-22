@@ -1,10 +1,11 @@
-x.y.z Release notes (yyyy-MM-dd)
+20.0.4 Release notes (2026-02-22)
 =============================================================
 
 * Update build scripts for Xcode 26.
 * Drop support for Xcode < 26.
 * Prebuilt binaries are no longer code signed as Realm is no longer officially
   distributed by MongoDB.
+* Fix compilation with Xcode 26.4.
 
 ### Compatibility
 
