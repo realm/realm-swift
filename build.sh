@@ -1123,9 +1123,9 @@ x.y.z Release notes (yyyy-MM-dd)
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* Carthage release for Swift is built with Xcode 26.0.1.
+* Carthage release for Swift is built with Xcode 26.3.
 * CocoaPods: 1.10 or later.
-* Xcode: 16.3-26.0.1
+* Xcode: 26.1-26.4 beta 1
 
 ### Internal
 * Upgraded realm-core from ? to ?
