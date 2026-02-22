@@ -867,7 +867,7 @@ class ObjectTests: TestCase {
         }
     }
 
-    func testObserveInvalidKeyPath () throws {
+    func testObserveInvalidKeyPath() throws {
         let object = try createObject()
         assertThrows(object.observe(keyPaths: ["notAProperty"], { _ in }),
                      reason: "property 'notAProperty' not found in object of type 'SwiftObject'")
