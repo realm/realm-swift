@@ -63,6 +63,7 @@ jobs:
       needs: prepare
       strategy:
         max-parallel: 20
+        fail-fast: false
         matrix:
           platform: ${{ fromJSON(needs.prepare.outputs.PLATFORM_MATRIX) }}
           xcode-version: ${{ fromJSON(needs.prepare.outputs.XCODE_VERSIONS_MATRIX) }}

@@ -15,6 +15,7 @@ jobs:
     outputs:
       core-version: ${{ steps.get-core-version.outputs.version }}
     strategy:
+      fail-fast: false
       matrix:
         target: [macosx, iphoneos, iphonesimulator, appletvos, appletvsimulator, watchos, watchsimulator, maccatalyst, xros, xrsimulator]
     env:
