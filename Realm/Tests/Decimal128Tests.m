@@ -48,12 +48,12 @@
 - (void)testDecimal128Decimal {
     NSNumber *n1 = @3.14159;
     RLMDecimal128 *d1 = [[RLMDecimal128 alloc] initWithString:@"3.14159"];
-    XCTAssertEqual(n1.decimalValue._exponent, d1.decimalValue._exponent);
-    XCTAssertEqual(n1.decimalValue._isCompact, d1.decimalValue._isCompact);
-    XCTAssertEqual(n1.decimalValue._isNegative, d1.decimalValue._isNegative);
-    XCTAssertEqual(n1.decimalValue._length, d1.decimalValue._length);
+    XCTAssertEqual((int)n1.decimalValue._exponent, (int)d1.decimalValue._exponent);
+    XCTAssertEqual((int)n1.decimalValue._isCompact, (int)d1.decimalValue._isCompact);
+    XCTAssertEqual((int)n1.decimalValue._isNegative, (int)d1.decimalValue._isNegative);
+    XCTAssertEqual((int)n1.decimalValue._length, (int)d1.decimalValue._length);
     XCTAssertEqual(n1.decimalValue._mantissa[0], d1.decimalValue._mantissa[0]);
-    XCTAssertEqual(n1.decimalValue._reserved, d1.decimalValue._reserved);
+    XCTAssertEqual((int)n1.decimalValue._reserved, (int)d1.decimalValue._reserved);
 }
 
 #pragma mark - Arithmetic
