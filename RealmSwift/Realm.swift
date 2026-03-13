@@ -638,7 +638,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - parameter object: The object to be deleted.
      */
     public func delete(_ object: ObjectBase) {
-        rlmRealm.delete(unsafeBitCast(object, to: RLMObject.self))
+        rlmRealm.delete(object.unsafeCastToRLMObject())
     }
 
     /**
