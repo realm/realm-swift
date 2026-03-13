@@ -638,7 +638,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - parameter object: The object to be deleted.
      */
     public func delete(_ object: ObjectBase) {
-        RLMDeleteObjectFromRealm(object, rlmRealm)
+        rlmRealm.delete(unsafeDowncast(object, to: RLMObject.self))
     }
 
     /**
@@ -707,7 +707,7 @@ public typealias AsyncTransactionId = RLMAsyncTransactionId
      - warning: This method may only be called during a write transaction.
      */
     public func deleteAll() {
-        RLMDeleteAllObjectsFromRealm(rlmRealm)
+        rlmRealm.deleteAllObjects()
     }
 
     // MARK: Object Retrieval
