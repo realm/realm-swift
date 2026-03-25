@@ -68,7 +68,7 @@ readonly tar_path="${temp_dir}/${versioned_name}.tar.xz"
 readonly temp_path="${tar_path}.tmp"
 
 while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
-    if ! error=$(/usr/bin/curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
+    if ! error=$(/usr/bin/curl -L --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
         tries_left=$((tries_left-1))
     else
         mv "$temp_path" "$tar_path"
