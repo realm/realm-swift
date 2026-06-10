@@ -530,7 +530,7 @@ class SwiftUITests: TestCase {
 
         let filteredResults = ObservedResults(SwiftUIObject.self,
                                               configuration: realm.configuration,
-                                              where: { $0.str.starts(with: "a") },
+                                              whereQuery: { $0.str.starts(with: "a") },
                                               sortDescriptor: SortDescriptor.init(keyPath: \SwiftUIObject.str, ascending: true))
         XCTAssertEqual(filteredResults.wrappedValue.count, 2)
         XCTAssertEqual(filteredResults.wrappedValue[0].str, "antenna")
@@ -755,11 +755,11 @@ class SwiftUITests: TestCase {
 
         filteredResults = ObservedSectionedResults(SwiftUIObject.self,
                                                    sectionKeyPath: \.str,
-                                                   where: { $0.str == "def" },
+                                                   whereQuery: { $0.str == "def" },
                                                    configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(filteredResults.wrappedValue.count, 1)
         XCTAssertEqual(filteredResults.wrappedValue[0].key, "def")
-        fullResults.where = { $0.str == "def" }
+        fullResults.whereQuery = { $0.str == "def" }
         XCTAssertEqual(fullResults.wrappedValue.count, 1)
         XCTAssertEqual(fullResults.wrappedValue[0].key, "def")
         fullResults.filter = NSPredicate(format: "str != %@", "def")
@@ -889,7 +889,7 @@ class SwiftUITests: TestCase {
         objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
                                                           sectionKeyPath: \.str,
                                                           sortDescriptors: [SortDescriptor.init(keyPath: "str")],
-                                                          where: { $0.str == "foo" },
+                                                          whereQuery: { $0.str == "foo" },
                                                           configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
         XCTAssertEqual(objectSectionedResults.wrappedValue.allKeys, ["foo"])
@@ -930,7 +930,7 @@ class SwiftUITests: TestCase {
         objectSectionedResults = ObservedSectionedResults(SwiftUIObject.self,
                                                           sectionBlock: { $0.str.first.map(String.init(_:)) ?? "" },
                                                           sortDescriptors: [SortDescriptor.init(keyPath: "str")],
-                                                          where: { $0.str == "foo" },
+                                                          whereQuery: { $0.str == "foo" },
                                                           configuration: inMemoryRealm(inMemoryIdentifier).configuration)
         XCTAssertEqual(objectSectionedResults.wrappedValue.count, 1)
         XCTAssertEqual(objectSectionedResults.wrappedValue.allKeys, ["f"])

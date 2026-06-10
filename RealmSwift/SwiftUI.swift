@@ -523,7 +523,7 @@ extension Projection: _ObservedResultsValue { }
     }
     /// Stores a type safe query used for filtering the Results. This is mutually exclusive
     /// to the `filter` parameter.
-    @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+    @State public var whereQuery: ((Query<ResultType>) -> Query<Bool>)? {
         willSet {
             storage.filter = newValue?(Query()).predicate
         }
@@ -597,7 +597,7 @@ extension Projection: _ObservedResultsValue { }
      - parameter configuration: The `Realm.Configuration` used when creating the Realm,
      user's sync configuration for the given partition value will be set as the `syncConfiguration`,
      if empty the configuration is set to the `defaultConfiguration`
-     - parameter where: Observations will be made only for passing objects.
+     - parameter whereQuery: Observations will be made only for passing objects.
      If no type safe query is given - all objects will be observed
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
@@ -606,12 +606,12 @@ extension Projection: _ObservedResultsValue { }
      */
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
-                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                whereQuery: ((Query<ResultType>) -> Query<Bool>)? = nil,
                 keyPaths: [String]? = nil,
                 sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
         self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
-        self.where = `where`
+        self.whereQuery = whereQuery
         self.sortDescriptor = sortDescriptor
     }
     /// :nodoc:
@@ -727,7 +727,7 @@ extension Projection: _ObservedResultsValue { }
     }
     /// Stores a type safe query used for filtering the SectionedResults. This is mutually exclusive
     /// to the `filter` parameter.
-    @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+    @State public var whereQuery: ((Query<ResultType>) -> Query<Bool>)? {
         willSet {
             storage.filter = newValue?(Query()).predicate
         }
@@ -764,7 +764,7 @@ extension Projection: _ObservedResultsValue { }
                  sectionBlock: @escaping ((ResultType) -> Key),
                  sortDescriptors: [SortDescriptor] = [],
                  filter: NSPredicate? = nil,
-                 where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                 whereQuery: ((Query<ResultType>) -> Query<Bool>)? = nil,
                  keyPaths: [String]? = nil,
                  keyPathString: String? = nil,
                  configuration: Realm.Configuration? = nil) where ResultType: AnyObject {
@@ -775,10 +775,10 @@ extension Projection: _ObservedResultsValue { }
                                keyPathString: keyPathString,
                                keyPaths: keyPaths)
         self.storage.configuration = configuration
-        if let filter = filter {
+        if let filter {
             self.filter = filter
-        } else if let `where` = `where` {
-            self.where = `where`
+        } else if let whereQuery {
+            self.whereQuery = whereQuery
         }
         self.sortDescriptors = sortDescriptors
     }
@@ -908,7 +908,7 @@ extension Projection: _ObservedResultsValue { }
      - parameter type: Observed type
      - parameter sectionBlock: A callback which returns the section key for each object in the collection.
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
-     - parameter where: Observations will be made only for passing objects.
+     - parameter whereQuery: Observations will be made only for passing objects.
      If no type safe query is given - all objects will be observed.
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
@@ -921,13 +921,13 @@ extension Projection: _ObservedResultsValue { }
     public init(_ type: ResultType.Type,
                 sectionBlock: @escaping ((ResultType) -> Key),
                 sortDescriptors: [SortDescriptor] = [],
-                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                whereQuery: ((Query<ResultType>) -> Query<Bool>)? = nil,
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
         self.init(type: type,
                   sectionBlock: sectionBlock,
                   sortDescriptors: sortDescriptors,
-                  where: `where`,
+                  whereQuery: whereQuery,
                   keyPaths: keyPaths,
                   configuration: configuration)
     }
@@ -938,7 +938,7 @@ extension Projection: _ObservedResultsValue { }
      - parameter sectionKeyPath: The keyPath that will produce the key for each section.
      For every unique value retrieved from the keyPath a section key will be generated.
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
-     - parameter where: Observations will be made only for passing objects.
+     - parameter whereQuery: Observations will be made only for passing objects.
      If no type safe query is given - all objects will be observed.
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
@@ -951,13 +951,13 @@ extension Projection: _ObservedResultsValue { }
     public init(_ type: ResultType.Type,
                 sectionKeyPath: KeyPath<ResultType, Key>,
                 sortDescriptors: [SortDescriptor] = [],
-                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                whereQuery: ((Query<ResultType>) -> Query<Bool>)? = nil,
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil) where ResultType: Object {
         self.init(type: type,
                   sectionBlock: { (obj: ResultType) in obj[keyPath: sectionKeyPath] },
                   sortDescriptors: sortDescriptors,
-                  where: `where`,
+                  whereQuery: whereQuery,
                   keyPaths: keyPaths,
                   keyPathString: _name(for: sectionKeyPath),
                   configuration: configuration)
