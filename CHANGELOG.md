@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+20.0.5 Release notes (2026-06-14)
 =============================================================
 
 * Fix compilation with Xcode 27.
