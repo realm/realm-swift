@@ -1,3 +1,22 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+* Fix compilation with Xcode 27.
+* When using Xcode 27, the `where` property on some SwiftUI helpers is defined
+  differently to work around backtick-escaped names not working in macro
+  expansions. The new definition appears to be API-compatible, but please
+  report if there is some case where it does not work.
+
+### Compatibility
+
+* Carthage release for Swift is built with Xcode 26.5.
+* CocoaPods: 1.10 or later.
+* Xcode: 26.1-27
+
+### Internal
+
+* Upgraded realm-core from 20.1.4 to 20.1.5
+
 20.0.4 Release notes (2026-02-22)
 =============================================================
 
