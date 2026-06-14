@@ -521,6 +521,25 @@ extension Projection: _ObservedResultsValue { }
             storage.filter = newValue
         }
     }
+
+#if compiler(>=6.4)
+    /// Stores a type safe query used for filtering the Results. This is mutually exclusive
+    /// to the `filter` parameter.
+    public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        get {
+            self.whereStorage
+        }
+        nonmutating set {
+            self.whereStorage = newValue
+        }
+    }
+
+    @State private var whereStorage: ((Query<ResultType>) -> Query<Bool>)? {
+        willSet {
+            storage.filter = newValue?(Query()).predicate
+        }
+    }
+#else
     /// Stores a type safe query used for filtering the Results. This is mutually exclusive
     /// to the `filter` parameter.
     @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
@@ -528,6 +547,8 @@ extension Projection: _ObservedResultsValue { }
             storage.filter = newValue?(Query()).predicate
         }
     }
+#endif
+
     /// :nodoc:
     @State public var sortDescriptor: SortDescriptor? {
         willSet {
@@ -725,13 +746,34 @@ extension Projection: _ObservedResultsValue { }
             storage.filter = newValue
         }
     }
-    /// Stores a type safe query used for filtering the SectionedResults. This is mutually exclusive
+
+#if compiler(>=6.4)
+    /// Stores a type safe query used for filtering the Results. This is mutually exclusive
+    /// to the `filter` parameter.
+    public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
+        get {
+            self.whereStorage
+        }
+        nonmutating set {
+            self.whereStorage = newValue
+        }
+    }
+
+    @State private var whereStorage: ((Query<ResultType>) -> Query<Bool>)? {
+        willSet {
+            storage.filter = newValue?(Query()).predicate
+        }
+    }
+#else
+    /// Stores a type safe query used for filtering the Results. This is mutually exclusive
     /// to the `filter` parameter.
     @State public var `where`: ((Query<ResultType>) -> Query<Bool>)? {
         willSet {
             storage.filter = newValue?(Query()).predicate
         }
     }
+#endif
+
     /// :nodoc:
     @State public var sortDescriptors: [SortDescriptor] = [] {
         willSet {

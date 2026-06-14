@@ -6,9 +6,9 @@ if os == :catalyst
   os = :ios
 end
 version = case os
-          when :osx then 10.15
-          when :ios, :tvos then 12.0
-          when :watchos then 5.0
+          when :osx then 12.0
+          when :ios, :tvos then 15.0
+          when :watchos then 9.0
           end
 target 'App' do
   platform os, version
