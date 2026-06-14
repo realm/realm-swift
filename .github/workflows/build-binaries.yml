@@ -63,7 +63,7 @@ jobs:
           path: core/realm-Release-*.tar.gz
 
   combine-xcframework:
-    runs-on: macos-14
+    runs-on: macos-26
     name: Publish xcframework for Core ${{ inputs.core-version }}
     environment:
       name: Prebuilds
