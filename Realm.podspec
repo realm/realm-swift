@@ -97,18 +97,22 @@ Pod::Spec.new do |s|
                                 'IPHONEOS_DEPLOYMENT_TARGET_1500' => '12.0',
                                 'IPHONEOS_DEPLOYMENT_TARGET_1600' => '12.0',
                                 'IPHONEOS_DEPLOYMENT_TARGET_2600' => '12.0',
+                                'IPHONEOS_DEPLOYMENT_TARGET_2700' => '15.0',
                                 'IPHONEOS_DEPLOYMENT_TARGET' => '$(IPHONEOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
                                 'MACOSX_DEPLOYMENT_TARGET_1500' => '10.13',
                                 'MACOSX_DEPLOYMENT_TARGET_1600' => '10.13',
                                 'MACOSX_DEPLOYMENT_TARGET_2600' => '10.13',
+                                'MACOSX_DEPLOYMENT_TARGET_2700' => '12.0',
                                 'MACOSX_DEPLOYMENT_TARGET' => '$(MACOSX_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
                                 'WATCHOS_DEPLOYMENT_TARGET_1500' => '4.0',
                                 'WATCHOS_DEPLOYMENT_TARGET_1600' => '4.0',
                                 'WATCHOS_DEPLOYMENT_TARGET_2600' => '4.0',
+                                'WATCHOS_DEPLOYMENT_TARGET_2700' => '9.0',
                                 'WATCHOS_DEPLOYMENT_TARGET' => '$(WATCHOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
                                 'TVOS_DEPLOYMENT_TARGET_1500' => '12.0',
                                 'TVOS_DEPLOYMENT_TARGET_1600' => '12.0',
                                 'TVOS_DEPLOYMENT_TARGET_2600' => '12.0',
+                                'TVOS_DEPLOYMENT_TARGET_2700' => '15.0',
                                 'TVOS_DEPLOYMENT_TARGET' => '$(TVOS_DEPLOYMENT_TARGET_$(XCODE_VERSION_MAJOR))',
 
                                 'OTHER_LDFLAGS' => '"-Wl,-unexported_symbols_list,${PODS_ROOT}/Realm/Configuration/Realm/PrivateSymbols.txt"',
@@ -116,10 +120,10 @@ Pod::Spec.new do |s|
   s.preserve_paths          = %w(include scripts Configuration/Realm/PrivateSymbols.txt)
   s.resource_bundles        = {'realm_objc_privacy' => ['Realm/PrivacyInfo.xcprivacy']}
 
-  s.ios.deployment_target   = '12.0'
-  s.osx.deployment_target   = '10.13'
-  s.watchos.deployment_target = '4.0'
-  s.tvos.deployment_target = '12.0'
+  s.ios.deployment_target   = '15.0'
+  s.osx.deployment_target   = '12.0'
+  s.watchos.deployment_target = '9.0'
+  s.tvos.deployment_target = '15.0'
 
   s.vendored_frameworks  = 'core/realm-monorepo.xcframework'
 
