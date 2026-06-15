@@ -38,7 +38,7 @@ public final class MutableSet<Element: RealmCollectionValue>: RLMSwiftCollection
     internal var rlmSet: RLMSet<AnyObject> {
         unsafeDowncast(_rlmCollection, to: RLMSet.self)
     }
-    internal var collection: RLMCollection {
+    @usableFromInline internal var collection: RLMCollection {
         _rlmCollection
     }
 

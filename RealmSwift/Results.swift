@@ -110,7 +110,7 @@ extension Projection: KeypathSortable {}
  Results instances cannot be directly instantiated.
  */
 @frozen public struct Results<Element: RealmCollectionValue>: Equatable, RealmCollectionImpl {
-    internal let collection: RLMCollection
+    @usableFromInline internal let collection: RLMCollection
 
     /// A human-readable description of the objects represented by the results.
     public var description: String {
@@ -119,7 +119,7 @@ extension Projection: KeypathSortable {}
 
     // MARK: Initializers
 
-    internal init(collection: RLMCollection) {
+    @usableFromInline internal init(collection: RLMCollection) {
         self.collection = collection
     }
     internal init(_ collection: RLMCollection) {
