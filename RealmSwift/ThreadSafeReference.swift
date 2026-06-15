@@ -218,7 +218,5 @@ extension Realm {
 
 extension ThreadSafeReference: Sendable {
 }
-extension RLMThreadSafeReference: @unchecked Sendable {
-}
 extension ThreadSafe: @unchecked Sendable {
 }
