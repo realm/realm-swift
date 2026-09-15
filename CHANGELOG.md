@@ -1,3 +1,14 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+Fix a few warnings when building with Xcode 27 and updating packaging for Xcode 27.
+
+### Compatibility
+
+* Carthage release for Swift is built with Xcode 27.
+* CocoaPods: 1.10 or later.
+* Xcode: 26.1-27.0
+
 20.0.5 Release notes (2026-06-14)
 =============================================================
 
