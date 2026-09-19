@@ -29,7 +29,7 @@ import Realm
  Note that only types defined by Realm can meaningfully conform to this protocol, and defining new
  classes which attempt to conform to it will not make them work with `ThreadSafeReference`.
  */
-public protocol ThreadConfined {
+public protocol ThreadConfined: SendableMetatype {
     /**
      The Realm which manages the object, or `nil` if the object is unmanaged.
 
@@ -217,8 +217,6 @@ extension Realm {
 }
 
 extension ThreadSafeReference: Sendable {
-}
-extension RLMThreadSafeReference: @unchecked Sendable {
 }
 extension ThreadSafe: @unchecked Sendable {
 }

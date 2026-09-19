@@ -188,7 +188,7 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
-    func observeChange<T: Equatable>(
+    func observeChange<T: Equatable & SendableMetatype>(
         _ obj: SwiftKVOObject, _ keyPath: KeyPath<SwiftKVOObject, T>, _ old: T, _ new: T,
         fileName: StaticString = #filePath, lineNumber: UInt = #line, _ block: () -> Void
     ) {
@@ -209,7 +209,7 @@ class KVOTests: TestCase {
         XCTAssertTrue(gotNotification, file: (fileName), line: lineNumber)
     }
 
-    func observeChange<T: Equatable>(
+    func observeChange<T: Equatable & SendableMetatype>(
         _ obj: SwiftKVOObject, _ keyPath: KeyPath<SwiftKVOObject, T?>, _ old: T?, _ new: T?,
         fileName: StaticString = #filePath, lineNumber: UInt = #line, _ block: () -> Void
     ) {
