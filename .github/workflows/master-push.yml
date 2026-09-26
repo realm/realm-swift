@@ -30,7 +30,7 @@ jobs:
             version="$(sed -n 's/^VERSION=\(.*\)$/\1/p' "${GITHUB_WORKSPACE}/dependencies.list")"
             echo "VERSION=$version" >> $GITHUB_OUTPUT
   build-docs:
-      runs-on: macos-26
+      runs-on: xcode-27
       name: Package docs
       needs: prepare
       steps:
@@ -46,7 +46,7 @@ jobs:
             name: realm-docs
             path: docs/realm-docs.zip
   build-examples:
-      runs-on: macos-26
+      runs-on: xcode-27
       name: Package examples
       needs: prepare
       steps:
@@ -114,7 +114,7 @@ jobs:
             path: build.tar
             compression-level: 1
   package-release:
-      runs-on: macos-26
+      runs-on: xcode-27
       name: Package release file
       needs: [build-product, prepare]
       steps:
@@ -141,7 +141,7 @@ jobs:
             name: test-release-package
             path: pkg/realm-swift-${{ needs.prepare.outputs.VERSION }}.zip
   test-package-examples:
-      runs-on: macos-26
+      runs-on: xcode-27
       name: Test examples
       needs: [package-release, prepare]
       steps:
@@ -153,7 +153,7 @@ jobs:
         - name: Test examples
           run: sh -x build.sh release-test-examples
   test-ios-static:
-      runs-on: macos-26
+      runs-on: xcode-27
       name: Run tests on iOS with configuration Static
       needs: package-release
       steps:
@@ -161,7 +161,7 @@ jobs:
         - name: Test ios static
           run: sh -x build.sh test-ios-static
   test-osx-static:
-      runs-on: macos-26
+      runs-on: xcode-27
       name: Run tests on macOS
       needs: package-release
       steps:
@@ -171,7 +171,7 @@ jobs:
             export REALM_DISABLE_METADATA_ENCRYPTION=1
             sh -x build.sh test-osx
   test-installation:
-      runs-on: macos-26
+      runs-on: xcode-27
       name: Run installation test
       needs: [package-release, prepare]
       env:
