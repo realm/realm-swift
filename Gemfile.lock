@@ -102,7 +102,7 @@ GEM
     logger (1.7.0)
     minitest (5.27.0)
     molinillo (0.8.0)
-    mustache (1.1.3)
+    mustache (1.1.2)
     mutex_m (0.3.0)
     nanaimo (0.4.0)
     nap (1.1.0)
@@ -156,6 +156,7 @@ DEPENDENCIES
   fileutils
   jazzy
   jwt
+  mustache (= 1.1.2)
   octokit
   pathname (= 0.3.0)
 
