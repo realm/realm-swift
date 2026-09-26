@@ -4086,8 +4086,10 @@ class CombineAsyncRealmTests: CombinePublisherTestCase {
         cancellable = realm.objectWillChange.sink {
             exp.fulfill()
         }
+        let configuration = self.realm.configuration
+        let queue = self.queue
         queue.async {
-            let realm = try! Realm(configuration: self.realm.configuration, queue: self.queue)
+            let realm = try! Realm(configuration: configuration, queue: queue)
             realm.writeAsync {
                 realm.create(SwiftIntObject.self)
             }

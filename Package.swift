@@ -1,16 +1,10 @@
-// swift-tools-version:5.10
+// swift-tools-version:6.2.1
 
 import PackageDescription
 import Foundation
 
 let coreVersion = Version("20.1.5")
 let cocoaVersion = Version("20.0.5")
-
-#if compiler(>=6)
-let swiftVersion = [SwiftVersion.version("6")]
-#else
-let swiftVersion = [SwiftVersion.v5]
-#endif
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
@@ -46,7 +40,7 @@ let package = Package(
         .macOS(.v10_13),
         .iOS(.v12),
         .tvOS(.v12),
-        .watchOS(.v4)
+        .watchOS(.v9)
     ],
     products: [
         .library(
@@ -207,6 +201,6 @@ let package = Package(
             ]
         ),
     ],
-    swiftLanguageVersions: swiftVersion,
+    swiftLanguageVersions: [.version("6")],
     cxxLanguageStandard: .cxx20
 )

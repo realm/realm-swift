@@ -92,7 +92,7 @@ void RLMVerifyHasPrimaryKey(Class cls) {
 
 using realm::CreatePolicy;
 static CreatePolicy updatePolicyToCreatePolicy(RLMUpdatePolicy policy) {
-    CreatePolicy createPolicy = {.create = true, .copy = false, .diff = false, .update = false};
+    CreatePolicy createPolicy = {.create = true, .copy = false, .update = false, .diff = false};
     switch (policy) {
         case RLMUpdatePolicyError:
             break;
@@ -140,7 +140,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 void RLMCreateAsymmetricObjectInRealm(RLMRealm *realm, NSString *className, id value) {
     RLMVerifyInWriteTransaction(realm);
 
-    CreatePolicy createPolicy = {.create = true, .copy = true, .diff = false, .update = false};
+    CreatePolicy createPolicy = {.create = true, .copy = true, .update = false, .diff = false};
 
     auto& info = realm->_info[className];
     RLMAccessorContext c{info};

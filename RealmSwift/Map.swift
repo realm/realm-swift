@@ -21,7 +21,7 @@ import Realm
 import Realm.Private
 
 /// :nodoc:
-public protocol _MapKey: Hashable, _ObjcBridgeable {
+public protocol _MapKey: Hashable, SendableMetatype, _ObjcBridgeable {
     static var _rlmType: RLMPropertyType { get }
 }
 extension String: _MapKey { }

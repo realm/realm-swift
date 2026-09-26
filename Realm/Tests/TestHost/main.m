@@ -18,11 +18,24 @@ int main(int argc, const char *argv[]) {
 
 #import <UIKit/UIKit.h>
 
+@interface RLMSceneDelegate : UIResponder <UIWindowSceneDelegate>
+@end
+
+@implementation RLMSceneDelegate
+@end
+
 @interface RLMAppDelegate : UIResponder <UIApplicationDelegate>
-@property (strong, nonatomic) UIWindow *window;
 @end
 
 @implementation RLMAppDelegate
+- (UISceneConfiguration *)application:(UIApplication *)application
+    configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession
+    options:(UISceneConnectionOptions *)options {
+    UISceneConfiguration *configuration =
+        [[UISceneConfiguration alloc] initWithName:nil sessionRole:connectingSceneSession.role];
+    configuration.delegateClass = [RLMSceneDelegate class];
+    return configuration;
+}
 @end
 
 int main(int argc, char *argv[]) {

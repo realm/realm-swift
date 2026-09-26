@@ -183,7 +183,7 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 /// actually work. Most of the logic for how to store values in Realm is not
 /// implemented in Swift and there is currently no extension mechanism for
 /// supporting more types.
-public protocol RealmCollectionValue: Hashable, _HasPersistedType where PersistedType: RealmCollectionValue {
+public protocol RealmCollectionValue: Hashable, SendableMetatype, _HasPersistedType where PersistedType: RealmCollectionValue {
     // Get the zero/empty/nil value for this type. Used to supply a default
     // when the user does not declare one in their model.
     /// :nodoc:
@@ -229,7 +229,7 @@ public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProto
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmCollection: RealmCollectionBase, Equatable where Iterator == RLMIterator<Element> {
+public protocol RealmCollection: RealmCollectionBase, SendableMetatype, Equatable where Iterator == RLMIterator<Element> {
     // MARK: Properties
 
     /// The Realm which manages the collection, or `nil` for unmanaged collections.
