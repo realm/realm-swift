@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+20.0.6 Release notes (2026-09-26)
 =============================================================
 
 Fix a few warnings when building with Xcode 27 and updating packaging for Xcode 27.
