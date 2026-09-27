@@ -1823,9 +1823,9 @@ extension RealmCollection {
  collection directly.
  */
 @frozen public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollectionImpl {
-    internal let collection: RLMCollection
+    @usableFromInline internal let collection: RLMCollection
     internal var lastAccessedNames: NSMutableArray?
-    internal init(collection: RLMCollection) {
+    @usableFromInline internal init(collection: RLMCollection) {
         self.collection = collection
     }
 

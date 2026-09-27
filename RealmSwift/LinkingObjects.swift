@@ -83,12 +83,12 @@ import Realm
         self.propertyName = propertyName
         self.handle = handle
     }
-    internal init(collection: RLMCollection) {
+    @usableFromInline internal init(collection: RLMCollection) {
         self.propertyName = ""
         self.handle = RLMLinkingObjectsHandle(linkingObjects: collection as! RLMResults<AnyObject>)
     }
 
-    internal var collection: RLMCollection {
+    @usableFromInline internal var collection: RLMCollection {
         return handle?.results ?? RLMResults<AnyObject>.emptyDetached()
     }
 

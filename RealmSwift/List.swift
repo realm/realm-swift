@@ -38,7 +38,7 @@ public final class List<Element: RealmCollectionValue>: RLMSwiftCollectionBase, 
     internal var rlmArray: RLMArray<AnyObject> {
         unsafeDowncast(collection, to: RLMArray<AnyObject>.self)
     }
-    internal var collection: RLMCollection {
+    @usableFromInline internal var collection: RLMCollection {
         _rlmCollection
     }
 
