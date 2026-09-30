@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.homepage                = "https://realm.io"
   s.source                  = { :git => 'https://github.com/realm/realm-swift.git', :tag => "v#{s.version}" }
   s.author                  = { 'Realm' => 'realm-help@mongodb.com' }
-  s.library                 = 'c++', 'z', 'compression'
+  s.library                 = 'z', 'compression'
   s.requires_arc            = true
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
