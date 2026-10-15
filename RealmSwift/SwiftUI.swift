@@ -299,7 +299,7 @@ private class ObservableResultsStorage<T>: ObservableStorage<T> where T: RealmSu
         setupHasRun = true
     }
 
-    var sortDescriptor: SortDescriptor? {
+    var sortDescriptors: [SortDescriptor] = [] {
         didSet {
             didSet()
         }
@@ -495,8 +495,8 @@ extension Projection: _ObservedResultsValue { }
         override func updateValue() {
             let realm = try! Realm(configuration: configuration ?? Realm.Configuration.defaultConfiguration)
             var value = realm.objects(ResultType.self)
-            if let sortDescriptor = sortDescriptor {
-                value = value.sorted(byKeyPath: sortDescriptor.keyPath, ascending: sortDescriptor.ascending)
+            if !sortDescriptors.isEmpty {
+                value = value.sorted(by: sortDescriptors)
             }
 
             let filters = [searchFilter, filter].compactMap { $0 }
@@ -550,9 +550,9 @@ extension Projection: _ObservedResultsValue { }
 #endif
 
     /// :nodoc:
-    @State public var sortDescriptor: SortDescriptor? {
+    @State public var sortDescriptors: [SortDescriptor] = [] {
         willSet {
-            storage.sortDescriptor = newValue
+            storage.sortDescriptors = newValue
         }
     }
     /// :nodoc:
@@ -576,18 +576,28 @@ extension Projection: _ObservedResultsValue { }
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
      String key paths which do not correspond to a valid a property will throw an exception.
-     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by
      */
     public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
                                         configuration: Realm.Configuration? = nil,
                                         filter: NSPredicate? = nil,
                                         keyPaths: [String]? = nil,
-                                        sortDescriptor: SortDescriptor? = nil) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
+                                        sortDescriptors: [SortDescriptor] = []) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
         let results = Results<ResultType>(RLMResults<ResultType>.emptyDetached())
         self.storage = Storage(results, keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
-        self.sortDescriptor = sortDescriptor
+        self.sortDescriptors = sortDescriptors
+    }
+    /// :nodoc:
+    @available(*, deprecated, message: "Use the initializer which takes `sortDescriptors: [SortDescriptor]` instead")
+    public init<ObjectType: ObjectBase>(_ type: ResultType.Type,
+                                        configuration: Realm.Configuration? = nil,
+                                        filter: NSPredicate? = nil,
+                                        keyPaths: [String]? = nil,
+                                        sortDescriptor: SortDescriptor?) where ResultType: Projection<ObjectType>, ObjectType: ThreadConfined {
+        self.init(type, configuration: configuration, filter: filter, keyPaths: keyPaths,
+                  sortDescriptors: sortDescriptor.map { [$0] } ?? [])
     }
     /**
      Initialize a `ObservedResults` struct for a given `Object` or `EmbeddedObject` type.
@@ -600,17 +610,27 @@ extension Projection: _ObservedResultsValue { }
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
      String key paths which do not correspond to a valid a property will throw an exception.
-     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by
      */
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
                 filter: NSPredicate? = nil,
                 keyPaths: [String]? = nil,
-                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+                sortDescriptors: [SortDescriptor] = []) where ResultType: Object {
         self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
         self.filter = filter
-        self.sortDescriptor = sortDescriptor
+        self.sortDescriptors = sortDescriptors
+    }
+    /// :nodoc:
+    @available(*, deprecated, message: "Use the initializer which takes `sortDescriptors: [SortDescriptor]` instead")
+    public init(_ type: ResultType.Type,
+                configuration: Realm.Configuration? = nil,
+                filter: NSPredicate? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptor: SortDescriptor?) where ResultType: Object {
+        self.init(type, configuration: configuration, filter: filter, keyPaths: keyPaths,
+                  sortDescriptors: sortDescriptor.map { [$0] } ?? [])
     }
     /**
      Initialize a `ObservedResults` struct for a given `Object` or `EmbeddedObject` type.
@@ -623,26 +643,45 @@ extension Projection: _ObservedResultsValue { }
      - parameter keyPaths: Only properties contained in the key paths array will be observed.
      If `nil`, notifications will be delivered for any property change on the object.
      String key paths which do not correspond to a valid a property will throw an exception.
-     - parameter sortDescriptor: A sequence of `SortDescriptor`s to sort by
+     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by
      */
     public init(_ type: ResultType.Type,
                 configuration: Realm.Configuration? = nil,
                 where: ((Query<ResultType>) -> Query<Bool>)? = nil,
                 keyPaths: [String]? = nil,
-                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+                sortDescriptors: [SortDescriptor] = []) where ResultType: Object {
         self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
         self.where = `where`
-        self.sortDescriptor = sortDescriptor
+        self.sortDescriptors = sortDescriptors
+    }
+    /// :nodoc:
+    @available(*, deprecated, message: "Use the initializer which takes `sortDescriptors: [SortDescriptor]` instead")
+    public init(_ type: ResultType.Type,
+                configuration: Realm.Configuration? = nil,
+                where: ((Query<ResultType>) -> Query<Bool>)? = nil,
+                keyPaths: [String]? = nil,
+                sortDescriptor: SortDescriptor?) where ResultType: Object {
+        self.init(type, configuration: configuration, where: `where`, keyPaths: keyPaths,
+                  sortDescriptors: sortDescriptor.map { [$0] } ?? [])
     }
     /// :nodoc:
     public init(_ type: ResultType.Type,
                 keyPaths: [String]? = nil,
                 configuration: Realm.Configuration? = nil,
-                sortDescriptor: SortDescriptor? = nil) where ResultType: Object {
+                sortDescriptors: [SortDescriptor] = []) where ResultType: Object {
         self.storage = Storage(Results(RLMResults<ResultType>.emptyDetached()), keyPaths)
         self.storage.configuration = configuration
-        self.sortDescriptor = sortDescriptor
+        self.sortDescriptors = sortDescriptors
+    }
+    /// :nodoc:
+    @available(*, deprecated, message: "Use the initializer which takes `sortDescriptors: [SortDescriptor]` instead")
+    public init(_ type: ResultType.Type,
+                keyPaths: [String]? = nil,
+                configuration: Realm.Configuration? = nil,
+                sortDescriptor: SortDescriptor?) where ResultType: Object {
+        self.init(type, keyPaths: keyPaths, configuration: configuration,
+                  sortDescriptors: sortDescriptor.map { [$0] } ?? [])
     }
 
     nonisolated public func update() {
@@ -707,11 +746,6 @@ extension Projection: _ObservedResultsValue { }
             }
         }
 
-        var sortDescriptors: [SortDescriptor] = [] {
-            didSet {
-                didSet()
-            }
-        }
         var sectionBlock: ((ResultType) -> Key)
         var keyPathString: String?
 
@@ -721,15 +755,15 @@ extension Projection: _ObservedResultsValue { }
              keyPathString: String? = nil,
              keyPaths: [String]? = nil) {
             self.sectionBlock = sectionBlock
+            self.keyPathString = keyPathString
+            super.init(value, keyPaths)
             self.sortDescriptors = sortDescriptors
-            if let keyPathString = keyPathString {
-                self.keyPathString = keyPathString
-                self.sortDescriptors.append(.init(keyPath: keyPathString, ascending: true))
+            if keyPathString != nil {
+                self.sortDescriptors.append(.init(keyPath: keyPathString!, ascending: true))
             }
             if self.sortDescriptors.isEmpty {
                 throwRealmException("sortDescriptors must not be empty when sectioning ObservedSectionedResults with `sectionBlock`")
             }
-            super.init(value, keyPaths)
         }
     }
 

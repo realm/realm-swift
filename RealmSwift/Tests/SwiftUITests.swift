@@ -409,17 +409,36 @@ class SwiftUITests: TestCase {
         var sortedResults = ObservedResults(SwiftUIObject.self,
                                             configuration: inMemoryRealm(inMemoryIdentifier).configuration,
                                             filter: NSPredicate(format: "int >= 0"),
-                                            sortDescriptor: SortDescriptor(keyPath: "int", ascending: true))
+                                            sortDescriptors: [SortDescriptor(keyPath: "int", ascending: true)])
         XCTAssertEqual(sortedResults.wrappedValue.count, 2)
         XCTAssertEqual(sortedResults.wrappedValue[0].int, 0)
         XCTAssertEqual(sortedResults.wrappedValue[1].int, 1)
         sortedResults = ObservedResults(SwiftUIObject.self,
                                         configuration: inMemoryRealm(inMemoryIdentifier).configuration,
                                         filter: NSPredicate(format: "int >= 0"),
-                                        sortDescriptor: SortDescriptor(keyPath: "int", ascending: false))
+                                        sortDescriptors: [SortDescriptor(keyPath: "int", ascending: false)])
         XCTAssertEqual(sortedResults.wrappedValue.count, 2)
         XCTAssertEqual(sortedResults.wrappedValue[0].int, 1)
         XCTAssertEqual(sortedResults.wrappedValue[1].int, 0)
+    }
+    @MainActor func testResultsMultipleSortDescriptors() throws {
+        let realm = inMemoryRealm(inMemoryIdentifier)
+        try realm.write {
+            realm.add(SwiftUIObject(value: ["str": "b", "int": 1]))
+            realm.add(SwiftUIObject(value: ["str": "a", "int": 2]))
+            realm.add(SwiftUIObject(value: ["str": "a", "int": 1]))
+        }
+        let sortedResults = ObservedResults(SwiftUIObject.self,
+                                            configuration: realm.configuration,
+                                            sortDescriptors: [SortDescriptor(keyPath: \SwiftUIObject.str, ascending: true),
+                                                              SortDescriptor(keyPath: \SwiftUIObject.int, ascending: false)])
+        XCTAssertEqual(sortedResults.wrappedValue.count, 3)
+        XCTAssertEqual(sortedResults.wrappedValue[0].str, "a")
+        XCTAssertEqual(sortedResults.wrappedValue[0].int, 2)
+        XCTAssertEqual(sortedResults.wrappedValue[1].str, "a")
+        XCTAssertEqual(sortedResults.wrappedValue[1].int, 1)
+        XCTAssertEqual(sortedResults.wrappedValue[2].str, "b")
+        XCTAssertEqual(sortedResults.wrappedValue[2].int, 1)
     }
     @MainActor func testResultsAppendManagedObject() throws {
         @ObservedResults(SwiftUIObject.self, configuration: inMemoryRealm(inMemoryIdentifier).configuration) var state
@@ -531,7 +550,7 @@ class SwiftUITests: TestCase {
         let filteredResults = ObservedResults(SwiftUIObject.self,
                                               configuration: realm.configuration,
                                               where: { $0.str.starts(with: "a") },
-                                              sortDescriptor: SortDescriptor.init(keyPath: \SwiftUIObject.str, ascending: true))
+                                              sortDescriptors: [SortDescriptor(keyPath: \SwiftUIObject.str, ascending: true)])
         XCTAssertEqual(filteredResults.wrappedValue.count, 2)
         XCTAssertEqual(filteredResults.wrappedValue[0].str, "antenna")
     }

@@ -1,3 +1,20 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+### Enhancements
+
+* `@ObservedResults` now accepts multiple sort descriptors via a new
+  `sortDescriptors: [SortDescriptor]` parameter, matching its documentation and
+  `ObservedSectionedResults`. The initializers taking a single
+  `sortDescriptor: SortDescriptor?` are deprecated.
+  ([#7709](https://github.com/realm/realm-swift/issues/7709))
+
+### Compatibility
+
+* Carthage release for Swift is built with Xcode 27.
+* CocoaPods: 1.10 or later.
+* Xcode: 26.1-27.0
+
 20.0.6 Release notes (2026-09-26)
 =============================================================
 
