@@ -8,7 +8,6 @@ let cocoaVersion = Version("20.0.6")
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
-    .headerSearchPath("include"),
     .define("REALM_SPM", to: "1"),
     .define("REALM_COCOA_VERSION", to: "@\"\(cocoaVersion)\""),
     .define("REALM_VERSION", to: "\"\(coreVersion)\""),
