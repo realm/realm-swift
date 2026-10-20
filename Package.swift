@@ -14,7 +14,6 @@ let swiftVersion = [SwiftVersion.v5]
 
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
-    .headerSearchPath("include"),
     .define("REALM_SPM", to: "1"),
     .define("REALM_ENABLE_SYNC", to: "1"),
     .define("REALM_COCOA_VERSION", to: "@\"\(cocoaVersion)\""),
